@@ -7,6 +7,9 @@
 ###< symfony/framework-bundle ###
 
 ###> others ###
-/.idea/
 /docs/
+/.idea/
+/public-dev/
+
+.php_cs.cache
 ###< others ###
