@@ -2,12 +2,13 @@
 
 namespace App\Controller;
 
+use App\Repository\TrickRepository;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 /**
  * Class HomeController
- * manage homepage display.
+ * This class manages homepage display.
  */
 class HomeController extends Controller
 {
@@ -16,21 +17,13 @@ class HomeController extends Controller
      *
      * @Route("/", name="home")
      *
+     * @param TrickRepository $repository
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function index()
+    public function index(TrickRepository $repository)
     {
-        $tricks = [];
-        for ($i = 1; $i <= 45; ++$i) {
-            $tricks[$i] = new \stdClass();
-            $tricks[$i]->title = 'Trick '.$i;
-            $tricks[$i]->description = 'Here is content for trick '.$i.'<br> with 2 lines.';
-            $tricks[$i]->trickGroup = 'Ollies';
-        }
-
         return $this->render('home/index.html.twig', [
-            'controller_name' => 'HomeController',
-            'tricks' => $tricks,
+            'tricks' => $repository->findLatestByLimit(15)
         ]);
     }
 }
