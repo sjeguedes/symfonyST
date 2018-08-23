@@ -1,0 +1,9 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+    <h1>Error {{ errorCode }}</h1>
+    <p>
+        { errorMessage }<br>
+        <a href="{{ path('home') }}" title="Go back to the homepage">Go back to the homepage</a>.
+    </p>
+{% endblock %}
