@@ -1,0 +1,46 @@
+trick_groups:
+    -
+        #1
+        fields:
+            name: "Straight air"
+            description: "No description is available."
+    -
+        #2
+        fields:
+            name: "Grabs"
+            description: "No description is available."
+    -
+        #3
+        fields:
+            name: "Spins"
+            description: "No description is available."
+    -
+        #4
+        fields:
+            name: "Flips and inverted rotations"
+            description: "No description is available."
+    -
+        #5
+        fields:
+            name: "Inverted hand plants"
+            description: "No description is available."
+    -
+        #6
+        fields:
+            name: "Slides"
+            description: "No description is available."
+    -
+        #7
+        fields:
+            name: "Stalls"
+            description: "No description is available."
+    -
+        #8
+        fields:
+            name: "Tweaks and variations"
+            description: "No description is available."
+    -
+        #9
+        fields:
+            name: "Miscellaneous tricks and identifiers"
+            description: "No description is available."
