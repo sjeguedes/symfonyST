@@ -1,27 +1,33 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Utils\Traits;
 
-trait TwigHelpersTrait
+use Twig\Environment;
+
+/**
+ * Trait TwigHelperTrait.
+ *
+ * Enable use of Twig particular templating.
+ */
+trait TwigHelperTrait
 {
     /**
-     * @param $template
-     * @param $block
-     * @param array $params
+     * Enable Twig block template rendering.
+     *
+     * @param Environment $twig
+     * @param string      $template
+     * @param string      $block
+     * @param array       $params
      *
      * @return string
      *
-     * @throws \Twig_Error_Loader
-     * @throws \Twig_Error_Runtime
-     * @throws \Twig_Error_Syntax
+     * @throws \Throwable
      */
-    public function renderBlock(string $template, $block, $params = array())
+    public function renderBlock(Environment $twig, string $template, string $block, array $params) : string
     {
-        /** @var \Twig_Environment $twig */
-        $twig = $this->get('twig');
-        /** @var \Twig_Template $template */
-        $template = $twig->loadTemplate($template);
-
-        return $template->renderBlock($block, $twig->mergeGlobals($params));
+        // Get \Twig_TemplateWrapper $twigTemplate instance with Twig_Environment $twig
+        $twigTemplate = $twig->load($template);
+        return $twigTemplate->renderBlock($block, $params);
     }
 }

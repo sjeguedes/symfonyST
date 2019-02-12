@@ -1,0 +1,21 @@
+media_types:
+    -
+        fields:
+            name: "video_youtube"
+            description: "Video from Youtube - Embedded video provided by Youtube"
+    -
+        fields:
+            name: "video_vimeo"
+            description: "Video from Vimeo - Embedded video provided by Vimeo"
+    -
+        fields:
+            name: "image_thumbnail"
+            description: "Image for thumbnail format - A trick image used for list"
+    -
+        fields:
+            name: "image_normal"
+            description: "Image for normal format - A trick image used on top of presentation page"
+    -
+        fields:
+            name: "image_avatar"
+            description: "Image for user avatar - A user image to illustrate a profile"
