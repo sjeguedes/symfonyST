@@ -19,19 +19,30 @@ services:
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/*'
-        exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
+        exclude: '../src/{DependencyInjection,Domain/Entity,Utils/Database/Migrations,Tests,Kernel.php}'
 
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
-    App\Controller\:
-        resource: '../src/Controller'
+    App\Action\:
+        resource: '../src/Action'
         tags: ['controller.service_arguments']
-
-    # adding the required tag to all repository services
-    App\Repository\:
-        resource: '../src/Repository'
-        autowire: true
-        tags: ['doctrine.repository_service']
+        arguments:
+            $logger: '@Symfony\Component\HttpKernel\Log\Logger'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    # add PSR3 logger as default logger for actions (controllers)
+    Symfony\Component\HttpKernel\Log\Logger:
+        autowire: true
+        tags: ['symfony.component.http_kernel.log.logger']
+
+    # add ResultSetMappingBuilder as a service for native queries
+    Doctrine\ORM\Query\ResultSetMappingBuilder:
+        autowire: true
+        tags: ['doctrine.orm.query.result_set_mapping_builder']
+
+    # add template engine renderer default service when calling interface: Twig
+    App\Responder\Templating\TwigTemplateRenderer: ~
+    App\Responder\Templating\TemplateRendererInterface: '@App\Responder\Templating\TwigTemplateRenderer'
+    App\Responder\Templating\TemplateBlockRendererInterface: '@App\Responder\Templating\TwigTemplateRenderer'
