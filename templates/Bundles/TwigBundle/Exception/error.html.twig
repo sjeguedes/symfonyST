@@ -1,9 +1,39 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}SnowTricks - Error{% endblock %}
+
+{% block header %}
+    <div class="uk-position-relative uk-flex uk-flex-center uk-flex-middle uk-background-cover uk-background-blend-darken st-background-image-header" data-src="{{ asset('assets/images/error-snowboard.jpg') }}" style="background-position: 40% 25%; height: 600px" uk-img>
+        <div class="uk-position-center uk-text-center uk-padding-small">
+            <p class="st-color-white st-text-shadow-dark uk-text-large">
+                Oups, it seems to be a bad way...
+            </p>
+            <p class="st-color-white st-text-shadow-dark uk-text-medium uk-visible@m">
+                There are so many reasons to reach such a dead end (technical issue, wrong request...)! <br class="uk-visible@l">
+                Try another page, you will find the desired data.
+            </p>
+        </div>
+    </div>
+{% endblock %}
+
 {% block content %}
-    <h1>Error {{ errorCode }}</h1>
-    <p>
-        { errorMessage }<br>
-        <a href="{{ path('home') }}" title="Go back to the homepage">Go back to the homepage</a>.
-    </p>
+    <div class="uk-heading-line uk-text-large uk-text-center uk-margin-top">
+        <span uk-icon="icon: warning; ratio: 2"></span>
+    </div>
+    <div id="st-error-page" class="uk-section uk-preserve-color">
+        <div class="uk-container">
+            <h1 class="uk-heading-bullet uk-text-large uk-text-bold uk-text-uppercase uk-text-center">
+                {{ status_code }} HTTP Error
+            </h1>
+            <p class="uk-text-center">
+                <em class="uk-text-muted uk-text-bold">A technical error happened - Please contact us if necessary!</em><br>
+                <span class="uk-display-inline-block uk-card uk-card-primary uk-padding-small uk-text-uppercase">
+                    {{ status_text }}
+                </span><br>
+                <a href="{{ path('home') }}" title="Go back to homepage" class="uk-button uk-button-secondary uk-display-inline-block uk-margin-medium-top uk-margin-medium-bottom uk-border-rounded uk-box-shadow-hover-medium">
+                    <span uk-icon="arrow-left"></span>&nbsp;Go back to homepage
+                </a>
+            </p>
+        </div>
+    </div>
 {% endblock %}

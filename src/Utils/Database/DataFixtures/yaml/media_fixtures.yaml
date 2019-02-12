@@ -1,0 +1,152 @@
+medias:
+    -
+        #trick: "Ollie" (normal image)
+        references:
+            image: 1
+            media_type: 4
+            trick: 1
+    -
+        #trick: "Nollie" (normal image)
+        references:
+            image: 2
+            media_type: 4
+            trick: 2
+    -
+        #trick: "One-Two" (normal image)
+        references:
+            image: 3
+            media_type: 4
+            trick: 3
+    -
+        #trick: "Back flip" (normal image)
+        references:
+            image: 4
+            media_type: 4
+            trick: 4
+    -
+        #trick: "Front flip" (normal image)
+        references:
+            image: 5
+            media_type: 4
+            trick: 5
+    -
+        #trick: "Invert" (normal image)
+        references:
+            image: 6
+            media_type: 4
+            trick: 6
+    -
+        #trick: "Handplant" (normal image)
+        references:
+            image: 7
+            media_type: 4
+            trick: 7
+    -
+        #trick: "50-50" (normal image)
+        references:
+            image: 8
+            media_type: 4
+            trick: 8
+    -
+        #trick: "Boardslide" (normal image)
+        references:
+            image: 9
+            media_type: 4
+            trick: 9
+    -
+        #trick: "Nose-pick" (normal image)
+        references:
+            image: 10
+            media_type: 4
+            trick: 10
+    -
+        #trick: "Nose-pick" (normal image)
+        references:
+            image: 11
+            media_type: 4
+            trick: 11
+    -
+        #trick: "Board-stall" (normal image)
+        references:
+            image: 12
+            media_type: 4
+            trick: 12
+
+
+
+
+    -
+        #trick: "Ollie" (thumbnail image)
+        references:
+            image: 6
+            media_type: 5
+            trick: 1
+
+    -
+        #trick: "Nollie" (thumbnail image)
+        references:
+            image: 7
+            media_type: 5
+            trick: 2
+    -
+        #trick: "One-Two" (thumbnail image)
+        references:
+            image: 8
+            media_type: 5
+            trick: 3
+    -
+        #trick: "Back flip" (thumbnail image)
+        references:
+            image: 9
+            media_type: 5
+            trick: 4
+    -
+        #trick: "Front flip" (thumbnail image)
+        references:
+            image: 10
+            media_type: 5
+            trick: 5
+
+    -
+        #trick: "Invert" (normal image)
+        references:
+            image: 6
+            media_type: 5
+            trick: 6
+    -
+        #trick: "Handplant" (normal image)
+        references:
+            image: 7
+            media_type: 5
+            trick: 7
+    -
+        #trick: "50-50" (normal image)
+        references:
+            image: 8
+            media_type: 5
+            trick: 8
+    -
+        #trick: "Boardslide" (normal image)
+        references:
+            image: 9
+            media_type: 5
+            trick: 9
+
+    -
+        #trick: "Nose-pick" (normal image)
+        references:
+            image: 10
+            media_type: 5
+            trick: 10
+    -
+        #trick: "Nose-pick" (normal image)
+        references:
+            image: 11
+            media_type: 5
+            trick: 11
+    -
+        #trick: "Board-stall" (normal image)
+        references:
+            image: 12
+            media_type: 5
+            trick: 12
