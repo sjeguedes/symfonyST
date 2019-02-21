@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Action;
@@ -16,7 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * Class PaginatedTrickListAction.
  *
- * Manages complete trick list display with pagination.
+ * Manage complete trick list page display with pagination.
  */
 class PaginatedTrickListAction
 {

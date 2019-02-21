@@ -6,6 +6,7 @@ namespace App\Domain\Service;
 use App\Domain\Entity\Trick;
 use App\Domain\Repository\TrickRepository;
 use App\Utils\Traits\SessionHelperTrait;
+use App\Utils\Traits\UuidHelperTrait;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,6 +21,7 @@ class TrickManager
 {
     use LoggerAwareTrait;
     use SessionHelperTrait;
+    use UuidHelperTrait;
 
     /**
      * @var TrickRepository
@@ -43,9 +45,24 @@ class TrickManager
     }
 
     /**
+     * Find Trick by encoded uuid string.
+     *
+     * @param string $encodedUuid
+     *
+     * @return Trick|null
+     */
+    public function findSingleByEncodedUuid(string $encodedUuid) : ?Trick
+    {
+        $uuid = $this->decode($encodedUuid);
+        return $this->repository->findOneByUuid($uuid);
+    }
+
+    /**
      * Get default trick list.
      *
      * This is used for first load for instance.
+     *
+     * @return array
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
@@ -141,7 +158,7 @@ class TrickManager
         ];
     }
 
-        /**
+    /**
      * Define start offset accordingly to sort direction.
      *
      * @return int
@@ -256,7 +273,7 @@ class TrickManager
      * Filter complete trick list pagination request attribute.
      *
      * @param Request $request
-     * @param string $route
+     * @param string  $route
      *
      * @return int
      *
@@ -306,6 +323,10 @@ class TrickManager
     }
 
     /**
+     * Check if total count is outdated.
+     *
+     * For instance, this can happen when entities are added or removed and an ajax request is performed.
+     *
      * @param int $count
      *
      * @return bool

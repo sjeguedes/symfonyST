@@ -47,6 +47,10 @@ final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateB
             [
                 'responder' => 'App\\Responder\\PaginatedTrickListResponder',
                 'name'      => 'tricks/paginated_list.html.twig'
+            ],
+            [
+                'responder' => 'App\\Responder\\SingleTrickResponder',
+                'name'      => 'single-trick/trick.html.twig'
             ]
         ];
     }

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Utils\Database\DataFixtures;
@@ -54,7 +55,9 @@ class MediaFixtures extends BaseFixture implements DependentFixtureInterface
             $media = Media::createNewInstanceWithImage(
                 $proxy,
                 $proxy2,
-                $proxy3
+                $proxy3,
+                $data[$i]['fields']['isMain'],
+                $data[$i]['fields']['isPublished']
             );
             return $media;
         });
