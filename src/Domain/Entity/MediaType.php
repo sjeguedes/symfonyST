@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Domain\Entity;
@@ -20,6 +21,19 @@ use Ramsey\Uuid\UuidInterface;
 class MediaType
 {
     /**
+     * Immutable types used to filter medias.
+     */
+    const TYPE_CHOICES = [
+        'trickThumbnail'   => 't_thumbnail',
+        'trickNormal'      => 't_normal',
+        'trickBig'         => 't_big',
+        'userAvatar'       => 'u_avatar',
+        'trickYoutube'     => 't_youtube',
+        'trickVimeo'       => 't_vimeo',
+        'trickDailymotion' => 't_dailymotion'
+    ];
+
+    /**
      * The internal primary identity key.
      *
      * @var UuidInterface
@@ -28,6 +42,13 @@ class MediaType
      * @ORM\Column(type="uuid_binary", unique=true)
      */
     private $uuid;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string", unique=true)
+     */
+    private $type;
 
     /**
      * @var string
@@ -43,6 +64,22 @@ class MediaType
      * @ORM\Column(type="string")
      */
     private $description;
+
+    /**
+     *
+     * @var string
+     *
+     * @ORM\Column(type="integer")
+     */
+    private $width;
+
+    /**
+     *
+     * @var string
+     *
+     * @ORM\Column(type="integer")
+     */
+    private $height;
 
     /**
      * @var \DateTimeInterface
@@ -68,8 +105,11 @@ class MediaType
     /**
      * MediaType constructor.
      *
+     * @param string                  $type
      * @param string                  $name
      * @param string                  $description
+     * @param int                     $width
+     * @param int                     $height
      * @param \DateTimeInterface|null $creationDate
      * @param \DateTimeInterface|null $updateDate
      *
@@ -78,16 +118,25 @@ class MediaType
      * @throws \Exception
      */
     public function __construct(
+        string $type,
         string $name,
         string $description,
+        int $width,
+        int $height,
         \DateTimeInterface $creationDate = null,
         \DateTimeInterface $updateDate = null
     ) {
         $this->uuid = Uuid::uuid4();
+        assert(in_array($type,self::TYPE_CHOICES),'MediaType type does not exist!');
+        $this->type = $type;
         assert(!empty($name),'MediaType name can not be empty!');
         $this->name = $name;
         assert(!empty($description),'MediaType description can not be empty!');
         $this->description = $description;
+        assert($width > 0,'MediaType width must be greater than 0!');
+        $this->width = $width;
+        assert($height > 0,'MediaType height must be greater than 0!');
+        $this->height = $height;
         $createdAt = !\is_null($creationDate) ? $creationDate :  new \DateTime('now');
         $this->creationDate = $createdAt;
         assert($updateDate > $this->creationDate,'MediaType can not be created after update date!');
@@ -185,6 +234,14 @@ class MediaType
     /**
      * @return string
      */
+    public function getType() : string
+    {
+        return $this->type;
+    }
+
+    /**
+     * @return string
+     */
     public function getName() : string
     {
         return $this->name;
@@ -196,6 +253,22 @@ class MediaType
     public function getDescription() : string
     {
         return $this->description;
+    }
+
+    /**
+     * @return int
+     */
+    public function getWidth() : int
+    {
+        return $this->width;
+    }
+
+    /**
+     * @return int
+     */
+    public function getHeight() : int
+    {
+        return $this->height;
     }
 
     /**

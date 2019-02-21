@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Domain\Entity;
@@ -104,6 +105,8 @@ class Media
      * @return Media
      *
      * @throws \Exception
+     *
+     * @TODO need to create a particular named constructor for videos!
      */
     public static function createNewInstanceWithImage(
         Image $image,

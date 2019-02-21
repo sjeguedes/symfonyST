@@ -1,3 +1,4 @@
+{# Main navigation #}
 <ul class="uk-navbar-nav uk-flex-center">
     <li{{ app.request.get('_route') == 'home' ? ' class="uk-active uk-disabled"' }}>
         <a href="{{ path('home') }}" title="Home">
@@ -10,7 +11,7 @@
     <li{{ app.request.get('_route') == 'tricks' ? ' class="uk-active uk-disabled"' }}>
         <a href="{{ path('tricks') }}" title="Tricks">
             <div>
-                <span class="uk-text-uppercase"><span uk-icon="image"></span><br class="uk-hidden@m">&nbsp;Tricks</span>
+                <span class="uk-text-uppercase"><span uk-icon="thumbnails"></span><br class="uk-hidden@m">&nbsp;Tricks</span>
                 <div class="uk-navbar-subtitle uk-visible@m"><small>Look at complete list</small></div>
             </div>
         </a>

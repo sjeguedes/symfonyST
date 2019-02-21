@@ -1,21 +1,57 @@
 media_types:
     -
+        #1
         fields:
-            name: "video_youtube"
-            description: "Video from Youtube - Embedded video provided by Youtube"
-    -
-        fields:
-            name: "video_vimeo"
-            description: "Video from Vimeo - Embedded video provided by Vimeo"
-    -
-        fields:
-            name: "image_thumbnail"
+            type: "t_thumbnail"
+            name: "Trick thumbnail image"
             description: "Image for thumbnail format - A trick image used for list"
+            width: 350 #400
+            height: 200 #225
     -
+        #2
         fields:
-            name: "image_normal"
-            description: "Image for normal format - A trick image used on top of presentation page"
+            type: "t_normal"
+            name: "Trick normal image"
+            description: "Image for normal format - A trick image used for main image or modal presentation"
+            width: 1600 #800
+            height: 900 #450
     -
+        #3
         fields:
-            name: "image_avatar"
+            type: "t_big"
+            name: "Trick big image"
+            description: "Image for big format - A trick image used on top of presentation page"
+            width: 1600
+            height: 900
+    -
+        #4
+        fields:
+            type: "u_avatar"
+            name: "User avatar image"
             description: "Image for user avatar - A user image to illustrate a profile"
+            width: 80
+            height: 80
+    -
+        #5
+        fields:
+            type: "t_youtube"
+            name: "Trick Youtube video"
+            description: "Video from Youtube - Embedded video provided by Youtube"
+            width: 640
+            height: 480
+    -
+        #6
+        fields:
+            type: "t_vimeo"
+            name: "Trick Vimeo video"
+            description: "Video from Vimeo - Embedded video provided by Vimeo"
+            width: 640
+            height: 480
+    -
+        #7
+        fields:
+            type: "t_dailymotion"
+            name: "Trick Dailymotiion video"
+            description: "Video from Dailymotion - Embedded video provided by Dailymotion"
+            width: 640
+            height: 480
