@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Action;
@@ -15,7 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * Class HomeTrickListAction.
  *
- * Manages homepage tricks starting list display.
+ * Manage homepage tricks starting list display.
  */
 class HomeTrickListAction
 {

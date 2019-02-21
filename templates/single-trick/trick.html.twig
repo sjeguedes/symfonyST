@@ -1,0 +1,146 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}SnowTricks - trick detail{% endblock %}
+
+{# Initialize needed variables #}
+{% set mainImage = asset('assets/images/snowboard-6.jpg') %}
+{% set isMainAvailable = 0 %}
+{% set mainImageDesc = 'No description available' %}
+{% set trickImages = '' %}
+{% set trickVideos = '' %}
+{% set mediaToExpandDimensions = '' %}
+{# Loop only once for trick medias using variables! #}
+{% for media in trick.medias %}
+    {# Extract main image to show #}
+    {% if media.isMain == 1 and media.mediaType.type == mediaTypesValues['trickNormal'] %}
+        {% set mainImage = asset('assets/images/uploads/'~media.image.name~'.'~media.image.format) %}
+        {% set isMainAvailable = 1 %}
+        {% set mainImageDesc = media.image.description %}
+    {# Prepare medias with concatenation #}
+    {% elseif media.mediaType.type == mediaTypesValues['trickThumbnail'] %}
+        {# Image to show in slide #}
+        {% set mediaForSlide = media.image.name~'.'~media.image.format %}
+        {% set mediaToExpandDimensions = normalImageMediaType.width~'x'~normalImageMediaType.height %}
+        {# Image to show in modal: switch to normal image dimensions #}
+        {% set mediaToExpand = preg_replace('/\\d{3,4}x\\d{3,4}/', mediaToExpandDimensions, mediaForSlide) %}
+        {% set trickImages = trickImages~'<li>'~include('single-trick/media_card.html.twig', {'mediaForSlide': mediaForSlide, 'mediaToExpand': mediaToExpand, 'custom': {'icon': 'image', 'title': 'Look at this image'}, 'index': loop.index })~'</li>' %}
+    {% elseif media.mediaType.type matches '/'~mediaTypesValues['trickYoutube']~'|'~mediaTypesValues['trickVimeo']~'|'~mediaTypesValues['trickDailymotion']~'/' %}
+        {# Video to show both in slide and modal #}
+        {% set mediaForSlide = media.video.url %}
+        {% set trickVideos = trickVideos~'<li>'~include('single-trick/media_card.html.twig', {'mediaForSlide': mediaForSlide, 'mediaToExpand': mediaForSlide, 'custom': {'icon': 'video-camera', 'title': 'Watch this video'}, 'index': loop.index })~'</li>' %}
+    {% endif %}
+{% endfor %}
+
+{% block header %}
+    <div class="uk-position-relative uk-background-cover uk-background-blend-darken st-background-image-header" data-src="{{ asset('assets/images/snowboard-6.jpg') }}" style="background-position: 50% 50%; height: 600px" uk-img>
+        <div class="uk-padding">
+            <div class="uk-position-center uk-card uk-card-default uk-card-body uk-box-shadow-large uk-padding-small" style="width: 95%; height: 85%; max-width: 900px">
+                <div class="uk-background-cover uk-background-blend-darken st-background-image-header" data-src="{{ mainImage }}" style="background-position: 50% 50%; height: 100%" uk-img>
+                    <div class="uk-position-center uk-text-center">
+                        <p class="st-color-white st-text-shadow-dark uk-text-large">
+                            {{ trick.name }}
+                        </p>
+                        <p class="st-color-white st-text-shadow-dark uk-text-medium uk-visible@m">
+                            Snowboard trick referenced in {{ trick.trickGroup.name }}
+                        </p>
+                        {% if isMainAvailable == 0 %}
+                        <p class="uk-text-small uk-text-bold uk-text-uppercase st-background-white st-color-red">
+                            Main image for this trick is unavailable!
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="uk-heading-line uk-text-large uk-text-center uk-margin-top">
+        <span uk-icon="icon: nut; ratio: 2"></span>
+    </div>
+    <div id="st-single-trick" class="uk-section uk-preserve-color">
+        <div class="uk-container">
+            <h1 class="uk-heading-bullet uk-text-large uk-text-center uk-text-uppercase uk-text-bold">
+                Look at images and videos about <span class="st-color-blue">{{ trick.name }}</span> trick.
+            </h1>
+            <p class="uk-text-center uk-text-uppercase uk-text-bold st-color-red">
+                For more fun, a member have access to trick management to enhance content!<br>
+                So, everyone can share his passion and skills...
+            </p>
+        </div>
+        <!-- Trick medias slider -->
+        <div class="uk-padding" uk-slider="autoplay: true; autoplay-interval: 6000; pause-on-hover: true">
+            <div class="uk-position-relative">
+                <div class="uk-slider-container uk-padding-small st-card-container">
+                    <ul class="uk-margin-medium-top uk-margin-medium-bottom uk-slider-items uk-child-width-1-2@s uk-child-width-1-3@m uk-child-width-1-4@l uk-child-width-1-5@xl uk-grid uk-grid-match">
+                        {{ trickImages|raw }}
+                        {{ trickVideos|raw }}
+                    </ul>
+                </div>
+                <a class="uk-position-center-left-out" href="#" uk-slidenav-previous uk-slider-item="previous"></a>
+                <a class="uk-position-center-right-out" href="#" uk-slidenav-next uk-slider-item="next"></a>
+            </div>
+            {# TODO: list trick medias (with videos) at this place. #}
+        </div>
+        <!-- End trick medias slider -->
+        <div class="uk-container uk-section uk-section-muted uk-padding-remove">
+            <p class="uk-padding-small uk-margin-remove uk-margin-bottom uk-text-bold">
+                <span class="uk-display-block uk-text-center">
+                    <!-- Description -->
+                    <span class="uk-label uk-padding-small uk-text-small st-background-yellow st-color-blue">Trick description</span>
+                    <span class="uk-display-block uk-padding-small uk-text-left">{{ trick.description }}</span>
+                    <!-- Secondary information -->
+                    <span class="uk-badge uk-padding-small"><em class="st-color-yellow">In</em>&nbsp;{{ trick.trickGroup.name }}&nbsp;<em class="st-color-yellow">group</em></span>
+                    <span class="uk-badge uk-padding-small"><em class="st-color-yellow">Created on</em>&nbsp;{{ trick.creationDate|date('d/m/Y') }}</span>
+                    {% if trick.creationDate|date('d/m/Y') != trick.updateDate|date('d/m/Y') %}<span class="uk-badge uk-padding-small"><em class="st-color-yellow">Update on</em>&nbsp;{{ trick.updateDate|date('d/m/Y') }}</em></span>{% endif %}
+                </span>
+            </p>
+        </div>
+        <hr class="uk-margin-medium-top uk-margin-medium-bottom">
+        <div class="uk-container uk-margin-large-top">
+            <h1 class="uk-heading-bullet uk-text-large uk-text-center uk-text-uppercase uk-text-bold">
+                Follow comments about this trick from members below.
+            </h1>
+            <p class="uk-text-center uk-text-uppercase uk-text-bold st-color-red">
+                You can participate if you have an account. To register, simply fill the form.<br>
+                Then you will able to post messages.
+            </p>
+        </div>
+        <!-- Trick comments -->
+        <div class="uk-container uk-padding">
+            <!-- Messages -->
+            <ul class="uk-comment-list">
+                <li class="uk-comment uk-visible-toggle">
+                    <div class="uk-card uk-card-default uk-card-body uk-box-shadow-hover-large st-background-yellow st-border-white-small">
+                        <div class="uk-grid-divider" uk-grid>
+                            <div class="uk-width-1-3@m">
+                                <div class="uk-grid-small uk-flex-middle" uk-grid>
+                                    <div class="uk-width-auto st-avatar-default">
+                                        <div class="uk-comment-avatar uk-display-block svg-container uk-border-circle">
+                                            <object class="svg-content" type="image/svg+xml" width="100%" height="100%" data="{{ asset('assets/images/avatar-default.svg') }}"></object>
+                                        </div>
+                                    </div>
+                                    <div class="uk-width-expand">
+                                        <h3 class="uk-comment-title uk-margin-remove-bottom uk-text-small uk-text-uppercase uk-text-bold">Author name is here.</h3>
+                                        <p class="uk-comment-meta uk-margin-remove-top"><span class="uk-label st-background-blue">Date</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="uk-width-expand@m">
+                                <div class="uk-position-relative uk-comment-body">
+                                    <p class="uk-text-bold uk-margin-small-top uk-margin-large-right">
+                                        Message text is here.
+                                    </p>
+                                    <div class="uk-position-top-right uk-hidden-hover"><a class="uk-link-text uk-icon-link" uk-icon="comments" href="#">Reply&nbsp;</a></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+{# TODO: list trick messages at this place. #}
+            </ul>
+        </div>
+        <!-- End trick comments -->
+    </div>
+{% endblock %}

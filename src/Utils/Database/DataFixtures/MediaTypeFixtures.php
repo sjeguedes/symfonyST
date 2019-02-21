@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Utils\Database\DataFixtures;
@@ -29,8 +30,11 @@ class MediaTypeFixtures extends BaseFixture
         // Create media types
         $this->createFixtures(MediaType::class, \count($data), function($i) use($data) {
             $mediaType = new MediaType(
+                $data[$i]['fields']['type'],
                 $data[$i]['fields']['name'],
                 $data[$i]['fields']['description'],
+                $data[$i]['fields']['width'],
+                $data[$i]['fields']['height'],
                 new \DateTime(sprintf("+%d days", $i - 1)),
                 new \DateTime(sprintf("+%d days", $i - 1))
             );

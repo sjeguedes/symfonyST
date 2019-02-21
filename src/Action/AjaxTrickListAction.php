@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * Class AjaxTrickListAction.
  *
- * Manages homepage trick list initial display for "load more" functionality.
+ * Manage homepage trick list initial display for "load more" functionality.
  */
 class AjaxTrickListAction
 {
