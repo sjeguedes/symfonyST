@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Domain\Entity;
@@ -59,14 +60,6 @@ class Image
     private $size;
 
     /**
-     *
-     * @var string
-     *
-     * @ORM\Column(type="string", length=9)
-     */
-    private $dimensions;
-
-    /**
      * @var \DateTimeInterface
      *
      * @ORM\Column(type="datetime")
@@ -94,7 +87,6 @@ class Image
      * @param string                  $description
      * @param string                  $format
      * @param int                     $size
-     * @param string                  $dimensions
      * @param \DateTimeInterface|null $creationDate
      * @param \DateTimeInterface|null $updateDate
      *
@@ -107,7 +99,6 @@ class Image
         string $description,
         string $format,
         int $size,
-        string $dimensions,
         \DateTimeInterface $creationDate = null,
         \DateTimeInterface $updateDate = null
     ) {
@@ -120,8 +111,6 @@ class Image
         $this->format = $format;
         assert($size > 0, 'Image size must be greater than 0!');
         $this->size = $size;
-        assert(!empty($dimensions),'Image dimensions can not be empty!');
-        $this->dimensions = $dimensions;
         $createdAt = !\is_null($creationDate) ? $creationDate :  new \DateTime('now');
         $this->creationDate = $createdAt;
         assert($updateDate > $this->creationDate,'Image can not be created after update date!');
@@ -246,14 +235,6 @@ class Image
     public function getSize() : int
     {
         return $this->size;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDimensions() : string
-    {
-        return $this->dimensions;
     }
 
     /**
