@@ -86,11 +86,11 @@ class VideoURLProxyChecker
      */
     public function verify(string $url) : array
     {
-        // Prepare array to be converted in JSOn string with Symfony JsonResponse object (no need to use "json_encode" here)
+        // Prepare array to be converted in JSON string with Symfony JsonResponse object (no need to use "json_encode" here)
         if (empty($url)) {
             return ['status' => 0];
         }
-        return $this->allow($url) && $this->isContent($url) ?  ['status' => 1] :  ['status' => 0];
+        return $this->allow($url) && $this->isContent($url) ?  ['status' => 1] : ['status' => 0];
     }
 
 }
