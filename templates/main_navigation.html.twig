@@ -1,0 +1,46 @@
+{# Main navigation #}
+<ul class="uk-navbar-nav uk-flex-center">
+    <li{{ app.request.get('_route') == 'home' ? ' class="uk-active uk-disabled"' }}>
+        <a href="{{ path('home') }}" title="Home">
+            <div>
+                <span class="uk-text-uppercase"><span uk-icon="home"></span><br class="uk-hidden@m">&nbsp;Home</span>
+                <div class="uk-navbar-subtitle uk-visible@m"><small><span class="uk-visible@l">Be part of our </span>community</small></div>
+            </div>
+        </a>
+    </li>
+    <li{{ app.request.get('_route') == 'tricks' ? ' class="uk-active uk-disabled"' }}>
+        <a href="{{ path('tricks') }}" title="Tricks">
+            <div>
+                <span class="uk-text-uppercase"><span uk-icon="thumbnails"></span><br class="uk-hidden@m">&nbsp;Tricks</span>
+                <div class="uk-navbar-subtitle uk-visible@m"><small><span class="uk-visible@l">Look at </span>complete list</small></div>
+            </div>
+        </a>
+    </li>
+    <li{{ app.request.get('_route') == 'register' ? ' class="uk-active uk-disabled"' }}>
+        <a href="{#{{ path('register') }}#}#" title="Register">
+            <div>
+                <span class="uk-text-uppercase"><span uk-icon="users"></span><br class="uk-hidden@m">&nbsp;Register</span>
+                <div class="uk-navbar-subtitle uk-visible@m"><small><span class="uk-visible@l">Create an </span>account</small></div>
+            </div>
+        </a>
+    </li>
+    {% if is_granted('IS_AUTHENTICATED_FULLY') == false %}
+    <li{{ app.request.get('_route') == 'login' ? ' class="uk-active uk-disabled"' }}>
+        <a href="{#{{ path('login') }}#}#" title="Login">
+            <div>
+                <span class="uk-text-uppercase"><span uk-icon="sign-in"></span><br class="uk-hidden@m">&nbsp;Login</span>
+                <div class="uk-navbar-subtitle uk-visible@m"><small><span class="uk-visible@l">Contribute as a </span>member</small></div>
+            </div>
+        </a>
+    </li>
+    {% else %}
+    <li{{ app.request.get('_route') == 'logout' ? ' class="uk-active uk-disabled"' }}>
+        <a href="{#{{ path('logout') }}#}#" title="Logout">
+            <div>
+                <span class="uk-text-uppercase"><span uk-icon="sign-out"></span><br class="uk-hidden@m">&nbsp;Logout</span>
+                <div class="uk-navbar-subtitle uk-visible@m"><small class="uk-text-muted"><span class="uk-visible@l">Disconnect </span>profile</small></div>
+            </div>
+        </a>
+    </li>
+    {% endif %}
+</ul>

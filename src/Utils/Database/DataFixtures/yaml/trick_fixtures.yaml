@@ -1,0 +1,97 @@
+tricks:
+    -
+        #1
+        fields:
+            name: "Ollie"
+            description: "A trick in which the snowboarder springs off the tail of the board and into the air."
+            slug: "ollie"
+        references:
+            trick_group: 1
+    -
+        #2
+        fields:
+            name: "Nollie"
+            description: "A trick in which the snowboarder springs off the nose of the board and into the air."
+            slug: "nollie"
+        references:
+            trick_group: 1
+    -
+        #3
+        fields:
+            name: "One-Two"
+            description: "A trick in which the rider's front hand grabs the heel edge behind their back foot."
+            slug: "one-two"
+        references:
+            trick_group: 2
+    -
+        #4
+        fields:
+            name: "Back flip"
+            description: "Flipping backwards (like a standing backflip) off of a jump."
+            slug: "back-flip"
+        references:
+            trick_group: 4
+    -
+        #5
+        fields:
+            name: "Front flip"
+            description: "Flipping forward (like a standing frontflip) off of a jump."
+            slug: "front-flip"
+        references:
+             trick_group: 4
+    -
+        #6
+        fields:
+            name: "Invert"
+            description: "Overlaying term for handstands on the edge of a halfpipe."
+            slug: "invert"
+        references:
+            trick_group: 5
+    -
+        #7
+        fields:
+            name: "Handplant"
+            description: "A 180° degree handplant in which the rear hand is planted on the lip of the wall and the rotation is frontside."
+            slug: "handplant"
+        references:
+            trick_group: 5
+    -
+        #8
+        fields:
+            name: "50-50"
+            description: "A slide in which a snowboarder rides straight along a rail or other obstacle. This trick has its origin in skateboarding, where the trick is performed with both skateboard trucks grinding along a rail."
+            slug: "50-50"
+        references:
+            trick_group: 6
+    -
+        #9
+        fields:
+            name: "Boardslide"
+            description: "A slide performed where the riders leading foot passes over the rail on approach, with their snowboard traveling perpendicular along the rail or other obstacle. When performing a frontside boardslide, the snowboarder is facing uphill. When performing a backside boardslide, a snowboarder is facing downhill. This is often confusing to new riders learning the trick because with a frontside boardslide you are moving backward and with a backside boardslide you are moving forward."
+            slug: "boardslide"
+        references:
+            trick_group: 6
+    -
+        #10
+        fields:
+            name: "Nose-pick"
+            description: "Stalling on an object with the nose of the snowboard, while grabbing frontside, and then jumping back off the object into the jump you came off."
+            slug: "nose-pick"
+        references:
+            trick_group: 7
+    -
+        #11
+        fields:
+            name: "Board-stall"
+            description: "A trick performed when a rider stalls on an object with their snowboard, with the point of contact between both bindings. The Disaster variation comes from skateboarding, and involves performing a frontside or backside 180 before stalling on the lip of the obstacle, and then re-entering."
+            slug: "board-stall"
+        references:
+            trick_group: 7
+    -
+        #12
+        fields:
+            name: "One-footed"
+            description: "Tricks performed with one foot removed from the binding (typically the rear foot) are referred to as one-footed tricks. One footed tricks include fast plants in which the rear foot is dropped and initiates a straight air or rotation, the boneless, which is a fast-plant with a grab; and the no-comply, which is a front-footed fast plant."
+            slug: "one-footed"
+        references:
+            trick_group: 8

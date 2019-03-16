@@ -19,13 +19,41 @@ services:
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/*'
-        exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
+        exclude: '../src/{DependencyInjection,Domain/Entity,Utils/Traits,Utils/Database/Migrations,Tests,Kernel.php}'
 
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
-    App\Controller\:
-        resource: '../src/Controller'
+    App\Action\:
+        resource: '../src/Action'
         tags: ['controller.service_arguments']
+        arguments:
+            $logger: '@Symfony\Component\HttpKernel\Log\Logger'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    # add template engine renderer default service when calling interface: Twig
+    App\Responder\Templating\TwigTemplateRenderer: ~
+    App\Responder\Templating\TemplateRendererInterface: '@App\Responder\Templating\TwigTemplateRenderer'
+    App\Responder\Templating\TemplateBlockRendererInterface: '@App\Responder\Templating\TwigTemplateRenderer'
+
+    # add trick video URL "proxy" checker
+    App\Utils\Medias\VideoURLProxyChecker:
+        tags: ['app.utils.medias.video_url_proxy_checker']
+
+    # custom Twig extensions
+    # "uuid_encode" filter
+    App\Utils\Templating\UuidTwigExtension:
+        tags: ['app.utils.templating.uuid_twig_extension']
+
+    # add ResultSetMappingBuilder as a service for native queries
+    Doctrine\ORM\Query\ResultSetMappingBuilder:
+        tags: ['doctrine.orm.query.result_set_mapping_builder']
+
+    # add request as a service
+    Symfony\Component\HttpFoundation\Request:
+        tags: ['symfony.component.http_foundation.request']
+
+    # add PSR3 logger as default logger for actions (controllers)
+    Symfony\Component\HttpKernel\Log\Logger:
+        tags: ['symfony.component.http_kernel.log.logger']
