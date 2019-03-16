@@ -9,7 +9,6 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -49,7 +48,7 @@ class AjaxTrickListAction
      * @param AjaxTrickListResponder $responder
      * @param Request                $request
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      * @throws \Throwable
