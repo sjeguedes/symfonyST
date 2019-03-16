@@ -74,9 +74,9 @@ class VideoURLProxyChecker
     }
 
     /**
-     * Return a status code to be converted later in JSON string
+     * Return a status code to be converted later in JSON string.
      *
-     * value 1 means URL can be loaded and value 0 means error context must be used!
+     * Value 1 means URL can be loaded and value 0 means error context must be used!
      *
      * @param string $url
      *
