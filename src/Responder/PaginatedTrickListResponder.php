@@ -32,6 +32,8 @@ final class PaginatedTrickListResponder
     }
 
     /**
+     * Invokable Responder with Magic method.
+     *
      * @param array $data
      *
      * @return Response

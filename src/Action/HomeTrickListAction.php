@@ -62,7 +62,9 @@ class HomeTrickListAction
             throw new NotFoundHttpException('Trick list can not be initialized! Wrong parameters are used.');
         }
         $data = [
-            'locale'                => $request->attributes->get('_locale'),
+            'listEnded'             => 'No more trick to load!',
+            'technicalError'        => 'Sorry, something wrong happened<br>during trick list loading!<br>Please contact us or try again later.<br>',
+            'trickAjaxLoadingPath'  => $this->trickService->generateURLFromRoute('home_load_tricks_offset_only', []),
             'trickCount'            => $this->trickService->countAll(),
             'trickLoadingMode'      => $this->trickService->getListDefaultParameters()['loadingMode'],
             'trickNumberPerLoading' => $parameters['limit'],

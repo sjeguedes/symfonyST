@@ -5,12 +5,14 @@ namespace App\Domain\Service;
 
 use App\Domain\Entity\Trick;
 use App\Domain\Repository\TrickRepository;
+use App\Utils\Traits\RouterHelperTrait;
 use App\Utils\Traits\SessionHelperTrait;
 use App\Utils\Traits\UuidHelperTrait;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * Class TrickManager.
@@ -20,6 +22,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 class TrickManager
 {
     use LoggerAwareTrait;
+    use RouterHelperTrait;
     use SessionHelperTrait;
     use UuidHelperTrait;
 
@@ -33,14 +36,20 @@ class TrickManager
      *
      * @param TrickRepository  $repository
      * @param LoggerInterface  $logger
+     * @param RouterInterface  $router
      * @param SessionInterface $session
      *
      * @return void
      */
-    public function __construct(TrickRepository $repository, LoggerInterface $logger, SessionInterface $session)
-    {
+    public function __construct(
+        TrickRepository $repository,
+        LoggerInterface $logger,
+        RouterInterface $router,
+        SessionInterface $session
+    ) {
         $this->repository = $repository;
         $this->setLogger($logger);
+        $this->setRouter($router);
         $this->setSession($session);
     }
 

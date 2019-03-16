@@ -86,84 +86,167 @@ images:
     -
         #13
         fields:
-            name: "ollie-2d4b002c-350x200"
+            name: "ollie-2d4b002c-880x495"
             description: "Ollie - A trick in which the snowboarder springs off the tail of the board and into the air."
             format: "jpg"
-            size: 47000
+            size: 234000
     -
         #14
         fields:
-            name: "nollie-654fd080-350x200"
+            name: "nollie-654fd080-880x495"
             description: "Nollie - A trick in which the snowboarder springs off the nose of the board and into the air."
             format: "jpg"
-            size: 56000
-    -
-        #15
+            size: 289000
+    -   #15
         fields:
-            name: "one-two-0edd47a6-350x200"
+            name: "one-two-0edd47a6-880x495"
             description: "One-Two - A trick in which the rider's front hand grabs the heel edge behind their back foot."
             format: "jpg"
-            size: 65000
+            size: 322000
     -
         #16
         fields:
-            name: "back-flip-055e6c78-350x200"
+            name: "back-flip-055e6c78-880x495"
             description: "Back flip - Flipping backwards (like a standing backflip) off of a jump."
             format: "jpg"
-            size: 69000
+            size: 355000
     -
         #17
         fields:
-            name: "front-flip-8d3dbb8d-350x200"
+            name: "front-flip-8d3dbb8d-880x495"
             description: "Front flip - Flipping forward (like a standing frontflip) off of a jump."
             format: "jpg"
-            size: 68000
+            size: 323000
     -
         #18
         fields:
-            name: "invert-d8061ac8-350x200"
+            name: "invert-d8061ac8-880x495"
             description: "Invert - Overlaying term for handstands on the edge of a halfpipe."
             format: "jpg"
-            size: 48000
+            size: 242000
     -
         #19
         fields:
-            name: "handplant-606a6e96-350x200"
+            name: "handplant-606a6e96-880x495"
             description: "Handplant - A 180° degree handplant in which the rear hand is planted on the lip of the wall and the rotation is frontside."
             format: "jpg"
-            size: 32000
+            size: 156000
     -
         #20
         fields:
-            name: "50-50-3e9ad1c0-350x200"
+            name: "50-50-3e9ad1c0-880x495"
             description: "50-50 - A slide in which a snowboarder rides straight along a rail or other obstacle."
             format: "jpg"
-            size: 72000
+            size: 384000
     -
         #21
         fields:
-            name: "boardslide-5bdd9e7a-350x200"
+            name: "boardslide-5bdd9e7a-880x495"
             description: "boardslide - A slide performed where the riders leading foot passes over the rail on approach, with their snowboard traveling perpendicular along the rail or other obstacle."
             format: "jpg"
-            size: 52000
+            size: 240000
     -
         #22
         fields:
-            name: "nose-pick-8a3a46aa-350x200"
+            name: "nose-pick-8a3a46aa-880x495"
             description: "Nose-pick - Stalling on an object with the nose of the snowboard, while grabbing frontside, and then jumping back off the object into the jump you came off."
             format: "jpg"
-            size: 67000
+            size: 325000
     -
         #23
         fields:
-            name: "board-stall-6008595a-350x200"
+            name: "board-stall-6008595a-880x495"
             description: "Board-stall and Disaster variation - A trick performed when a rider stalls on an object with their snowboard, with the point of contact between both bindings."
             format: "jpg"
-            size: 70000
+            size: 419000
     -
         #24
         fields:
-            name: "one-footed-1e29bd6d-350x200"
+            name: "one-footed-1e29bd6d-880x495"
             description: "One-footed - Tricks performed with one foot removed from the binding (typically the rear foot) are referred to as one-footed tricks."
             format: "jpg"
-            size: 34000
+            size: 140000
+    -
+        #25
+        fields:
+            name: "ollie-2d4b002c-400x225"
+            description: "Ollie - A trick in which the snowboarder springs off the tail of the board and into the air."
+            format: "jpg"
+            size: 61000
+    -
+        #26
+        fields:
+            name: "nollie-654fd080-400x225"
+            description: "Nollie - A trick in which the snowboarder springs off the nose of the board and into the air."
+            format: "jpg"
+            size: 71000
+    -
+        #27
+        fields:
+            name: "one-two-0edd47a6-400x225"
+            description: "One-Two - A trick in which the rider's front hand grabs the heel edge behind their back foot."
+            format: "jpg"
+            size: 84000
+    -
+        #28
+        fields:
+            name: "back-flip-055e6c78-400x225"
+            description: "Back flip - Flipping backwards (like a standing backflip) off of a jump."
+            format: "jpg"
+            size: 87000
+    -
+        #29
+        fields:
+            name: "front-flip-8d3dbb8d-400x225"
+            description: "Front flip - Flipping forward (like a standing frontflip) off of a jump."
+            format: "jpg"
+            size: 84000
+    -
+        #30
+        fields:
+            name: "invert-d8061ac8-400x225"
+            description: "Invert - Overlaying term for handstands on the edge of a halfpipe."
+            format: "jpg"
+            size: 61000
+    -
+        #31
+        fields:
+            name: "handplant-606a6e96-400x225"
+            description: "Handplant - A 180° degree handplant in which the rear hand is planted on the lip of the wall and the rotation is frontside."
+            format: "jpg"
+            size: 43000
+    -
+        #32
+        fields:
+            name: "50-50-3e9ad1c0-400x225"
+            description: "50-50 - A slide in which a snowboarder rides straight along a rail or other obstacle."
+            format: "jpg"
+            size: 91000
+    -
+        #33
+        fields:
+            name: "boardslide-5bdd9e7a-400x225"
+            description: "boardslide - A slide performed where the riders leading foot passes over the rail on approach, with their snowboard traveling perpendicular along the rail or other obstacle."
+            format: "jpg"
+            size: 66000
+    -
+        #34
+        fields:
+            name: "nose-pick-8a3a46aa-400x225"
+            description: "Nose-pick - Stalling on an object with the nose of the snowboard, while grabbing frontside, and then jumping back off the object into the jump you came off."
+            format: "jpg"
+            size: 82000
+    -
+        #35
+        fields:
+            name: "board-stall-6008595a-400x225"
+            description: "Board-stall and Disaster variation - A trick performed when a rider stalls on an object with their snowboard, with the point of contact between both bindings."
+            format: "jpg"
+            size: 93000
+    -
+        #36
+        fields:
+            name: "one-footed-1e29bd6d-400x225"
+            description: "One-footed - Tricks performed with one foot removed from the binding (typically the rear foot) are referred to as one-footed tricks."
+            format: "jpg"
+            size: 42000

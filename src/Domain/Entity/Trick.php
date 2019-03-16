@@ -146,7 +146,7 @@ class Trick
         $this->description = $description;
         $this->trickGroup = $trickGroup;
         !\is_null($slug) ? $this->customizeSlug($slug) : $this->customizeSlug($name);
-        $createdAt = !\is_null($creationDate) ? $creationDate :  new \DateTime('now');
+        $createdAt = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
         $this->creationDate = $createdAt;
         assert($updateDate > $this->creationDate,'Trick can not be created after update date!');
         $this->updateDate = !\is_null($updateDate) ? $updateDate : $this->creationDate;

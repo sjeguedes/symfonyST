@@ -37,14 +37,22 @@ services:
     App\Responder\Templating\TemplateRendererInterface: '@App\Responder\Templating\TwigTemplateRenderer'
     App\Responder\Templating\TemplateBlockRendererInterface: '@App\Responder\Templating\TwigTemplateRenderer'
 
+    # add trick video URL "proxy" checker
+    App\Utils\Medias\VideoURLProxyChecker:
+        tags: ['app.utils.medias.video_url_proxy_checker']
+
     # custom Twig extensions
     # "uuid_encode" filter
     App\Utils\Templating\UuidTwigExtension:
-        tags: ['twig.extension']
+        tags: ['app.utils.templating.uuid_twig_extension']
 
     # add ResultSetMappingBuilder as a service for native queries
     Doctrine\ORM\Query\ResultSetMappingBuilder:
         tags: ['doctrine.orm.query.result_set_mapping_builder']
+
+    # add request as a service
+    Symfony\Component\HttpFoundation\Request:
+        tags: ['symfony.component.http_foundation.request']
 
     # add PSR3 logger as default logger for actions (controllers)
     Symfony\Component\HttpKernel\Log\Logger:

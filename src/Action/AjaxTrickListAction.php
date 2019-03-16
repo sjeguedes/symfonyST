@@ -44,7 +44,7 @@ class AjaxTrickListAction
      * load tricks from ajax request.
      *
      * @Route("/{_locale}/home-load-tricks/{offset}/{limit}", name="home_load_tricks_offset_limit", requirements={"offset":"\d+","limit":"\d+"})
-     * @Route("/{_locale}/home-load-tricks/{offset}", name="home_load_tricks_offset_only", requirements={"offset"="\d+"})
+     * @Route("/{_locale}/home-load-tricks/{offset}", name="home_load_tricks_offset_only", defaults={"offset"=null}, requirements={"offset"="\d+"})
      *
      * @param AjaxTrickListResponder $responder
      * @param Request                $request
@@ -63,7 +63,7 @@ class AjaxTrickListAction
             $this->trickService->storeInSession('trickCount', $trickCount);
             $parameters = $this->trickService->getDefaultTrickList();
             $this->logger->error("[trace app snowTricks] AjaxTrickListAction/__invoke => trickCount: " . $trickCount);
-            $listError = 'Trick list was reinitialized!<br>Wrong total count is used<br>due to outdated value.';
+            $listError = 'Trick list was reinitialized!<br>Wrong total count is used<br>due to outdated or unexpected value.';
         } else {
             // Filter request attributes (offset, limit, ...)
             $attributes = $this->trickService->filterListRequestAttributes($request);
