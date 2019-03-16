@@ -29,7 +29,7 @@ class MediaTypeFixtures extends BaseFixture
         $data = $array['media_types'];
         // Create media types
         $this->createFixtures(MediaType::class, \count($data), function($i) use($data) {
-            $mediaType = new MediaType(
+            return new MediaType(
                 $data[$i]['fields']['type'],
                 $data[$i]['fields']['name'],
                 $data[$i]['fields']['description'],
@@ -38,7 +38,6 @@ class MediaTypeFixtures extends BaseFixture
                 new \DateTime(sprintf("+%d days", $i - 1)),
                 new \DateTime(sprintf("+%d days", $i - 1))
             );
-            return $mediaType;
         });
         $manager->flush();
     }

@@ -33,9 +33,11 @@ final class RedirectionResponder
     }
 
     /**
+     * Invokable Responder with Magic method.
+     *
      * @param string $route
-     * @param array $parameters
-     * @param int $referenceType
+     * @param array  $parameters
+     * @param int    $referenceType
      *
      * @return RedirectResponse
      */

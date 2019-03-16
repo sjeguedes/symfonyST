@@ -89,7 +89,7 @@ class TrickGroup
         $this->name = $name;
         assert(!empty($description),'TrickGroup description can not be empty!');
         $this->description = $description;
-        $createdAt = !\is_null($creationDate) ? $creationDate :  new \DateTime('now');
+        $createdAt = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
         $this->creationDate = $createdAt;
         assert($updateDate > $this->creationDate,'TrickGroup can not be created after update date!');
         $this->updateDate = !\is_null($updateDate) ? $updateDate : $this->creationDate;

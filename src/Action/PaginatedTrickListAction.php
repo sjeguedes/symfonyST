@@ -47,14 +47,14 @@ class PaginatedTrickListAction
      * @Route("/{_locale}/trick-list/{page}", name="tricks", defaults={"page"=1}, requirements={"page"="\d+"})
      *
      * @param PaginatedTrickListResponder $responder
-     * @param Request                     $request
      * @param RedirectionResponder        $redirectionResponder
+     * @param Request                     $request
      *
      * @return Response
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function __invoke(PaginatedTrickListResponder $responder, Request $request, RedirectionResponder $redirectionResponder) : Response
+    public function __invoke(PaginatedTrickListResponder $responder, RedirectionResponder $redirectionResponder, Request $request) : Response
     {
         // Particular redirection (optional)
         if ('/' . $request->get('_locale') . '/trick-list/1' === $request->getPathInfo()) {
