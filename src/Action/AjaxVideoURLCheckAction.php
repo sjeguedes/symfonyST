@@ -32,6 +32,7 @@ class AjaxVideoURLCheckAction
      *
      * @param LoggerInterface $logger
      *
+     * @return void
      */
     public function __construct(VideoURLProxyChecker $trickVideoChecker, LoggerInterface $logger)
     {
@@ -48,7 +49,7 @@ class AjaxVideoURLCheckAction
      * @param AjaxVideoURLCheckResponder $responder
      * @param Request                    $request
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
      * @see https://symfony.com/doc/current/routing/slash_in_parameter.html
      */
