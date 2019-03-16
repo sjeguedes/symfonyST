@@ -29,13 +29,12 @@ class TrickGroupFixtures extends BaseFixture
         $data = $array['trick_groups'];
         // Create trick groups
         $this->createFixtures(TrickGroup::class, \count($data), function($i) use($data) {
-            $trickGroup = new TrickGroup(
+            return new TrickGroup(
                 $data[$i]['fields']['name'],
                 $data[$i]['fields']['description'],
                 new \DateTime(sprintf("+%d days", $i - 1)),
                 new \DateTime(sprintf("+%d days", $i - 1))
             );
-            return $trickGroup;
         });
         $manager->flush();
     }

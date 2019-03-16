@@ -168,14 +168,21 @@ class TrickRepository extends ServiceEntityRepository
      */
     public function findOneByUuid(UuidInterface $uuid) : ?Trick
     {
-        // TODO: complete query later with medias videos and users messages!
+        // TODO: complete query later with users messages or use Message Repository to limit result!
         $queryBuilder = $this->createQueryBuilder('t' );
+        // No need to join media_types and trick_groups due to no particular filter on data
+        // trick group and media type data is added automatically thanks to lazy loading!
+        // Specifying joins reduces query numbers!
         $result = $queryBuilder
-            ->select(['t', 'm', 'mt', 'i'])
+            ->select(['t', 'tg', 'm', 'mt', 'i', 'v'])
+            ->leftJoin('t.trickGroup', 'tg', 'WITH', 't.trickGroup = tg.uuid')
             ->leftJoin('t.medias', 'm', 'WITH', 'm.trick = t.uuid')
             ->leftJoin('m.mediaType', 'mt', 'WITH', 'm.mediaType = mt.uuid')
             ->leftJoin('m.image', 'i', 'WITH', 'm.image = i.uuid')
+            ->leftJoin('m.video', 'v', 'WITH', 'm.video = v.uuid')
             ->where('t.uuid = ?1')
+            ->orderBy('i.creationDate', 'DESC')
+            ->addOrderBy('v.creationDate', 'DESC')
             ->setParameter(1, $uuid->getBytes())
             ->getQuery()
             ->getResult()

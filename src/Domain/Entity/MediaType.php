@@ -137,7 +137,7 @@ class MediaType
         $this->width = $width;
         assert($height > 0,'MediaType height must be greater than 0!');
         $this->height = $height;
-        $createdAt = !\is_null($creationDate) ? $creationDate :  new \DateTime('now');
+        $createdAt = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
         $this->creationDate = $createdAt;
         assert($updateDate > $this->creationDate,'MediaType can not be created after update date!');
         $this->updateDate = !\is_null($updateDate) ? $updateDate : $this->creationDate;

@@ -45,6 +45,14 @@ class Media
     private $image;
 
     /**
+     * @var Video|null
+     *
+     * @ORM\ManyToOne(targetEntity=Video::class, inversedBy="medias")
+     * @ORM\JoinColumn(name="video_uuid", referencedColumnName="uuid", nullable=true)
+     */
+    private $video;
+
+    /**
      * @var Trick (owning side of entity relation)
      *
      * @ORM\ManyToOne(targetEntity=Trick::class, inversedBy="medias")
@@ -105,8 +113,6 @@ class Media
      * @return Media
      *
      * @throws \Exception
-     *
-     * @TODO need to create a particular named constructor for videos!
      */
     public static function createNewInstanceWithImage(
         Image $image,
@@ -118,7 +124,34 @@ class Media
     {
         $self = new self($mediaType, $trick, $isMain, $isPublished);
         $self->image = $image;
-        //TODO: $self->video = null;
+        $self->video = null;
+        return $self;
+    }
+
+    /**
+     * Named constructor used to create instance based on Video instance.
+     *
+     * @param Video     $video
+     * @param MediaType $mediaType
+     * @param Trick     $trick
+     * @param bool      $isMain
+     * @param bool      $isPublished
+     *
+     * @return Media
+     *
+     * @throws \Exception
+     */
+    public static function createNewInstanceWithVideo(
+        Video $video,
+        MediaType $mediaType,
+        Trick $trick,
+        bool $isMain = false,
+        bool $isPublished = false
+    ) : Media
+    {
+        $self = new self($mediaType, $trick, $isMain, $isPublished);
+        $self->video = $video;
+        $self->image = null;
         return $self;
     }
 
@@ -132,6 +165,19 @@ class Media
     public function modifyImage(Image $image) : self
     {
         $this->image = $image;
+        return $this;
+    }
+
+    /**
+     * Change assigned video resource after creation.
+     *
+     * @param Video $video
+     *
+     * @return Media
+     */
+    public function modifyVideo(Video $video) : self
+    {
+        $this->video = $video;
         return $this;
     }
 
@@ -205,11 +251,19 @@ class Media
     }
 
     /**
-     * @return Image
+     * @return Image|null
      */
-    public function getImage() : Image
+    public function getImage() : ?Image
     {
         return $this->image;
+    }
+
+    /**
+     * @return Video|null
+     */
+    public function getVideo() : ?Video
+    {
+        return $this->video;
     }
 
     /**

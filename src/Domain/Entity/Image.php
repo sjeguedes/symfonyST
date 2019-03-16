@@ -111,7 +111,7 @@ class Image
         $this->format = $format;
         assert($size > 0, 'Image size must be greater than 0!');
         $this->size = $size;
-        $createdAt = !\is_null($creationDate) ? $creationDate :  new \DateTime('now');
+        $createdAt = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
         $this->creationDate = $createdAt;
         assert($updateDate > $this->creationDate,'Image can not be created after update date!');
         $this->updateDate = !\is_null($updateDate) ? $updateDate : $this->creationDate;
@@ -171,7 +171,7 @@ class Image
      *
      * @param Media $media
      *
-     * @return Image;
+     * @return Image
      */
     public function addMedia(Media $media) : self
     {
