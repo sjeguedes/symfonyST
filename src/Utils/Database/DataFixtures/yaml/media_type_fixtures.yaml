@@ -5,16 +5,16 @@ media_types:
             type: "t_thumbnail"
             name: "Trick thumbnail image"
             description: "Image for thumbnail format - A trick image used for list"
-            width: 350 #400
-            height: 200 #225
+            width: 400
+            height: 225
     -
         #2
         fields:
             type: "t_normal"
             name: "Trick normal image"
             description: "Image for normal format - A trick image used for main image or modal presentation"
-            width: 1600 #800
-            height: 900 #450
+            width: 880
+            height: 495
     -
         #3
         fields:

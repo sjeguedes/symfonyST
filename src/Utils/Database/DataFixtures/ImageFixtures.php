@@ -27,9 +27,9 @@ class ImageFixtures extends BaseFixture
     {
         $array = $this->parseYamlFile('image_fixtures.yaml');
         $data = $array['images'];
-        // Create tricks
+        // Create trick images
         $this->createFixtures(Image::class, \count($data), function($i) use($data) {
-            $trick = new Image(
+            return new Image(
                 $data[$i]['fields']['name'],
                 $data[$i]['fields']['description'],
                 $data[$i]['fields']['format'],
@@ -37,7 +37,6 @@ class ImageFixtures extends BaseFixture
                 new \DateTime(sprintf("+%d days", $i - 1)),
                 new \DateTime(sprintf("+%d days", $i - 1))
             );
-            return $trick;
         });
         $manager->flush();
     }

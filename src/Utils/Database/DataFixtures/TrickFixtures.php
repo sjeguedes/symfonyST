@@ -42,7 +42,7 @@ class TrickFixtures extends BaseFixture implements DependentFixtureInterface
         // Create tricks
         $this->createFixtures(Trick::class, \count($data), function($i) use($data) {
             $proxy = $this->getReference(TrickGroup::class . '_' . $data[$i]['references']['trick_group']);
-            $trick = new Trick(
+            return new Trick(
                 $data[$i]['fields']['name'],
                 $data[$i]['fields']['description'],
                 $proxy,
@@ -50,7 +50,6 @@ class TrickFixtures extends BaseFixture implements DependentFixtureInterface
                 new \DateTime(sprintf("+%d days", $i - 1)),
                 new \DateTime(sprintf("+%d days", $i - 1))
             );
-            return $trick;
         });
         $manager->flush();
     }
