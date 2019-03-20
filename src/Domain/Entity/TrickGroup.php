@@ -62,7 +62,7 @@ class TrickGroup
     /**
      * @var Collection (inverse side of entity relation)
      *
-     * @ORM\OneToMany(targetEntity=Trick::class, cascade={"persist", "remove"}, orphanRemoval=true, mappedBy="trickGroup")
+     * @ORM\OneToMany(targetEntity=Trick::class, mappedBy="trickGroup")
      */
     private $tricks;
 
@@ -137,7 +137,7 @@ class TrickGroup
      */
     public function modifyUpdateDate(\DateTimeInterface $updateDate) : self
     {
-        if ($this->updateDate > $updateDate) {
+        if ($this->creationDate > $updateDate) {
             throw new \RuntimeException('Update date is not logical: TrickGroup can not be created after modified update date!');
         }
         $this->updateDate = $updateDate;

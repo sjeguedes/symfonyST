@@ -76,7 +76,7 @@ class Image
     /**
      * @var Collection (inverse side of entity relation)
      *
-     * @ORM\OneToMany(targetEntity=Media::class, cascade={"persist", "remove"}, orphanRemoval=true, mappedBy="image")
+     * @ORM\OneToMany(targetEntity=Media::class, mappedBy="image")
      */
     private $medias;
 
@@ -159,7 +159,7 @@ class Image
      */
     public function modifyUpdateDate(\DateTimeInterface $updateDate) : self
     {
-        if ($this->updateDate > $updateDate) {
+        if ($this->creationDate > $updateDate) {
             throw new \RuntimeException('Update date is not logical: Image can not be created after modified update date!');
         }
         $this->updateDate = $updateDate;

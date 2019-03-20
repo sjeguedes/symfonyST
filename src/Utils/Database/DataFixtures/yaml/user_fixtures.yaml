@@ -1,0 +1,17 @@
+users:
+    -
+        #1 admin profile
+        fields:
+            family_name: "RYAN"
+            first_name: "Myke"
+            nick_name: "Samy"
+            email: "admin1@test.com"
+            password: "$2y$10$nnAO6t7ndOzL.Ariqra2G.MFPpVqg9zyA68hA2xVYPVozvCiJ0U1G"
+    -
+        #2 member profile
+        fields:
+            family_name: "DOE"
+            first_name: "John"
+            nick_name: "Rooky"
+            email: "member1@test.com"
+            password: "$2y$10$amj7urCAMnIPQjv4soHOWuUhSCgoNZmMn9sZhhCxXT.FZUYljFh.u"

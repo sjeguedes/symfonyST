@@ -105,9 +105,17 @@ class Trick
     private $trickGroup;
 
     /**
+     * @var User (owning side of entity relation)
+     *
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="tricks")
+     * @ORM\JoinColumn(name="user_uuid", referencedColumnName="uuid", nullable=false)
+     */
+    private $user;
+
+    /**
      * @var Collection (inverse side of entity relation)
      *
-     * @ORM\OneToMany(targetEntity=Media::class, cascade={"persist", "remove"}, orphanRemoval=true, mappedBy="trick")
+     * @ORM\OneToMany(targetEntity=Media::class, mappedBy="trick")
      */
     private $medias;
 
@@ -123,6 +131,7 @@ class Trick
      * @param string                  $name
      * @param string                  $description
      * @param TrickGroup              $trickGroup
+     * @param User                    $user
      * @param string|null             $slug
      * @param \DateTimeInterface|null $creationDate
      * @param \DateTimeInterface|null $updateDate
@@ -135,6 +144,7 @@ class Trick
         string $name,
         string $description,
         TrickGroup $trickGroup,
+        User $user,
         string $slug = null,
         \DateTimeInterface $creationDate = null,
         \DateTimeInterface $updateDate = null
@@ -145,6 +155,7 @@ class Trick
         assert(!empty($description),'Trick description can not be empty!');
         $this->description = $description;
         $this->trickGroup = $trickGroup;
+        $this->user = $user;
         !\is_null($slug) ? $this->customizeSlug($slug) : $this->customizeSlug($name);
         $createdAt = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
         $this->creationDate = $createdAt;
@@ -213,7 +224,7 @@ class Trick
      */
     public function modifyUpdateDate(\DateTimeInterface $updateDate) : self
     {
-        if ($this->updateDate > $updateDate) {
+        if ($this->creationDate > $updateDate) {
             throw new \RuntimeException('Update date is not logical: Trick can not be created after modified update date!');
         }
         $this->updateDate = $updateDate;
@@ -230,6 +241,19 @@ class Trick
     public function modifyTrickGroup(TrickGroup $trickGroup) : self
     {
         $this->trickGroup = $trickGroup;
+        return $this;
+    }
+
+    /**
+     * Change assigned user after creation.
+     *
+     * @param User $user
+     *
+     * @return Trick
+     */
+    public function modifyUser(User $user) : self
+    {
+        $this->user = $user;
         return $this;
     }
 

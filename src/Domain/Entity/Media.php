@@ -37,7 +37,7 @@ class Media
     private $mediaType;
 
     /**
-     * @var Image|null
+     * @var Image|null (owning side of entity relation)
      *
      * @ORM\ManyToOne(targetEntity=Image::class, inversedBy="medias")
      * @ORM\JoinColumn(name="image_uuid", referencedColumnName="uuid", nullable=true)
@@ -45,7 +45,7 @@ class Media
     private $image;
 
     /**
-     * @var Video|null
+     * @var Video|null (owning side of entity relation)
      *
      * @ORM\ManyToOne(targetEntity=Video::class, inversedBy="medias")
      * @ORM\JoinColumn(name="video_uuid", referencedColumnName="uuid", nullable=true)
@@ -59,6 +59,14 @@ class Media
      * @ORM\JoinColumn(name="trick_uuid", referencedColumnName="uuid", nullable=false)
      */
     private $trick;
+
+    /**
+     * @var User (owning side of entity relation)
+     *
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="medias")
+     * @ORM\JoinColumn(name="user_uuid", referencedColumnName="uuid", nullable=false)
+     */
+    private $user;
 
     /**
      *
@@ -81,6 +89,7 @@ class Media
      *
      * @param MediaType $mediaType
      * @param Trick     $trick
+     * @param User      $user
      * @param bool      $isMain
      * @param bool      $isPublished
      *
@@ -91,12 +100,14 @@ class Media
     private function __construct(
         MediaType $mediaType,
         Trick $trick,
+        User $user,
         bool $isMain = false,
         bool $isPublished = false
     ) {
         $this->uuid = Uuid::uuid4();
         $this->mediaType = $mediaType;
         $this->trick = $trick;
+        $this->user = $user;
         $this->isMain = $isMain;
         $this->isPublished = $isPublished;
     }
@@ -107,6 +118,7 @@ class Media
      * @param Image     $image
      * @param MediaType $mediaType
      * @param Trick     $trick
+     * @param User      $user
      * @param bool      $isMain
      * @param bool      $isPublished
      *
@@ -118,11 +130,12 @@ class Media
         Image $image,
         MediaType $mediaType,
         Trick $trick,
+        User $user,
         bool $isMain = false,
         bool $isPublished = false
     ) : Media
     {
-        $self = new self($mediaType, $trick, $isMain, $isPublished);
+        $self = new self($mediaType, $trick, $user, $isMain, $isPublished);
         $self->image = $image;
         $self->video = null;
         return $self;
@@ -134,6 +147,7 @@ class Media
      * @param Video     $video
      * @param MediaType $mediaType
      * @param Trick     $trick
+     * @param User      $user
      * @param bool      $isMain
      * @param bool      $isPublished
      *
@@ -145,11 +159,12 @@ class Media
         Video $video,
         MediaType $mediaType,
         Trick $trick,
+        User $user,
         bool $isMain = false,
         bool $isPublished = false
     ) : Media
     {
-        $self = new self($mediaType, $trick, $isMain, $isPublished);
+        $self = new self($mediaType, $trick, $user, $isMain, $isPublished);
         $self->video = $video;
         $self->image = null;
         return $self;
@@ -205,6 +220,19 @@ class Media
     public function modifyTrick(Trick $trick) : self
     {
         $this->trick = $trick;
+        return $this;
+    }
+
+    /**
+     * Change assigned user after creation.
+     *
+     * @param User $user
+     *
+     * @return Media
+     */
+    public function modifyUser(User $user) : self
+    {
+        $this->user = $user;
         return $this;
     }
 

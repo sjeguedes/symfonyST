@@ -61,7 +61,7 @@ class Video
     /**
      * @var Collection (inverse side of entity relation)
      *
-     * @ORM\OneToMany(targetEntity=Media::class, cascade={"persist", "remove"}, orphanRemoval=true, mappedBy="video")
+     * @ORM\OneToMany(targetEntity=Media::class, mappedBy="video")
      */
     private $medias;
 
@@ -136,7 +136,7 @@ class Video
      */
     public function modifyUpdateDate(\DateTimeInterface $updateDate) : self
     {
-        if ($this->updateDate > $updateDate) {
+        if ($this->creationDate > $updateDate) {
             throw new \RuntimeException('Update date is not logical: Video can not be created after modified update date!');
         }
         $this->updateDate = $updateDate;
