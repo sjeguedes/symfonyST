@@ -113,8 +113,9 @@ class Image
         $this->size = $size;
         $createdAt = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
         $this->creationDate = $createdAt;
-        assert($updateDate > $this->creationDate,'Image can not be created after update date!');
-        $this->updateDate = !\is_null($updateDate) ? $updateDate : $this->creationDate;
+        $updatedAt = !\is_null($updateDate) ? $updateDate : $this->creationDate;
+        assert($updatedAt >= $this->creationDate,'Image can not be created after update date!');
+        $this->updateDate = $updatedAt;
         $this->medias = new ArrayCollection();
     }
 

@@ -159,8 +159,9 @@ class Trick
         !\is_null($slug) ? $this->customizeSlug($slug) : $this->customizeSlug($name);
         $createdAt = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
         $this->creationDate = $createdAt;
-        assert($updateDate > $this->creationDate,'Trick can not be created after update date!');
-        $this->updateDate = !\is_null($updateDate) ? $updateDate : $this->creationDate;
+        $updatedAt = !\is_null($updateDate) ? $updateDate : $this->creationDate;
+        assert($updatedAt >= $this->creationDate,'Trick can not be created after update date!');
+        $this->updateDate = $updatedAt;
         $this->rank = null;
         $this->medias = new ArrayCollection();
     }

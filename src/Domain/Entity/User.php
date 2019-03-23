@@ -15,6 +15,8 @@ use Ramsey\Uuid\UuidInterface;
  *
  * Define User entity schema in database, its initial state and behaviors.
  *
+ * Avatar image reference is shared with Image - Media - MediaType entities.
+ *
  * @ORM\Entity(repositoryClass=UserRepository::class)
  * @ORM\Table(name="users")
  */
@@ -123,7 +125,7 @@ class User
      * @param string                  $firstName
      * @param string                  $nickName
      * @param string                  $email
-     * @param string                  $password
+     * @param string                  $password a default BCrypt encoded password
      * @param \DateTimeInterface|null $creationDate
      * @param \DateTimeInterface|null $updateDate
      *
@@ -147,15 +149,16 @@ class User
         $this->firstName = $firstName;
         assert(!empty($nickName),'User nickname can not be empty!');
         $this->nickName = $nickName;
-        assert(!empty($email),'User email can not be empty!');
+        assert(!empty($email) && filter_var($email,FILTER_VALIDATE_EMAIL),'User email format must be valid!');
         $this->email = $email;
-        // Bcrypt encoded password
-        assert(!\is_null($password) && strlen($password) === 60,'User password must contain 64 characters!');
+        // BCrypt encoded password
+        assert(!\is_null($password) && preg_match('/^\$2[ayb]\$.{56}$/', $password),'User BCrypt password must be valid!');
         $this->password = $password;
         $createdAt = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
         $this->creationDate = $createdAt;
-        assert($updateDate > $this->creationDate,'Trick can not be created after update date!');
-        $this->updateDate = !\is_null($updateDate) ? $updateDate : $this->creationDate;
+        $updatedAt = !\is_null($updateDate) ? $updateDate : $this->creationDate;
+        assert($updatedAt >= $this->creationDate,'User can not be created after update date!');
+        $this->updateDate = $updatedAt;
         $this->medias = new ArrayCollection();
     }
 
@@ -200,9 +203,9 @@ class User
      */
     public function modifyPassword(string $password) : self
     {
-        // Bcrypt encoded password
-        if (empty($password) || strlen($password) !== 60) {
-            throw new \InvalidArgumentException('User password can not be empty!');
+        // BCrypt encoded password
+        if (empty($password) || !preg_match('/^\$2[ayb]\$.{56}$/', $password)) {
+            throw new \InvalidArgumentException('User BCrypt password is not valid!');
         }
         $this->password = $password;
         return $this;
@@ -212,17 +215,16 @@ class User
      * Generate a password renewal token.
      *
      * User has forgotten his password, so this token is used to renew it.
+     * Token format is generated with: substr(hash('sha256', bin2hex(openssl_random_pseudo_bytes(8))), 0, 15);
      *
      * @param string $renewalToken
      *
      * @return User
-     *
-     * @TODO: to generate token use substr(hash('sha256', bin2hex(openssl_random_pseudo_bytes(8))), 0, 15);
      */
     public function generateRenewalToken(string $renewalToken) : self
     {
-        if (\is_null($renewalToken) || strlen($renewalToken) !== 15) {
-            throw new \InvalidArgumentException('User password renewal token must contain 15 characters!');
+        if (empty($renewalToken) || !preg_match('/^[a-z0-9]{15}$/', $renewalToken)) {
+            throw new \InvalidArgumentException('User password renewal token must be valid!');
         }
         $this->renewalToken = $renewalToken;
         return $this;

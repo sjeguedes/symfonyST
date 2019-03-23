@@ -85,13 +85,31 @@ class Media
     private $isPublished;
 
     /**
+     *
+     * @var \DateTimeInterface
+     *
+     * @ORM\Column(type="datetime", name="creation_date")
+     */
+    private $creationDate;
+
+    /**
+     *
+     * @var \DateTimeInterface
+     *
+     * @ORM\Column(type="datetime", name="update_date")
+     */
+    private $updateDate;
+
+    /**
      * Media constructor.
      *
-     * @param MediaType $mediaType
-     * @param Trick     $trick
-     * @param User      $user
-     * @param bool      $isMain
-     * @param bool      $isPublished
+     * @param MediaType               $mediaType
+     * @param Trick                   $trick
+     * @param User                    $user
+     * @param bool                    $isMain
+     * @param bool                    $isPublished
+     * @param \DateTimeInterface|null $creationDate
+     * @param \DateTimeInterface|null $updateDate
      *
      * @return void
      *
@@ -102,7 +120,9 @@ class Media
         Trick $trick,
         User $user,
         bool $isMain = false,
-        bool $isPublished = false
+        bool $isPublished = false,
+        \DateTimeInterface $creationDate = null,
+        \DateTimeInterface $updateDate = null
     ) {
         $this->uuid = Uuid::uuid4();
         $this->mediaType = $mediaType;
@@ -110,17 +130,24 @@ class Media
         $this->user = $user;
         $this->isMain = $isMain;
         $this->isPublished = $isPublished;
+        $createdAt = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
+        $this->creationDate = $createdAt;
+        $updatedAt = !\is_null($updateDate) ? $updateDate : $this->creationDate;
+        assert($updatedAt >= $this->creationDate,'Video can not be created after update date!');
+        $this->updateDate = $updatedAt;
     }
 
     /**
      * Named constructor used to create instance based on Image instance.
      *
-     * @param Image     $image
-     * @param MediaType $mediaType
-     * @param Trick     $trick
-     * @param User      $user
-     * @param bool      $isMain
-     * @param bool      $isPublished
+     * @param Image                   $image
+     * @param MediaType               $mediaType
+     * @param Trick                   $trick
+     * @param User                    $user
+     * @param bool                    $isMain
+     * @param bool                    $isPublished
+     * @param \DateTimeInterface|null $creationDate
+     * @param \DateTimeInterface|null $updateDate
      *
      * @return Media
      *
@@ -132,10 +159,12 @@ class Media
         Trick $trick,
         User $user,
         bool $isMain = false,
-        bool $isPublished = false
+        bool $isPublished = false,
+        \DateTimeInterface $creationDate = null,
+        \DateTimeInterface $updateDate = null
     ) : Media
     {
-        $self = new self($mediaType, $trick, $user, $isMain, $isPublished);
+        $self = new self($mediaType, $trick, $user, $isMain, $isPublished, $creationDate, $updateDate);
         $self->image = $image;
         $self->video = null;
         return $self;
@@ -144,12 +173,14 @@ class Media
     /**
      * Named constructor used to create instance based on Video instance.
      *
-     * @param Video     $video
-     * @param MediaType $mediaType
-     * @param Trick     $trick
-     * @param User      $user
-     * @param bool      $isMain
-     * @param bool      $isPublished
+     * @param Video                   $video
+     * @param MediaType               $mediaType
+     * @param Trick                   $trick
+     * @param User                    $user
+     * @param bool                    $isMain
+     * @param bool                    $isPublished
+     * @param \DateTimeInterface|null $creationDate
+     * @param \DateTimeInterface|null $updateDate
      *
      * @return Media
      *
@@ -161,10 +192,12 @@ class Media
         Trick $trick,
         User $user,
         bool $isMain = false,
-        bool $isPublished = false
+        bool $isPublished = false,
+        \DateTimeInterface $creationDate = null,
+        \DateTimeInterface $updateDate = null
     ) : Media
     {
-        $self = new self($mediaType, $trick, $user, $isMain, $isPublished);
+        $self = new self($mediaType, $trick, $user, $isMain, $isPublished, $creationDate, $updateDate);
         $self->video = $video;
         $self->image = null;
         return $self;
@@ -271,6 +304,22 @@ class Media
     }
 
     /**
+     * Change update date after creation.
+     *
+     * @param \DateTimeInterface $updateDate
+     *
+     * @return Media
+     */
+    public function modifyUpdateDate(\DateTimeInterface $updateDate) : self
+    {
+        if ($this->creationDate > $updateDate) {
+            throw new \RuntimeException('Update date is not logical: Media can not be created after modified update date!');
+        }
+        $this->updateDate = $updateDate;
+        return $this;
+    }
+
+    /**
      * @return UuidInterface
      */
     public function getUuid() : UuidInterface
@@ -324,5 +373,21 @@ class Media
     public function getIsPublished() : bool
     {
         return $this->isPublished;
+    }
+
+    /**
+     * @return \DateTimeInterface
+     */
+    public function getCreationDate() : \DateTimeInterface
+    {
+        return $this->creationDate;
+    }
+
+    /**
+     * @return \DateTimeInterface
+     */
+    public function getUpdateDate() : \DateTimeInterface
+    {
+        return $this->updateDate;
     }
 }

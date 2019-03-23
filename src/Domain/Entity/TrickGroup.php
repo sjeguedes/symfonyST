@@ -91,8 +91,9 @@ class TrickGroup
         $this->description = $description;
         $createdAt = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
         $this->creationDate = $createdAt;
-        assert($updateDate > $this->creationDate,'TrickGroup can not be created after update date!');
-        $this->updateDate = !\is_null($updateDate) ? $updateDate : $this->creationDate;
+        $updatedAt = !\is_null($updateDate) ? $updateDate : $this->creationDate;
+        assert($updatedAt >= $this->creationDate,'TrickGroup can not be created after update date!');
+        $this->updateDate = $updatedAt;
         $this->tricks = new ArrayCollection();
     }
 
