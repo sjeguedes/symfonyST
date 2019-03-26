@@ -35,7 +35,6 @@ class MediaTypeFixtures extends BaseFixture
                 $data[$i]['fields']['description'],
                 $data[$i]['fields']['width'],
                 $data[$i]['fields']['height'],
-                new \DateTime(sprintf("+%d days", $i - 1)),
                 new \DateTime(sprintf("+%d days", $i - 1))
             );
         });

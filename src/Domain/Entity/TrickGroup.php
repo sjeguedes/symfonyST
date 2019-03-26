@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Entity;
 
+use App\Domain\Repository\TrickGroupRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -72,7 +73,6 @@ class TrickGroup
      * @param string                  $name
      * @param string                  $description
      * @param \DateTimeInterface|null $creationDate
-     * @param \DateTimeInterface|null $updateDate
      *
      * @return void
      *
@@ -81,19 +81,16 @@ class TrickGroup
     public function __construct(
         string $name,
         string $description,
-        \DateTimeInterface $creationDate = null,
-        \DateTimeInterface $updateDate = null
+        \DateTimeInterface $creationDate = null
     ) {
         $this->uuid = Uuid::uuid4();
-        assert(!empty($name),'TrickGroup name can not be empty!');
+        \assert(!empty($name),'TrickGroup name can not be empty!');
         $this->name = $name;
-        assert(!empty($description),'TrickGroup description can not be empty!');
+        \assert(!empty($description),'TrickGroup description can not be empty!');
         $this->description = $description;
         $createdAt = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
         $this->creationDate = $createdAt;
-        $updatedAt = !\is_null($updateDate) ? $updateDate : $this->creationDate;
-        assert($updatedAt >= $this->creationDate,'TrickGroup can not be created after update date!');
-        $this->updateDate = $updatedAt;
+        $this->updateDate = $createdAt;
         $this->tricks = new ArrayCollection();
     }
 

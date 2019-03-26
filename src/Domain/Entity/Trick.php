@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Entity;
 
+use App\Domain\Repository\TrickRepository;
 use App\Utils\Traits\StringHelperTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -134,7 +135,6 @@ class Trick
      * @param User                    $user
      * @param string|null             $slug
      * @param \DateTimeInterface|null $creationDate
-     * @param \DateTimeInterface|null $updateDate
      *
      * @return void
      *
@@ -146,22 +146,19 @@ class Trick
         TrickGroup $trickGroup,
         User $user,
         string $slug = null,
-        \DateTimeInterface $creationDate = null,
-        \DateTimeInterface $updateDate = null
+        \DateTimeInterface $creationDate = null
     ) {
         $this->uuid = Uuid::uuid4();
-        assert(!empty($name),'Trick name can not be empty!');
+        \assert(!empty($name),'Trick name can not be empty!');
         $this->name = $name;
-        assert(!empty($description),'Trick description can not be empty!');
+        \assert(!empty($description),'Trick description can not be empty!');
         $this->description = $description;
         $this->trickGroup = $trickGroup;
         $this->user = $user;
         !\is_null($slug) ? $this->customizeSlug($slug) : $this->customizeSlug($name);
         $createdAt = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
         $this->creationDate = $createdAt;
-        $updatedAt = !\is_null($updateDate) ? $updateDate : $this->creationDate;
-        assert($updatedAt >= $this->creationDate,'Trick can not be created after update date!');
-        $this->updateDate = $updatedAt;
+        $this->updateDate = $createdAt;
         $this->rank = null;
         $this->medias = new ArrayCollection();
     }

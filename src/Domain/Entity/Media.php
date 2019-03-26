@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Entity;
 
+use App\Domain\Repository\MediaRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
@@ -109,7 +110,6 @@ class Media
      * @param bool                    $isMain
      * @param bool                    $isPublished
      * @param \DateTimeInterface|null $creationDate
-     * @param \DateTimeInterface|null $updateDate
      *
      * @return void
      *
@@ -121,8 +121,7 @@ class Media
         User $user,
         bool $isMain = false,
         bool $isPublished = false,
-        \DateTimeInterface $creationDate = null,
-        \DateTimeInterface $updateDate = null
+        \DateTimeInterface $creationDate = null
     ) {
         $this->uuid = Uuid::uuid4();
         $this->mediaType = $mediaType;
@@ -132,9 +131,7 @@ class Media
         $this->isPublished = $isPublished;
         $createdAt = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
         $this->creationDate = $createdAt;
-        $updatedAt = !\is_null($updateDate) ? $updateDate : $this->creationDate;
-        assert($updatedAt >= $this->creationDate,'Video can not be created after update date!');
-        $this->updateDate = $updatedAt;
+        $this->updateDate = $createdAt;
     }
 
     /**
@@ -147,7 +144,6 @@ class Media
      * @param bool                    $isMain
      * @param bool                    $isPublished
      * @param \DateTimeInterface|null $creationDate
-     * @param \DateTimeInterface|null $updateDate
      *
      * @return Media
      *
@@ -160,11 +156,10 @@ class Media
         User $user,
         bool $isMain = false,
         bool $isPublished = false,
-        \DateTimeInterface $creationDate = null,
-        \DateTimeInterface $updateDate = null
+        \DateTimeInterface $creationDate = null
     ) : Media
     {
-        $self = new self($mediaType, $trick, $user, $isMain, $isPublished, $creationDate, $updateDate);
+        $self = new self($mediaType, $trick, $user, $isMain, $isPublished, $creationDate);
         $self->image = $image;
         $self->video = null;
         return $self;
@@ -180,7 +175,6 @@ class Media
      * @param bool                    $isMain
      * @param bool                    $isPublished
      * @param \DateTimeInterface|null $creationDate
-     * @param \DateTimeInterface|null $updateDate
      *
      * @return Media
      *
@@ -193,11 +187,10 @@ class Media
         User $user,
         bool $isMain = false,
         bool $isPublished = false,
-        \DateTimeInterface $creationDate = null,
-        \DateTimeInterface $updateDate = null
+        \DateTimeInterface $creationDate = null
     ) : Media
     {
-        $self = new self($mediaType, $trick, $user, $isMain, $isPublished, $creationDate, $updateDate);
+        $self = new self($mediaType, $trick, $user, $isMain, $isPublished, $creationDate);
         $self->video = $video;
         $self->image = null;
         return $self;
@@ -297,7 +290,7 @@ class Media
     public function modifyIsPublished(bool $isPublished) : self
     {
         if (false === $this->isPublished && true === $this->isMain) {
-            throw new \RuntimeException('You can not un-publish this media, if it is used as main the same time!');
+            throw new \RuntimeException('You can not un-publish this media, if it is used as main at the same time!');
         }
         $this->isPublished = $isPublished;
         return $this;

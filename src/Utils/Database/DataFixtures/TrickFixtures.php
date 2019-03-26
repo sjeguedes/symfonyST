@@ -53,7 +53,6 @@ class TrickFixtures extends BaseFixture implements DependentFixtureInterface
                 $proxy,
                 $proxy2,
                 $data[$i]['fields']['slug'],
-                new \DateTime(sprintf("+%d days", $i - 1)),
                 new \DateTime(sprintf("+%d days", $i - 1))
             );
         });

@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Domain\Entity;
 
+use App\Domain\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Class User.
@@ -20,8 +22,23 @@ use Ramsey\Uuid\UuidInterface;
  * @ORM\Entity(repositoryClass=UserRepository::class)
  * @ORM\Table(name="users")
  */
-class User
+class User implements UserInterface, \Serializable
 {
+    /**
+     * Define default algorithm for password hash.
+     */
+    const DEFAULT_ALGORITHM = 'BCrypt';
+
+    /**
+     * Define a default role for authorization process.
+     */
+    const DEFAULT_ROLE = 'ROLE_USER';
+
+    /**
+     * Define algorithms for password hash.
+     */
+    const HASH_ALGORITHMS = ['BCrypt', 'Argon2i'];
+
     /**
      * The internal primary identity key.
      *
@@ -36,7 +53,7 @@ class User
      *
      * @var string
      *
-     * @ORM\Column(type="string", name="family_name")
+     * @ORM\Column(type="string")
      */
     private $familyName;
 
@@ -44,7 +61,7 @@ class User
      *
      * @var string
      *
-     * @ORM\Column(type="string", name="first_name")
+     * @ORM\Column(type="string")
      */
     private $firstName;
 
@@ -52,7 +69,7 @@ class User
      *
      * @var string
      *
-     * @ORM\Column(type="string", name="nick_name", unique=true)
+     * @ORM\Column(type="string", unique=true)
      */
     private $nickName;
 
@@ -71,6 +88,26 @@ class User
      * @ORM\Column(type="string", length=60, unique=true)
      */
     private $password;
+
+    /**
+     * @var string|null a custom salt for password hash (e.g. BCrypt but Symfony does not use custom value for that kind of algorithm!)
+     */
+    private $salt;
+
+    /**
+     * @var array
+     *
+     * @ORM\Column(type="array")
+     */
+    private $roles;
+
+    /**
+     *
+     * @var boolean
+     *
+     * @ORM\Column(type="boolean")
+     */
+    private $isActivated;
 
     /**
      *
@@ -125,9 +162,11 @@ class User
      * @param string                  $firstName
      * @param string                  $nickName
      * @param string                  $email
-     * @param string                  $password a default BCrypt encoded password
+     * @param string                  $password an encoded password
+     * @param string                  $algorithm a hash algorithm type for password
+     * @param array                   $roles
+     * @param string|null             $salt
      * @param \DateTimeInterface|null $creationDate
-     * @param \DateTimeInterface|null $updateDate
      *
      * @return void
      *
@@ -139,26 +178,28 @@ class User
         string $nickName,
         string $email,
         string $password,
-        \DateTimeInterface $creationDate = null,
-        \DateTimeInterface $updateDate = null
+        string $algorithm = self::DEFAULT_ALGORITHM,
+        array $roles = [self::DEFAULT_ROLE],
+        string $salt = null,
+        \DateTimeInterface $creationDate = null
     ) {
         $this->uuid = Uuid::uuid4();
-        assert(!empty($familyName),'User family name can not be empty!');
+        \assert(!empty($familyName),'User family name can not be empty!');
         $this->familyName = $familyName;
-        assert(!empty($firstName),'User first name can not be empty!');
+        \assert(!empty($firstName),'User first name can not be empty!');
         $this->firstName = $firstName;
-        assert(!empty($nickName),'User nickname can not be empty!');
+        \assert(!empty($nickName),'User nickname can not be empty!');
         $this->nickName = $nickName;
-        assert(!empty($email) && filter_var($email,FILTER_VALIDATE_EMAIL),'User email format must be valid!');
+        \assert($this->isEmailValidated($email),'User email format must be valid!');
         $this->email = $email;
-        // BCrypt encoded password
-        assert(!\is_null($password) && preg_match('/^\$2[ayb]\$.{56}$/', $password),'User BCrypt password must be valid!');
+        \assert($this->isPasswordValidated($password, $algorithm),'User password must be valid!');
         $this->password = $password;
+        $this->roles = $roles;
+        $this->salt = $salt;
+        $this->isActivated = false;
         $createdAt = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
         $this->creationDate = $createdAt;
-        $updatedAt = !\is_null($updateDate) ? $updateDate : $this->creationDate;
-        assert($updatedAt >= $this->creationDate,'User can not be created after update date!');
-        $this->updateDate = $updatedAt;
+        $this->updateDate = $createdAt;
         $this->medias = new ArrayCollection();
     }
 
@@ -195,19 +236,105 @@ class User
     }
 
     /**
+     * Validate email format.
+     *
+     * @param string $email
+     *
+     * @return bool
+     */
+    private function isEmailValidated(string $email) : bool
+    {
+        if (empty($email) || !filter_var($email,FILTER_VALIDATE_EMAIL)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Validate password with algorithm type.
+     *
+     * @param string $password
+     * @param string $algorithm
+     *
+     * @return bool
+     */
+    private function isPasswordValidated(string $password, string $algorithm) : bool
+    {
+        if (!\in_array($algorithm, self::HASH_ALGORITHMS)) {
+            return false;
+        }
+        if ('BCrypt' === $algorithm && (empty($password) || !preg_match('/^\$2[ayb]\$.{56}$/', $password))) {
+            return false;
+        }
+        // Other possible cases here!
+        return true;
+    }
+
+    /**
      * Change password after creation.
      *
+     * @param string $algorithm
      * @param string $password
      *
      * @return User
      */
-    public function modifyPassword(string $password) : self
+    public function modifyPassword(string $password, string $algorithm) : self
     {
         // BCrypt encoded password
-        if (empty($password) || !preg_match('/^\$2[ayb]\$.{56}$/', $password)) {
-            throw new \InvalidArgumentException('User BCrypt password is not valid!');
+        if (!$this->isPasswordValidated($password, $algorithm)) {
+            throw new \InvalidArgumentException('User password is not valid!');
         }
         $this->password = $password;
+        return $this;
+    }
+
+    /**
+     * Validate user roles.
+     *
+     * @param array $roles
+     *
+     * @return bool
+     */
+    private function isRolesArrayValidated(array $roles) : bool
+    {
+        if (!\in_array(self::DEFAULT_ROLE, $roles)) {
+            $roles[] = self::DEFAULT_ROLE;
+        }
+        $roles = array_unique($roles);
+        foreach ($roles as $role) {
+            if (substr($role, 0, 5) !== 'ROLE_') {
+               return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Change user roles after creation.
+     *
+     * @param array $roles
+     *
+     * @return User
+     */
+    public function modifyRoles(array $roles) : self
+    {
+        if (!$this->isRolesArrayValidated($roles)) {
+            throw new \InvalidArgumentException('Each role must begin with "ROLE_"!');
+        }
+        $this->roles = $roles;
+        return $this;
+    }
+
+    /**
+     * Change account activated state after creation.
+     *
+     * @param bool $isActivated
+     *
+     * @return User
+     */
+    public function modifyIsActivated(bool $isActivated) : self
+    {
+        $this->isActivated = $isActivated;
         return $this;
     }
 
@@ -368,10 +495,45 @@ class User
 
     /**
      * @return string
+     *
+     * Mandatory method name due to UserInterface
      */
     public function getPassword() : string
     {
         return $this->password;
+    }
+
+    /**
+     * @return array
+     */
+    public function getRoles() : array
+    {
+        return $this->roles;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSalt() : ?string
+    {
+        return $this->salt;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getUsername() : string
+    {
+        // nickname equals username in App.
+        return $this->nickName;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsActivated() : bool
+    {
+        return $this->isActivated;
     }
 
     /**
@@ -420,5 +582,45 @@ class User
     public function getTricks() : Collection
     {
         return $this->tricks;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function eraseCredentials() : void
+    {
+        // UserInterface method implementation is not used.
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @see \Serializable::serialize()
+     */
+    public function serialize() : string
+    {
+        return serialize([
+            $this->uuid,
+            $this->nickName,
+            $this->password,
+            $this->isActivated,
+            $this->salt
+        ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @see \Serializable::unserialize()
+     */
+    public function unserialize($serialized) : void
+    {
+        list(
+            $this->uuid,
+            $this->nickName,
+            $this->password,
+            $this->isActivated,
+            $this->salt
+        ) = unserialize($serialized); // ['allowed_classes' => false]
     }
 }

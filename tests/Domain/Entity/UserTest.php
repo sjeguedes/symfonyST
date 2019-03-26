@@ -51,7 +51,7 @@ class UserTest extends TestCase
      */
     public function testModifyPasswordHasBCryptFormat()
     {
-        $this->user->modifyPassword('$2y$10$mAN1D4rwZT0wnxRM2er/0OfzgpZelwL6PSTNoqC3p/EmfV3lV5DSe');
+        $this->user->modifyPassword('$2y$10$mAN1D4rwZT0wnxRM2er/0OfzgpZelwL6PSTNoqC3p/EmfV3lV5DSe', 'BCrypt');
         $password = $this->user->getPassword();
         $this->assertRegExp('/^\$2[ayb]\$.{56}$/', $password);
     }

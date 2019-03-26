@@ -63,7 +63,8 @@ class MediaFixtures extends BaseFixture implements DependentFixtureInterface
                         $proxy3,
                         $proxy4,
                         $data[$i]['fields']['is_main'],
-                        $data[$i]['fields']['is_published']
+                        $data[$i]['fields']['is_published'],
+                        new \DateTime(sprintf("+%d days", $i - 1))
                     );
                     break;
                 case array_key_exists('video', $data[$i]['references']):
@@ -74,7 +75,8 @@ class MediaFixtures extends BaseFixture implements DependentFixtureInterface
                         $proxy3,
                         $proxy4,
                         $data[$i]['fields']['is_main'],
-                        $data[$i]['fields']['is_published']
+                        $data[$i]['fields']['is_published'],
+                        new \DateTime(sprintf("+%d days", $i - 1))
                     );
                     break;
             }

@@ -32,10 +32,11 @@ class UserFixtures extends BaseFixture
             return new User(
                 $data[$i]['fields']['family_name'],
                 $data[$i]['fields']['first_name'],
-                $data[$i]['fields']['nick_name'],
+                $data[$i]['fields']['user_name'],
                 $data[$i]['fields']['email'],
                 $data[$i]['fields']['password'],
-                new \DateTime(sprintf("+%d days", $i - 1)),
+                $data[$i]['fields']['roles'],
+                $data[$i]['fields']['salt'],
                 new \DateTime(sprintf("+%d days", $i - 1))
             );
         });

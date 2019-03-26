@@ -1,24 +1,42 @@
 security:
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     providers:
-        in_memory: { memory: ~ }
+        database_users:
+            entity:
+                class: App\Domain\Entity\User
+                # Checked user properties are nickName or email.
+                # Look at implemented UserLoaderInterface in App\Domain\Repository\UserRepository
+                # https://stackoverflow.com/questions/52559925/decouple-authentication-from-your-user-entity-in-symfony-4
+    encoders:
+        # Custom User class
+        App\Domain\Entity\User:
+            # BCrypt
+            algorithm: bcrypt
+            cost: 12
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
-            anonymous: true
-
+            pattern: ^/
+            anonymous: ~
+            # enable ROLE_SUPER_ADMIN role switching https://symfony.com/doc/current/security/impersonating_user.html
+            switch_user: ~
             # activate different ways to authenticate
-
-            # http_basic: true
+            http_basic: ~
+            provider: database_users
             # https://symfony.com/doc/current/security.html#a-configuring-how-your-users-will-authenticate
-
             # form_login: true
             # https://symfony.com/doc/current/security/form_login_setup.html
+    role_hierarchy:
+        #ROLE_USER: ROLE_MEMBER
+        # ROLE_ADMIN has also ROLE_USER rights
+        ROLE_ADMIN: ROLE_USER
+        # ROLE_SUPER_ADMIN has both ROLE_ADMIN and ROLE_USER rights. Also, it can switch roles.
+        ROLE_SUPER_ADMIN: [ROLE_USER, ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
 
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/member, roles: ROLE_USER }
