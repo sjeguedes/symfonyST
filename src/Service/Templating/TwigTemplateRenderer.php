@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Responder\Templating;
+declare(strict_types = 1);
+
+namespace App\Service\Templating;
 
 use App\Utils\Traits\TwigHelperTrait;
 use Twig\Environment;
@@ -8,7 +10,7 @@ use Twig\Environment;
 /**
  * Class TwigTemplateRenderer.
  *
- * Render a Twig template or block
+ * Render a Twig template or block.
  */
 final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateBlockRendererInterface
 {
@@ -45,6 +47,10 @@ final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateB
                 'name'      => 'home/trick_list.html.twig'
             ],
             [
+                'responder' => 'App\\Responder\\Admin\\LoginResponder',
+                'name'      => 'admin/login.html.twig'
+            ],
+            [
                 'responder' => 'App\\Responder\\PaginatedTrickListResponder',
                 'name'      => 'tricks/paginated_list.html.twig'
             ],
@@ -59,13 +65,13 @@ final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateB
      * Render a Twig engine template.
      *
      * @param string $template
-     * @param array  $data
+     * @param array $data
      *
      * @return string
      *
-     * @throws \Twig_Error_Loader
-     * @throws \Twig_Error_Runtime
-     * @throws \Twig_Error_Syntax
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
      */
     public function renderTemplate(string $template, array $data) : string
     {
@@ -87,18 +93,22 @@ final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateB
         if (!class_exists($className)) {
             throw new \InvalidArgumentException('Response can not be rendered: mandatory Responder does not exist!');
         }
-        $isMatched = false;
+        $data = '';
+        $i = 0;
         foreach ($this->templates as $template) {
+            ++ $i;
             $hasBlock = !isset($template['block']) ? false : true;
             $isMatched = $className !== $template['responder'] ? false : true;
+            if ($i === count($this->templates) && false === $isMatched) {
+                throw new \RuntimeException('No template name was found: try to use another rendering method!');
+            }
             if (true === $hasBlock || false === $isMatched) {
                 continue;
             }
-            return $template['name'];
+            $data = $template['name'];
+            break;
         }
-        if (false === $isMatched) {
-            throw new \RuntimeException('No template name was found: try to use another rendering method!');
-        }
+        return $data;
     }
 
     /**
@@ -133,20 +143,24 @@ final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateB
         if (!class_exists($className)) {
             throw new \InvalidArgumentException('Response can not be rendered: mandatory Responder does not exist!');
         }
-        $isMatched = false;
+        $data = [];
+        $i = 0;
         foreach ($this->templates as $template) {
+            ++ $i;
             $hasBlock = !isset($template['block']) ? false : true;
             $isMatched = $className !== $template['responder'] ? false : true;
+            if ($i === count($this->templates) && false === $isMatched) {
+                throw new \RuntimeException('No template block name was found: try to use another rendering method!');
+            }
             if (false === $hasBlock || false === $isMatched) {
                 continue;
             }
-            return [
+            $data = [
                 'template' => $template['name'],
-                'block'    => $template['block']
+                'block' => $template['block']
             ];
+            break;
         }
-        if (false === $isMatched) {
-            throw new \RuntimeException('No template block name was found: try to use another rendering method!');
-        }
+        return $data;
     }
 }

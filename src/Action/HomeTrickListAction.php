@@ -1,10 +1,9 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace App\Action;
 
-use App\Domain\Repository\UserRepository;
 use App\Domain\Service\TrickManager;
 use App\Responder\HomeTrickListResponder;
 use Psr\Log\LoggerAwareTrait;

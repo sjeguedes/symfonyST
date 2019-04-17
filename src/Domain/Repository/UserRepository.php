@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace App\Domain\Repository;
 
@@ -30,9 +30,27 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
     }
 
     /**
+     * Find a user only with email.
+     *
+     * @param string $email
+     *
+     * @return User|null
+     *
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function findOneByEmail(string $email) : ?User
+    {
+       return $this->createQueryBuilder('u')
+        ->where('u.email = :query')
+        ->setParameter('query', $email)
+        ->getQuery()
+        ->getOneOrNullResult();
+    }
+
+    /**
      * {@inheritdoc}
      *
-     * Load User by finding him with his nickname or email.
+     * Load a user finding him with his nickname or email.
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */

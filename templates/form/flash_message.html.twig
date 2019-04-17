@@ -1,0 +1,28 @@
+{# Used with notification #}
+{% block flash %}
+{# Use peekAll() to not erase flash messages with condition #}
+{% if app.session.flashbag.peekAll() is not empty %}
+<div id="st-flash-message-content" class="uk-hidden">
+    {% for flash_message in app.session.flashbag.get('success') %}
+        <div class="st-flash-message" data-flash-type="success">
+            {{ flash_message }}
+        </div>
+    {% endfor %}
+    {% for flash_message in app.session.flashbag.get('info') %}
+        <div class="st-flash-message" data-flash-type="info">
+            {{ flash_message }}
+        </div>
+    {% endfor %}
+    {% for flash_message in app.session.flashbag.get('warning') %}
+        <div class="st-flash-message" data-flash-type="warning">
+            {{ flash_message }}
+        </div>
+    {% endfor %}
+    {% for flash_message in app.session.flashbag.get('danger') %}
+        <div class="st-flash-message" data-flash-type="danger">
+            {{ flash_message }}
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

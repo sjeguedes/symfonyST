@@ -27,7 +27,7 @@ class MediaTypeManager
      * MediaTypeManager constructor.
      *
      * @param MediaTypeRepository $repository
-     * @param LoggerInterface $logger
+     * @param LoggerInterface     $logger
      *
      * @return void
      */
@@ -44,7 +44,7 @@ class MediaTypeManager
      *
      * @return MediaType|null
      */
-    public function findSingleByUniqueType(string $type): ?MediaType
+    public function findSingleByUniqueType(string $type) : ?MediaType
     {
         return $this->repository->findOneByType($type);
     }

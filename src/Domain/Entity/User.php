@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace App\Domain\Entity;
 
@@ -38,6 +38,12 @@ class User implements UserInterface, \Serializable
      * Define algorithms for password hash.
      */
     const HASH_ALGORITHMS = ['BCrypt', 'Argon2i'];
+
+    const ROLE_LABELS = [
+        'ROLE_USER'  => 'Member',
+        'ROLE_ADMIN' => 'Admin',
+        'ROLE_SUPER_ADMIN' => 'Super admin'
+    ];
 
     /**
      * The internal primary identity key.
@@ -321,7 +327,7 @@ class User implements UserInterface, \Serializable
         if (!$this->isRolesArrayValidated($roles)) {
             throw new \InvalidArgumentException('Each role must begin with "ROLE_"!');
         }
-        $this->roles = $roles;
+        $this->roles = array_unique($roles);
         return $this;
     }
 
@@ -385,7 +391,7 @@ class User implements UserInterface, \Serializable
     public function generateRenewalRequestDate(\DateTimeInterface $renewalRequestDate) : self
     {
         if ($this->creationDate > $renewalRequestDate) {
-            throw new \RuntimeException('Renewal request date is not logical: User renewal token can not be created before User creation date!');
+            throw new \RuntimeException('Renewal request date is not logical: user renewal token can not be created before user creation date!');
         }
         $this->renewalRequestDate = $renewalRequestDate;
         return $this;
@@ -509,6 +515,29 @@ class User implements UserInterface, \Serializable
     public function getRoles() : array
     {
         return $this->roles;
+    }
+
+    /**
+     * Get user main role label.
+     *
+     * @return string
+     */
+    public function getMainRoleLabel() : string
+    {
+        $roleLabels = self::ROLE_LABELS;
+        $roles = $this->getRoles();
+        $mainRoleLabel = '';
+        foreach ($roles as $value) {
+            switch ($value) {
+                case 'ROLE_SUPER_ADMIN':
+                case 'ROLE_ADMIN':
+                    $mainRoleLabel = $roleLabels[$value];
+                    break;
+                default:
+                    $mainRoleLabel = $roleLabels['ROLE_USER'];
+            }
+        };
+        return $mainRoleLabel;
     }
 
     /**

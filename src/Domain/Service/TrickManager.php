@@ -140,7 +140,7 @@ class TrickManager
         $trickNumberPerPage = $listDefaultParameters['numberPerPage'];
         $pageCount = $countAll % $trickNumberPerPage == 0
             ? $countAll / $trickNumberPerPage
-            : (int) floor($countAll  / $trickNumberPerPage) + 1;
+            : (int) floor($countAll / $trickNumberPerPage) + 1;
         $loadingMode = $listDefaultParameters['loadingMode'];
         if ($pageIndex <= 0 || $pageIndex > $pageCount) {
             return null;

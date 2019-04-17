@@ -2,6 +2,7 @@
 <html lang="{{ app.request.locale }}">
 <head>
     <meta charset="{{ _charset }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
@@ -27,7 +28,7 @@
                             <p class="uk-text-middle st-slogan"><span uk-icon="icon: more-vertical; ratio: 1"></span>&nbsp;<em>Born to ride...</em>&nbsp;<span uk-icon="icon: more-vertical; ratio: 1"></span></p>
                         </div>
                         <div class="uk-navbar-right">
-                            <a class="uk-navbar-toggle uk-hidden@m" uk-navbar-toggle-icon href="#" uk-toggle="target: .st-footer-nav--none; cls: uk-display-block; animation: uk-animation-fade; queued: true"></a>
+                            <a class="uk-navbar-toggle uk-hidden@m" uk-navbar-toggle-icon href="#" uk-toggle="target: .st-footer-nav-none; cls: uk-display-block; animation: uk-animation-fade; queued: true"></a>
                             <div class="uk-visible@m st-main-nav">
                                 {% include 'main_navigation.html.twig' %}
                             </div>
@@ -38,6 +39,8 @@
                     </div>
                 </header>
                 <section id="content" class="st-content">
+                    {# Flash messages with notification component #}
+                    {% include 'form/flash_message.html.twig' %}
                     {% block content %}{% endblock %}
                 </section>
                 <footer id="footer" class="uk-section-secondary st-footer">
@@ -56,11 +59,11 @@
                             </div>
                         </div>
                         <!-- Hidden/shown at the same time when footer navigation is not displayed. -->
-                        <div class="uk-margin-large-bottom uk-padding-large-bottom uk-hidden@m st-footer-nav--none"></div>
+                        <div class="uk-margin-large-bottom uk-padding-large-bottom uk-hidden@m st-footer-nav-none"></div>
                     </div>
                 </footer>
                 <!-- Main navigation in footer for smaller screen -->
-                <nav id="footer-primary-navigation" class="uk-navbar-container uk-hidden@m st-footer-nav st-footer-nav--none" role="navigation" uk-navbar>
+                <nav id="footer-primary-navigation" class="uk-navbar-container uk-hidden@m st-footer-nav st-footer-nav-none" role="navigation" uk-navbar>
                     <div class="uk-text-center">
                         {% include 'main_navigation.html.twig' %}
                     </div>

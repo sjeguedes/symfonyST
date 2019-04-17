@@ -1,10 +1,10 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace App\Responder;
 
-use App\Responder\Templating\TemplateRendererInterface;
+use App\Service\Templating\TemplateRendererInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 /**

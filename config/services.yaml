@@ -18,7 +18,8 @@ services:
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/*'
-        exclude: '../src/{DependencyInjection,Domain/Entity,Utils/Traits,Utils/Database/Migrations,Tests,Kernel.php}'
+        exclude: '../src/{Domain/Entity,Kernel.php,Service,Tests,Utils/Traits,Utils/Database/Migrations}'
+        #DependencyInjection,
 
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
@@ -31,14 +32,22 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
-    # add template engine renderer default service when calling interface: Twig
-    App\Responder\Templating\TwigTemplateRenderer: ~
-    App\Responder\Templating\TemplateRendererInterface: '@App\Responder\Templating\TwigTemplateRenderer'
-    App\Responder\Templating\TemplateBlockRendererInterface: '@App\Responder\Templating\TwigTemplateRenderer'
+    # add logout handler
+    App\Event\Handler\LogoutHandler:
+        tags: ['app.event.handler.logout_handler']
+
+    # add login form guard authenticator
+    App\Service\Security\LoginFormAuthenticationManager:
+        tags: ['app.service.security.login_form_authentication_manager']
 
     # add trick video URL "proxy" checker
-    App\Utils\Medias\VideoURLProxyChecker:
-        tags: ['app.utils.medias.video_url_proxy_checker']
+    App\Service\Medias\VideoURLProxyChecker:
+        tags: ['app.service.medias.video_url_proxy_checker']
+
+    # add template engine renderer default service when calling interface: Twig
+    App\Service\Templating\TwigTemplateRenderer: ~
+    App\Service\Templating\TemplateRendererInterface: '@App\Service\Templating\TwigTemplateRenderer'
+    App\Service\Templating\TemplateBlockRendererInterface: '@App\Service\Templating\TwigTemplateRenderer'
 
     # custom Twig extensions
     # "uuid_encode" filter
@@ -56,3 +65,5 @@ services:
     # add PSR3 logger as default logger for actions (controllers)
     Symfony\Component\HttpKernel\Log\Logger:
         tags: ['symfony.component.http_kernel.log.logger']
+
+    #Symfony\Component\Security\Http\Logout\LogoutSuccessHandlerInterface: '@App\Event\Handler\LogoutHandler'

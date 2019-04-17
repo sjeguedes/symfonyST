@@ -2,6 +2,9 @@ twig:
     paths: ['%kernel.project_dir%/templates']
     debug: '%kernel.debug%'
     strict_variables: '%kernel.debug%'
+    # UIkit form themes
+    form_themes: ['form/uikit_3_form.html.twig']
     # Global custom variables
     globals:
         globalMediaTextError: 'Media loading Error'
+

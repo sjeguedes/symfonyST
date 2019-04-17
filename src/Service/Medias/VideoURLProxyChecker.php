@@ -1,8 +1,8 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
-namespace App\Utils\Medias;
+namespace App\Service\Medias;
 
 use Symfony\Component\HttpFoundation\Request;
 
@@ -68,7 +68,7 @@ class VideoURLProxyChecker
     private function isContent(string $url) : bool
     {
         $resource = @fopen($url,'r');
-        $isResource = is_resource($resource) ? true : false;
+        $isResource = \is_resource($resource) ? true : false;
         fclose($resource);
         return $isResource;
     }
@@ -90,7 +90,7 @@ class VideoURLProxyChecker
         if (empty($url)) {
             return ['status' => 0];
         }
-        return $this->allow($url) && $this->isContent($url) ?  ['status' => 1] : ['status' => 0];
+        return $this->allow($url) && $this->isContent($url) ? ['status' => 1] : ['status' => 0];
     }
 
 }
