@@ -29,16 +29,18 @@ class UserFixtures extends BaseFixture
         $data = $array['users'];
         // Create users
         $this->createFixtures(User::class, \count($data), function($i) use($data) {
-            return new User(
+            $user = new User(
                 $data[$i]['fields']['family_name'],
                 $data[$i]['fields']['first_name'],
                 $data[$i]['fields']['user_name'],
                 $data[$i]['fields']['email'],
                 $data[$i]['fields']['password'],
+                User::DEFAULT_ALGORITHM,
                 $data[$i]['fields']['roles'],
-                $data[$i]['fields']['salt'],
-                new \DateTime(sprintf("+%d days", $i - 1))
+                $data[$i]['fields']['salt']
             );
+            $user->modifyIsActivated(true);
+            return $user;
         });
         $manager->flush();
     }

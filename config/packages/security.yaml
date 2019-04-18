@@ -23,6 +23,8 @@ security:
             # enable ROLE_SUPER_ADMIN role switching
             # https://symfony.com/doc/current/security/impersonating_user.html
             switch_user: ~
+            # check user authentication particular rules (e.g. user account activation)
+            user_checker: App\Service\Security\AuthenticationUserChecker
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#a-configuring-how-your-users-will-authenticate
             guard:
@@ -45,6 +47,5 @@ security:
         ROLE_SUPER_ADMIN: [ROLE_USER, ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
-    access_control:
-        - { path: management_access, roles: ROLE_ADMIN }
-        - { path: member_access, roles: ROLE_USER }
+    access_control: # define needed paths here!
+

@@ -36,6 +36,10 @@ services:
     App\Event\Handler\LogoutHandler:
         tags: ['app.event.handler.logout_handler']
 
+    # add authentication checker
+    App\Service\Security\AuthenticationUserChecker:
+        tags: ['app.service.security.authentication_user_checker']
+
     # add login form guard authenticator
     App\Service\Security\LoginFormAuthenticationManager:
         tags: ['app.service.security.login_form_authentication_manager']
@@ -50,7 +54,7 @@ services:
     App\Service\Templating\TemplateBlockRendererInterface: '@App\Service\Templating\TwigTemplateRenderer'
 
     # custom Twig extensions
-    # "uuid_encode" filter
+    # add "uuid_encode" filter
     App\Utils\Templating\UuidTwigExtension:
         tags: ['app.utils.templating.uuid_twig_extension']
 
@@ -65,5 +69,3 @@ services:
     # add PSR3 logger as default logger for actions (controllers)
     Symfony\Component\HttpKernel\Log\Logger:
         tags: ['symfony.component.http_kernel.log.logger']
-
-    #Symfony\Component\Security\Http\Logout\LogoutSuccessHandlerInterface: '@App\Event\Handler\LogoutHandler'

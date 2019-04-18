@@ -6,6 +6,8 @@ namespace App\Action\Admin;
 
 use App\Form\Type\Admin\LoginType;
 use App\Responder\Admin\LoginResponder;
+use Symfony\Component\Finder\Exception\AccessDeniedException;
+use Symfony\Component\Security\Core\Security;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -40,12 +42,18 @@ class LoginAction
     private $formFactory;
 
     /**
+     * @var Security
+     */
+    private $security;
+
+    /**
      * LoginAction constructor.
      *
      * @param AuthenticationUtils  $authenticationUtils
      * @param FlashBagInterface    $flashBag
      * @param FormFactoryInterface $formFactory
      * @param LoggerInterface      $logger
+     * @param Security             $security
      *
      * @return void
      */
@@ -53,12 +61,14 @@ class LoginAction
         AuthenticationUtils $authenticationUtils,
         FlashBagInterface $flashBag,
         FormFactoryInterface $formFactory,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        Security $security
     ) {
         $this->authenticationUtils = $authenticationUtils;
         $this->flashBag = $flashBag;
         $this->formFactory = $formFactory;
         $this->setLogger($logger);
+        $this->security = $security;
     }
 
     /**
@@ -73,6 +83,10 @@ class LoginAction
      */
     public function __invoke(LoginResponder $responder, Request $request) : Response
     {
+        // Deny access if a user is already authenticated.
+        if (!\is_null($this->security->getUser())) {
+            throw new AccessDeniedException('User is already authenticated.');
+        }
         // Get login form with a form factory and handle request
         $loginFormType = $this->formFactory->create(LoginType::class)->handleRequest($request);
         // Get the last authentication error

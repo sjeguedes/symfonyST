@@ -527,14 +527,20 @@ class User implements UserInterface, \Serializable
         $roleLabels = self::ROLE_LABELS;
         $roles = $this->getRoles();
         $mainRoleLabel = '';
+        $found = false;
         foreach ($roles as $value) {
             switch ($value) {
+                // Don't forget to add more roles here if others are created.
                 case 'ROLE_SUPER_ADMIN':
                 case 'ROLE_ADMIN':
                     $mainRoleLabel = $roleLabels[$value];
+                    $found = true;
                     break;
                 default:
                     $mainRoleLabel = $roleLabels['ROLE_USER'];
+            }
+            if ($found) {
+                break;
             }
         };
         return $mainRoleLabel;
