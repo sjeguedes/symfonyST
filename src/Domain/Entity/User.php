@@ -272,7 +272,7 @@ class User implements UserInterface, \Serializable
         if ('BCrypt' === $algorithm && (empty($password) || !preg_match('/^\$2[ayb]\$.{56}$/', $password))) {
             return false;
         }
-        // Other possible cases here!
+        // Other possible cases here like Argon2i: do stuff!
         return true;
     }
 
@@ -345,18 +345,18 @@ class User implements UserInterface, \Serializable
     }
 
     /**
-     * Generate a password renewal token.
+     * Update a password renewal token.
      *
      * User has forgotten his password, so this token is used to renew it.
      * Token format is generated with: substr(hash('sha256', bin2hex(openssl_random_pseudo_bytes(8))), 0, 15);
      *
-     * @param string $renewalToken
+     * @param string|null $renewalToken
      *
      * @return User
      */
-    public function generateRenewalToken(string $renewalToken) : self
+    public function updateRenewalToken(?string $renewalToken) : self
     {
-        if (empty($renewalToken) || !preg_match('/^[a-z0-9]{15}$/', $renewalToken)) {
+        if (!\is_null($renewalToken) && !preg_match('/^[a-z0-9]{15}$/', $renewalToken)) {
             throw new \InvalidArgumentException('User password renewal token must be valid!');
         }
         $this->renewalToken = $renewalToken;
@@ -380,17 +380,17 @@ class User implements UserInterface, \Serializable
     }
 
     /**
-     * Generate a password renewal request date.
+     * Update a password renewal request date.
      *
      * User has forgotten his password, so this date is used to limit time validity for token above.
      *
-     * @param \DateTimeInterface $renewalRequestDate
+     * @param \DateTimeInterface|null $renewalRequestDate
      *
      * @return User
      */
-    public function generateRenewalRequestDate(\DateTimeInterface $renewalRequestDate) : self
+    public function updateRenewalRequestDate(?\DateTimeInterface $renewalRequestDate) : self
     {
-        if ($this->creationDate > $renewalRequestDate) {
+        if (!\is_null($renewalRequestDate) && $this->creationDate > $renewalRequestDate) {
             throw new \RuntimeException('Renewal request date is not logical: user renewal token can not be created before user creation date!');
         }
         $this->renewalRequestDate = $renewalRequestDate;
@@ -572,9 +572,9 @@ class User implements UserInterface, \Serializable
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getRenewalToken() : string
+    public function getRenewalToken() : ?string
     {
         return $this->renewalToken;
     }
@@ -596,9 +596,9 @@ class User implements UserInterface, \Serializable
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
-    public function getRenewalRequestDate() : \DateTimeInterface
+    public function getRenewalRequestDate() : ?\DateTimeInterface
     {
         return $this->renewalRequestDate;
     }

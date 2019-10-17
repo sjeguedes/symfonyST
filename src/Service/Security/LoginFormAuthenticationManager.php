@@ -103,7 +103,7 @@ class LoginFormAuthenticationManager extends AbstractFormLoginAuthenticator
         $token = new CsrfToken('login_token', $credentials['csrf_token']);
         // CSRF token is not valid.
         if (!$this->csrfTokenManager->isTokenValid($token)) {
-            throw new CustomUserMessageAuthenticationException('Security error<br>Form token is not valid!');
+            throw new \Exception('Security error: CSRF form token is invalid!');
         }
         $user = $this->userService->getRepository()->loadUserByUsername($credentials['username']);
         // Authentication failed. User value is null.

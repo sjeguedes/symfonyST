@@ -6,7 +6,7 @@ namespace App\Action\Admin;
 
 use App\Form\Type\Admin\LoginType;
 use App\Responder\Admin\LoginResponder;
-use Symfony\Component\Finder\Exception\AccessDeniedException;
+use App\Responder\Redirection\RedirectionResponder;
 use Symfony\Component\Security\Core\Security;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
@@ -76,16 +76,18 @@ class LoginAction
      *
      * @Route("/{_locale}/login", name="connection")
      *
-     * @param LoginResponder $responder
-     * @param Request        $request
+     * @param RedirectionResponder $redirectionResponder
+     * @param LoginResponder       $responder
+     * @param Request              $request
      *
      * @return Response
      */
-    public function __invoke(LoginResponder $responder, Request $request) : Response
+    public function __invoke(RedirectionResponder $redirectionResponder, LoginResponder $responder, Request $request) : Response
     {
         // Deny access if a user is already authenticated.
         if (!\is_null($this->security->getUser())) {
-            throw new AccessDeniedException('User is already authenticated.');
+            $this->flashBag->add('danger', 'User is already authenticated!<br>Please logout first.');
+            return $redirectionResponder('home');
         }
         // Get login form with a form factory and handle request
         $loginFormType = $this->formFactory->create(LoginType::class)->handleRequest($request);
@@ -94,10 +96,10 @@ class LoginAction
         if ($loginFormType->isSubmitted() && !\is_null($authenticationError)) {
             // DTO is in valid state but with authentication error.
             if ($loginFormType->isValid()) {
-                $this->flashBag->add('danger', 'Authentication failure!<br>Try to login again by checking the fields.');
+                $this->flashBag->add('danger', 'Authentication failed!<br>Try to login again by checking the fields.');
             // Validation failed.
             } else {
-                $this->flashBag->add('danger', 'Form validation failure!<br>Try to login again by checking the fields.');
+                $this->flashBag->add('danger', 'Form validation failed!<br>Try to login again by checking the fields.');
             }
         }
         $data = [

@@ -49,7 +49,7 @@ class LogoutHandler implements LogoutSuccessHandlerInterface
      */
     public function onLogoutSuccess(Request $request) : RedirectResponse
     {
-        $this->flashBag->add('success','You are logged out!<br>Hope to see you soon.');
+        $this->flashBag->add('success','You logged out!<br>Hope to see you soon.');
         return new RedirectResponse($this->router->generate('home'));
     }
 }

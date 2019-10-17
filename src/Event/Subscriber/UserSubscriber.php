@@ -55,7 +55,7 @@ class UserSubscriber implements EventSubscriberInterface
     {
         $user = $event->getAuthenticationToken()->getUser();
         $userNickName = $user->getNickName();
-        $message = 'Welcome on board ' . $userNickName . '!<br>You are successfully logged in.';
+        $message = 'Welcome on board ' . $userNickName . '!<br>You logged in successfully.';
         $this->flashBag->add('success', $message);
     }
 }

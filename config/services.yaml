@@ -4,7 +4,7 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
-
+    app.swiftmailer.website.email: '%env(MAILER_WEBSITE_EMAIL)%'
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -14,12 +14,14 @@ services:
                             # fetching services directly from the container via $container->get() won't work.
                             # The best practice is to be explicit about your dependencies anyway.
 
+        # setup special, global autowiring rules
+        bind:
+
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/*'
-        exclude: '../src/{Domain/Entity,Kernel.php,Service,Tests,Utils/Traits,Utils/Database/Migrations}'
-        #DependencyInjection,
+        exclude: '../src/{DependencyInjection,Domain/Entity,Kernel.php,Service,Tests,Utils/Traits,Utils/Database/Migrations}'
 
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
@@ -32,21 +34,37 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
+    # add form handler when renewing password
+    App\Action\Admin\RenewPasswordAction:
+        tags: ['controller.service_arguments']
+        arguments:
+            $formHandler: '@App\Form\Handler\RenewPasswordHandler'
+
+    # add form handler when requesting new password
+    App\Action\Admin\RequestNewPasswordAction:
+        tags: ['controller.service_arguments']
+        arguments:
+            $formHandler: '@App\Form\Handler\RequestNewPasswordHandler'
+
     # add logout handler
     App\Event\Handler\LogoutHandler:
-        tags: ['app.event.handler.logout_handler']
+        #tags: ['app.event.handler.logout_handler']
 
     # add authentication checker
     App\Service\Security\AuthenticationUserChecker:
-        tags: ['app.service.security.authentication_user_checker']
+        #tags: ['app.service.security.authentication_user_checker']
 
     # add login form guard authenticator
     App\Service\Security\LoginFormAuthenticationManager:
-        tags: ['app.service.security.login_form_authentication_manager']
+        #tags: ['app.service.security.login_form_authentication_manager']
+
+    # add SwiftMailer manager
+    App\Service\Mailer\SwiftMailerManager:
+        #tags: ['app.service.mailer.swift_mailer_manager']
 
     # add trick video URL "proxy" checker
     App\Service\Medias\VideoURLProxyChecker:
-        tags: ['app.service.medias.video_url_proxy_checker']
+        #tags: ['app.service.medias.video_url_proxy_checker']
 
     # add template engine renderer default service when calling interface: Twig
     App\Service\Templating\TwigTemplateRenderer: ~
@@ -56,16 +74,16 @@ services:
     # custom Twig extensions
     # add "uuid_encode" filter
     App\Utils\Templating\UuidTwigExtension:
-        tags: ['app.utils.templating.uuid_twig_extension']
+        #tags: ['app.utils.templating.uuid_twig_extension']
 
     # add ResultSetMappingBuilder as a service for native queries
     Doctrine\ORM\Query\ResultSetMappingBuilder:
-        tags: ['doctrine.orm.query.result_set_mapping_builder']
+        #tags: ['doctrine.orm.query.result_set_mapping_builder']
 
     # add request as a service
     Symfony\Component\HttpFoundation\Request:
-        tags: ['symfony.component.http_foundation.request']
+        #tags: ['symfony.component.http_foundation.request']
 
     # add PSR3 logger as default logger for actions (controllers)
     Symfony\Component\HttpKernel\Log\Logger:
-        tags: ['symfony.component.http_kernel.log.logger']
+        #tags: ['symfony.component.http_kernel.log.logger']

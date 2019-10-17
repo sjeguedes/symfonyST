@@ -6,9 +6,9 @@ namespace App\Domain\Repository;
 
 use App\Domain\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Ramsey\Uuid\UuidInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Class UserRepository.
@@ -48,13 +48,35 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
     }
 
     /**
+     * Find a Trick entity with query based on its uuid.
+     *
+     * @param UuidInterface $uuid
+     *
+     * @return User|null
+     *
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function findOneByUuid(UuidInterface $uuid) : ?User
+    {
+        return $this->createQueryBuilder('u')
+        ->where('u.uuid = :uuid')
+        ->setParameter('uuid', $uuid->getBytes())
+        ->getQuery()
+        ->getOneOrNullResult();
+    }
+
+    /**
      * {@inheritdoc}
      *
      * Load a user finding him with his nickname or email.
      *
+     * @param string $username
+     *
+     * @return User|null
+     *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function loadUserByUsername($username) : ?UserInterface
+    public function loadUserByUsername($username) : ?User
     {
         return $this->createQueryBuilder('u')
             ->where('u.nickName = :query OR u.email = :query')

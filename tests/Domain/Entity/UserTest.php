@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace App\Tests\Domain\Entity;
 
@@ -66,7 +66,7 @@ class UserTest extends TestCase
     public function testGenerateRenewalTokenHasAWrongFormat(string $token)
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->user->generateRenewalToken($token);
+        $this->user->updateRenewalToken($token);
 
     }
 
@@ -75,9 +75,9 @@ class UserTest extends TestCase
      */
     public function getWrongRenewalTokensDataProvider()
     {
-        yield [substr(hash('sha256', bin2hex(openssl_random_pseudo_bytes(8))), 0, 0)];
-        yield [substr(hash('sha256', bin2hex(openssl_random_pseudo_bytes(8))), 0, 13)];
-        yield [substr(hash('sha256', bin2hex(openssl_random_pseudo_bytes(8))), 0, 20)];
+        yield [substr(hash('sha256', 'test1' . bin2hex(openssl_random_pseudo_bytes(8))), 0, 0)];
+        yield [substr(hash('sha256', 'test2' . bin2hex(openssl_random_pseudo_bytes(8))), 0, 13)];
+        yield [substr(hash('sha256', 'test3' . bin2hex(openssl_random_pseudo_bytes(8))), 0, 20)];
     }
 
     /**
@@ -85,11 +85,11 @@ class UserTest extends TestCase
      *
      * Look at chosen principle based on hash with 15 characters.
      */
-    public function testGenerateRenewalTokenHasAValidFormat()
+    public function testUpdateRenewalTokenHasAValidFormat()
     {
-        $this->user->generateRenewalToken(
+        $this->user->updateRenewalToken(
             // Defined principle to generate a token
-            substr(hash('sha256', bin2hex(openssl_random_pseudo_bytes(8))), 0, 15)
+            substr(hash('sha256', bin2hex('test' . openssl_random_pseudo_bytes(8))), 0, 15)
         );
         $token = $this->user->getRenewalToken();
         $this->assertRegExp('/^[a-z0-9]{15}$/', $token);
@@ -98,10 +98,10 @@ class UserTest extends TestCase
     /*
      * Test if renewal request date is before creation date and throws an exception.
      */
-    public function testGenerateRenewalRequestDateCanNotBeSetBeforeCreation()
+    public function testUpdateRenewalRequestDateCanNotBeSetBeforeCreation()
     {
         $this->expectException(\RuntimeException::class);
-        $this->user->generateRenewalRequestDate(new \DateTime('-1days'));
+        $this->user->updateRenewalRequestDate(new \DateTime('-1days'));
     }
 
     /**

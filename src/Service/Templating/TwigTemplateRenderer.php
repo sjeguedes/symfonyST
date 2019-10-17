@@ -38,26 +38,44 @@ final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateB
         $this->templateRenderer = $twig;
         $this->templates = [
             [
-                'responder' => 'App\\Responder\\AjaxTrickListResponder',
-                'name'      => 'home/trick_list.html.twig',
-                'block'     => 'trick_cards'
+                'class' => 'App\\Responder\\AjaxTrickListResponder',
+                'name'  => 'home/trick_list.html.twig',
+                'block' => 'trick_cards'
             ],
             [
-                'responder' => 'App\\Responder\\HomeTrickListResponder',
-                'name'      => 'home/trick_list.html.twig'
+                'class' => 'App\\Responder\\HomeTrickListResponder',
+                'name'  => 'home/trick_list.html.twig'
             ],
             [
-                'responder' => 'App\\Responder\\Admin\\LoginResponder',
-                'name'      => 'admin/login.html.twig'
+                'class' => 'App\\Responder\\PaginatedTrickListResponder',
+                'name'  => 'tricks/paginated_list.html.twig'
             ],
             [
-                'responder' => 'App\\Responder\\PaginatedTrickListResponder',
-                'name'      => 'tricks/paginated_list.html.twig'
+                'class' => 'App\\Responder\\SingleTrickResponder',
+                'name'  => 'single-trick/trick.html.twig'
             ],
             [
-                'responder' => 'App\\Responder\\SingleTrickResponder',
-                'name'      => 'single-trick/trick.html.twig'
+                'class' => 'App\\Responder\\Admin\\LoginResponder',
+                'name'  => 'admin/login.html.twig'
+            ],
+            [
+                'class' => 'App\\Responder\\Admin\\RequestNewPasswordResponder',
+                'name'  => 'admin/request-new-password.html.twig'
+            ],
+            [
+                'class' => 'App\\Responder\\Admin\\RenewPasswordResponder',
+                'name'  => 'admin/renew-password.html.twig'
+            ],
+            // Emails
+            [
+                'class' => 'App\\Action\\Admin\\RequestNewPasswordAction',
+                'name'  => 'admin/mailing/mail-request-new-password.html.twig'
+            ],
+            [
+                'class' => 'App\\Action\\Admin\\RenewPasswordAction',
+                'name'  => 'admin/mailing/mail-renew-password.html.twig'
             ]
+
         ];
     }
 
@@ -81,7 +99,7 @@ final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateB
     /**
      * Retrieve the Twig template name to show.
      *
-     * @param string $className a fully qualified name based on responder class
+     * @param string $className a fully qualified name based on action (for email templates) or responder class
      *
      * @return string
      *
@@ -91,14 +109,14 @@ final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateB
     public function getTemplate(string $className) : string
     {
         if (!class_exists($className)) {
-            throw new \InvalidArgumentException('Response can not be rendered: mandatory Responder does not exist!');
+            throw new \InvalidArgumentException('Template can not be rendered: mandatory class does not exist!');
         }
         $data = '';
         $i = 0;
         foreach ($this->templates as $template) {
             ++ $i;
             $hasBlock = !isset($template['block']) ? false : true;
-            $isMatched = $className !== $template['responder'] ? false : true;
+            $isMatched = $className !== $template['class'] ? false : true;
             if ($i === count($this->templates) && false === $isMatched) {
                 throw new \RuntimeException('No template name was found: try to use another rendering method!');
             }
@@ -141,14 +159,14 @@ final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateB
     public function getTemplateBlock(string $className) : array
     {
         if (!class_exists($className)) {
-            throw new \InvalidArgumentException('Response can not be rendered: mandatory Responder does not exist!');
+            throw new \InvalidArgumentException('Template block can not be rendered: mandatory class does not exist!');
         }
         $data = [];
         $i = 0;
         foreach ($this->templates as $template) {
             ++ $i;
             $hasBlock = !isset($template['block']) ? false : true;
-            $isMatched = $className !== $template['responder'] ? false : true;
+            $isMatched = $className !== $template['class'] ? false : true;
             if ($i === count($this->templates) && false === $isMatched) {
                 throw new \RuntimeException('No template block name was found: try to use another rendering method!');
             }

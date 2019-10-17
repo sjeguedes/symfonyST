@@ -1,0 +1,5 @@
+# See https://symfony.com/doc/current/email/dev_environment.html
+swiftmailer:
+    url: '%env(MAILER_DEV_URL)%'
+    # caution: force to send all emails to a specific email address for dev environment only!
+    #delivery_addresses: ['%env(MAILER_WEBSITE_EMAIL)%']

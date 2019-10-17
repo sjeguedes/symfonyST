@@ -8,6 +8,8 @@ namespace App\Domain\DTO;
  * Class LoginUserDTO.
  *
  * Data Transfer Object used to search and connect an authenticated user.
+ *
+ * @see validation constraints LoginUserDTO.yaml file
  */
 final class LoginUserDTO
 {
