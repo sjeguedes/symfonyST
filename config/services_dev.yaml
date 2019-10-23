@@ -1,2 +1,2 @@
 parameters:
-  app.data_fixtures.yaml.dir: '%kernel.project_dir%/src/Utils/Database/DataFixtures/yaml/'
+  app_data_fixtures_yaml_dir: '%kernel.project_dir%/src/Utils/Database/DataFixtures/yaml/'

@@ -6,7 +6,6 @@ namespace App\Action\Admin;
 
 use App\Domain\Service\UserManager;
 use App\Form\Handler\FormHandlerInterface;
-use App\Form\Handler\RenewPasswordHandler;
 use App\Responder\Admin\RenewPasswordResponder;
 use App\Responder\Redirection\RedirectionResponder;
 use App\Service\Mailer\SwiftMailerManager;
@@ -92,27 +91,28 @@ class RenewPasswordAction
         if ($renewPasswordForm->isSubmitted()) {
             // Constraints validation
             $isFormRequestValid = $this->formHandler->processFormRequestOnSubmit($request);
-            // Error: userName filled in form does not match user properties from request parameter.
-            if ($user->getNickName() !== $renewPasswordForm->get('userName')->getData() && $user->getEmail() !== $renewPasswordForm->get('userName')->getData()) {
-                $isFormRequestValid = false;
-                $userNameError = 'Your username is not allowed!';
-            }
             if (!$isFormRequestValid) {
                 $this->flashBag->add('danger', 'Form validation failed!<br>Try to request again by checking the fields.');
             } else {
-                // Save data
-                $this->userService->renewPassword($user, $renewPasswordForm->get('passwords')->getData());
-                // Send email
-                $isEmailSent = $this->formHandler->executeFormRequestActionOnSuccess(['userToUpdate' => $user], $request);
-                // Technical error when trying to send
-                if (!$isEmailSent) {
-                    /** @var SwiftMailerManager $mailer */
-                    $mailer = $this->formHandler->getMailer();
-                    $this->logger->error("[trace app snowTricks] RenewPasswordAction/__invoke => email not sent: " . $mailer->getLoggerPlugin()->dump());
-                    throw new \Exception('Request failed: email was not sent due to technical error or wrong parameters!');
+                // Error: userName filled in form does not match user properties from request parameter.
+                if ($user->getNickName() !== $renewPasswordForm->get('userName')->getData() && $user->getEmail() !== $renewPasswordForm->get('userName')->getData()) {
+                    $this->flashBag->add('danger', 'Form authentication failed!<br>Try to request again by checking the fields.');
+                    $userNameError = 'Please check your credentials!<br>Your username is not allowed!';
+                } else {
+                    // Save data
+                    $this->userService->renewPassword($user, $renewPasswordForm->get('passwords')->getData());
+                    // Send email
+                    $isEmailSent = $this->formHandler->executeFormRequestActionOnSuccess(['userToUpdate' => $user], $request);
+                    // Technical error when trying to send
+                    if (!$isEmailSent) {
+                        /** @var SwiftMailerManager $mailer */
+                        $mailer = $this->formHandler->getMailer();
+                        $this->logger->error("[trace app snowTricks] RenewPasswordAction/__invoke => email not sent: " . $mailer->getLoggerPlugin()->dump());
+                        throw new \Exception('Request failed: email was not sent due to technical error or wrong parameters!');
+                    }
+                    $this->flashBag->add('success', 'An email was sent successfully!<br>Please check your box<br>to look at your password renewal confirmation.');
+                    return $redirectionResponder('connection');
                 }
-                $this->flashBag->add('success', 'An email was sent successfully!<br>Please check your box<br>to look at your password renewal confirmation.');
-                return $redirectionResponder('connection');
             }
         }
         $data = [

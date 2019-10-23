@@ -97,6 +97,7 @@ class LoginAction
         $authenticationError = $this->authenticationUtils->getLastAuthenticationError();
         // Process only on submit
         if ($loginForm->isSubmitted()) {
+            // Constraints validation
             $isFormRequestValid = $this->formHandler->processFormRequestOnSubmit($request);
             if ($isFormRequestValid) {
                 // DTO is in valid state but with authentication error.

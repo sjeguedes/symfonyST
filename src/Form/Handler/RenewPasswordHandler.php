@@ -9,7 +9,7 @@ use App\Domain\Entity\User;
 use App\Form\Type\Admin\RenewPasswordType;
 use App\Service\Mailer\SwiftMailerManager;
 use App\Utils\Traits\CSRFTokenHelperTrait;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -41,9 +41,9 @@ final class RenewPasswordHandler extends AbstractFormHandler
     protected $form;
 
     /**
-     * @var ContainerInterface
+     * @var ParameterBagInterface
      */
-    private $container;
+    private $parameterBag;
 
     /**
      * @var SwiftMailerManager
@@ -55,19 +55,19 @@ final class RenewPasswordHandler extends AbstractFormHandler
      *
      * @param FormFactoryInterface      $formFactory
      * @param CsrfTokenManagerInterface $csrfTokenManager
-     * @param ContainerInterface        $container
+     * @param ParameterBagInterface     $parameterBag
      * @param SwiftMailerManager        $mailer
      */
     public function __construct(
         FormFactoryInterface $formFactory,
         csrfTokenManagerInterface $csrfTokenManager,
-        ContainerInterface $container,
+        ParameterBagInterface $parameterBag,
         SwiftMailerManager $mailer
     ) {
         $this->formFactory = $formFactory;
         $this->csrfTokenManager = $csrfTokenManager;
         $this->form = $this->initForm(renewPasswordType::class);
-        $this->container = $container;
+        $this->parameterBag = $parameterBag;
         $this->mailer = $mailer;
     }
 
@@ -109,7 +109,7 @@ final class RenewPasswordHandler extends AbstractFormHandler
         if (!$user instanceof User || \is_null($user)) {
             throw new \InvalidArgumentException('A instance of User must be set first!');
         }
-        $sender = [$this->container->getParameter('app.swiftmailer.website.email') => 'SnowTricks - Member service'];
+        $sender = [$this->parameterBag->get('app_swiftmailer_website_email') => 'SnowTricks - Member service'];
         $receiver = [$user->getEmail() => $user->getFirstName() . ' ' . $user->getFamilyName()];
         $emailHtmlBody = $this->mailer->createEmailBody(RenewPasswordAction::class, ['_locale' => $request->get('_locale'), 'user' => $user]);
         $isEmailSent = $this->mailer->sendEmail($sender, $receiver, 'Password renewal confirmation', $emailHtmlBody);

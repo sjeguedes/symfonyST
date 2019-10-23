@@ -11,7 +11,6 @@ use App\Responder\Redirection\RedirectionResponder;
 use App\Service\Mailer\SwiftMailerManager;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -49,18 +48,12 @@ class RequestNewPasswordAction
     private $mailer;
 
     /**
-     * @var ContainerInterface
-     */
-    private $container;
-
-    /**
      * RequestNewPasswordAction constructor.
      *
      * @param UserManager          $userService
      * @param FlashBagInterface    $flashBag
      * @param FormHandlerInterface $formHandler
      * @param SwiftMailerManager   $mailer
-     * @param ContainerInterface   $container
      * @param LoggerInterface      $logger
      */
     public function __construct(
@@ -68,14 +61,12 @@ class RequestNewPasswordAction
         FlashBagInterface $flashBag,
         FormHandlerInterface $formHandler,
         SwiftMailerManager $mailer,
-        ContainerInterface $container,
         LoggerInterface $logger
     ) {
         $this->userService = $userService;
         $this->flashBag = $flashBag;
         $this->formHandler = $formHandler;
         $this->mailer = $mailer;
-        $this->container = $container;
         $this->setLogger($logger);
     }
 
@@ -98,15 +89,16 @@ class RequestNewPasswordAction
         $requestNewPasswordForm = $this->formHandler->bindRequest($request);
         // Process only on submit
         if ($requestNewPasswordForm->isSubmitted()) {
+            // Constraints validation
             $isFormRequestValid = $this->formHandler->processFormRequestOnSubmit($request);
             if (!$isFormRequestValid) {
                 $this->flashBag->add('danger', 'Form validation failed!<br>Try to request again by checking the fields.');
             } else {
                 $user = $this->userService->getRepository()->loadUserByUsername($requestNewPasswordForm->getData()->getUserName());
-                // No user found.
+                // Error: no user is found.
                 if (!$user) {
                     $this->flashBag->add('danger', 'Form authentication failed!<br>Try to request again by checking the fields.');
-                    $error = 'Please check your credentials!<br>User can not be found.';
+                    $userError = 'Please check your credentials!<br>User can not be found.';
                 } else {
                     // Save data
                     $this->userService->generatePasswordRenewalToken($user);
@@ -125,7 +117,7 @@ class RequestNewPasswordAction
             }
         }
         $data = [
-            'userError'              => $error ?? null,
+            'userError'              => $userError ?? null,
             'requestNewPasswordForm' => $requestNewPasswordForm->createView()
         ];
         return $responder($data);
