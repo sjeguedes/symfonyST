@@ -185,9 +185,9 @@ class UserManager
     public function getUserFoundInPasswordRenewalRequest(Request $request) : ?User
     {
         // 2 methods can be used: some request query parameters or attributes (placeholders) are expected in url!
-        // User identifier is not used, bur expected.
+        // User identifier is not used, but expected as mandatory.
         if (\is_null($request->query->get('id')) && \is_null($request->attributes->get('userId'))) {
-            throw new \RuntimeException('No password renewal user identifier parameters are used in request!');
+            throw new \RuntimeException('No password renewal user identifier parameter is used in request!');
         }
         $encodedUuid = !\is_null($request->query->get('id')) ? $request->query->get('id') : $request->attributes->get('userId');
         $user = $this->findSingleByUuid($encodedUuid);
@@ -213,6 +213,22 @@ class UserManager
         // Reset renewal token request data
         $user->updateRenewalRequestDate(null);
         $user->updateRenewalToken(null);
+        $this->getEntityManager()->flush();
+    }
+
+    /**
+     * Update user password token by updating corresponding data.
+     *
+     * @param User $user
+     *
+     * @return void
+     *
+     * @throws \Exception
+     */
+    public function generatePasswordRenewalToken(User $user) : void
+    {
+        $user->updateRenewalRequestDate(new \Datetime('now'));
+        $user->updateRenewalToken($this->generateCustomToken($user->getNickName()));
         $this->getEntityManager()->flush();
     }
 }

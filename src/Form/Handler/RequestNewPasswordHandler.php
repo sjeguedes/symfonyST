@@ -4,35 +4,115 @@ declare(strict_types = 1);
 
 namespace App\Form\Handler;
 
-use Symfony\Component\Security\Csrf\CsrfToken;
+use App\Action\Admin\RequestNewPasswordAction;
+use App\Domain\Entity\User;
+use App\Form\Type\Admin\RequestNewPasswordType;
+use App\Service\Mailer\SwiftMailerManager;
+use App\Utils\Traits\CSRFTokenHelperTrait;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 /**
  * Class RequestNewPasswordHandler.
  *
- * Handle the request to apply additional actions.
+ * Handle the form request when a user asks for reset his password.
+ * Call any additional actions.
  */
-class RequestNewPasswordHandler implements FormHandlerInterface
+final class RequestNewPasswordHandler extends AbstractFormHandler
 {
+    use CSRFTokenHelperTrait;
+
+    /**
+     * @var FormFactoryInterface
+     */
+    protected $formFactory;
+
     /**
      * @var csrfTokenManagerInterface
      */
     private $csrfTokenManager;
 
-    public function __construct(csrfTokenManagerInterface $csrfTokenManager)
-    {
+    /**
+     * @var FormInterface
+     */
+    protected $form;
+
+    /**
+     * @var ContainerInterface
+     */
+    private $container;
+
+    /**
+     * @var SwiftMailerManager
+     */
+    private $mailer;
+
+    /**
+     * RequestNewPasswordHandler constructor.
+     *
+     * @param FormFactoryInterface      $formFactory
+     * @param CsrfTokenManagerInterface $csrfTokenManager
+     * @param ContainerInterface        $container
+     * @param SwiftMailerManager        $mailer
+     */
+    public function __construct(
+        FormFactoryInterface $formFactory,
+        csrfTokenManagerInterface $csrfTokenManager,
+        ContainerInterface $container,
+        SwiftMailerManager $mailer
+    ) {
+        $this->formFactory = $formFactory;
         $this->csrfTokenManager = $csrfTokenManager;
+        $this->form = $this->initForm(requestNewPasswordType::class);
+        $this->container = $container;
+        $this->mailer = $mailer;
     }
 
     /**
-     * {@inheritdoc}
+     * Get mailer service.
      *
-     * Token id is the value used in the template to generate the token.
+     * @return SwiftMailerManager
      */
-    public function isCSRFTokenValid(string $tokenId, ?string $token) : bool
+    public function getMailer() : SwiftMailerManager
     {
-        // Check validity
-        $csrfToken = new CsrfToken($tokenId, $token);
-        return $this->csrfTokenManager->isTokenValid($csrfToken);
+        return $this->mailer;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws \Exception
+     */
+    public function processFormRequestOnSubmit(Request $request) : bool
+    {
+        $csrfToken = $request->request->get('request_new_password')['token'];
+        // CSRF token is not valid.
+        if (false === $this->isCSRFTokenValid('request_new_password_token', $csrfToken)) {
+            throw new \Exception('Security error: CSRF form token is invalid!');
+        }
+        $validProcess = $this->getForm()->isValid() ? true : false;
+        return $validProcess;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function executeFormRequestActionOnSuccess(array $actionData = null, Request $request = null) : bool
+    {
+        /** @var User $user */
+        $user = $actionData['userToUpdate'] ?? null;
+        if (!$user instanceof User || \is_null($user)) {
+            throw new \InvalidArgumentException('A instance of User must be set first!');
+        }
+        $sender = [$this->container->getParameter('app.swiftmailer.website.email') => 'SnowTricks - Member service'];
+        $receiver = [$user->getEmail() => $user->getFirstName() . ' ' . $user->getFamilyName()];
+        $emailHtmlBody = $this->mailer->createEmailBody(RequestNewPasswordAction::class, ['_locale' => $request->get('_locale'), 'user' => $user]);
+        $isEmailSent = $this->mailer->sendEmail($sender, $receiver, 'Password renewal request', $emailHtmlBody);
+        return $isEmailSent ? true : false;
     }
 }

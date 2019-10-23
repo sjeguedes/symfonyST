@@ -215,6 +215,8 @@ class User implements UserInterface, \Serializable
      * @param string $familyName
      *
      * @return User
+     *
+     * @throws \InvalidArgumentException
      */
     public function modifyFamilyName(string $familyName) : self
     {
@@ -231,6 +233,8 @@ class User implements UserInterface, \Serializable
      * @param string $firstName
      *
      * @return User
+     *
+     * @throws \InvalidArgumentException
      */
     public function modifyFirstName(string $firstName) : self
     {
@@ -283,6 +287,8 @@ class User implements UserInterface, \Serializable
      * @param string $password
      *
      * @return User
+     *
+     * @throws \InvalidArgumentException
      */
     public function modifyPassword(string $password, string $algorithm) : self
     {
@@ -321,6 +327,8 @@ class User implements UserInterface, \Serializable
      * @param array $roles
      *
      * @return User
+     *
+     * @throws \InvalidArgumentException
      */
     public function modifyRoles(array $roles) : self
     {
@@ -353,6 +361,8 @@ class User implements UserInterface, \Serializable
      * @param string|null $renewalToken
      *
      * @return User
+     *
+     * @throws \InvalidArgumentException
      */
     public function updateRenewalToken(?string $renewalToken) : self
     {
@@ -369,6 +379,8 @@ class User implements UserInterface, \Serializable
      * @param \DateTimeInterface $updateDate
      *
      * @return User
+     *
+     * @throws \RuntimeException
      */
     public function modifyUpdateDate(\DateTimeInterface $updateDate) : self
     {
@@ -387,6 +399,8 @@ class User implements UserInterface, \Serializable
      * @param \DateTimeInterface|null $renewalRequestDate
      *
      * @return User
+     *
+     * @throws \RuntimeException
      */
     public function updateRenewalRequestDate(?\DateTimeInterface $renewalRequestDate) : self
     {

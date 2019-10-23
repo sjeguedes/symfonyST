@@ -97,6 +97,7 @@ class LoginFormAuthenticationManager extends AbstractFormLoginAuthenticator
      * {@inheritdoc}
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws CustomUserMessageAuthenticationException
      */
     public function getUser($credentials, UserProviderInterface $userProvider) : UserInterface
     {
@@ -108,17 +109,24 @@ class LoginFormAuthenticationManager extends AbstractFormLoginAuthenticator
         $user = $this->userService->getRepository()->loadUserByUsername($credentials['username']);
         // Authentication failed. User value is null.
         if (!$user) {
-            throw new CustomUserMessageAuthenticationException('Please check your credentials!<br>User could not be found.');
+            throw new CustomUserMessageAuthenticationException('Please check your credentials!<br>User can not be found.');
         }
         return $user;
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @throws CustomUserMessageAuthenticationException
      */
     public function checkCredentials($credentials, UserInterface $user) : bool
     {
-        return $this->passwordEncoder->isPasswordValid($user, $credentials['password']);
+        $isPasswordMatching = $this->passwordEncoder->isPasswordValid($user, $credentials['password']);
+        // Authentication failed. Password value does not match user.
+        if (!$isPasswordMatching) {
+            throw new CustomUserMessageAuthenticationException('Please check your credentials!<br>User and password do not match.');
+        }
+        return $isPasswordMatching;
     }
 
     /**

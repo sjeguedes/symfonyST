@@ -21,6 +21,8 @@ class AuthenticationUserChecker implements UserCheckerInterface
      * @param UserInterface $user
      *
      * @return void
+     *
+     * @throws \Exception
      */
     public function checkPreAuth(UserInterface $user) : void
     {

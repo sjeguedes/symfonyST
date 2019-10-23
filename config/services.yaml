@@ -34,6 +34,12 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
+    # add form handler when calling login
+    App\Action\Admin\LoginAction:
+        tags: ['controller.service_arguments']
+        arguments:
+            $formHandler: '@App\Form\Handler\LoginHandler'
+
     # add form handler when renewing password
     App\Action\Admin\RenewPasswordAction:
         tags: ['controller.service_arguments']

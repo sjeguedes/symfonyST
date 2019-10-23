@@ -5,7 +5,7 @@
     {%- if errors|length > 0 -%}
         <ul class="uk-list">
             {%- for error in errors -%}
-                <li class="">
+                <li>
                     <div class="uk-label uk-form-danger uk-box-shadow-large uk-text-bold">
                         <p class="uk-margin-remove">
                             <span uk-icon="icon: arrow-down"></span> {{ error.message }}
