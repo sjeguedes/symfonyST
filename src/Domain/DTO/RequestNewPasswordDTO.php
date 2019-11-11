@@ -14,7 +14,7 @@ namespace App\Domain\DTO;
 final class RequestNewPasswordDTO
 {
     /**
-     * @var string
+     * @var string|null
      */
     private $userName;
 
@@ -25,15 +25,15 @@ final class RequestNewPasswordDTO
      *
      * @return void
      */
-    public function __construct(string $userName)
+    public function __construct(?string $userName)
     {
         $this->userName = $userName;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getUserName() : string
+    public function getUserName() : ?string
     {
         return $this->userName;
     }

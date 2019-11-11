@@ -6,54 +6,78 @@ namespace App\Form\Handler;
 
 use App\Form\Type\Admin\LoginType;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 /**
  * Class LoginHandler.
  *
  * Handle the form request when a user tries to login.
- * Call any additional actions.
+ * Call any additional validations and actions.
  */
 final class LoginHandler extends AbstractFormHandler
 {
     /**
-     * @var FormFactoryInterface
+     * @var AuthenticationUtils
      */
-    protected $formFactory;
+    private $authenticationUtils;
 
     /**
-     * @var FormInterface
+     * @var string
      */
-    protected $form;
+    private $customError;
 
     /**
      * LoginHandler constructor.
      *
+     * @param AuthenticationUtils  $authenticationUtils
+     * @param FlashBagInterface    $flashBag
      * @param FormFactoryInterface $formFactory
+     * @param RequestStack         $requestStack
      */
-    public function __construct(FormFactoryInterface $formFactory)
-    {
-        $this->formFactory = $formFactory;
-        $this->form = $this->initForm(LoginType::class);
+    public function __construct(
+        AuthenticationUtils $authenticationUtils,
+        FlashBagInterface $flashBag,
+        FormFactoryInterface $formFactory,
+        RequestStack $requestStack
+    ) {
+        parent::__construct($flashBag, $formFactory,LoginType::class, $requestStack);
+        $this->authenticationUtils = $authenticationUtils;
+        $this->customError = null;
     }
 
     /**
-     * {@inheritDoc}
+     * Add custom validation to check once form constraints are validated.
      *
-     * @see: CSRF token is checked in App\Service\Security\LoginFormAuthenticationManager.
+     * CSRF token is checked in App\Service\Security\LoginFormAuthenticationManager::getUser()
+     * Success flash message is made in App\Event\Subscriber\UserSubscriber::onSecurityInteractiveLogin()
+     * Success redirection is made in App\Service\Security\LoginFormAuthenticationManager::onAuthenticationSuccess()
+     *
+     * @return bool
+     *
+     * @see AbstractFormHandler::processFormRequest()
      */
-    public function processFormRequestOnSubmit(Request $request) : bool
+    protected function addCustomValidation() : bool
     {
-        $validProcess = $this->getForm()->isValid() ? true : false;
-        return $validProcess;
+        // Get the last authentication error
+        $authenticationError = $this->authenticationUtils->getLastAuthenticationError();
+        // DTO is in valid state but with authentication error.
+        if (!\is_null($authenticationError)) {
+            $this->customError = $authenticationError;
+            $this->flashBag->add('danger', 'Form authentication failed!<br>Try to login again by checking the fields.');
+            return false;
+        }
+        return true;
     }
 
     /**
-     * {@inheritDoc}
+     * Get the authentication error.
+     *
+     * @return string|null
      */
-    public function executeFormRequestActionOnSuccess(array $actionData = null, Request $request = null) : bool
+    public function getAuthenticationError()
     {
-        // Do stuff if necessary.
+        return $this->customError;
     }
 }

@@ -31,7 +31,6 @@ class RequestNewPasswordType extends AbstractType
     {
         $builder
             ->add('userName',TextType::class, [
-                'empty_data'   => ''
             ])
             ->add('token',HiddenType::class, [
                 'inherit_data' => true

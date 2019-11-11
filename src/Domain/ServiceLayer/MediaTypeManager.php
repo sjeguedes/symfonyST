@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace App\Domain\Service;
+namespace App\Domain\ServiceLayer;
 
 use App\Domain\Entity\MediaType;
 use App\Domain\Repository\MediaTypeRepository;
@@ -12,7 +12,7 @@ use Psr\Log\LoggerInterface;
 /**
  * Class MediaTypeManager.
  *
- * Manage media types to retrieve as a "service layer".
+ * Manage media types to handle, and retrieve as a "service layer".
  */
 class MediaTypeManager
 {

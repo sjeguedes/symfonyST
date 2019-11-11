@@ -37,7 +37,7 @@ security:
             remember_me:
                 secret: '%kernel.secret%'
                 lifetime: 604800 # 1 week in seconds
-                path: /
+                path: / # whole site
                 remember_me_parameter: 'login[rememberMe]'
     role_hierarchy:
         ROLE_USER: ROLE_MEMBER

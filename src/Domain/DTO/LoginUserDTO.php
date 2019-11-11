@@ -31,15 +31,15 @@ final class LoginUserDTO
     /**
      * LoginUserDTO constructor.
      *
-     * @param string $userName
-     * @param string $password
-     * @param bool   $rememberMe
+     * @param string|null $userName
+     * @param string|null $password
+     * @param bool        $rememberMe
      *
      * @return void
      */
     public function __construct(
-        string $userName,
-        string $password,
+        ?string $userName,
+        ?string $password,
         bool $rememberMe
     ) {
         $this->userName = $userName;
@@ -48,17 +48,17 @@ final class LoginUserDTO
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getUserName() : string
+    public function getUserName() : ?string
     {
         return $this->userName;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getPassword() : string
+    public function getPassword() : ?string
     {
         return $this->password;
     }

@@ -6,9 +6,9 @@
         <ul class="uk-list">
             {%- for error in errors -%}
                 <li>
-                    <div class="uk-label uk-form-danger uk-box-shadow-large uk-text-bold">
-                        <p class="uk-margin-remove">
-                            <span uk-icon="icon: arrow-down"></span> {{ error.message }}
+                    <div class="uk-label uk-form-danger uk-box-shadow-large uk-text-bold uk-text">
+                        <p class="uk-margin-remove uk-text-center">
+                            <span uk-icon="icon: arrow-down"></span> {{ error.message|raw }}
                         </p>
                     </div>
                 </li>

@@ -39,8 +39,11 @@
                     </div>
                 </header>
                 <section id="content" class="st-content">
+                {# this check prevents starting a session when there are no flash messages. #}
+                {% if app.request.hasPreviousSession %}
                     {# Flash messages with notification component #}
-                    {% include 'form/flash_message.html.twig' %}
+                    {% include 'all/flash_message.html.twig' %}
+                {% endif %}
                     {% block content %}{% endblock %}
                 </section>
                 <footer id="footer" class="uk-section-secondary st-footer">

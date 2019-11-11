@@ -29,7 +29,9 @@ trait SessionHelperTrait
     public function setSession(SessionInterface $session)
     {
         $this->session = $session;
-        $this->session->start();
+        if (!$this->session->isStarted()) {
+            $this->session->start();
+        }
     }
 
     /**
@@ -55,14 +57,14 @@ trait SessionHelperTrait
      *
      * @param string $name
      *
-     * @return mixed|null
+     * @return array|null
      */
-    public function getFromSession(string $name) : mixed
+    public function getFromSession(string $name) : ?array
     {
         if (!$this->session->has($name)) {
             return null;
         }
-        return $this->session->get($name);
+        return [$name => $this->session->get($name)];
     }
 
     /**

@@ -4,7 +4,10 @@ declare(strict_types = 1);
 
 namespace App\Service\Mailer;
 
+use App\Service\Mailer\Email\EmailConfigInterface;
 use App\Service\Templating\TemplateRendererInterface;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class SwiftMailerManager.
@@ -13,10 +16,12 @@ use App\Service\Templating\TemplateRendererInterface;
  */
 class SwiftMailerManager
 {
+    use LoggerAwareTrait;
+
     /**
-     * @var TemplateRendererInterface
+     * @var array
      */
-    private $renderer;
+    private $emailParameters;
 
     /**
      * @var \Swift_Mailer
@@ -29,19 +34,43 @@ class SwiftMailerManager
     private $mailerLogger;
 
     /**
+     * @var TemplateRendererInterface
+     */
+    private $renderer;
+
+    /**
      * SwiftMailerManager constructor.
      *
      * @param \Swift_Mailer             $mailer
      * @param TemplateRendererInterface $renderer
-     *
-     * @return void
+     * @param LoggerInterface           $logger
      */
-    public function __construct(\Swift_Mailer $mailer, TemplateRendererInterface $renderer)
-    {
+    public function __construct(
+        \Swift_Mailer $mailer,
+        TemplateRendererInterface $renderer,
+        LoggerInterface $logger
+    ) {
         $this->mailer = $mailer;
-        $this->renderer = $renderer;
         $this->mailerLogger = new \Swift_Plugins_Loggers_ArrayLogger();
         $this->mailer->registerPlugin(new \Swift_Plugins_LoggerPlugin($this->mailerLogger));
+        $this->renderer = $renderer;
+        $this->setLogger($logger);
+     }
+
+    /**
+     * Create an email content with a template and data.
+     *
+     * @param string $className
+     * @param array  $data
+     *
+     * @return string the email HTML content with data
+     *
+     * @throws \Exception
+     */
+    public function createEmailBody(string $className, array $data) : string
+    {
+        $template = $this->renderer->getTemplate($className);
+        return $this->renderer->renderTemplate($template, $data);
     }
 
     /**
@@ -64,12 +93,8 @@ class SwiftMailerManager
      *
      * @return bool
      */
-    public function sendEmail(
-        array $from,
-        array $to,
-        string $subject,
-        string $body
-    ) : bool {
+    public function sendEmail(array $from, array $to, string $subject, string $body) : bool
+    {
         $mail = (new \Swift_Message($subject))
             ->setFrom($from)
             ->setTo($to)
@@ -84,16 +109,32 @@ class SwiftMailerManager
     }
 
     /**
-     * Create an email content with a template and data.
+     * Notify by sending information.
      *
-     * @param string $className
-     * @param array  $data
+     * @param EmailConfigInterface $emailConfig
      *
-     * @return string
+     * @return bool
+     *
+     * @throws \ReflectionException
+     * @throws \Exception
      */
-    public function createEmailBody(string $className, array $data) : string
+    public function notify(EmailConfigInterface $emailConfig) : bool
     {
-        $template = $this->renderer->getTemplate($className);
-        return $this->renderer->renderTemplate($template, $data);
+        $sender = $emailConfig->getSender();
+        $receiver =  $emailConfig->getReceiver();
+        $emailHtmlBody = $this->createEmailBody($emailConfig->getActionClassName(), $emailConfig->getTemplateData());
+        $actionClassShortName = (new \ReflectionClass($emailConfig->getActionClassName()))->getShortName();
+        // Technical error when trying to send
+        if (!$isEmailSent = $this->sendEmail($sender, $receiver, $emailConfig->getSubject(), $emailHtmlBody)) {
+            $this->logger->error(
+                sprintf('[trace app snowTricks] action: %s/__invoke and subject: %s  => email not sent to %s: %s',
+                    $actionClassShortName, $emailConfig->getSubject(), $emailConfig->getReceiver(), $this->getLoggerPlugin()->dump()
+                )
+            );
+        }
+        return $isEmailSent;
     }
+
+
+
 }

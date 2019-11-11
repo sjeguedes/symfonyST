@@ -6,29 +6,26 @@ namespace App\Form\Handler;
 
 use App\Action\Admin\RequestNewPasswordAction;
 use App\Domain\Entity\User;
+use App\Domain\ServiceLayer\UserManager;
 use App\Form\Type\Admin\RequestNewPasswordType;
+use App\Service\Mailer\Email\EmailConfigFactory;
+use App\Service\Mailer\Email\EmailConfigFactoryInterface;
 use App\Service\Mailer\SwiftMailerManager;
 use App\Utils\Traits\CSRFTokenHelperTrait;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 /**
  * Class RequestNewPasswordHandler.
  *
  * Handle the form request when a user asks for reset his password.
- * Call any additional actions.
+ * Call any additional validations and actions.
  */
 final class RequestNewPasswordHandler extends AbstractFormHandler
 {
     use CSRFTokenHelperTrait;
-
-    /**
-     * @var FormFactoryInterface
-     */
-    protected $formFactory;
 
     /**
      * @var csrfTokenManagerInterface
@@ -36,14 +33,14 @@ final class RequestNewPasswordHandler extends AbstractFormHandler
     private $csrfTokenManager;
 
     /**
-     * @var FormInterface
+     * @var EmailConfigFactoryInterface
      */
-    protected $form;
+    private $emailConfigFactory;
 
     /**
-     * @var ParameterBagInterface
+     * @var string
      */
-    private $parameterBag;
+    private $customError;
 
     /**
      * @var SwiftMailerManager
@@ -51,68 +48,117 @@ final class RequestNewPasswordHandler extends AbstractFormHandler
     private $mailer;
 
     /**
+     * @var User|null
+     */
+    private $userToUpdate;
+
+    /**
      * RequestNewPasswordHandler constructor.
      *
-     * @param FormFactoryInterface      $formFactory
-     * @param CsrfTokenManagerInterface $csrfTokenManager
-     * @param ParameterBagInterface     $parameterBag
-     * @param SwiftMailerManager        $mailer
+     * @param CsrfTokenManagerInterface   $csrfTokenManager
+     * @param EmailConfigFactoryInterface $emailConfigFactory
+     * @param FlashBagInterface           $flashBag
+     * @param FormFactoryInterface        $formFactory
+     * @param SwiftMailerManager          $mailer
+     * @param RequestStack                $requestStack
      */
     public function __construct(
-        FormFactoryInterface $formFactory,
         csrfTokenManagerInterface $csrfTokenManager,
-        ParameterBagInterface $parameterBag,
+        EmailConfigFactoryInterface $emailConfigFactory,
+        FlashBagInterface $flashBag,
+        FormFactoryInterface $formFactory,
+        RequestStack $requestStack,
         SwiftMailerManager $mailer
     ) {
-        $this->formFactory = $formFactory;
+        parent::__construct($flashBag, $formFactory,requestNewPasswordType::class, $requestStack);
         $this->csrfTokenManager = $csrfTokenManager;
-        $this->form = $this->initForm(requestNewPasswordType::class);
-        $this->parameterBag = $parameterBag;
+        $this->customError = null;
+        $this->emailConfigFactory = $emailConfigFactory;
         $this->mailer = $mailer;
+        $this->userToUpdate = null;
+
     }
 
     /**
-     * Get mailer service.
+     * Add custom validation to check once form constraints are validated.
      *
-     * @return SwiftMailerManager
-     */
-    public function getMailer() : SwiftMailerManager
-    {
-        return $this->mailer;
-    }
-
-    /**
-     * {@inheritDoc}
+     * @param array $actionData some data to handle
+     *
+     * @return bool
      *
      * @throws \Exception
      */
-    public function processFormRequestOnSubmit(Request $request) : bool
+    protected function addCustomValidation(array $actionData) : bool
     {
-        $csrfToken = $request->request->get('request_new_password')['token'];
+        $csrfToken = $this->request->request->get('request_new_password')['token'];
         // CSRF token is not valid.
         if (false === $this->isCSRFTokenValid('request_new_password_token', $csrfToken)) {
             throw new \Exception('Security error: CSRF form token is invalid!');
         }
-        $validProcess = $this->getForm()->isValid() ? true : false;
-        return $validProcess;
+        // Find user who asks for a new password by using a user service
+        $userService = $actionData['userService'] ?? null;
+        if (!$userService instanceof UserManager || \is_null($userService)) {
+            throw new \InvalidArgumentException('A instance of UserManager must be set first!');
+        }
+        $loadedUser = $userService->getRepository()->loadUserByUsername($this->form->getData()->getUserName()); // or $this->form->get('userName')->getData()
+        // DTO is in valid state but user can not be found.
+        if (\is_null($loadedUser)) {
+            $userError = 'Please check your credentials!<br>User can not be found.';
+            $this->customError = $userError;
+            $this->flashBag->add('danger', 'Form authentication failed!<br>Try to request again by checking the fields.');
+            return false;
+        }
+        $this->userToUpdate = $loadedUser;
+        return true;
     }
 
     /**
-     * {@inheritDoc}
+     * Add custom action once form is validated.
      *
-     * @throws \InvalidArgumentException
+     * @param array $actionData some data to handle
+     *
+     * @return void
+     *
+     * @throws \ReflectionException
+     * @throws \Exception
+     * @see AbstractFormHandler::processFormRequest()
      */
-    public function executeFormRequestActionOnSuccess(array $actionData = null, Request $request = null) : bool
+    protected function addCustomAction(array $actionData) : void
     {
-        /** @var User $user */
-        $user = $actionData['userToUpdate'] ?? null;
-        if (!$user instanceof User || \is_null($user)) {
-            throw new \InvalidArgumentException('A instance of User must be set first!');
+        $userService = $actionData['userService'];
+        if (!$userService instanceof UserManager || \is_null($userService)) {
+            throw new \InvalidArgumentException('A instance of UserManager must be set first!');
         }
-        $sender = [$this->parameterBag->get('app_swiftmailer_website_email') => 'SnowTricks - Member service'];
-        $receiver = [$user->getEmail() => $user->getFirstName() . ' ' . $user->getFamilyName()];
-        $emailHtmlBody = $this->mailer->createEmailBody(RequestNewPasswordAction::class, ['_locale' => $request->get('_locale'), 'user' => $user]);
-        $isEmailSent = $this->mailer->sendEmail($sender, $receiver, 'Password renewal request', $emailHtmlBody);
-        return $isEmailSent ? true : false;
+        $user = $this->userToUpdate;
+        // Save data
+        /** @var User $updatedUser */
+        $updatedUser = $userService->generatePasswordRenewalToken($user);
+        // Send email notification
+        $emailParameters = [
+            'receiver'     => [$updatedUser->getEmail() => $updatedUser->getFirstName() . ' ' . $updatedUser->getFamilyName()],
+            'templateData' => ['user' => $updatedUser]
+        ];
+        // Use a factory to configure the email
+        $emailConfig = $this->emailConfigFactory->createFromActionContext(
+            RequestNewPasswordAction::class,
+            EmailConfigFactory::USER_ASK_FOR_RENEW_PASSWORD,
+            $emailParameters
+        );
+        $isEmailSent = $this->mailer->notify($emailConfig);
+        // Technical error when trying to send
+        if (!$isEmailSent) {
+            throw new \Exception(sprintf('Notification failed: email was not sent to %s due to technical error or wrong parameters!', $updatedUser->getEmail()));
+        }
+        $this->flashBag->add('success','An email was sent successfully!<br>Please check your box and<br>use your personalized link<br>to renew your password.');
+    }
+
+    /**
+     * Get the user not found error.
+     *
+     * @return string|null
+     */
+    public function getUserError()
+    {
+        return $this->customError;
     }
 }

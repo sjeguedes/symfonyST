@@ -4,7 +4,10 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
-    app_swiftmailer_website_email: '%env(MAILER_WEBSITE_EMAIL)%'
+    app_website_name: '%env(WEBSITE_NAME)%'
+    app_swift_mailer_sender_email: '%env(MAILER_SENDER_EMAIL)%' # admin email
+    app_swift_mailer_sender_name: '%env(MAILER_SENDER_NAME)%' # admin email name
+
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -56,6 +59,14 @@ services:
     App\Event\Handler\LogoutHandler:
         #tags: ['app.event.handler.logout_handler']
 
+    App\Form\Handler\RequestNewPasswordHandler:
+        arguments:
+            $emailConfigFactory: '@App\Service\Mailer\Email\EmailConfigFactory'
+
+    App\Form\Handler\RenewPasswordHandler:
+        arguments:
+            $emailConfigFactory: '@App\Service\Mailer\Email\EmailConfigFactory'
+
     # add authentication checker
     App\Service\Security\AuthenticationUserChecker:
         #tags: ['app.service.security.authentication_user_checker']
@@ -67,6 +78,10 @@ services:
     # add SwiftMailer manager
     App\Service\Mailer\SwiftMailerManager:
         #tags: ['app.service.mailer.swift_mailer_manager']
+
+    # add EmailConfigFactory
+    App\Service\Mailer\Email\EmailConfigFactory: ~
+    App\Service\Mailer\Email\EmailConfigFactoryInterface: '@App\Service\Mailer\Email\EmailConfigFactory'
 
     # add trick video URL "proxy" checker
     App\Service\Medias\VideoURLProxyChecker:
@@ -86,10 +101,9 @@ services:
     Doctrine\ORM\Query\ResultSetMappingBuilder:
         #tags: ['doctrine.orm.query.result_set_mapping_builder']
 
-    # add request as a service
-    Symfony\Component\HttpFoundation\Request:
-        #tags: ['symfony.component.http_foundation.request']
-
     # add PSR3 logger as default logger for actions (controllers)
     Symfony\Component\HttpKernel\Log\Logger:
         #tags: ['symfony.component.http_kernel.log.logger']
+
+    # add options resolver as a service
+    Symfony\Component\OptionsResolver\OptionsResolver:

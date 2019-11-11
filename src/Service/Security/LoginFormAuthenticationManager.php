@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Service\Security;
 
-use App\Domain\Service\UserManager;
+use App\Domain\ServiceLayer\UserManager;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 use Symfony\Component\HttpFoundation\RedirectResponse;

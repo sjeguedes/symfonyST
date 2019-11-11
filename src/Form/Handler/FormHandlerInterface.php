@@ -5,28 +5,23 @@ declare(strict_types = 1);
 namespace App\Form\Handler;
 
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Interface FormHandlerInterface.
+ *
+ * Define a contract to set a form handler.
+ */
 interface FormHandlerInterface
 {
-    /**
-     * Initialize a form by creating it with a form factory.
-     *
-     * @param string     $formType the class name as F.Q.C.N
-     * @param mixed|null $data
-     * @param array      $options
-     *
-     * @return FormInterface
-     */
-    public function initForm(string $formType, $data = null, array $options = []) : FormInterface;
-
     /**
      * Bind request and form to get all of the submitted data.
      *
      * @param Request $request
      *
      * @return FormInterface
+     *
+     * @throws \RuntimeException
      */
     public function bindRequest(Request $request) : FormInterface;
 
@@ -34,27 +29,39 @@ interface FormHandlerInterface
      * Get password renewal request form with a form factory.
      *
      * @return FormInterface
+     *
+     * @throws \RuntimeException
      */
     public function getForm() : FormInterface;
 
     /**
-     * Deal with form request to return validation state.
+     * Initialize a form by creating it with a form factory.
      *
-     * @param Request $request
+     * @param array|null  $data
+     * @param string|null $formType the class name as F.Q.C.N
+     * @param array|null  $options
      *
-     * @return bool
+     * @return FormHandlerInterface
      *
-     * @throws \Exception
+     * @throws \RuntimeException
      */
-    public function processFormRequestOnSubmit(Request $request) : bool;
+    public function initForm(array $data = null, string $formType = null, array $options = null) : FormHandlerInterface;
 
     /**
-     * Execute action purpose if form is validated.
-     *
-     * @param array $actionData an array of particular data to perform action
-     * @param Request $request
+     * Check if form handles current request.
      *
      * @return bool
      */
-    public function executeFormRequestActionOnSuccess(array $actionData = null, Request $request = null) : bool;
+    public function isRequestHandled() : bool;
+
+    /**
+     * Deal with form request to return validation state only if request is bind.
+     * Add any additional custom validations once constraints are validated.
+     * Add any actions to perform when form is validated.
+     *
+     * @param array|null $actionData
+     *
+     * @return bool
+     */
+    public function processFormRequest(array $actionData = null) : bool;
 }

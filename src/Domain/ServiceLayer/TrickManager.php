@@ -1,7 +1,7 @@
 <?php
 declare(strict_types = 1);
 
-namespace App\Domain\Service;
+namespace App\Domain\ServiceLayer;
 
 use App\Domain\Entity\Trick;
 use App\Domain\Repository\TrickRepository;
@@ -17,7 +17,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * Class TrickManager.
  *
- * Manage tricks to retrieve as a "service layer".
+ * Manage tricks to handle, and retrieve them as a "service layer".
  */
 class TrickManager
 {

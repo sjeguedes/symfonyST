@@ -33,10 +33,8 @@ class LoginType extends AbstractType
     {
         $builder
             ->add('userName',TextType::class, [
-                'empty_data'   => ''
             ])
             ->add('password',PasswordType::class, [
-                'empty_data'   => ''
             ])
             ->add('rememberMe',CheckboxType::class, [
                 'empty_data'   => false,
