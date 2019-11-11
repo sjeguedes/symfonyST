@@ -1,7 +1,7 @@
 ###> symfony/framework-bundle ###
-.env.local
-.env.local.php
-.env.*.local
+/.env.local
+/.env.local.php
+/.env.*.local
 /public/bundles/
 /var/
 /vendor/
@@ -11,9 +11,12 @@
 /docs/
 /.idea/
 /public-dev/
-
-.php_cs.cache
 ###< others ###
+
+###> friendsofphp/php-cs-fixer ###
+/.php_cs
+/.php_cs.cache
+###< friendsofphp/php-cs-fixer ###
 
 ###> symfony/phpunit-bridge ###
 .phpunit
