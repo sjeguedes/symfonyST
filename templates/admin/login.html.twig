@@ -61,15 +61,15 @@
                                 {{ form_label(loginForm.userName, 'Username or email address', {'label_attr': {'class': 'uk-form-label'}}) }}
                                 {# --- Username reminder --- #}
                                 <div class="uk-inline">
-                                    <a href="#" class="uk-button-link uk-text-right">
-                                        <span class="st-color-yellow" uk-icon="icon: question"></span>
+                                    <a href="#" class="uk-button-link">
+                                        <span class="st-color-yellow" uk-icon="icon: question; ratio: 1.25"></span>
                                     </a>
                                     <div uk-drop="mode: click; pos: top-center; animation: uk-animation-slide-top-small; duration: 500">
                                         <div class="uk-inline uk-position-relative uk-padding-small uk-border-rounded uk-box-shadow-medium st-background-yellow st-color-black">
-                                            <a href="#" class="uk-drop-close uk-position-top-right uk-padding-small st-color-blue">
+                                            <a href="#" class="uk-drop-close uk-position-absolute uk-padding-small">
                                                 <span class="st-color-blue" uk-icon="icon: close"></span>
                                             </a>
-                                            <p class="uk-margin-remove uk-text-center" style="line-height: 1">
+                                            <p class="uk-margin-remove uk-text-center st-line-height-normal">
                                                 <small class="uk-display-block uk-margin-small-top uk-margin-small-bottom uk-text-bold">
                                                     <span uk-icon="icon: info"></span> Username reminder<br>
                                                 </small>
@@ -87,12 +87,12 @@
                                 <div class="uk-inline uk-flex">
                                     <span class="uk-form-icon" uk-icon="icon: user"></span>
                                     {{ form_widget(loginForm.userName, {
-                                        'attr': {'class': 'uk-input'},
+                                        'attr': {'class': 'uk-input', 'maxlength': '15'},
                                         'value': loginForm.userName.vars.value})
                                     }}
                                     {% if loginForm.userName.vars.errors.form.submitted == 1 %}
                                         {% set class = loginForm.userName.vars.valid == 0  or lastAuthenticationError is not null ? 'uk-form-danger' : 'uk-form-success' %}
-                                        {% set icon =  loginForm.userName.vars.valid == 0  or lastAuthenticationError is not null ? 'warning' : 'check' %}
+                                        {% set icon = loginForm.userName.vars.valid == 0  or lastAuthenticationError is not null ? 'warning' : 'check' %}
                                         <span class="uk-form-icon uk-form-icon-flip {{ class }}" uk-icon="icon: {{ icon }}"></span>
                                     {% endif %}
                                 </div>
@@ -106,14 +106,14 @@
                                 {# --- Password reminder --- #}
                                 <div class="uk-inline">
                                     <a href="#" class="uk-button-link">
-                                        <span class="st-color-yellow" uk-icon="icon: question"></span>
+                                        <span class="st-color-yellow" uk-icon="icon: question; ratio: 1.25"></span>
                                     </a>
                                     <div uk-drop="mode: click; pos: top-center; animation: uk-animation-slide-top-small; duration: 500">
                                         <div class="uk-inline uk-position-relative uk-padding-small uk-border-rounded uk-box-shadow-medium st-background-yellow st-color-black">
-                                            <a href="#" class="uk-drop-close uk-position-top-right uk-padding-small st-color-blue">
+                                            <a href="#" class="uk-drop-close uk-position-absolute uk-padding-small">
                                                 <span class="st-color-blue" uk-icon="icon: close"></span>
                                             </a>
-                                            <p class="uk-margin-remove uk-text-center" style="line-height: 1">
+                                            <p class="uk-margin-remove uk-text-center st-line-height-normal" style="line-height: 1">
                                                 <small class="uk-display-block uk-margin-small-top uk-margin-small-bottom uk-text-bold">
                                                     <span uk-icon="icon: info"></span> Password reminder<br>
                                                 </small>
@@ -135,13 +135,13 @@
                                     }}
                                     {% if loginForm.password.vars.errors.form.submitted == 1 %}
                                     {% set class = loginForm.password.vars.valid == 0 or lastAuthenticationError is not null ? 'uk-form-danger' : 'uk-form-success' %}
-                                    {% set icon =  loginForm.password.vars.valid == 0 or lastAuthenticationError is not null  ? 'warning' : 'check' %}
+                                    {% set icon = loginForm.password.vars.valid == 0 or lastAuthenticationError is not null  ? 'warning' : 'check' %}
                                     <span class="uk-form-icon uk-form-icon-flip {{ class }}" uk-icon="icon: {{ icon }}"></span>
                                     {% endif %}
                                 </div>
                             </div>
                             {# Remember me #}
-                            <div class="uk-width-1-1 uk-margin-small-bottom">
+                            <div class="uk-width-1-1 uk-margin-small-top uk-margin-small-bottom">
                                 <div class="uk-inline">
                                     {{ form_widget(loginForm.rememberMe, {
                                         'attr': {'class': 'uk-checkbox'},
@@ -162,7 +162,7 @@
                     <div class="uk-card-footer">
                         {# Password renewal request #}
                         <div class="uk-text-center">
-                            <a href="{{ path('request_new_password') }}" class="uk-link-text uk-button-text uk-display-inline-block uk-margin-small-bottom uk-text-small" title="You forgot your password?">
+                            <a href="{{ path('request_new_password') }}" class="uk-link-text uk-button-text uk-display-inline-block uk-margin-small-bottom" title="You forgot your password?">
                                 <span uk-icon="icon: arrow-right"></span>
                                 You forgot your password?
                             </a>
