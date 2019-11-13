@@ -1,0 +1,33 @@
+{# https://github.com/symfony/symfony/blob/master/src/Symfony/Bridge/Twig/Resources/views/Form/form_div_layout.html.twig #}
+
+{# Errors #}
+{%- block form_errors -%}
+    {%- if errors|length > 0 -%}
+        <ul class="uk-list">
+            {%- for error in errors -%}
+                <li>
+                    <div class="uk-label uk-form-danger uk-box-shadow-large uk-text-bold uk-text">
+                        <p class="uk-margin-remove uk-text-center">
+                            <span uk-icon="icon: arrow-down"></span> {{ error.message|raw }}
+                        </p>
+                    </div>
+                </li>
+            {%- endfor -%}
+        </ul>
+    {%- endif -%}
+{%- endblock form_errors -%}
+
+{# Inputs #}
+{%- block form_widget_simple -%}
+    {%- set type = type|default('text') -%}
+    {%- if type == 'range' or type == 'color' -%}
+        {# Attribute "required" is not supported #}
+        {%- set required = false -%}
+    {%- endif -%}
+    <input type="{{ type }}" {{ block('widget_attributes') }} {% if data is not empty %}value="{{ data }}" {% endif %}/>
+{%- endblock form_widget_simple -%}
+
+{# Checkboxes #}
+{%- block checkbox_widget -%}
+    <input type="checkbox" {{ block('widget_attributes') }}{% if data is not empty %}value="{{ data }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
+{%- endblock checkbox_widget -%}

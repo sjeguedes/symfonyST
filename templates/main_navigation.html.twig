@@ -16,8 +16,8 @@
             </div>
         </a>
     </li>
-    <li{{ app.request.get('_route') == 'register' ? ' class="uk-active uk-disabled"' }}>
-        <a href="{#{{ path('register') }}#}#" title="Register">
+    <li{{ app.request.get('_route') == 'registration' ? ' class="uk-active uk-disabled"' }}>
+        <a href="{#{{ path('registration') }}#}#" title="Register">
             <div>
                 <span class="uk-text-uppercase"><span uk-icon="users"></span><br class="uk-hidden@m">&nbsp;Register</span>
                 <div class="uk-navbar-subtitle uk-visible@m"><small><span class="uk-visible@l">Create an </span>account</small></div>
@@ -25,8 +25,8 @@
         </a>
     </li>
     {% if is_granted('IS_AUTHENTICATED_FULLY') == false %}
-    <li{{ app.request.get('_route') == 'login' ? ' class="uk-active uk-disabled"' }}>
-        <a href="{#{{ path('login') }}#}#" title="Login">
+    <li{{ app.request.get('_route') == 'connection' ? ' class="uk-active uk-disabled"' }}>
+        <a href="{{ path('connection') }}" title="Login">
             <div>
                 <span class="uk-text-uppercase"><span uk-icon="sign-in"></span><br class="uk-hidden@m">&nbsp;Login</span>
                 <div class="uk-navbar-subtitle uk-visible@m"><small><span class="uk-visible@l">Contribute as a </span>member</small></div>
@@ -34,12 +34,28 @@
         </a>
     </li>
     {% else %}
-    <li{{ app.request.get('_route') == 'logout' ? ' class="uk-active uk-disabled"' }}>
-        <a href="{#{{ path('logout') }}#}#" title="Logout">
+    <li>
+        <a href="{{ logout_path('main') }}" title="Logout">
             <div>
                 <span class="uk-text-uppercase"><span uk-icon="sign-out"></span><br class="uk-hidden@m">&nbsp;Logout</span>
-                <div class="uk-navbar-subtitle uk-visible@m"><small class="uk-text-muted"><span class="uk-visible@l">Disconnect </span>profile</small></div>
+                <div class="uk-navbar-subtitle uk-visible@m"><small><span class="uk-visible@l">Disconnect </span>profile</small></div>
             </div>
+        </a>
+    </li>
+    {% endif %}
+    {# User profile information #}
+    {% if app.user %}
+    <li class="st-background-blue">
+        <a class="uk-position-relative" href="{{ logout_path('main') }}" title="Logout">
+            <div>
+                <span class="uk-text-break uk-text-uppercase">
+                     <small>{{ app.user.firstName~' '~app.user.familyName }} <br class="uk-hidden@m"><span uk-icon="user"></span></small>
+                </span>
+                <div class="uk-navbar-subtitle uk-text-right uk-visible@m">
+                    <small>{{ app.user.mainRoleLabel }}</small>
+                </div>
+            </div>
+            <span class="uk-position-top-right" uk-icon="icon: close; ratio: 0.5"></span>
         </a>
     </li>
     {% endif %}

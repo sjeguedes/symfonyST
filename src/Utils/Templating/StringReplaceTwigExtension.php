@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace App\Utils\Templating;
 
@@ -10,7 +10,7 @@ use Twig\TwigFunction;
 /*
  * Class RegExpReplaceTwigExtension.
  *
- * Create a Twig filter extension to encode uuid directly in template.
+ * Create a Twig function extension to encode uuid directly in template.
  */
 class StringReplaceTwigExtension extends AbstractExtension
 {

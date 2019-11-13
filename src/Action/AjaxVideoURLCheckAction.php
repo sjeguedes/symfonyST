@@ -1,10 +1,11 @@
 <?php
+
 declare(strict_types = 1);
 
 namespace App\Action;
 
 use App\Responder\AjaxVideoURLCheckResponder;
-use App\Utils\Medias\VideoURLProxyChecker;
+use App\Service\Medias\VideoURLProxyChecker;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;

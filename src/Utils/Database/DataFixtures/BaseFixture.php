@@ -5,7 +5,7 @@ namespace App\Utils\Database\DataFixtures;
 
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -28,11 +28,11 @@ abstract class BaseFixture extends Fixture
     /**
      * BaseFixture constructor.
      *
-     * @param ContainerInterface $container
+     * @param ParameterBagInterface $parameterBag
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(ParameterBagInterface $parameterBag)
     {
-        $this->yamlFilePath = $container->getParameter('app.data_fixtures.yaml.dir');
+        $this->yamlFilePath = $parameterBag->get('app_data_fixtures_yaml_dir');
     }
 
     /**

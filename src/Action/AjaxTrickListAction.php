@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace App\Action;
 
-use App\Domain\Service\TrickManager;
+use App\Domain\ServiceLayer\TrickManager;
 use App\Responder\AjaxTrickListResponder;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
@@ -61,7 +61,7 @@ class AjaxTrickListAction
         if ($this->trickService->isCountAllOutdated($trickCount)) {
             $this->trickService->storeInSession('trickCount', $trickCount);
             $parameters = $this->trickService->getDefaultTrickList();
-            $this->logger->error("[trace app snowTricks] AjaxTrickListAction/__invoke => trickCount: " . $trickCount);
+            $this->logger->error("[trace app snowTricks] AjaxTrickListAction/__invoke => trickCount: $trickCount");
             $listError = 'Trick list was reinitialized!<br>Wrong total count is used<br>due to outdated or unexpected value.';
         } else {
             // Filter request attributes (offset, limit, ...)

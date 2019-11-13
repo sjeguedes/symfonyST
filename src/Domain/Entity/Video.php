@@ -1,9 +1,10 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace App\Domain\Entity;
 
+use App\Domain\Repository\VideoRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -61,7 +62,7 @@ class Video
     /**
      * @var Collection (inverse side of entity relation)
      *
-     * @ORM\OneToMany(targetEntity=Media::class, cascade={"persist", "remove"}, orphanRemoval=true, mappedBy="video")
+     * @ORM\OneToMany(targetEntity=Media::class, mappedBy="video")
      */
     private $medias;
 
@@ -71,7 +72,6 @@ class Video
      * @param string                  $url
      * @param string                  $description
      * @param \DateTimeInterface|null $creationDate
-     * @param \DateTimeInterface|null $updateDate
      *
      * @return void
      *
@@ -80,18 +80,16 @@ class Video
     public function __construct(
         string $url,
         string $description,
-        \DateTimeInterface $creationDate = null,
-        \DateTimeInterface $updateDate = null
+        \DateTimeInterface $creationDate = null
     ) {
         $this->uuid = Uuid::uuid4();
-        assert(!empty($url),'Video URL can not be empty!');
+        \assert(!empty($url),'Video URL can not be empty!');
         $this->url = $url;
-        assert(!empty($description),'Video description can not be empty!');
+        \assert(!empty($description),'Video description can not be empty!');
         $this->description = $description;
         $createdAt = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
         $this->creationDate = $createdAt;
-        assert($updateDate > $this->creationDate,'Video can not be created after update date!');
-        $this->updateDate = !\is_null($updateDate) ? $updateDate : $this->creationDate;
+        $this->updateDate = $createdAt;
         $this->medias = new ArrayCollection();
     }
 
@@ -136,7 +134,7 @@ class Video
      */
     public function modifyUpdateDate(\DateTimeInterface $updateDate) : self
     {
-        if ($this->updateDate > $updateDate) {
+        if ($this->creationDate > $updateDate) {
             throw new \RuntimeException('Update date is not logical: Video can not be created after modified update date!');
         }
         $this->updateDate = $updateDate;

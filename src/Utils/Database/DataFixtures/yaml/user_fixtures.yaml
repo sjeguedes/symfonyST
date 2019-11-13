@@ -1,0 +1,21 @@
+users:
+    -
+        #1 admin profile
+        fields:
+            family_name: "RYAN"
+            first_name: "Mike"
+            user_name: "Miky"
+            email: "admin1@test.com"
+            password: "$2y$10$FG3LeBBCW0J4o.j3TYCoSOeAQqrDO/2Ovbpitv.yB8sJvMq37WPEq"
+            roles: ['ROLE_ADMIN', 'ROLE_USER']
+            salt: null
+    -
+        #2 member profile
+        fields:
+            family_name: "DOE"
+            first_name: "John"
+            user_name: "Rooky"
+            email: "member1@test.com"
+            password: "$2y$10$fHFC.NaUGHFZRwR7t3ZD8OxqdXi7xhxxM29EIfLDpkQMkf/2xrzRu"
+            roles: ['ROLE_USER']
+            salt: null

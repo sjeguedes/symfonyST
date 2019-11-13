@@ -1,11 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace App\Action;
 
-use App\Domain\Service\MediaTypeManager;
-use App\Domain\Service\TrickManager;
+use App\Domain\ServiceLayer\MediaTypeManager;
+use App\Domain\ServiceLayer\TrickManager;
 use App\Responder\SingleTrickResponder;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
@@ -67,7 +67,7 @@ class SingleTrickAction
         // Get registered normal image type (corresponds particular dimensions)
         $trickNormalImageTypeValue = $this->mediaTypeService->getMandatoryDefaultTypes()['trickNormal'];
         $normalImageMediaType = $this->mediaTypeService->findSingleByUniqueType($trickNormalImageTypeValue);
-        // Get trick;
+        // Get trick
         $trick = $this->trickService->findSingleByEncodedUuid($request->attributes->get('encodedUuid'));
         // Check wrong parameters!
         if (\is_null($normalImageMediaType) || \is_null($trick)) {

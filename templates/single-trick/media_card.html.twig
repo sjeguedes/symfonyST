@@ -78,17 +78,17 @@
                     <span class="st-single-button-spinner" uk-spinner="ratio: 0.4"></span>
                     <small>&nbsp;Loading</small>
                 </span>
-                <a id="st-modal-button-{{ index }}" href="#st-modal-media-{{ custom.icon matches '/^image/' ? 'image' : 'video' }}-{{ index }}" class="uk-button uk-button-primary uk-button-small uk-border-rounded uk-invisible uk-disabled" title="{{ custom.title|e('html_attr') }}" uk-toggle>
-                    <span uk-icon="icon: {{ custom.icon|e('html_attr') }}; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-padding"></span>&nbsp;<span uk-icon="icon: expand; ratio: 1" class="uk-icon"></span>
+                <a id="st-modal-button-{{ index }}" href="#st-modal-media-{{ custom.icon matches '/^image/' ? 'image' : 'video' }}-{{ index }}" class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-invisible uk-disabled" title="{{ custom.title|e('html_attr') }}" uk-toggle>
+                    <span uk-icon="icon: expand; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-other"><span uk-icon="icon: {{ custom.icon|e('html_attr') }}; ratio: 1" class="uk-icon"></span>&nbsp;</span>&nbsp;
                 </a>
             </div>
             {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                 <div class="uk-text-right">
-                    <a href="{#{{ path('update_media', { 'encodedUuid': media.uuid|uuid_encode }) }}#}#" class="uk-button uk-button-primary uk-button-small uk-border-rounded" title="Update">
-                        <span uk-icon="pencil"></span>
+                    <a href="{#{{ path('update_media', { 'encodedUuid': media.uuid|uuid_encode }) }}#}#" class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove" title="Update">
+                        <span uk-icon="icon: pencil; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-update"></span>
                     </a>
-                    <a href="{#{{ path('delete_media', { 'encodedUuid': media.uuid|uuid_encode }) }}#}#" class="uk-button uk-button-primary uk-button-small uk-border-rounded" title="Delete">
-                        <span uk-icon="trash"></span>
+                    <a href="{#{{ path('delete_media', { 'encodedUuid': media.uuid|uuid_encode }) }}#}#" class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove" title="Delete">
+                        <span uk-icon="icon: trash; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-delete"></span>
                     </a>
                 </div>
             {% endif %}

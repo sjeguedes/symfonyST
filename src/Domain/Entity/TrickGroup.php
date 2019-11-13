@@ -1,9 +1,10 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace App\Domain\Entity;
 
+use App\Domain\Repository\TrickGroupRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -62,7 +63,7 @@ class TrickGroup
     /**
      * @var Collection (inverse side of entity relation)
      *
-     * @ORM\OneToMany(targetEntity=Trick::class, cascade={"persist", "remove"}, orphanRemoval=true, mappedBy="trickGroup")
+     * @ORM\OneToMany(targetEntity=Trick::class, mappedBy="trickGroup")
      */
     private $tricks;
 
@@ -72,7 +73,6 @@ class TrickGroup
      * @param string                  $name
      * @param string                  $description
      * @param \DateTimeInterface|null $creationDate
-     * @param \DateTimeInterface|null $updateDate
      *
      * @return void
      *
@@ -81,18 +81,16 @@ class TrickGroup
     public function __construct(
         string $name,
         string $description,
-        \DateTimeInterface $creationDate = null,
-        \DateTimeInterface $updateDate = null
+        \DateTimeInterface $creationDate = null
     ) {
         $this->uuid = Uuid::uuid4();
-        assert(!empty($name),'TrickGroup name can not be empty!');
+        \assert(!empty($name),'TrickGroup name can not be empty!');
         $this->name = $name;
-        assert(!empty($description),'TrickGroup description can not be empty!');
+        \assert(!empty($description),'TrickGroup description can not be empty!');
         $this->description = $description;
         $createdAt = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
         $this->creationDate = $createdAt;
-        assert($updateDate > $this->creationDate,'TrickGroup can not be created after update date!');
-        $this->updateDate = !\is_null($updateDate) ? $updateDate : $this->creationDate;
+        $this->updateDate = $createdAt;
         $this->tricks = new ArrayCollection();
     }
 
@@ -137,7 +135,7 @@ class TrickGroup
      */
     public function modifyUpdateDate(\DateTimeInterface $updateDate) : self
     {
-        if ($this->updateDate > $updateDate) {
+        if ($this->creationDate > $updateDate) {
             throw new \RuntimeException('Update date is not logical: TrickGroup can not be created after modified update date!');
         }
         $this->updateDate = $updateDate;

@@ -1,12 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace App\Responder\Redirection;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\RouterInterface;
 
 /**
  * Class RedirectionResponder.
@@ -16,20 +15,20 @@ use Symfony\Component\Routing\RouterInterface;
 final class RedirectionResponder
 {
     /**
-     * @var RouterInterface
+     * @var UrlGeneratorInterface
      */
-    private $router;
+    private $urlGenerator;
 
     /**
      * RedirectionResponder constructor.
      *
-     * @param RouterInterface $router
+     * @param UrlGeneratorInterface $urlGenerator
      *
      * @return void
      */
-    public function __construct(RouterInterface $router)
+    public function __construct(UrlGeneratorInterface $urlGenerator)
     {
-        $this->router = $router;
+        $this->urlGenerator = $urlGenerator;
     }
 
     /**
@@ -46,6 +45,6 @@ final class RedirectionResponder
         array $parameters = [],
         $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
     ) : RedirectResponse {
-        return new RedirectResponse($this->router->generate($route, $parameters, $referenceType));
+        return new RedirectResponse($this->urlGenerator->generate($route, $parameters, $referenceType));
     }
 }

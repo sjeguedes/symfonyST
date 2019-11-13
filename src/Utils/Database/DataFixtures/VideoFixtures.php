@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace App\Utils\Database\DataFixtures;
 
@@ -32,7 +32,6 @@ class VideoFixtures extends BaseFixture
             return new Video(
                 $data[$i]['fields']['url'],
                 $data[$i]['fields']['description'],
-                new \DateTime(sprintf("+%d days", $i - 1)),
                 new \DateTime(sprintf("+%d days", $i - 1))
             );
         });

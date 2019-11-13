@@ -1,0 +1,16 @@
+{# Used with UIkit JavaScript notification #}
+{# Flash message types are: success, info, warning, danger #}
+{% block flashMessages %}
+    {# Use peekAll() to not erase flash messages with condition #}
+    {% if app.session.flashbag.peekAll() is not empty %}
+    <div id="st-flash-message-content" class="uk-hidden">
+    {% for type, messages in app.session.flashbag.all() %}
+        {% for message in messages %}
+        <div class="st-flash-message" data-flash-type="{{ type }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    {% endfor %}
+    </div>
+    {% endif %}
+{% endblock %}

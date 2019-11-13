@@ -4,655 +4,726 @@ medias:
     -
         #trick: "Ollie" (big image)
         fields:
-            isMain: true
-            isPublished: true
+            is_main: true
+            is_published: true
         references:
             image: 1
             media_type: 3
             trick: 1
+            user: 1
     -
         #trick: "Nollie" (big image)
         fields:
-            isMain: true
-            isPublished: true
+            is_main: true
+            is_published: true
         references:
             image: 2
             media_type: 3
             trick: 2
+            user: 2
     -
         #trick: "One-Two" (big image)
         fields:
-            isMain: true
-            isPublished: true
+            is_main: true
+            is_published: true
         references:
             image: 3
             media_type: 3
             trick: 3
+            user: 1
     -
         #trick: "Back flip" (big image)
         fields:
-            isMain: true
-            isPublished: true
+            is_main: true
+            is_published: true
         references:
             image: 4
             media_type: 3
             trick: 4
+            user: 2
     -
         #trick: "Front flip" (big image)
         fields:
-            isMain: true
-            isPublished: true
+            is_main: true
+            is_published: true
         references:
             image: 5
             media_type: 3
             trick: 5
+            user: 1
     -
         #trick: "Invert" (big image)
         fields:
-            isMain: true
-            isPublished: true
+            is_main: true
+            is_published: true
         references:
             image: 6
             media_type: 3
             trick: 6
+            user: 2
     -
         #trick: "Handplant" (big image)
         fields:
-            isMain: true
-            isPublished: true
+            is_main: true
+            is_published: true
         references:
             image: 7
             media_type: 3
             trick: 7
+            user: 1
     -
         #trick: "50-50" (big image)
         fields:
-            isMain: true
-            isPublished: true
+            is_main: true
+            is_published: true
         references:
             image: 8
             media_type: 3
             trick: 8
+            user: 2
     -
         #trick: "Boardslide" (big image)
         fields:
-            isMain: true
-            isPublished: true
+            is_main: true
+            is_published: true
         references:
             image: 9
             media_type: 3
             trick: 9
+            user: 1
     -
         #trick: "Nose-pick" (big image)
         fields:
-            isMain: true
-            isPublished: true
+            is_main: true
+            is_published: true
         references:
             image: 10
             media_type: 3
             trick: 10
+            user: 2
     -
         #trick: "Board-stall" (big image)
         fields:
-            isMain: true
-            isPublished: true
+            is_main: true
+            is_published: true
         references:
             image: 11
             media_type: 3
             trick: 11
+            user: 1
     -
         #trick: "One-footed" (big image)
         fields:
-            isMain: true
-            isPublished: true
+            is_main: true
+            is_published: true
         references:
             image: 12
             media_type: 3
             trick: 12
+            user: 2
     ## Normal format ##
     -
         #trick: "Ollie" (normal image)
         fields:
-            isMain: true
-            isPublished: true
+            is_main: true
+            is_published: true
         references:
             image: 13
             media_type: 2
             trick: 1
+            user: 1
     -
         #trick: "Nollie" (normal image)
         fields:
-            isMain: true
-            isPublished: true
+            is_main: true
+            is_published: true
         references:
             image: 14
             media_type: 2
             trick: 2
+            user: 2
     -
         #trick: "One-Two" (normal image)
         fields:
-            isMain: true
-            isPublished: true
+            is_main: true
+            is_published: true
         references:
             image: 15
             media_type: 2
             trick: 3
+            user: 1
     -
         #trick: "Back flip" (normal image)
         fields:
-            isMain: true
-            isPublished: true
+            is_main: true
+            is_published: true
         references:
             image: 16
             media_type: 2
             trick: 4
+            user: 2
     -
         #trick: "Front flip" (normal image)
         fields:
-            isMain: true
-            isPublished: true
+            is_main: true
+            is_published: true
         references:
             image: 17
             media_type: 2
             trick: 5
+            user: 1
     -
         #trick: "Invert" (normal image)
         fields:
-            isMain: true
-            isPublished: true
+            is_main: true
+            is_published: true
         references:
             image: 18
             media_type: 2
             trick: 6
+            user: 2
     -
         #trick: "Handplant" (normal image)
         fields:
-            isMain: true
-            isPublished: true
+            is_main: true
+            is_published: true
         references:
             image: 19
             media_type: 2
             trick: 7
+            user: 1
     -
         #trick: "50-50" (normal image)
         fields:
-            isMain: true
-            isPublished: true
+            is_main: true
+            is_published: true
         references:
             image: 20
             media_type: 2
             trick: 8
+            user: 2
     -
         #trick: "Boardslide" (normal image)
         fields:
-            isMain: true
-            isPublished: true
+            is_main: true
+            is_published: true
         references:
             image: 21
             media_type: 2
             trick: 9
+            user: 1
     -
         #trick: "Nose-pick" (normal image)
         fields:
-            isMain: true
-            isPublished: true
+            is_main: true
+            is_published: true
         references:
             image: 22
             media_type: 2
             trick: 10
+            user: 2
     -
         #trick: "Board-stall" (normal image)
         fields:
-            isMain: true
-            isPublished: true
+            is_main: true
+            is_published: true
         references:
             image: 23
             media_type: 2
             trick: 11
+            user: 1
     -
         #trick: "One-footed" (normal image)
         fields:
-            isMain: true
-            isPublished: true
+            is_main: true
+            is_published: true
         references:
             image: 24
             media_type: 2
             trick: 12
+            user: 2
     ## Thumbnail format ##
     -
         #trick: "Ollie" (thumbnail image)
         fields:
-            isMain: true
-            isPublished: true
+            is_main: true
+            is_published: true
         references:
             image: 25
             media_type: 1
             trick: 1
+            user: 1
     -
         #trick: "Nollie" (thumbnail image)
         fields:
-            isMain: true
-            isPublished: true
+            is_main: true
+            is_published: true
         references:
             image: 26
             media_type: 1
             trick: 2
+            user: 2
     -
         #trick: "One-Two" (thumbnail image)
         fields:
-            isMain: true
-            isPublished: true
+            is_main: true
+            is_published: true
         references:
             image: 27
             media_type: 1
             trick: 3
+            user: 1
     -
         #trick: "Back flip" (thumbnail image)
         fields:
-            isMain: true
-            isPublished: true
+            is_main: true
+            is_published: true
         references:
             image: 28
             media_type: 1
             trick: 4
+            user: 2
     -
         #trick: "Front flip" (thumbnail image)
         fields:
-            isMain: true
-            isPublished: true
+            is_main: true
+            is_published: true
         references:
             image: 29
             media_type: 1
             trick: 5
-
+            user: 1
     -
         #trick: "Invert" (thumbnail image)
         fields:
-            isMain: true
-            isPublished: true
+            is_main: true
+            is_published: true
         references:
             image: 30
             media_type: 1
             trick: 6
+            user: 2
     -
         #trick: "Handplant" (thumbnail image)
         fields:
-            isMain: true
-            isPublished: true
+            is_main: true
+            is_published: true
         references:
             image: 31
             media_type: 1
             trick: 7
+            user: 1
     -
         #trick: "50-50" (thumbnail image)
         fields:
-            isMain: true
-            isPublished: true
+            is_main: true
+            is_published: true
         references:
             image: 32
             media_type: 1
             trick: 8
+            user: 2
     -
         #trick: "Boardslide" (thumbnail image)
         fields:
-            isMain: true
-            isPublished: true
+            is_main: true
+            is_published: true
         references:
             image: 33
             media_type: 1
             trick: 9
+            user: 1
     -
         #trick: "Nose-pick" (thumbnail image)
         fields:
-            isMain: true
-            isPublished: true
+            is_main: true
+            is_published: true
         references:
             image: 34
             media_type: 1
             trick: 10
+            user: 2
     -
         #trick: "Board-stall" (thumbnail image)
         fields:
-            isMain: true
-            isPublished: true
+            is_main: true
+            is_published: true
         references:
             image: 35
             media_type: 1
             trick: 11
+            user: 1
     -
         #trick: "One-footed" (thumbnail image)
         fields:
-            isMain: true
-            isPublished: true
+            is_main: true
+            is_published: true
         references:
             image: 36
             media_type: 1
             trick: 12
+            user: 2
     ### VIDEOS ###
     ## Youtube ##
     -
         #trick: "Ollie"
         fields:
-            isMain: false
-            isPublished: true
+            is_main: false
+            is_published: true
         references:
             video: 1
             media_type: 5
             trick: 1
+            user: 1
     -
         #trick: "Nollie"
         fields:
-            isMain: false
-            isPublished: true
+            is_main: false
+            is_published: true
         references:
             video: 2
             media_type: 5
             trick: 2
+            user: 2
     -
         #trick: "One-Two"
         fields:
-            isMain: false
-            isPublished: true
+            is_main: false
+            is_published: true
         references:
             video: 3
             media_type: 5
             trick: 3
+            user: 1
     -
         #trick: "Back flip"
         fields:
-            isMain: false
-            isPublished: true
+            is_main: false
+            is_published: true
         references:
             video: 4
             media_type: 5
             trick: 4
+            user: 2
     -
         #trick: "Front flip"
         fields:
-            isMain: false
-            isPublished: true
+            is_main: false
+            is_published: true
         references:
             video: 5
             media_type: 5
             trick: 5
+            user: 1
     -
         #trick: "Invert"
         fields:
-            isMain: false
-            isPublished: true
+            is_main: false
+            is_published: true
         references:
             video: 6
             media_type: 5
             trick: 6
+            user: 2
     -
         #trick: "Handplant"
         fields:
-            isMain: false
-            isPublished: true
+            is_main: false
+            is_published: true
         references:
             video: 7
             media_type: 5
             trick: 7
+            user: 1
     -
         #trick: "50-50"
         fields:
-            isMain: false
-            isPublished: true
+            is_main: false
+            is_published: true
         references:
             video: 8
             media_type: 5
             trick: 8
+            user: 2
     -
         #trick: "Boardslide"
         fields:
-            isMain: false
-            isPublished: true
+            is_main: false
+            is_published: true
         references:
             video: 9
             media_type: 5
             trick: 9
+            user: 1
     -
         #trick: "Nose-pick"
         fields:
-            isMain: false
-            isPublished: true
+            is_main: false
+            is_published: true
         references:
             video: 10
             media_type: 5
             trick: 10
+            user: 2
     -
         #trick: "Board-stall"
         fields:
-            isMain: false
-            isPublished: true
+            is_main: false
+            is_published: true
         references:
             video: 11
             media_type: 5
             trick: 11
+            user: 1
     -
         #trick: "One-footed"
         fields:
-            isMain: false
-            isPublished: true
+            is_main: false
+            is_published: true
         references:
             video: 12
             media_type: 5
             trick: 12
+            user: 2
     ## Vimeo ##
     -
         #trick: "Ollie"
         fields:
-            isMain: false
-            isPublished: true
+            is_main: false
+            is_published: true
         references:
             video: 13
             media_type: 6
             trick: 1
+            user: 1
     -
         #trick: "Nollie"
         fields:
-            isMain: false
-            isPublished: true
+            is_main: false
+            is_published: true
         references:
             video: 14
             media_type: 6
             trick: 2
+            user: 2
     -
         #trick: "One-Two"
         fields:
-            isMain: false
-            isPublished: true
+            is_main: false
+            is_published: true
         references:
             video: 15
             media_type: 6
             trick: 3
+            user: 1
     -
         #trick: "Back flip"
         fields:
-            isMain: false
-            isPublished: true
+            is_main: false
+            is_published: true
         references:
             video: 16
             media_type: 6
             trick: 4
+            user: 2
     -
         #trick: "Front flip"
         fields:
-            isMain: false
-            isPublished: true
+            is_main: false
+            is_published: true
         references:
             video: 17
             media_type: 6
             trick: 5
+            user: 1
     -
         #trick: "Invert"
         fields:
-            isMain: false
-            isPublished: true
+            is_main: false
+            is_published: true
         references:
             video: 18
             media_type: 6
             trick: 6
+            user: 2
     -
         #trick: "Handplant"
         fields:
-            isMain: false
-            isPublished: true
+            is_main: false
+            is_published: true
         references:
             video: 19
             media_type: 6
             trick: 7
+            user: 1
     -
         #trick: "50-50"
         fields:
-            isMain: false
-            isPublished: true
+            is_main: false
+            is_published: true
         references:
             video: 20
             media_type: 6
             trick: 8
+            user: 2
     -
         #trick: "Boardslide"
         fields:
-            isMain: false
-            isPublished: true
+            is_main: false
+            is_published: true
         references:
             video: 21
             media_type: 6
             trick: 9
+            user: 1
     -
         #trick: "Nose-pick"
         fields:
-            isMain: false
-            isPublished: true
+            is_main: false
+            is_published: true
         references:
             video: 22
             media_type: 6
             trick: 10
+            user: 2
     -
         #trick: "Board-stall"
         fields:
-            isMain: false
-            isPublished: true
+            is_main: false
+            is_published: true
         references:
             video: 23
             media_type: 6
             trick: 11
+            user: 1
     -
         #trick: "One-footed"
         fields:
-            isMain: false
-            isPublished: true
+            is_main: false
+            is_published: true
         references:
             video: 24
             media_type: 6
             trick: 12
+            user: 2
     ## Dailymotion ##
     -
         #trick: "Ollie"
         fields:
-            isMain: false
-            isPublished: true
+            is_main: false
+            is_published: true
         references:
             video: 25
             media_type: 7
             trick: 1
+            user: 1
     -
         #trick: "Nollie"
         fields:
-            isMain: false
-            isPublished: true
+            is_main: false
+            is_published: true
         references:
             video: 26
             media_type: 7
             trick: 2
+            user: 2
     -
         #trick: "One-Two"
         fields:
-            isMain: false
-            isPublished: true
+            is_main: false
+            is_published: true
         references:
             video: 27
             media_type: 7
             trick: 3
+            user: 1
     -
         #trick: "Back flip"
         fields:
-            isMain: false
-            isPublished: true
+            is_main: false
+            is_published: true
         references:
             video: 28
             media_type: 7
             trick: 4
+            user: 2
     -
         #trick: "Front flip"
         fields:
-            isMain: false
-            isPublished: true
+            is_main: false
+            is_published: true
         references:
             video: 29
             media_type: 7
             trick: 5
+            user: 1
     -
         #trick: "Invert"
         fields:
-            isMain: false
-            isPublished: true
+            is_main: false
+            is_published: true
         references:
             video: 30
             media_type: 7
             trick: 6
+            user: 2
     -
         #trick: "Handplant"
         fields:
-            isMain: false
-            isPublished: true
+            is_main: false
+            is_published: true
         references:
             video: 31
             media_type: 7
             trick: 7
+            user: 1
     -
         #trick: "50-50"
         fields:
-            isMain: false
-            isPublished: true
+            is_main: false
+            is_published: true
         references:
             video: 32
             media_type: 7
             trick: 8
+            user: 2
     -
         #trick: "Boardslide"
         fields:
-            isMain: false
-            isPublished: true
+            is_main: false
+            is_published: true
         references:
             video: 33
             media_type: 7
             trick: 9
+            user: 1
     -
         #trick: "Nose-pick"
         fields:
-            isMain: false
-            isPublished: true
+            is_main: false
+            is_published: true
         references:
             video: 34
             media_type: 7
             trick: 10
+            user: 2
     -
         #trick: "Board-stall"
         fields:
-            isMain: false
-            isPublished: true
+            is_main: false
+            is_published: true
         references:
             video: 35
             media_type: 7
             trick: 11
+            user: 1
     -
         #trick: "One-footed"
         fields:
-            isMain: false
-            isPublished: true
+            is_main: false
+            is_published: true
         references:
             video: 36
             media_type: 7
             trick: 12
+            user: 2

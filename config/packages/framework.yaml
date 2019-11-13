@@ -11,6 +11,12 @@ framework:
     # Remove or comment this section to explicitly disable session support.
     session:
         handler_id: ~
+        # avoid to modify php.ini "session.cookie_lifetime" on server file by defining cookie lifetime here
+        cookie_lifetime: 15778800
+        # configure cookies for http or https protocol
+        # https://symfony.com/doc/current/reference/configuration/framework.html#cookie-secure
+        # https://symfony.com/blog/new-in-symfony-4-2-auto-secure-cookies
+        cookie_secure: 'auto'
 
     #esi: true
     #fragments: true
@@ -31,3 +37,8 @@ framework:
 
         # APCu (not recommended with heavy random-write workloads as memory fragmentation can cause perf issues)
         #app: cache.adapter.apcu
+
+    # Define a front-end base path to be used for assets
+    # Default sub directory is '/assets'
+    #assets:
+        #base_path: ''

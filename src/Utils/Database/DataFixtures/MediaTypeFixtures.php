@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace App\Utils\Database\DataFixtures;
 
@@ -35,7 +35,6 @@ class MediaTypeFixtures extends BaseFixture
                 $data[$i]['fields']['description'],
                 $data[$i]['fields']['width'],
                 $data[$i]['fields']['height'],
-                new \DateTime(sprintf("+%d days", $i - 1)),
                 new \DateTime(sprintf("+%d days", $i - 1))
             );
         });

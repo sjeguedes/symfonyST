@@ -7,6 +7,7 @@ tricks:
             slug: "ollie"
         references:
             trick_group: 1
+            user: 1
     -
         #2
         fields:
@@ -15,6 +16,7 @@ tricks:
             slug: "nollie"
         references:
             trick_group: 1
+            user: 2
     -
         #3
         fields:
@@ -23,6 +25,7 @@ tricks:
             slug: "one-two"
         references:
             trick_group: 2
+            user: 1
     -
         #4
         fields:
@@ -31,6 +34,7 @@ tricks:
             slug: "back-flip"
         references:
             trick_group: 4
+            user: 2
     -
         #5
         fields:
@@ -39,6 +43,7 @@ tricks:
             slug: "front-flip"
         references:
              trick_group: 4
+             user: 1
     -
         #6
         fields:
@@ -47,6 +52,7 @@ tricks:
             slug: "invert"
         references:
             trick_group: 5
+            user: 2
     -
         #7
         fields:
@@ -55,6 +61,7 @@ tricks:
             slug: "handplant"
         references:
             trick_group: 5
+            user: 1
     -
         #8
         fields:
@@ -63,6 +70,7 @@ tricks:
             slug: "50-50"
         references:
             trick_group: 6
+            user: 2
     -
         #9
         fields:
@@ -71,6 +79,7 @@ tricks:
             slug: "boardslide"
         references:
             trick_group: 6
+            user: 1
     -
         #10
         fields:
@@ -79,6 +88,7 @@ tricks:
             slug: "nose-pick"
         references:
             trick_group: 7
+            user: 2
     -
         #11
         fields:
@@ -87,6 +97,7 @@ tricks:
             slug: "board-stall"
         references:
             trick_group: 7
+            user: 1
     -
         #12
         fields:
@@ -95,3 +106,4 @@ tricks:
             slug: "one-footed"
         references:
             trick_group: 8
+            user: 2

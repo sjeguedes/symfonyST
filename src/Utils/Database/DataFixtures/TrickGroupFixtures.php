@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace App\Utils\Database\DataFixtures;
 
@@ -32,7 +32,6 @@ class TrickGroupFixtures extends BaseFixture
             return new TrickGroup(
                 $data[$i]['fields']['name'],
                 $data[$i]['fields']['description'],
-                new \DateTime(sprintf("+%d days", $i - 1)),
                 new \DateTime(sprintf("+%d days", $i - 1))
             );
         });
