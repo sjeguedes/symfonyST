@@ -9,4 +9,4 @@ twig:
     # Global custom variables
     globals:
         globalMediaTextError: 'Media loading Error'
-
+        globalContactEmail: '%env(MAILER_SENDER_EMAIL)%'

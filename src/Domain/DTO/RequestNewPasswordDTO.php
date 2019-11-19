@@ -21,7 +21,7 @@ final class RequestNewPasswordDTO
     /**
      * RequestNewPasswordDTO constructor.
      *
-     * @param string $userName
+     * @param string|null $userName
      *
      * @return void
      */

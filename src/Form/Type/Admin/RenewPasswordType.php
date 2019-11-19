@@ -34,13 +34,13 @@ class RenewPasswordType extends AbstractType
     {
         $builder
             ->add('userName',TextType::class, [
-                'disabled'        => true
+                'disabled'        => false
             ])
             ->add('passwords',RepeatedType::class, [
                 'type'            => PasswordType::class,
                 'first_name'      => 'password',
                 'second_name'     => 'confirmedPassword',
-                'invalid_message' => 'Password and confirmation fields<br>must match.'
+                'invalid_message' => 'Password and confirmation must match.'
             ])
             ->add('token',HiddenType::class, [
                 'inherit_data'    => true

@@ -56,13 +56,12 @@ class LoginAction
      * @Route("/{_locale}/login", name="connection")
      *
      * @param RedirectionResponder $redirectionResponder
-     * @param LoginResponder $responder
-     * @param Request $request
+     * @param LoginResponder       $responder
+     * @param Request              $request
      *
      * @return Response
      *
      * @throws \Exception
-     *
      */
     public function __invoke(RedirectionResponder $redirectionResponder, LoginResponder $responder, Request $request) : Response
     {

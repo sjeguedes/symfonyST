@@ -17,7 +17,7 @@
         </a>
     </li>
     <li{{ app.request.get('_route') == 'registration' ? ' class="uk-active uk-disabled"' }}>
-        <a href="{#{{ path('registration') }}#}#" title="Register">
+        <a href="{{ path('registration') }}" title="Register">
             <div>
                 <span class="uk-text-uppercase"><span uk-icon="users"></span><br class="uk-hidden@m">&nbsp;Register</span>
                 <div class="uk-navbar-subtitle uk-visible@m"><small><span class="uk-visible@l">Create an </span>account</small></div>

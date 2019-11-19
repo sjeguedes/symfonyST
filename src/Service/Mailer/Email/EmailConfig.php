@@ -101,7 +101,7 @@ class EmailConfig implements EmailConfigInterface
 
     /**
      * Check if an array respects the expected format:
-     * it has a unique value.
+     * It has a unique value.
      * It has a key formatted with an email address.
      * It has a string value associated to email key.
      *

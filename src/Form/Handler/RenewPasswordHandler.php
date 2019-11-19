@@ -71,7 +71,7 @@ final class RenewPasswordHandler extends AbstractFormHandler implements InitMode
         RequestStack $requestStack,
         SwiftMailerManager $mailer
     ) {
-        parent::__construct($flashBag, $formFactory,renewPasswordType::class, $requestStack);
+        parent::__construct($flashBag, $formFactory,RenewPasswordType::class, $requestStack);
         $this->csrfTokenManager = $csrfTokenManager;
         $this->customError = null;
         $this->emailConfigFactory = $emailConfigFactory;

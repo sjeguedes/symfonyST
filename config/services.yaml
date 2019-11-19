@@ -55,6 +55,12 @@ services:
         arguments:
             $formHandler: '@App\Form\Handler\RequestNewPasswordHandler'
 
+    # add form handler when creating a new user account
+    App\Action\Admin\RegisterAction:
+        tags: ['controller.service_arguments']
+        arguments:
+            $formHandler: '@App\Form\Handler\RegisterHandler'
+
     # add logout handler
     App\Event\Handler\LogoutHandler:
         #tags: ['app.event.handler.logout_handler']

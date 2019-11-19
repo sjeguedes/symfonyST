@@ -70,7 +70,7 @@ final class RequestNewPasswordHandler extends AbstractFormHandler
         RequestStack $requestStack,
         SwiftMailerManager $mailer
     ) {
-        parent::__construct($flashBag, $formFactory,requestNewPasswordType::class, $requestStack);
+        parent::__construct($flashBag, $formFactory,RequestNewPasswordType::class, $requestStack);
         $this->csrfTokenManager = $csrfTokenManager;
         $this->customError = null;
         $this->emailConfigFactory = $emailConfigFactory;
