@@ -69,12 +69,39 @@ class RegisterAction
         // Process only on submit
         if ($registrationForm->isSubmitted()) {
             // Constraints and custom validation: call actions to perform if necessary on success
-            $this->formHandler->processFormRequest(['userService' => $this->userService]);
+            $isFormRequestValid = $this->formHandler->processFormRequest(['userService' => $this->userService]);
+            if ($isFormRequestValid) {
+                return $redirectionResponder('home');
+            }
         }
         $data = [
-            'uniqueUserError'  => null, // TODO: add error content here!
+            'uniqueUserError'  => $this->formHandler->getUniqueUserError() ?? null,
             'registrationForm' => $registrationForm->createView()
         ];
         return $responder($data);
+    }
+
+    /**
+     * Activate user account after registration.
+     *
+     * @Route("/{_locale}/validate-account/{userId}", name="validate_account")
+     *
+     * @param RedirectionResponder $redirectionResponder
+     * @param Request              $request
+     *
+     * @return Response
+     *
+     * @throws \Exception
+     */
+    public function activateUserAccount(RedirectionResponder $redirectionResponder, Request $request) : Response
+    {
+        $userId = $request->attributes->get('userId');
+        $isActivated = $this->userService->activateAccount($userId);
+        if (!$isActivated) {
+            $this->flashBag->add('danger','You are not allowed to access<br>account activation process!<br>Please contact us if necessary.');
+        } else {
+            $this->flashBag->add('success','Good job!<br>Your account was successfully activated.<br>Please login to access member area.');
+        }
+        return $redirectionResponder('home');
     }
 }

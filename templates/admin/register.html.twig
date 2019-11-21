@@ -44,7 +44,7 @@
                             <div class="uk-label uk-form-danger uk-box-shadow-large uk-text-bold">
                                 <p class="uk-margin-remove">
                                     <span uk-icon="icon: warning; ratio: 0.8"></span>
-                                    {{ uniqueUserError|raw }}
+                                    {{ uniqueUserError['email'] is defined ? uniqueUserError['email']|raw : uniqueUserError['username']|raw }}
                                 </p>
                             </div>
                         </div>
@@ -124,12 +124,12 @@
                                 <div class="uk-inline uk-flex">
                                     <span class="uk-form-icon" uk-icon="icon: user"></span>
                                     {{ form_widget(registrationForm.userName, {
-                                        'attr': {'class': 'uk-input', 'maxlength': '15'},
+                                        'attr': {'class': 'uk-input'},
                                         'value': registrationForm.userName.vars.value})
                                     }}
                                     {% if registrationForm.userName.vars.errors.form.submitted == 1 %}
-                                        {% set class = registrationForm.userName.vars.valid == 0 ? 'uk-form-danger' : 'uk-form-success' %}
-                                        {% set icon = registrationForm.userName.vars.valid == 0 ? 'warning' : 'check' %}
+                                        {% set class = registrationForm.userName.vars.valid == 0 or uniqueUserError['username'] is defined ? 'uk-form-danger' : 'uk-form-success' %}
+                                        {% set icon = registrationForm.userName.vars.valid == 0 or uniqueUserError['username'] is defined ? 'warning' : 'check' %}
                                         <span class="uk-form-icon uk-form-icon-flip {{ class }}" uk-icon="icon: {{ icon }}"></span>
                                     {% endif %}
                                 </div>
@@ -170,8 +170,8 @@
                                         'value': registrationForm.email.vars.value})
                                     }}
                                     {% if registrationForm.email.vars.errors.form.submitted == 1 %}
-                                        {% set class = registrationForm.email.vars.valid == 0 ? 'uk-form-danger' : 'uk-form-success' %}
-                                        {% set icon = registrationForm.email.vars.valid == 0 ? 'warning' : 'check' %}
+                                        {% set class = registrationForm.email.vars.valid == 0 or uniqueUserError['email'] is defined ? 'uk-form-danger' : 'uk-form-success' %}
+                                        {% set icon = registrationForm.email.vars.valid == 0 or uniqueUserError['email'] is defined ? 'warning' : 'check' %}
                                         <span class="uk-form-icon uk-form-icon-flip {{ class }}" uk-icon="icon: {{ icon }}"></span>
                                     {% endif %}
                                 </div>
@@ -208,12 +208,12 @@
                                 <div class="uk-inline uk-flex">
                                     <span class="uk-form-icon" uk-icon="icon: lock"></span>
                                     {{ form_widget(registrationForm.passwords.password, {
-                                        'attr': {'class': 'uk-input', 'maxlength': '20'},
+                                        'attr': {'class': 'uk-input'},
                                         'value': registrationForm.passwords.password.vars.value})
                                     }}
                                     {% if registrationForm.passwords.password.vars.errors.form.submitted == 1 %}
                                         {% set class = registrationForm.passwords.password.vars.valid == 0 ? 'uk-form-danger' : 'uk-form-success' %}
-                                        {% set icon =  registrationForm.passwords.password.vars.valid == 0 ? 'warning' : 'check' %}
+                                        {% set icon = registrationForm.passwords.password.vars.valid == 0 ? 'warning' : 'check' %}
                                         <span class="uk-form-icon uk-form-icon-flip {{ class }}" uk-icon="icon: {{ icon }}"></span>
                                     {% endif %}
                                 </div>

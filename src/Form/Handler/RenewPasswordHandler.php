@@ -107,7 +107,7 @@ final class RenewPasswordHandler extends AbstractFormHandler implements InitMode
             if (!$isUserInFormMatched) {
                 $userNameError = 'Please check your credentials!<br>Your username is not allowed!';
                 $this->customError = $userNameError;
-                $this->flashBag->add('danger', 'Form authentication failed!<br>Try to request again by checking the fields.');
+                $this->flashBag->add('danger','Form authentication failed!<br>Try to request again by checking the fields.');
                 return false;
             }
         }
@@ -148,9 +148,9 @@ final class RenewPasswordHandler extends AbstractFormHandler implements InitMode
         $isEmailSent = $this->mailer->notify($emailConfig);
         // Technical error when trying to send
         if (!$isEmailSent) {
-            $this->flashBag->add('info', 'Your password renewal is successfully saved!<br>However, confirmation email was not sent<br>due to technical reasons...<br>Please contact us if necessary.');
+            $this->flashBag->add('info','Your password renewal is successfully saved!<br>However, confirmation email was not sent<br>due to technical reasons...<br>Please contact us if necessary.');
         } else {
-            $this->flashBag->add('success', 'An email was sent successfully!<br>Please check your box<br>to look at your password renewal confirmation.');
+            $this->flashBag->add('success','An email was sent successfully!<br>Please check your box<br>to look at your password renewal confirmation.');
         }
     }
 

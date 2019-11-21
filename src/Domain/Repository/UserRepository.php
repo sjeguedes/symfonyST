@@ -40,7 +40,9 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
      */
     public function findOneByEmail(string $email) : ?User
     {
-       return $this->createQueryBuilder('u')
+        // Avoid unexpected case sensitive SQL collation to compare lowercase stored email
+        $email = strtolower($email);
+        return $this->createQueryBuilder('u')
         ->where('u.email = :query')
         ->setParameter('query', $email)
         ->getQuery()
@@ -78,6 +80,9 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
      */
     public function loadUserByUsername($username) : ?User
     {
+        // Avoid unexpected case sensitive SQL collation to compare lowercase stored email
+        $isEmail = preg_match('/@/', $username);
+        $username = $isEmail ? strtolower($username) : $username;
         return $this->createQueryBuilder('u')
             ->where('u.nickName = :query OR u.email = :query')
             ->setParameter('query', $username)

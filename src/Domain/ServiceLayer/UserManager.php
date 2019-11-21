@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace App\Domain\ServiceLayer;
 
+use App\Domain\DTO\RegisterUserDTO;
 use App\Domain\Entity\User;
 use App\Domain\Repository\UserRepository;
 use App\Event\CustomEventFactory;
@@ -16,7 +17,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 
 /**
  * Class UserManager.
@@ -70,7 +72,7 @@ class UserManager
     private $session;
 
     /**
-     * @var UserPasswordEncoderInterface
+     * @var PasswordEncoderInterface
      */
     private $userPasswordEncoder;
 
@@ -78,25 +80,25 @@ class UserManager
      * UserManager constructor.
      *
      * @param CustomEventFactoryInterface  $customEventFactory
+     * @param EncoderFactoryInterface      $encoderFactory
      * @param EntityManagerInterface       $entityManager
      * @param EventDispatcherInterface     $eventDispatcher
      * @param RequestStack                 $requestStack
      * @param SessionInterface             $session
      * @param UserRepository               $repository
-     * @param UserPasswordEncoderInterface $userPasswordEncoder
      * @param LoggerInterface              $logger
      *
      * @return void
      */
     public function __construct(
         CustomEventFactoryInterface $customEventFactory,
+        EncoderFactoryInterface $encoderFactory,
         EntityManagerInterface $entityManager,
         EventDispatcherInterface $eventDispatcher,
         LoggerInterface $logger,
         RequestStack $requestStack,
         SessionInterface $session,
-        UserRepository $repository,
-        UserPasswordEncoderInterface $userPasswordEncoder
+        UserRepository $repository
     ) {
         $this->customEventFactory = $customEventFactory;
         $this->entityManager = $entityManager;
@@ -105,28 +107,66 @@ class UserManager
         $this->request = $requestStack->getCurrentRequest();
         $this->requestStack = $requestStack;
         $this->session =$session;
-        $this->userPasswordEncoder = $userPasswordEncoder;
+        $this->userPasswordEncoder = $encoderFactory->getEncoder(User::class);
         $this->setLogger($logger);
     }
 
+
     /**
-     * Get entity manager.
+     * @param RegisterUserDTO $newUser
      *
-     * @return EntityManagerInterface
+     * @return User
+     *
+     * @throws \Exception
      */
-    public function getEntityManager() : EntityManagerInterface
+    public function createUser(RegisterUserDTO $newUser) : User
     {
-        return $this->entityManager;
+        return new User(
+            $newUser->getFamilyName(),
+            $newUser->getFirstName(),
+            $newUser->getUserName(),
+            $newUser->getEmail(),
+            $this->userPasswordEncoder->encodePassword($newUser->getPasswords(),null)
+        );
     }
 
     /**
-     * Get User entity repository.
+     * Try to activate user account.
      *
-     * @return UserRepository
+     * @param string $userEncodedId a user uuid encoded for url
+     *
+     * @return bool
+     *
+     * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getRepository() : UserRepository
+    public function activateAccount(string $userEncodedId) : bool
     {
-        return $this->repository;
+        $userToValidate = $this->findSingleByEncodedUuid($userEncodedId);
+        // User is unknown or his account is already activated.
+        if (\is_null( $userToValidate) || $userToValidate->getIsActivated()) {
+            return false;
+        }
+        // Update account status
+        $userToValidate->modifyIsActivated(true);
+        $this->getEntityManager()->flush();
+        return true;
+    }
+
+    /**
+     * Create a event related to user and dispatch it.
+     *
+     * An auto configured User subscriber listens to that kind of event.
+     *
+     * @param string $eventContext
+     * @param User   $user
+     *
+     * @return void
+     */
+    private function createUserEvent(string $eventContext, User $user) : void
+    {
+        $event = $this->customEventFactory->createFromContext($eventContext, ['user' => $user]);
+        $eventName = $this->customEventFactory->getEventNameByContext($eventContext);
+        $this->eventDispatcher->dispatch($eventName, $event);
     }
 
     /**
@@ -169,6 +209,47 @@ class UserManager
     public function generateCustomToken(string $tokenId) : string
     {
         return substr(hash('sha256', bin2hex($tokenId . openssl_random_pseudo_bytes(8))),0,15);
+    }
+
+    /**
+     * Get entity manager.
+     *
+     * @return EntityManagerInterface
+     */
+    public function getEntityManager() : EntityManagerInterface
+    {
+        return $this->entityManager;
+    }
+
+    /**
+     * Get User entity repository.
+     *
+     * @return UserRepository
+     */
+    public function getRepository() : UserRepository
+    {
+        return $this->repository;
+    }
+
+    /**
+     * Get user from password renewal request.
+     *
+     * @return User|null
+     *
+     * @throws \Exception
+     */
+    public function getUserFoundInPasswordRenewalRequest() : ?User
+    {
+        // 2 methods can be used: some request query parameters or attributes (placeholders) are expected in url!
+        // User identifier is not used, but expected as mandatory.
+        if (\is_null($this->request->query->get('id')) && \is_null($this->request->attributes->get('userId'))) {
+            throw new \RuntimeException('No password renewal user identifier parameter is used in request!');
+        }
+        $encodedUuid = !\is_null($this->request->query->get('id'))
+            ? $this->request->query->get('id')
+            : $this->request->attributes->get('userId');
+        $user = $this->findSingleByEncodedUuid($encodedUuid);
+        return $user;
     }
 
     /**
@@ -223,44 +304,6 @@ class UserManager
     }
 
     /**
-     * Create a event related to user and dispatch it.
-     *
-     * An auto configured User subscriber listens to that kind of event.
-     *
-     * @param string $eventContext
-     * @param User   $user
-     *
-     * @return void
-     */
-    private function createUserEvent(string $eventContext, User $user) : void
-    {
-        $event = $this->customEventFactory->createFromContext($eventContext, ['user' => $user]);
-        $eventName = $this->customEventFactory->getEventNameByContext($eventContext);
-        $this->eventDispatcher->dispatch($eventName, $event);
-    }
-
-    /**
-     * Get user from password renewal request.
-     *
-     * @return User|null
-     *
-     * @throws \Exception
-     */
-    public function getUserFoundInPasswordRenewalRequest() : ?User
-    {
-        // 2 methods can be used: some request query parameters or attributes (placeholders) are expected in url!
-        // User identifier is not used, but expected as mandatory.
-        if (\is_null($this->request->query->get('id')) && \is_null($this->request->attributes->get('userId'))) {
-            throw new \RuntimeException('No password renewal user identifier parameter is used in request!');
-        }
-        $encodedUuid = !\is_null($this->request->query->get('id'))
-            ? $this->request->query->get('id')
-            : $this->request->attributes->get('userId');
-        $user = $this->findSingleByEncodedUuid($encodedUuid);
-        return $user;
-    }
-
-    /**
      * Renew user password by updating corresponding data.
      *
      * @param User   $user
@@ -273,7 +316,7 @@ class UserManager
     public function renewPassword(User $user, string $plainPassword) : User
     {
         // Generate encrypted password with BCrypt
-        $newPassword = $this->userPasswordEncoder->encodePassword($user, $plainPassword);
+        $newPassword = $this->userPasswordEncoder->encodePassword($plainPassword,null);
         $user->modifyPassword($newPassword, 'BCrypt');
         $user->modifyUpdateDate(new \DateTime());
         // Reset renewal token request data

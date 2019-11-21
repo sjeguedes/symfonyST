@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Service\Mailer\Email;
 
+use App\Action\Admin\RegisterAction;
 use App\Action\Admin\RenewPasswordAction;
 use App\Action\Admin\RequestNewPasswordAction;
 use App\Domain\Entity\User;
@@ -29,6 +30,11 @@ class EmailConfigFactory implements EmailConfigFactoryInterface
     public const USER_RENEW_PASSWORD = 'user.renewPassword';
 
     /**
+     * Define a context label each time a user is created.
+     */
+    public const USER_REGISTER = 'user.register';
+
+    /**
      * Define all the emails custom parameters configuration.
      */
     public const CUSTOM_PARAMETERS_CONFIG = [
@@ -44,6 +50,14 @@ class EmailConfigFactory implements EmailConfigFactoryInterface
         RenewPasswordAction::class  => [
             self::USER_RENEW_PASSWORD => [
                 'subject'      => 'Password renewal confirmation',
+                'templateData' => [
+                    'user' => ['type' => User::class, 'value' => null]
+                ]
+            ]
+        ],
+        RegisterAction::class  => [
+            self::USER_REGISTER => [
+                'subject'      => 'Account registration confirmation',
                 'templateData' => [
                     'user' => ['type' => User::class, 'value' => null]
                 ]

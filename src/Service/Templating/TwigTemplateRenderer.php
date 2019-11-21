@@ -78,8 +78,11 @@ final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateB
             [
                 'class' => 'App\\Action\\Admin\\RenewPasswordAction',
                 'name'  => 'admin/mailing/mail-renew-password.html.twig'
+            ],
+            [
+                'class' => 'App\\Action\\Admin\\RegisterAction',
+                'name'  => 'admin/mailing/mail-register.html.twig'
             ]
-
         ];
     }
 
@@ -121,7 +124,7 @@ final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateB
             ++ $i;
             $hasBlock = !isset($template['block']) ? false : true;
             $isMatched = $className !== $template['class'] ? false : true;
-            if ($i === count($this->templates) && false === $isMatched) {
+            if ($i === \count($this->templates) && false === $isMatched) {
                 throw new \RuntimeException('No template name was found: try to use another rendering method!');
             }
             if (true === $hasBlock || false === $isMatched) {
@@ -171,7 +174,7 @@ final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateB
             ++ $i;
             $hasBlock = !isset($template['block']) ? false : true;
             $isMatched = $className !== $template['class'] ? false : true;
-            if ($i === count($this->templates) && false === $isMatched) {
+            if ($i === \count($this->templates) && false === $isMatched) {
                 throw new \RuntimeException('No template block name was found: try to use another rendering method!');
             }
             if (false === $hasBlock || false === $isMatched) {
