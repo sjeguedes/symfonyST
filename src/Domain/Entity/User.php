@@ -10,7 +10,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
-use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -165,15 +164,14 @@ class User implements UserInterface, \Serializable
     /**
      * User constructor.
      *
-     * @param string                  $familyName
-     * @param string                  $firstName
-     * @param string                  $nickName
-     * @param string                  $email
-     * @param string                  $password an encoded password
-     * @param string                  $algorithm a hash algorithm type for password
-     * @param array                   $roles
-     * @param string|null             $salt
-     * @param \DateTimeInterface|null $creationDate
+     * @param string      $familyName
+     * @param string      $firstName
+     * @param string      $nickName
+     * @param string      $email
+     * @param string      $password an encoded password
+     * @param string      $algorithm a hash algorithm type for password
+     * @param array       $roles
+     * @param string|null $salt
      *
      * @return void
      *
@@ -187,26 +185,25 @@ class User implements UserInterface, \Serializable
         string $password,
         string $algorithm = self::DEFAULT_ALGORITHM,
         array $roles = [self::DEFAULT_ROLE],
-        string $salt = null,
-        \DateTimeInterface $creationDate = null
+        string $salt = null
     ) {
-        $this->uuid = Uuid::uuid4();
         \assert(!empty($familyName),'User family name can not be empty!');
-        $this->familyName = strtoupper($familyName);
         \assert(!empty($firstName),'User first name can not be empty!');
-        $this->firstName = ucwords(strtolower($firstName));
-        \assert($this->isUserNameValidated($nickName),'User nickname format must be valid!');
-        $this->nickName = $nickName;
+        \assert($this->isNickNameValidated($nickName),'User nickname format must be valid!');
         \assert($this->isEmailValidated($email),'User email format must be valid!');
-        $this->email = strtolower($email);
         \assert($this->isPasswordValidated($password, $algorithm),'User password must be valid!');
+        \assert($this->isRolesArrayValidated($roles),'User Roles must be valid!');
+        $this->uuid = Uuid::uuid4();
+        $this->familyName = strtoupper($familyName);
+        $this->firstName = ucwords(strtolower($firstName));
+        $this->nickName = $nickName;
+        $this->email = strtolower($email);
         $this->password = $password;
         $this->roles = $roles;
         $this->salt = $salt;
         $this->isActivated = false;
-        $createdAt = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
-        $this->creationDate = $createdAt;
-        $this->updateDate = $createdAt;
+        $this->creationDate = new \DateTime();
+        $this->updateDate = $this->creationDate;
         $this->medias = new ArrayCollection();
     }
 
@@ -226,13 +223,29 @@ class User implements UserInterface, \Serializable
     }
 
     /**
-     * Validate password with algorithm type.
+     * Validate nickname (username) format.
      *
-     * @param EncoderFactoryInterface $encoderFactory
-     * @param string                  $password
-     * @param string                  $algorithm
+     * @param string $username
      *
      * @return bool
+     */
+    private function isNickNameValidated(string $username) : bool
+    {
+        if (empty($username) || !preg_match('/^[\w-]{3,15}$/u', $username)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Validate password with algorithm type.
+     *
+     * @param string $password
+     * @param string $algorithm
+     *
+     * @return bool
+     *
+     * // TODO: use EncoderFactoryInterface $encoderFactory
      */
     private function isPasswordValidated(string $password, string $algorithm) : bool
     {
@@ -250,28 +263,13 @@ class User implements UserInterface, \Serializable
     /**
      * Validate renewal token format.
      *
-     * @param string $renewalToken
+     * @param string $renewalToken|null
      *
      * @return bool
      */
     private function isRenewalTokenValidated(?string $renewalToken) : bool
     {
         if (!\is_null($renewalToken) && !preg_match('/^[a-z0-9]{15}$/', $renewalToken)) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Validate username (nickname) format.
-     *
-     * @param string $username
-     *
-     * @return bool
-     */
-    private function isUserNameValidated(string $username) : bool
-    {
-        if (empty($username) || !preg_match('/^[\w-]{3,15}$/u', $username)) {
             return false;
         }
         return true;
@@ -332,6 +330,42 @@ class User implements UserInterface, \Serializable
             throw new \InvalidArgumentException('User first name can not be empty!');
         }
         $this->firstName = ucwords(strtolower($firstName));
+        return $this;
+    }
+
+    /**
+     * Change nickname (username) after creation.
+     *
+     * @param string $userName
+     *
+     * @return User
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function modifyNickName(string $userName) : self
+    {
+        if (!$this->isNickNameValidated($userName)) {
+            throw new \InvalidArgumentException('User nickname is not valid!');
+        }
+        $this->nickName = strtolower($userName);
+        return $this;
+    }
+
+    /**
+     * Change email after creation.
+     *
+     * @param string $email
+     *
+     * @return User
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function modifyEmail(string $email) : self
+    {
+        if (!$this->isEmailValidated($email)) {
+            throw new \InvalidArgumentException('User email is not valid!');
+        }
+        $this->email = strtolower($email);
         return $this;
     }
 

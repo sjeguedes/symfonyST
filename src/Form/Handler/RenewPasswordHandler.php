@@ -39,11 +39,6 @@ final class RenewPasswordHandler extends AbstractFormHandler implements InitMode
     private $emailConfigFactory;
 
     /**
-     * @var string|null
-     */
-    private $customError;
-
-    /**
      * @var SwiftMailerManager
      */
     private $mailer;
@@ -96,10 +91,8 @@ final class RenewPasswordHandler extends AbstractFormHandler implements InitMode
             throw new \Exception('Security error: CSRF form token is invalid!');
         }
         // Get allowed user who asks for a new password.
-        $identifiedUser = $actionData['userToUpdate'] ?? null;
-        if (!$identifiedUser instanceof User || \is_null($identifiedUser)) {
-            throw new \InvalidArgumentException('A instance of UserManager must be set first!');
-        }
+        // Check User instance in passed data
+        $identifiedUser = $this->checkUserInstance($actionData);
         // Validate user matching only if username field is not disabled.
         if (!$this->form->get('userName')->isDisabled()) {
             $isUserInFormMatched = $this->isIdentifiedUserMatchedInForm($identifiedUser);
@@ -107,7 +100,7 @@ final class RenewPasswordHandler extends AbstractFormHandler implements InitMode
             if (!$isUserInFormMatched) {
                 $userNameError = 'Please check your credentials!<br>Your username is not allowed!';
                 $this->customError = $userNameError;
-                $this->flashBag->add('danger','Form authentication failed!<br>Try to request again by checking the fields.');
+                $this->flashBag->add('danger','Authentication failed!<br>Try to request again by checking the form fields.');
                 return false;
             }
         }
@@ -128,10 +121,8 @@ final class RenewPasswordHandler extends AbstractFormHandler implements InitMode
      */
     protected function addCustomAction(array $actionData) : void
     {
-        $userService = $actionData['userService'] ?? null;
-        if (!$userService instanceof UserManager || \is_null($userService)) {
-            throw new \InvalidArgumentException('A instance of UserManager must be set first!');
-        }
+        // Check UserManager instance in passed data
+        $userService = $this->checkUserServiceInstance($actionData);
         $user = $this->userToUpdate;
         // Save data
         $updatedUser = $userService->renewPassword($user, $this->form->getData()->getPasswords()); // or $this->form->get('passwords')->getData()
@@ -148,9 +139,15 @@ final class RenewPasswordHandler extends AbstractFormHandler implements InitMode
         $isEmailSent = $this->mailer->notify($emailConfig);
         // Technical error when trying to send
         if (!$isEmailSent) {
-            $this->flashBag->add('info','Your password renewal is successfully saved!<br>However, confirmation email was not sent<br>due to technical reasons...<br>Please contact us if necessary.');
+            $this->flashBag->add(
+                'info',
+                'Your password renewal is successfully saved!<br>However, confirmation email was not sent<br>due to technical reasons...<br>Please contact us if necessary.'
+            );
         } else {
-            $this->flashBag->add('success','An email was sent successfully!<br>Please check your box<br>to look at your password renewal confirmation.');
+            $this->flashBag->add(
+                'success',
+                'An email was sent successfully!<br>Please check your box<br>to look at your password renewal confirmation.'
+            );
         }
     }
 
@@ -167,14 +164,13 @@ final class RenewPasswordHandler extends AbstractFormHandler implements InitMode
     /**
      * {@inheritDoc}
      *
-     * @return RenewPasswordDTO
+     * @return object|RenewPasswordDTO
+     *
+     * @throws \Exception
      */
     public function initModelData(array $data) : object
     {
-        $user = $data['userToUpdate'] ?? null;
-        if (!$user instanceof User || \is_null($user)) {
-            throw new \InvalidArgumentException('A instance of User must be set first!');
-        }
+        $user = $this->checkUserInstance($data);
         return new RenewPasswordDTO($user->getEmail());
     }
 

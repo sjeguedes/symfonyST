@@ -70,6 +70,10 @@ final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateB
                 'class' => 'App\\Responder\\Admin\\RegisterResponder',
                 'name'  => 'admin/register.html.twig'
             ],
+            [
+                'class' => 'App\\Responder\\Admin\\UpdateProfileResponder',
+                'name'  => 'admin/update-profile.html.twig'
+            ],
             // Emails
             [
                 'class' => 'App\\Action\\Admin\\RequestNewPasswordAction',

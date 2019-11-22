@@ -11,6 +11,7 @@
 /docs/
 /.idea/
 /public-dev/
+/public/assets/images/uploads/avatar
 ###< others ###
 
 ###> friendsofphp/php-cs-fixer ###

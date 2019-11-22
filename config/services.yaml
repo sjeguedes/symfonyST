@@ -7,6 +7,7 @@ parameters:
     app_website_name: '%env(WEBSITE_NAME)%'
     app_swift_mailer_sender_email: '%env(MAILER_SENDER_EMAIL)%' # admin email
     app_swift_mailer_sender_name: '%env(MAILER_SENDER_NAME)%' # admin email name
+    app_avatar_upload_directory: '%kernel.project_dir%/public/assets/images/uploads/avatar'
 
 services:
     # default configuration for services in *this* file
@@ -61,9 +62,14 @@ services:
         arguments:
             $formHandler: '@App\Form\Handler\RegisterHandler'
 
+    # add form handler when updating a user account
+    App\Action\Admin\UpdateProfileAction:
+        tags: ['controller.service_arguments']
+        arguments:
+            $formHandler: '@App\Form\Handler\UpdateProfileHandler'
+
     # add logout handler
     App\Event\Handler\LogoutHandler:
-        #tags: ['app.event.handler.logout_handler']
 
     App\Form\Handler\RequestNewPasswordHandler:
         arguments:
@@ -73,25 +79,28 @@ services:
         arguments:
             $emailConfigFactory: '@App\Service\Mailer\Email\EmailConfigFactory'
 
-    # add authentication checker
-    App\Service\Security\AuthenticationUserChecker:
-        #tags: ['app.service.security.authentication_user_checker']
-
-    # add login form guard authenticator
-    App\Service\Security\LoginFormAuthenticationManager:
-        #tags: ['app.service.security.login_form_authentication_manager']
+    App\Form\Handler\UpdateProfileHandler:
+        arguments:
+            $imageUploader: '@App\Service\Medias\Upload\ImageUploader'
 
     # add SwiftMailer manager
     App\Service\Mailer\SwiftMailerManager:
-        #tags: ['app.service.mailer.swift_mailer_manager']
+
+    # add image uploader
+    App\Service\Medias\Upload\ImageUploader:
+
+    # add trick video URL "proxy" checker
+    App\Service\Medias\VideoURLProxyChecker:
 
     # add EmailConfigFactory
     App\Service\Mailer\Email\EmailConfigFactory: ~
     App\Service\Mailer\Email\EmailConfigFactoryInterface: '@App\Service\Mailer\Email\EmailConfigFactory'
 
-    # add trick video URL "proxy" checker
-    App\Service\Medias\VideoURLProxyChecker:
-        #tags: ['app.service.medias.video_url_proxy_checker']
+    # add authentication checker
+    App\Service\Security\AuthenticationUserChecker:
+
+    # add login form guard authenticator
+    App\Service\Security\LoginFormAuthenticationManager:
 
     # add template engine renderer default service when calling interface: Twig
     App\Service\Templating\TwigTemplateRenderer: ~
@@ -101,15 +110,12 @@ services:
     # custom Twig extensions
     # add "uuid_encode" filter
     App\Utils\Templating\UuidTwigExtension:
-        #tags: ['app.utils.templating.uuid_twig_extension']
 
     # add ResultSetMappingBuilder as a service for native queries
     Doctrine\ORM\Query\ResultSetMappingBuilder:
-        #tags: ['doctrine.orm.query.result_set_mapping_builder']
 
     # add PSR3 logger as default logger for actions (controllers)
     Symfony\Component\HttpKernel\Log\Logger:
-        #tags: ['symfony.component.http_kernel.log.logger']
 
     # add options resolver as a service
     Symfony\Component\OptionsResolver\OptionsResolver:

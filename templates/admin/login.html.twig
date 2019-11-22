@@ -50,7 +50,7 @@
                     </div>
                     {% endif %}
                     {# Login form #}
-                    <div id="st-form" class="uk-card-body uk-padding-medium{{ loginForm.vars.valid == 1 and lastAuthenticationError == 0 ?: ' st-form-error' }}">
+                    <div id="st-form" class="uk-card-body uk-padding-medium{{ loginForm.vars.valid == 1 and lastAuthenticationError == false ?: ' st-form-error' }}">
                         {% form_theme loginForm 'form/uikit_3_form.html.twig' %}
                         {{ form_start(loginForm, {'attr': {'class': 'uk-grid uk-grid-collpase', 'novalidate': ''}}) }}
                             {# Username #}

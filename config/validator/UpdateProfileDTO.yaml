@@ -1,0 +1,57 @@
+# https://symfony.com/doc/current/validation.html#validation-constraints
+# https://symfony.com/doc/current/validation/groups.html
+App\Domain\DTO\UpdateProfileDTO:
+    properties:
+        familyName:
+            - NotBlank:
+                message: Please fill in your family name.
+
+        firstName:
+            - NotBlank:
+                message: Please fill in your firstname.
+
+        userName:
+            - NotBlank:
+                message: Please fill in your username.
+            - Regex:
+                # Nickname:
+                # Expected format: nickname contains between 3 and 15 characters or email address
+                # (nickname with letters, numbers, "-", "_") alphanumeric characters defined with [\w-] or possibly [\p{Xan}-_] or [[:alnum:]-_] work with unicode flag u
+                # https://www.pcre.org/current/doc/html/pcre2pattern.html
+                # https://stackoverflow.com/questions/2432868/php-regex-word-boundary-matching-in-utf-8
+                pattern: '/^[\w-]{3,15}$/u'
+                message: Please use a valid username format.
+
+        email:
+            - NotBlank:
+                message: Please fill in your email address.
+            #- Email:
+            #    mode: html5
+            - Regex:
+                # Use a more practical implementation of RFC 5322 and adapt the equivalent to html5 mode for "Email" constraint validator with "i" flag
+                # Please note this does not manage IP addresses and IDN domain names: http://en.wikipedia.org/wiki/Internationalized_domain_name
+                # This is inspired from: https://www.regular-expressions.info/email.html
+                # https://github.com/symfony/symfony/blob/4.3/src/Symfony/Component/Validator/Constraints/EmailValidator.php
+                # CAUTION: this must be filtered before database storage!
+                pattern: "/^[a-z0-9!#$%&'*+\\/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+\\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/i"
+                message: Please use a valid email format.
+
+        passwords:
+            - Regex:
+                # Expected format: plain-text password containing between 8 and 20 characters
+                # (password with at least 1 special, 1 number, 1 upper and 1 lower letter)
+                pattern: '/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W]).{8,20}$/'
+                message: Please use a valid password format.
+
+        avatar:
+            - File:
+                  maxSize: 100k
+                  maxSizeMessage: The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.
+            - Image:
+                  mimeTypes:
+                      - image/jpeg
+                      - image/gif
+                      - image/png
+                      - image/svg+xml
+                  mimeTypesMessage: This file is not a valid image.
+

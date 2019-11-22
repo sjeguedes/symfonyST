@@ -37,11 +37,6 @@ final class RegisterHandler extends AbstractFormHandler
     private $emailConfigFactory;
 
     /**
-     * @var string|null
-     */
-    private $customError;
-
-    /**
      * @var SwiftMailerManager
      */
     private $mailer;
@@ -95,26 +90,10 @@ final class RegisterHandler extends AbstractFormHandler
         if (false === $this->isCSRFTokenValid('register_token', $csrfToken)) {
             throw new \Exception('Security error: CSRF form token is invalid!');
         }
-        $userService = $actionData['userService'] ?? null;
-        if (!$userService instanceof UserManager || \is_null($userService)) {
-            throw new \InvalidArgumentException('A instance of UserManager must be set first!');
-        }
-        // DTO is in valid state:
-        // but filled in email already exists in database.
-        $emailToCheck = $this->form->getData()->getEmail(); // or $this->form->get('email')->getData()
-        $isEmailUnique = $this->isUserUnique('email', $emailToCheck, $userService);
-        $isUsernameUnique = false;
-        // Execute second database query only if email is unique.
-        if ($isEmailUnique) {
-            // but filled in username already exists in database.
-            $userNameToCheck = $this->form->getData()->getUserName(); // or $this->form->get('userName')->getData()
-            $isUsernameUnique = $this->isUserUnique('username', $userNameToCheck, $userService);
-        }
-        if (false === $isEmailUnique || false === $isUsernameUnique) {
-            $this->flashBag->add('danger','Form registration failed!<br>Try to request again by checking the fields.');
-            return false;
-        }
-        return true;
+        // Check UserManager instance in passed data
+        $userService = $this->checkUserServiceInstance($actionData);
+        // DTO is in valid state but chosen email or username (nickname) must not exist in database.
+        return $this->checkUserUniqueData($userService);
     }
 
     /**
@@ -130,15 +109,10 @@ final class RegisterHandler extends AbstractFormHandler
      */
     protected function addCustomAction(array $actionData) : void
     {
-        $userService = $actionData['userService'];
-        if (!$userService instanceof UserManager || \is_null($userService)) {
-            throw new \InvalidArgumentException('A instance of UserManager must be set first!');
-        }
+        // Check UserManager instance in passed data
+        $userService = $this->checkUserServiceInstance($actionData);
         // Create a new user in database with the validated DTO
         $newUser = $userService->createUser($this->form->getData());
-        // Save data
-        $userService->getEntityManager()->persist($newUser);
-        $userService->getEntityManager()->flush();
         // Send email notification
         $emailParameters = [
             'receiver'     => [$newUser->getEmail() => $newUser->getFirstName() . ' ' . $newUser->getFamilyName()],
@@ -152,9 +126,13 @@ final class RegisterHandler extends AbstractFormHandler
         $isEmailSent = $this->mailer->notify($emailConfig);
         // Technical error when trying to send
         if (!$isEmailSent) {
-            $this->flashBag->add('info','Your account is successfully created!<br>However, confirmation email was not sent<br>due to technical reasons...<br>Please contact us if necessary.');
+            $this->flashBag->add(
+                'info',
+                'Your account is successfully created!<br>However, confirmation email was not sent<br>due to technical reasons...<br>Please contact us if necessary.');
         } else {
-            $this->flashBag->add('success','An email was sent successfully!<br>Please check your box<br>and look at your registration confirmation<br>to <strong>validate your account</strong>.');
+            $this->flashBag->add(
+                'success',
+                'An email was sent successfully!<br>Please check your box<br>and look at your registration confirmation<br>to <strong>validate your account</strong>.');
         }
     }
 
@@ -166,38 +144,5 @@ final class RegisterHandler extends AbstractFormHandler
     public function getUniqueUserError()
     {
         return $this->customError;
-    }
-
-    /**
-     * Check if a user is unique according to a type property.
-     *
-     * @param string      $type
-     * @param string      $value
-     * @param UserManager $userService
-     *
-     * @return bool
-     *
-     * @throws \Exception
-     * @throws \Doctrine\ORM\NonUniqueResultException
-     */
-    private function isUserUnique(string $type, string $value, UserManager $userService) : bool
-    {
-        if (!\in_array($type, ['email', 'username'])) {
-            throw new \InvalidArgumentException('Type of value is unknown!');
-        }
-        $isUniqueUser = \is_null($userService->getRepository()->loadUserByUsername($value)) ? true : false;
-        if (false === $isUniqueUser) {
-            switch ($type) {
-                case 'email':
-                    $uniqueEmailError = 'Please choose another email address!<br>It is already used!';
-                    $this->customError = ['email' => $uniqueEmailError];
-                    break;
-                case 'username':
-                    $uniqueUserNameError = 'Please choose another username!<br>Your nickname is already used!';
-                    $this->customError =  ['username' => $uniqueUserNameError];
-                    break;
-            }
-        }
-        return $isUniqueUser;
     }
 }

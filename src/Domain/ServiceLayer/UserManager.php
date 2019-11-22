@@ -4,10 +4,15 @@ declare(strict_types = 1);
 namespace App\Domain\ServiceLayer;
 
 use App\Domain\DTO\RegisterUserDTO;
+use App\Domain\DTO\UpdateProfileDTO;
+use App\Domain\Entity\Image;
+use App\Domain\Entity\Media;
+use App\Domain\Entity\MediaType;
 use App\Domain\Entity\User;
 use App\Domain\Repository\UserRepository;
 use App\Event\CustomEventFactory;
 use App\Event\CustomEventFactoryInterface;
+use App\Service\Medias\Upload\ImageUploader;
 use App\Utils\Traits\UuidHelperTrait;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -88,7 +93,7 @@ class UserManager
      * @param UserRepository               $repository
      * @param LoggerInterface              $logger
      *
-     * @return void
+     * // TODO: reduce dependencies if it's possible
      */
     public function __construct(
         CustomEventFactoryInterface $customEventFactory,
@@ -111,23 +116,28 @@ class UserManager
         $this->setLogger($logger);
     }
 
-
     /**
-     * @param RegisterUserDTO $newUser
+     * Create a new User instance.
+     *
+     * @param RegisterUserDTO $dataModel a DTO
      *
      * @return User
      *
      * @throws \Exception
      */
-    public function createUser(RegisterUserDTO $newUser) : User
+    public function createUser(RegisterUserDTO $dataModel) : User
     {
-        return new User(
-            $newUser->getFamilyName(),
-            $newUser->getFirstName(),
-            $newUser->getUserName(),
-            $newUser->getEmail(),
-            $this->userPasswordEncoder->encodePassword($newUser->getPasswords(),null)
+        $newUser =  new User(
+            $dataModel->getFamilyName(),
+            $dataModel->getFirstName(),
+            $dataModel->getUserName(),
+            $dataModel->getEmail(),
+            $this->userPasswordEncoder->encodePassword($dataModel->getPasswords(),null)
         );
+        // Save data
+        $this->getEntityManager()->persist($newUser);
+        $this->getEntityManager()->flush();
+        return $newUser;
     }
 
     /**
@@ -326,6 +336,61 @@ class UserManager
         // Return an updated user
         $updatedUser = $this->repository->findOneByUuid($user->getUuid());
         return $updatedUser;
+    }
+
+    /**
+     * Update a user profile account.
+     *
+     * @param UpdateProfileDTO $dataModel
+     * @param User             $user
+     * @param ImageUploader    $imageUploader
+     * @param MediaTypeManager $mediaTypeService
+     *
+     * @return void
+     *
+     * @throws \Exception
+     *
+     * // TODO: refactor this method quickly!
+     */
+    public function updateUserProfile(
+        UpdateProfileDTO $dataModel,
+        User $user,
+        ImageUploader $imageUploader,
+        MediaTypeManager $mediaTypeService
+    ) : void {
+        // Update user
+        $user->modifyFamilyName($dataModel->getFamilyName())
+            ->modifyFirstName($dataModel->getFirstName())
+            ->modifyNickName($dataModel->getUserName())
+            ->modifyEmail($dataModel->getEmail())
+            ->modifyUpdateDate(new \DateTime());
+        // Update password only if it's not null
+        if (!\is_null($dataModel->getPasswords())) {
+            $updatedPassword = $this->userPasswordEncoder->encodePassword($dataModel->getPasswords(), null);
+            $user->modifyPassword($updatedPassword, 'BCrypt');
+        }
+        // TODO: refactor this part
+        // Update avatar image media
+        if (!\is_null($dataModel->getAvatar())) {
+            $avatarIdentifierName = $this->encode($user->getUuid());
+            $avatarWidth = getimagesize($dataModel->getAvatar()->getPathName())[0];
+            $avatarHeight = getimagesize($dataModel->getAvatar()->getPathName())[1];
+            $avatarDimensionsFormat = $avatarWidth . 'x' . $avatarHeight;
+            $avatarExtension = $dataModel->getAvatar()->guessExtension();
+            $avatarSize = $dataModel->getAvatar()->getSize();
+            // Upload file on server
+            $avatarName = $imageUploader->upload($dataModel->getAvatar(), $avatarIdentifierName, $avatarDimensionsFormat);
+            // Create avatar media image entity
+            // TODO: refactor this part, review Image, MediaType, Media entity and add more constants for names and description
+            $image = new Image($avatarName, $user->getNickName() . "'s avatar", $avatarExtension, $avatarSize);
+            $mediaType = $mediaTypeService->findSingleByUniqueType(MediaType::TYPE_CHOICES['userAvatar']);
+            $media = Media::createNewInstanceWithImage($image, $mediaType,null, $user,false,true);
+            // Persist avatar data
+            $this->getEntityManager()->persist($image);
+            $this->getEntityManager()->persist($media);
+        }
+        // Save all updated data
+        $this->getEntityManager()->flush();
     }
 
     /**

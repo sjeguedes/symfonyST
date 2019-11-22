@@ -1,16 +1,16 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}SnowTricks - Registration form{% endblock %}
+{% block title %}SnowTricks - Profile update form{% endblock %}
 
 {% block header %}
     {% include 'all/image-header-loader.html.twig' with {'spinnerRatio': '2.5'} %}
     <div class="uk-position-relative uk-flex uk-flex-center uk-flex-middle uk-background-cover uk-background-blend-darken uk-invisible st-background-image-header" data-src="{{ asset('assets/images/snowboard-4.jpg') }}" style="background-position: 40% 25%; height: 600px" uk-img>
         <div class="uk-position-center uk-text-center uk-padding-small st-overlay-image-header-container">
             <p class="st-color-white st-text-shadow-dark uk-text-large">
-                Please fill in the form to become a really proud member!
+                Please fill in the form to edit your personal data!
             </p>
             <p class="st-color-white st-text-shadow-dark uk-text-medium uk-visible@m">
-                Once registered, you will need to activate your account.
+                Keep your account up to date if it's necessary.
             </p>
         </div>
     </div>
@@ -23,17 +23,17 @@
     <div id="st-register" class="uk-section uk-preserve-color">
         <div class="uk-container uk-margin-medium-bottom">
             <h1 class="uk-heading-bullet uk-text-large uk-text-center uk-text-uppercase uk-text-bold">
-                Use this form to take part of our tribe and stay in touch.
+                Use this form to personalize your avatar and essential data.
             </h1>
             <p class="uk-text-center uk-text-uppercase uk-text-bold st-color-red">
-                Before validate your registration request,<br>
-                please check expected information about you and give your agreement.
+                Before update your account,<br>
+                please check expected information about you and be aware of all changes.
             </p>
         </div>
         <div id="st-register-form" class="uk-container-expand st-register-form">
             <div class="uk-text-center">
                 <h2 class="uk-display-inline-block uk-padding-small uk-box-shadow-medium st-border-white-small uk-text-small uk-text-bold uk-text-uppercase st-background-yellow">
-                    Member registration area
+                    Member Profile area
                 </h2>
             </div>
             <div class="uk-flex-center uk-grid uk-grid-collapse">
@@ -50,53 +50,53 @@
                         </div>
                     {% endif %}
                     {# Registration form #}
-                    <div id="st-form" class="uk-card-body uk-padding-medium{{ registerForm.vars.valid == 1 and uniqueUserError is null ?: ' st-form-error' }}">
-                        {% form_theme registerForm 'form/uikit_3_form.html.twig' %}
-                        {{ form_start(registerForm, {'attr': {'class': 'uk-grid uk-grid-collpase', 'novalidate': ''}}) }}
+                    <div id="st-form" class="uk-card-body uk-padding-medium{{ updateProfileForm.vars.valid == 1 and uniqueUserError is null ?: ' st-form-error' }}">
+                        {% form_theme updateProfileForm 'form/uikit_3_form.html.twig' %}
+                        {{ form_start(updateProfileForm, {'attr': {'class': 'uk-grid uk-grid-collpase', 'novalidate': ''}}) }}
                             {# Family name #}
                             <div class="uk-width-1-1 uk-margin-small-bottom">
-                                {% if registerForm.familyName.vars.valid == 0 %}
-                                    {{ form_errors(registerForm.familyName) }}
+                                {% if updateProfileForm.familyName.vars.valid == 0 %}
+                                    {{ form_errors(updateProfileForm.familyName) }}
                                 {% endif %}
-                                {{ form_label(registerForm.familyName, 'Family name', {'label_attr': {'class': 'uk-form-label'}}) }}
+                                {{ form_label(updateProfileForm.familyName, 'Family name', {'label_attr': {'class': 'uk-form-label'}}) }}
                                 <div class="uk-inline uk-flex">
                                     <span class="uk-form-icon" uk-icon="icon: users; ratio: 1.1"></span>
-                                    {{ form_widget(registerForm.familyName, {
+                                    {{ form_widget(updateProfileForm.familyName, {
                                         'attr': {'class': 'uk-input'},
-                                        'value': registerForm.familyName.vars.value})
+                                        'value': updateProfileForm.familyName.vars.value})
                                     }}
-                                    {% if registerForm.familyName.vars.errors.form.submitted == 1 %}
-                                        {% set class = registerForm.familyName.vars.valid == 0 ? 'uk-form-danger' : 'uk-form-success' %}
-                                        {% set icon = registerForm.familyName.vars.valid == 0 ? 'warning' : 'check' %}
+                                    {% if updateProfileForm.familyName.vars.errors.form.submitted == 1 %}
+                                        {% set class = updateProfileForm.familyName.vars.valid == 0 ? 'uk-form-danger' : 'uk-form-success' %}
+                                        {% set icon = updateProfileForm.familyName.vars.valid == 0 ? 'warning' : 'check' %}
                                         <span class="uk-form-icon uk-form-icon-flip {{ class }}" uk-icon="icon: {{ icon }}"></span>
                                     {% endif %}
                                 </div>
                             </div>
-                            {# Firstname #}
+                            {# First name #}
                             <div class="uk-width-1-1 uk-margin-small-bottom">
-                                {% if registerForm.firstName.vars.valid == 0 %}
-                                    {{ form_errors(registerForm.firstName) }}
+                                {% if updateProfileForm.firstName.vars.valid == 0 %}
+                                    {{ form_errors(updateProfileForm.firstName) }}
                                 {% endif %}
-                                {{ form_label(registerForm.firstName, 'Firstname', {'label_attr': {'class': 'uk-form-label'}}) }}
+                                {{ form_label(updateProfileForm.firstName, 'First name', {'label_attr': {'class': 'uk-form-label'}}) }}
                                 <div class="uk-inline uk-flex">
                                     <span class="uk-form-icon" uk-icon="icon: user; ratio: 0.9"></span>
-                                    {{ form_widget(registerForm.firstName, {
+                                    {{ form_widget(updateProfileForm.firstName, {
                                         'attr': {'class': 'uk-input'},
-                                        'value': registerForm.firstName.vars.value})
+                                        'value': updateProfileForm.firstName.vars.value})
                                     }}
-                                    {% if registerForm.firstName.vars.errors.form.submitted == 1 %}
-                                        {% set class = registerForm.firstName.vars.valid == 0 ? 'uk-form-danger' : 'uk-form-success' %}
-                                        {% set icon = registerForm.firstName.vars.valid == 0 ? 'warning' : 'check' %}
+                                    {% if updateProfileForm.firstName.vars.errors.form.submitted == 1 %}
+                                        {% set class = updateProfileForm.firstName.vars.valid == 0 ? 'uk-form-danger' : 'uk-form-success' %}
+                                        {% set icon = updateProfileForm.firstName.vars.valid == 0 ? 'warning' : 'check' %}
                                         <span class="uk-form-icon uk-form-icon-flip {{ class }}" uk-icon="icon: {{ icon }}"></span>
                                     {% endif %}
                                 </div>
                             </div>
                             {# Username #}
                             <div class="uk-width-1-1 uk-margin-small-bottom">
-                                {% if registerForm.userName.vars.valid == 0 %}
-                                {{ form_errors(registerForm.userName) }}
+                                {% if updateProfileForm.userName.vars.valid == 0 %}
+                                {{ form_errors(updateProfileForm.userName) }}
                                 {% endif %}
-                                {{ form_label(registerForm.userName, 'Username (nickname)', {'label_attr': {'class': 'uk-form-label'}}) }}
+                                {{ form_label(updateProfileForm.userName, 'Username (nickname)', {'label_attr': {'class': 'uk-form-label'}}) }}
                                 {# --- Username reminder --- #}
                                 <div class="uk-inline">
                                     <a href="#" class="uk-button-link">
@@ -123,23 +123,23 @@
                                 {# --- end Username reminder --- #}
                                 <div class="uk-inline uk-flex">
                                     <span class="uk-form-icon" uk-icon="icon: user"></span>
-                                    {{ form_widget(registerForm.userName, {
+                                    {{ form_widget(updateProfileForm.userName, {
                                         'attr': {'class': 'uk-input'},
-                                        'value': registerForm.userName.vars.value})
+                                        'value': updateProfileForm.userName.vars.value})
                                     }}
-                                    {% if registerForm.userName.vars.errors.form.submitted == 1 %}
-                                        {% set class = registerForm.userName.vars.valid == 0 or uniqueUserError['username'] is defined ? 'uk-form-danger' : 'uk-form-success' %}
-                                        {% set icon = registerForm.userName.vars.valid == 0 or uniqueUserError['username'] is defined ? 'warning' : 'check' %}
+                                    {% if updateProfileForm.userName.vars.errors.form.submitted == 1 %}
+                                        {% set class = updateProfileForm.userName.vars.valid == 0 or uniqueUserError['username'] is defined ? 'uk-form-danger' : 'uk-form-success' %}
+                                        {% set icon = updateProfileForm.userName.vars.valid == 0 or uniqueUserError['username'] is defined ? 'warning' : 'check' %}
                                         <span class="uk-form-icon uk-form-icon-flip {{ class }}" uk-icon="icon: {{ icon }}"></span>
                                     {% endif %}
                                 </div>
                             </div>
                             {# Email #}
                             <div class="uk-width-1-1 uk-margin-small-bottom">
-                                {% if registerForm.email.vars.valid == 0 %}
-                                    {{ form_errors(registerForm.email) }}
+                                {% if updateProfileForm.email.vars.valid == 0 %}
+                                    {{ form_errors(updateProfileForm.email) }}
                                 {% endif %}
-                                {{ form_label(registerForm.email, 'Personal email', {'label_attr': {'class': 'uk-form-label'}}) }}
+                                {{ form_label(updateProfileForm.email, 'Personal email', {'label_attr': {'class': 'uk-form-label'}}) }}
                                 {# --- Email reminder --- #}
                                 <div class="uk-inline">
                                     <a href="#" class="uk-button-link">
@@ -165,23 +165,23 @@
                                 {# --- end Email reminder --- #}
                                 <div class="uk-inline uk-flex">
                                     <span class="uk-form-icon" uk-icon="icon: mail; ratio: 1.1"></span>
-                                    {{ form_widget(registerForm.email, {
+                                    {{ form_widget(updateProfileForm.email, {
                                         'attr': {'class': 'uk-input'},
-                                        'value': registerForm.email.vars.value})
+                                        'value': updateProfileForm.email.vars.value})
                                     }}
-                                    {% if registerForm.email.vars.errors.form.submitted == 1 %}
-                                        {% set class = registerForm.email.vars.valid == 0 or uniqueUserError['email'] is defined ? 'uk-form-danger' : 'uk-form-success' %}
-                                        {% set icon = registerForm.email.vars.valid == 0 or uniqueUserError['email'] is defined ? 'warning' : 'check' %}
+                                    {% if updateProfileForm.email.vars.errors.form.submitted == 1 %}
+                                        {% set class = updateProfileForm.email.vars.valid == 0 or uniqueUserError['email'] is defined ? 'uk-form-danger' : 'uk-form-success' %}
+                                        {% set icon = updateProfileForm.email.vars.valid == 0 or uniqueUserError['email'] is defined ? 'warning' : 'check' %}
                                         <span class="uk-form-icon uk-form-icon-flip {{ class }}" uk-icon="icon: {{ icon }}"></span>
                                     {% endif %}
                                 </div>
                             </div>
                             {# (New) Password #}
                             <div class="uk-width-1-1 uk-margin-small-bottom">
-                                {% if registerForm.passwords.password.vars.valid == 0 %}
-                                    {{ form_errors(registerForm.passwords.password) }}
+                                {% if updateProfileForm.passwords.password.vars.valid == 0 %}
+                                    {{ form_errors(updateProfileForm.passwords.password) }}
                                 {% endif %}
-                                {{ form_label(registerForm.passwords.password, 'Password', {'label_attr': {'class': 'uk-form-label'}}) }}
+                                {{ form_label(updateProfileForm.passwords.password, 'New Password', {'label_attr': {'class': 'uk-form-label'}}) }}
                                 {# --- Password reminder --- #}
                                 <div class="uk-inline">
                                     <a href="#" class="uk-button-link">
@@ -207,96 +207,99 @@
                                 {# --- end Password reminder --- #}
                                 <div class="uk-inline uk-flex">
                                     <span class="uk-form-icon" uk-icon="icon: lock"></span>
-                                    {{ form_widget(registerForm.passwords.password, {
+                                    {{ form_widget(updateProfileForm.passwords.password, {
                                         'attr': {'class': 'uk-input'},
-                                        'value': registerForm.passwords.password.vars.value})
+                                        'value': updateProfileForm.passwords.password.vars.value})
                                     }}
-                                    {% if registerForm.passwords.password.vars.errors.form.submitted == 1 %}
-                                        {% set class = registerForm.passwords.password.vars.valid == 0 ? 'uk-form-danger' : 'uk-form-success' %}
-                                        {% set icon = registerForm.passwords.password.vars.valid == 0 ? 'warning' : 'check' %}
+                                    {% if updateProfileForm.passwords.password.vars.errors.form.submitted == 1 %}
+                                        {% set class = updateProfileForm.passwords.password.vars.valid == 0 ? 'uk-form-danger' : 'uk-form-success' %}
+                                        {% set icon = updateProfileForm.passwords.password.vars.valid == 0 ? 'warning' : 'check' %}
                                         <span class="uk-form-icon uk-form-icon-flip {{ class }}" uk-icon="icon: {{ icon }}"></span>
                                     {% endif %}
                                 </div>
                             </div>
                             {# Confirmed Password #}
                             <div class="uk-width-1-1 uk-margin-small-bottom">
-                                {% if registerForm.passwords.confirmedPassword.vars.valid == 0 %}
-                                    {{ form_errors(registerForm.passwords.confirmedPassword) }}
+                                {% if updateProfileForm.passwords.confirmedPassword.vars.valid == 0 %}
+                                    {{ form_errors(updateProfileForm.passwords.confirmedPassword) }}
                                 {% endif %}
-                                {{ form_label(registerForm.passwords.confirmedPassword, 'Confirm password', {'label_attr': {'class': 'uk-form-label'}}) }}
+                                {{ form_label(updateProfileForm.passwords.confirmedPassword, 'Confirm new password', {'label_attr': {'class': 'uk-form-label'}}) }}
                                 <div class="uk-inline uk-flex">
                                     <span class="uk-form-icon" uk-icon="icon: lock"></span>
-                                    {{ form_widget(registerForm.passwords.confirmedPassword, {
+                                    {{ form_widget(updateProfileForm.passwords.confirmedPassword, {
                                         'attr': {'class': 'uk-input'},
-                                        'value': registerForm.passwords.confirmedPassword.vars.value})
+                                        'value': updateProfileForm.passwords.confirmedPassword.vars.value})
                                     }}
-                                    {% if registerForm.passwords.confirmedPassword.vars.errors.form.submitted == 1 %}
-                                        {% set class = (registerForm.passwords.password.vars.valid == 0)
-                                            or (registerForm.passwords.confirmedPassword.vars.value != registerForm.passwords.password.vars.value)
+                                    {% if updateProfileForm.passwords.confirmedPassword.vars.errors.form.submitted == 1 %}
+                                        {% set class = (updateProfileForm.passwords.password.vars.valid == 0)
+                                            or (updateProfileForm.passwords.confirmedPassword.vars.value != updateProfileForm.passwords.password.vars.value)
                                             ? 'uk-form-danger' : 'uk-form-success' %}
-                                        {% set icon = (registerForm.passwords.password.vars.valid == 0)
-                                            or (registerForm.passwords.confirmedPassword.vars.value != registerForm.passwords.password.vars.value)
+                                        {% set icon = (updateProfileForm.passwords.password.vars.valid == 0)
+                                            or (updateProfileForm.passwords.confirmedPassword.vars.value != updateProfileForm.passwords.password.vars.value)
                                             ? 'warning' : 'check' %}
                                         <span class="uk-form-icon uk-form-icon-flip {{ class }}" uk-icon="icon: {{ icon }}"></span>
                                     {% endif %}
                                 </div>
                             </div>
-                            {# Agreement #}
-                            <div class="uk-width-1-1 uk-margin-small-top uk-margin-small-bottom">
+                            {# Avatar #}
+                            <div class="uk-width-1-1 uk-margin-small-bottom">
+                                {% if updateProfileForm.avatar.vars.valid == 0 %}
+                                    {{ form_errors(updateProfileForm.avatar) }}
+                                {% endif %}
+                                {{ form_label(updateProfileForm.avatar, 'Personalize your avatar', {'label_attr': {'class': 'uk-form-label'}}) }}
+                                {# --- Avatar reminder --- #}
                                 <div class="uk-inline">
-                                    {% if registerForm.agreement.vars.valid == 0 %}
-                                        {{ form_errors(registerForm.agreement) }}
-                                    {% endif %}
-                                    {{ form_widget(registerForm.agreement, {
-                                        'attr': {'class': registerForm.agreement.vars.valid == 0 ? 'uk-checkbox uk-form-error' : 'uk-checkbox'},
-                                        })
-                                    }}
-                                    {{ form_label(registerForm.agreement, 'I accept the terms of use', {'label_attr': {'class': 'uk-form-label'}}) }}
-                                    {# --- Agreement reminder --- #}
-                                    <div class="uk-inline">
-                                        <a href="#" class="uk-button-link">
-                                            <span class="st-color-yellow" uk-icon="icon: question; ratio: 1.25"></span>
-                                        </a>
-                                        <div uk-drop="mode: click; pos: top-center; animation: uk-animation-slide-top-small; duration: 500">
-                                            <div class="uk-inline uk-position-relative uk-padding-small uk-border-rounded uk-box-shadow-medium st-background-yellow st-color-black">
-                                                <a href="#" class="uk-drop-close uk-position-absolute uk-padding-small">
-                                                    <span class="st-color-blue" uk-icon="icon: close"></span>
-                                                </a>
-                                                <p class="uk-margin-remove uk-text-center st-line-height-normal">
-                                                    <small class="uk-display-block uk-margin-small-top uk-margin-small-bottom uk-text-bold">
-                                                        <span uk-icon="icon: info"></span> Terms of use<br>
-                                                    </small>
-                                                    <small>
-                                                        Your account will not be used for commercial ads or given to our partners.<br>
-                                                        Your personal data can be modified or deleted by using a simple request sent to:
-                                                        <strong><a class="uk-link-text" href="mailto:{{ globalContactEmail }}" title="Contact Email"><span class="st-color-blue">SnowTricks - Member service</span></a></strong>
-                                                    </small>
-                                                </p>
-                                            </div>
+                                    <a href="#" class="uk-button-link">
+                                        <span class="st-color-yellow" uk-icon="icon: question; ratio: 1.25"></span>
+                                    </a>
+                                    <div uk-drop="mode: click; pos: top-center; animation: uk-animation-slide-top-small; duration: 500">
+                                        <div class="uk-inline uk-position-relative uk-padding-small uk-border-rounded uk-box-shadow-medium st-background-yellow st-color-black">
+                                            <a href="#" class="uk-drop-close uk-position-absolute uk-padding-small">
+                                                <span class="st-color-blue" uk-icon="icon: close"></span>
+                                            </a>
+                                            <p class="uk-margin-remove uk-text-center st-line-height-normal">
+                                                <small class="uk-display-block uk-margin-small-top uk-margin-small-bottom uk-text-bold">
+                                                    <span uk-icon="icon: info"></span> Avatar reminder<br>
+                                                </small>
+                                                <small>
+                                                    Your avatar image is expected to be a .jpeg, .png, .gif file.<br>
+                                                    Its maximum size must be 100k.
+                                                </small>
+                                            </p>
                                         </div>
-
                                     </div>
-                                    {# --- end Agreement reminder --- #}
+                                </div>
+                                {# --- end Avatar reminder --- #}
+                                <div class="uk-inline uk-flex">
+                                    <div uk-form-custom>
+                                        <span class="uk-form-icon uk-padding-small-left" uk-icon="icon: upload"></span>
+                                        {{ form_widget(updateProfileForm.avatar, {
+                                            'attr': {'class': 'uk-input'},
+                                            'value': updateProfileForm.avatar.vars.value})
+                                        }}
+                                        {% if updateProfileForm.avatar.vars.errors.form.submitted == 1 %}
+                                            {% set class = updateProfileForm.avatar.vars.valid == 0 ? 'uk-form-danger' : 'uk-form-success' %}
+                                            {% set icon = updateProfileForm.avatar.vars.valid == 0 ? 'warning' : 'check' %}
+                                            <span class="uk-form-icon uk-form-icon-flip {{ class }}" uk-icon="icon: {{ icon }}"></span>
+                                        {% endif %}
+                                        <button class="uk-button uk-button-default" type="button" tabindex="-1">Select</button>
+                                    </div>
                                 </div>
                             </div>
                             {# CSRF token #}
-                            {{ form_row(registerForm.token, {'value': csrf_token('register_token')}) }}
+                            {{ form_row(updateProfileForm.token, {'value': csrf_token('update_profile_token')}) }}
                             <div class="uk-width-1-1 uk-flex uk-flex-center">
                                 <button type="submit" class="uk-button uk-button-secondary uk-border-rounded uk-box-shadow-hover-medium uk-text-bold" title="Validate">
-                                    Create an account <span uk-icon="icon: chevron-right; ratio: 1.3"></span>
+                                    Update profile <span uk-icon="icon: chevron-right; ratio: 1.3"></span>
                                 </button>
                             </div>
-                        {{ form_end(registerForm) }}
-                        <p class="uk-text-center"><small>All fields are mandatory.</small></p>
-                    </div>
-                    <div class="uk-card-footer">
-                        {# Login #}
-                        <div class="uk-text-center">
-                            <a href="{{ path('connection') }}" class="uk-link-text uk-button-text uk-display-inline-block uk-margin-small-bottom" title="Already an account?">
-                                <span uk-icon="icon: arrow-right"></span>
-                                Already an account?
-                            </a>
-                        </div>
+                        {{ form_end(updateProfileForm) }}
+                        <p class="uk-text-center">
+                            <small>
+                                For security reason, your password is not shown.<br>
+                                Your new password will simply erase actual functional password.
+                            </small>
+                        </p>
                     </div>
                 </div>
             </div>

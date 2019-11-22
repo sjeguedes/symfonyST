@@ -54,10 +54,10 @@ class Media
     private $video;
 
     /**
-     * @var Trick (owning side of entity relation)
+     * @var Trick|null (owning side of entity relation)
      *
      * @ORM\ManyToOne(targetEntity=Trick::class, inversedBy="medias")
-     * @ORM\JoinColumn(name="trick_uuid", referencedColumnName="uuid", nullable=false)
+     * @ORM\JoinColumn(name="trick_uuid", referencedColumnName="uuid", nullable=true)
      */
     private $trick;
 
@@ -105,8 +105,8 @@ class Media
      * Media constructor.
      *
      * @param MediaType               $mediaType
-     * @param Trick                   $trick
-     * @param User                    $user
+     * @param Trick|null              $trick
+     * @param User|null               $user
      * @param bool                    $isMain
      * @param bool                    $isPublished
      * @param \DateTimeInterface|null $creationDate
@@ -117,8 +117,8 @@ class Media
      */
     private function __construct(
         MediaType $mediaType,
-        Trick $trick,
-        User $user,
+        Trick $trick = null,
+        User $user = null,
         bool $isMain = false,
         bool $isPublished = false,
         \DateTimeInterface $creationDate = null
@@ -139,8 +139,8 @@ class Media
      *
      * @param Image                   $image
      * @param MediaType               $mediaType
-     * @param Trick                   $trick
-     * @param User                    $user
+     * @param Trick|null              $trick
+     * @param User|null               $user
      * @param bool                    $isMain
      * @param bool                    $isPublished
      * @param \DateTimeInterface|null $creationDate
@@ -152,8 +152,8 @@ class Media
     public static function createNewInstanceWithImage(
         Image $image,
         MediaType $mediaType,
-        Trick $trick,
-        User $user,
+        Trick $trick = null,
+        User $user = null,
         bool $isMain = false,
         bool $isPublished = false,
         \DateTimeInterface $creationDate = null
@@ -170,8 +170,8 @@ class Media
      *
      * @param Video                   $video
      * @param MediaType               $mediaType
-     * @param Trick                   $trick
-     * @param User                    $user
+     * @param Trick|null              $trick
+     * @param User|null               $user
      * @param bool                    $isMain
      * @param bool                    $isPublished
      * @param \DateTimeInterface|null $creationDate
@@ -183,8 +183,8 @@ class Media
     public static function createNewInstanceWithVideo(
         Video $video,
         MediaType $mediaType,
-        Trick $trick,
-        User $user,
+        Trick $trick = null,
+        User $user = null,
         bool $isMain = false,
         bool $isPublished = false,
         \DateTimeInterface $creationDate = null

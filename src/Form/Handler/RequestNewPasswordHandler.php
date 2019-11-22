@@ -38,11 +38,6 @@ final class RequestNewPasswordHandler extends AbstractFormHandler
     private $emailConfigFactory;
 
     /**
-     * @var string
-     */
-    private $customError;
-
-    /**
      * @var SwiftMailerManager
      */
     private $mailer;
@@ -105,7 +100,7 @@ final class RequestNewPasswordHandler extends AbstractFormHandler
         if (\is_null($loadedUser)) {
             $userError = 'Please check your credentials!<br>User can not be found.';
             $this->customError = $userError;
-            $this->flashBag->add('danger', 'Form authentication failed!<br>Try to request again by checking the fields.');
+            $this->flashBag->add('danger', 'Authentication failed!<br>Try to request again by checking the form fields.');
             return false;
         }
         $this->userToUpdate = $loadedUser;
@@ -149,7 +144,10 @@ final class RequestNewPasswordHandler extends AbstractFormHandler
         if (!$isEmailSent) {
             throw new \Exception(sprintf('Notification failed: email was not sent to %s due to technical error or wrong parameters!', $updatedUser->getEmail()));
         }
-        $this->flashBag->add('success','An email was sent successfully!<br>Please check your box and<br>use your personalized link<br>to renew your password.');
+        $this->flashBag->add(
+            'success',
+            'An email was sent successfully!<br>Please check your box and<br>use your personalized link<br>to renew your password.'
+        );
     }
 
     /**
