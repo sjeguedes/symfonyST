@@ -46,7 +46,7 @@
     {# User profile information #}
     {% if app.user %}
     <li class="st-background-blue">
-        <a class="uk-position-relative" href="{{ path('update_profile', { userId : app.user.uuid|uuid_encode }) }}" title="{{ app.user.nickName|e('html_attr') }}'s Profile">
+        <a class="uk-position-relative" href="{{ path('update_profile') }}" title="{{ app.user.nickName|e('html_attr') }}'s Profile">
             <div>
                 <span class="uk-text-break uk-text-uppercase">
                      <small>{{ app.user.firstName~' '~app.user.familyName }} <br class="uk-hidden@m"><span uk-icon="user"></span></small>

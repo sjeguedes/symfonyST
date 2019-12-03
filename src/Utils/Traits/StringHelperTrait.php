@@ -42,5 +42,4 @@ trait StringHelperTrait
         setlocale(LC_ALL, $oldLocale);
         return $clean;
     }
-
 }

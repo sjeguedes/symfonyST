@@ -20,7 +20,7 @@
     <div class="uk-heading-line uk-text-large uk-text-center uk-margin-top">
         <span uk-icon="icon: unlock; ratio: 2"></span>
     </div>
-    <div id="st-register" class="uk-section uk-preserve-color">
+    <div id="st-update-profile" class="uk-section uk-preserve-color">
         <div class="uk-container uk-margin-medium-bottom">
             <h1 class="uk-heading-bullet uk-text-large uk-text-center uk-text-uppercase uk-text-bold">
                 Use this form to personalize your avatar and essential data.
@@ -30,7 +30,7 @@
                 please check expected information about you and be aware of all changes.
             </p>
         </div>
-        <div id="st-register-form" class="uk-container-expand st-register-form">
+        <div id="st-update-profile-form" class="uk-container-expand st-update-profile-form">
             <div class="uk-text-center">
                 <h2 class="uk-display-inline-block uk-padding-small uk-box-shadow-medium st-border-white-small uk-text-small uk-text-bold uk-text-uppercase st-background-yellow">
                     Member Profile area
@@ -115,6 +115,8 @@
                                                     You need to use a chosen nickname.<br>
                                                     Nickname can contain only lowercase and uppercase letters, numbers, top dash "<strong>-</strong>" and underscore "<strong>_</strong>" characters.<br>
                                                     Its length is expected to be between a minimum of 3 and a maximum of 15 characters.<br>
+                                                    Please note it is case insensitive:<br>
+                                                    For instance "<strong>Miky-12_4</strong>" is the same as "<strong>mikY-12_4</strong>".
                                                 </small>
                                             </p>
                                         </div>
@@ -263,16 +265,23 @@
                                                 </small>
                                                 <small>
                                                     Your avatar image is expected to be a .jpeg, .png, .gif file.<br>
-                                                    Its maximum size must be 100k.
+                                                    Its maximum size must be 100k (Kilobyte / ko).
                                                 </small>
                                             </p>
                                         </div>
                                     </div>
                                 </div>
                                 {# --- end Avatar reminder --- #}
-                                <div class="uk-inline uk-flex">
-                                    <div uk-form-custom>
-                                        <span class="uk-form-icon uk-padding-small-left" uk-icon="icon: upload"></span>
+                                <div class="uk-inline uk-flex uk-flex-middle">
+                                    <div class="uk-flex-column uk-card uk-box-shadow-small uk-border-rounded uk-padding-small uk-margin-small-right st-background-white">
+                                    {% if userAvatarImage is not null %}
+                                        <img width="80" src="{{ asset('assets/images/uploads/avatar/'~userAvatarImage.getName()~'.'~userAvatarImage.getFormat()) }}" alt="{{ userAvatarImage.getDescription() }}">
+                                    {% else %}
+                                        <img width="80" src="{{ asset('assets/images/avatar-default.svg') }}" alt="{{ app.user.getNickName()~'\s avatar' }}">
+                                    {% endif %}
+                                    </div>
+                                    <div class="uk-flex-column" uk-form-custom>
+                                        <span class="uk-form-icon" uk-icon="icon: upload"></span>
                                         {{ form_widget(updateProfileForm.avatar, {
                                             'attr': {'class': 'uk-input'},
                                             'value': updateProfileForm.avatar.vars.value})
@@ -282,7 +291,7 @@
                                             {% set icon = updateProfileForm.avatar.vars.valid == 0 ? 'warning' : 'check' %}
                                             <span class="uk-form-icon uk-form-icon-flip {{ class }}" uk-icon="icon: {{ icon }}"></span>
                                         {% endif %}
-                                        <button class="uk-button uk-button-default" type="button" tabindex="-1">Select</button>
+                                        <button class="uk-button uk-button-default" type="button" tabindex="-1"><span class="uk-padding-small">Select</span></button>
                                     </div>
                                 </div>
                             </div>
@@ -296,7 +305,8 @@
                         {{ form_end(updateProfileForm) }}
                         <p class="uk-text-center">
                             <small>
-                                For security reason, your password is not shown.<br>
+                                For security and private reasons, your password is not shown.<br>
+                                Furthermore, our service has no access to your personal password.<br>
                                 Your new password will simply erase actual functional password.
                             </small>
                         </p>

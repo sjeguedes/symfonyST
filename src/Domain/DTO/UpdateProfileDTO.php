@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  *
  * @see validation constraints UpdateProfileDTO.yaml file
  */
-final class UpdateProfileDTO
+final class UpdateProfileDTO extends AbstractReadableDTO
 {
     /**
      * @var string|null
@@ -43,7 +43,7 @@ final class UpdateProfileDTO
     /**
      * @var UploadedFile
      */
-    private $avatar;
+    protected $avatar;
 
     /**
      * RegisterUserDTO constructor.

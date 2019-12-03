@@ -6,24 +6,24 @@ namespace App\Domain\ServiceLayer;
 use App\Domain\DTO\RegisterUserDTO;
 use App\Domain\DTO\UpdateProfileDTO;
 use App\Domain\Entity\Image;
-use App\Domain\Entity\Media;
-use App\Domain\Entity\MediaType;
 use App\Domain\Entity\User;
 use App\Domain\Repository\UserRepository;
 use App\Event\CustomEventFactory;
 use App\Event\CustomEventFactoryInterface;
-use App\Service\Medias\Upload\ImageUploader;
 use App\Utils\Traits\UuidHelperTrait;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
+use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Class UserManager.
@@ -52,11 +52,6 @@ class UserManager
     private $entityManager;
 
     /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
-
-    /**
      * @var Request
      */
     private $request;
@@ -70,6 +65,11 @@ class UserManager
      * @var UserRepository
      */
     private $repository;
+
+    /**
+     * @var Security
+     */
+    private $security;
 
     /**
      * @var SessionInterface
@@ -87,10 +87,9 @@ class UserManager
      * @param CustomEventFactoryInterface  $customEventFactory
      * @param EncoderFactoryInterface      $encoderFactory
      * @param EntityManagerInterface       $entityManager
-     * @param EventDispatcherInterface     $eventDispatcher
      * @param RequestStack                 $requestStack
-     * @param SessionInterface             $session
      * @param UserRepository               $repository
+     * @param Security                     $security
      * @param LoggerInterface              $logger
      *
      * // TODO: reduce dependencies if it's possible
@@ -99,20 +98,19 @@ class UserManager
         CustomEventFactoryInterface $customEventFactory,
         EncoderFactoryInterface $encoderFactory,
         EntityManagerInterface $entityManager,
-        EventDispatcherInterface $eventDispatcher,
         LoggerInterface $logger,
         RequestStack $requestStack,
-        SessionInterface $session,
-        UserRepository $repository
+        UserRepository $repository,
+        Security $security
     ) {
         $this->customEventFactory = $customEventFactory;
         $this->entityManager = $entityManager;
-        $this->eventDispatcher = $eventDispatcher;
         $this->repository = $repository;
         $this->request = $requestStack->getCurrentRequest();
         $this->requestStack = $requestStack;
-        $this->session =$session;
+        $this->session = $this->request->getSession();
         $this->userPasswordEncoder = $encoderFactory->getEncoder(User::class);
+        $this->security = $security;
         $this->setLogger($logger);
     }
 
@@ -127,12 +125,13 @@ class UserManager
      */
     public function createUser(RegisterUserDTO $dataModel) : User
     {
+        // Create a new instance based on DTO
         $newUser =  new User(
             $dataModel->getFamilyName(),
             $dataModel->getFirstName(),
             $dataModel->getUserName(),
             $dataModel->getEmail(),
-            $this->userPasswordEncoder->encodePassword($dataModel->getPasswords(),null)
+            $this->userPasswordEncoder->encodePassword($dataModel->getPasswords(), null)
         );
         // Save data
         $this->getEntityManager()->persist($newUser);
@@ -172,11 +171,13 @@ class UserManager
      *
      * @return void
      */
-    private function createUserEvent(string $eventContext, User $user) : void
+    public function createAndDispatchUserEvent(string $eventContext, User $user) : void
     {
         $event = $this->customEventFactory->createFromContext($eventContext, ['user' => $user]);
         $eventName = $this->customEventFactory->getEventNameByContext($eventContext);
-        $this->eventDispatcher->dispatch($eventName, $event);
+        /** @var EventDispatcherInterface $eventDispatcher */
+        $eventDispatcher = $this->customEventFactory->getEventDispatcher();
+        $eventDispatcher->dispatch($eventName, $event);
     }
 
     /**
@@ -208,6 +209,16 @@ class UserManager
     }
 
     /**
+     * Get current authenticated member (user).
+     *
+     * @return UserInterface
+     */
+    public function getAuthenticatedMember() : UserInterface
+    {
+        return $this->security->getUser();
+    }
+
+    /**
      * Generate a particular token string.
      *
      * This is used for password renewal token for instance.
@@ -218,7 +229,7 @@ class UserManager
      */
     public function generateCustomToken(string $tokenId) : string
     {
-        return substr(hash('sha256', bin2hex($tokenId . openssl_random_pseudo_bytes(8))),0,15);
+        return substr(hash('sha256', bin2hex($tokenId . openssl_random_pseudo_bytes(8))), 0, 15);
     }
 
     /**
@@ -308,9 +319,24 @@ class UserManager
         if ($token !== $user->getRenewalToken() || $isRenewalRequestOutdated) {
             return false;
         }
-        // Create a event to inform Allowed user is allowed to renew his password
-        $this->createUserEvent(CustomEventFactory::USER_ALLOWED_TO_RENEW_PASSWORD, $user);
+        // Create and dispatch an event to inform about the fact user is allowed to renew his password
+        $this->createAndDispatchUserEvent(CustomEventFactory::USER_ALLOWED_TO_RENEW_PASSWORD, $user);
         return true;
+    }
+
+    /**
+     * Remove user avatar image.
+     *
+     * @param User         $user
+     * @param ImageManager $imageService
+     *
+     * @return void
+     *
+     * @throws \Exception
+     */
+    private function removeAvatarImage(User $user, ImageManager $imageService) : void
+    {
+        $imageService->removeUserAvatar($user);
     }
 
     /**
@@ -326,7 +352,7 @@ class UserManager
     public function renewPassword(User $user, string $plainPassword) : User
     {
         // Generate encrypted password with BCrypt
-        $newPassword = $this->userPasswordEncoder->encodePassword($plainPassword,null);
+        $newPassword = $this->userPasswordEncoder->encodePassword($plainPassword, null);
         $user->modifyPassword($newPassword, 'BCrypt');
         $user->modifyUpdateDate(new \DateTime());
         // Reset renewal token request data
@@ -334,30 +360,39 @@ class UserManager
         $user->updateRenewalToken(null);
         $this->getEntityManager()->flush();
         // Return an updated user
-        $updatedUser = $this->repository->findOneByUuid($user->getUuid());
+        $updatedUser = $user;
         return $updatedUser;
+    }
+
+    /**
+     * Set user avatar image.
+     *
+     * @param User         $user
+     * @param ImageManager $imageService
+     * @param UploadedFile $avatarFile
+     *
+     * @return Image
+     *
+     * @throws \Exception
+     */
+    private function setAvatarImage(User $user, ImageManager $imageService, UploadedFile $avatarFile) : Image
+    {
+        return $imageService->createUserAvatar($user, $avatarFile);
     }
 
     /**
      * Update a user profile account.
      *
+     * @param ImageManager     $imageService
      * @param UpdateProfileDTO $dataModel
      * @param User             $user
-     * @param ImageUploader    $imageUploader
-     * @param MediaTypeManager $mediaTypeService
      *
      * @return void
      *
      * @throws \Exception
-     *
-     * // TODO: refactor this method quickly!
      */
-    public function updateUserProfile(
-        UpdateProfileDTO $dataModel,
-        User $user,
-        ImageUploader $imageUploader,
-        MediaTypeManager $mediaTypeService
-    ) : void {
+    public function updateUserProfile(UpdateProfileDTO $dataModel, User $user, ImageManager $imageService) : void
+    {
         // Update user
         $user->modifyFamilyName($dataModel->getFamilyName())
             ->modifyFirstName($dataModel->getFirstName())
@@ -366,30 +401,18 @@ class UserManager
             ->modifyUpdateDate(new \DateTime());
         // Update password only if it's not null
         if (!\is_null($dataModel->getPasswords())) {
+            // Don't forget to update user salt if not set to null bellow with $user->modifySalt($salt);
             $updatedPassword = $this->userPasswordEncoder->encodePassword($dataModel->getPasswords(), null);
             $user->modifyPassword($updatedPassword, 'BCrypt');
         }
-        // TODO: refactor this part
         // Update avatar image media
         if (!\is_null($dataModel->getAvatar())) {
-            $avatarIdentifierName = $this->encode($user->getUuid());
-            $avatarWidth = getimagesize($dataModel->getAvatar()->getPathName())[0];
-            $avatarHeight = getimagesize($dataModel->getAvatar()->getPathName())[1];
-            $avatarDimensionsFormat = $avatarWidth . 'x' . $avatarHeight;
-            $avatarExtension = $dataModel->getAvatar()->guessExtension();
-            $avatarSize = $dataModel->getAvatar()->getSize();
-            // Upload file on server
-            $avatarName = $imageUploader->upload($dataModel->getAvatar(), $avatarIdentifierName, $avatarDimensionsFormat);
-            // Create avatar media image entity
-            // TODO: refactor this part, review Image, MediaType, Media entity and add more constants for names and description
-            $image = new Image($avatarName, $user->getNickName() . "'s avatar", $avatarExtension, $avatarSize);
-            $mediaType = $mediaTypeService->findSingleByUniqueType(MediaType::TYPE_CHOICES['userAvatar']);
-            $media = Media::createNewInstanceWithImage($image, $mediaType,null, $user,false,true);
-            // Persist avatar data
-            $this->getEntityManager()->persist($image);
-            $this->getEntityManager()->persist($media);
+            // Remove previous avatar image if it exists
+            $this->removeAvatarImage($user, $imageService);
+            // Save image and corresponding media instances (persistence is used in image service layer.)
+            $this->setAvatarImage($user, $imageService, $dataModel->getAvatar());
         }
-        // Save all updated data
+        // Save all other user updated data
         $this->getEntityManager()->flush();
     }
 
@@ -408,7 +431,7 @@ class UserManager
         $user->updateRenewalToken($this->generateCustomToken($user->getNickName()));
         $this->getEntityManager()->flush();
         // Return an updated user
-        $updatedUser = $this->repository->findOneByUuid($user->getUuid());
+        $updatedUser = $user;
         return $updatedUser;
     }
 }

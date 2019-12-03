@@ -32,7 +32,7 @@ class Media
     /**
      * @var MediaType (owning side of entity relation)
      *
-     * @ORM\ManyToOne(targetEntity=MediaType::class, inversedBy="medias")
+     * @ORM\ManyToOne(targetEntity=MediaType::class, cascade={"persist"}, inversedBy="medias")
      * @ORM\JoinColumn(name="media_type_uuid", referencedColumnName="uuid", nullable=false)
      */
     private $mediaType;
@@ -40,7 +40,7 @@ class Media
     /**
      * @var Image|null (owning side of entity relation)
      *
-     * @ORM\ManyToOne(targetEntity=Image::class, inversedBy="medias")
+     * @ORM\ManyToOne(targetEntity=Image::class, cascade={"persist"}, inversedBy="medias")
      * @ORM\JoinColumn(name="image_uuid", referencedColumnName="uuid", nullable=true)
      */
     private $image;
@@ -48,7 +48,7 @@ class Media
     /**
      * @var Video|null (owning side of entity relation)
      *
-     * @ORM\ManyToOne(targetEntity=Video::class, inversedBy="medias")
+     * @ORM\ManyToOne(targetEntity=Video::class, cascade={"persist"}, inversedBy="medias")
      * @ORM\JoinColumn(name="video_uuid", referencedColumnName="uuid", nullable=true)
      */
     private $video;
@@ -56,7 +56,7 @@ class Media
     /**
      * @var Trick|null (owning side of entity relation)
      *
-     * @ORM\ManyToOne(targetEntity=Trick::class, inversedBy="medias")
+     * @ORM\ManyToOne(targetEntity=Trick::class, cascade={"persist"}, inversedBy="medias")
      * @ORM\JoinColumn(name="trick_uuid", referencedColumnName="uuid", nullable=true)
      */
     private $trick;

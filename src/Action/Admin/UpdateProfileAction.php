@@ -4,15 +4,20 @@ declare(strict_types = 1);
 
 namespace App\Action\Admin;
 
+use App\Domain\Entity\User;
+use App\Domain\ServiceLayer\ImageManager;
 use App\Domain\ServiceLayer\UserManager;
 use App\Form\Handler\FormHandlerInterface;
 use App\Responder\Admin\UpdateProfileResponder;
 use App\Responder\Redirection\RedirectionResponder;
+use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Class UpdateProfileAction.
@@ -21,6 +26,11 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class UpdateProfileAction
 {
+    /**
+     * @var ImageManager $imageService
+     */
+    private $imageService;
+
     /**
      * @var UserManager $userService
      */
@@ -37,22 +47,37 @@ class UpdateProfileAction
     private $formHandler;
 
     /**
+     * @var Security
+     */
+    private $security;
+
+    /**
      * RenewPasswordAction constructor.
      *
+     * @param ImageManager         $imageService
      * @param UserManager          $userService
      * @param FlashBagInterface    $flashBag
      * @param FormHandlerInterface $formHandler
+     * @param Security             $security
      */
-    public function __construct(UserManager $userService, FlashBagInterface $flashBag, FormHandlerInterface $formHandler) {
+    public function __construct(
+        ImageManager $imageService,
+        UserManager $userService,
+        FlashBagInterface $flashBag,
+        FormHandlerInterface $formHandler,
+        Security $security
+    ) {
+        $this->imageService = $imageService;
         $this->userService = $userService;
         $this->flashBag = $flashBag;
         $this->formHandler = $formHandler;
+        $this->security = $security;
     }
 
     /**
      *  Show profile update form (user account) and validation errors.
      *
-     * @Route("/{_locale}/update-profile/{userId}", name="update_profile")
+     * @Route("/{_locale}/update-profile", name="update_profile")
      *
      * @param RedirectionResponder   $redirectionResponder
      * @param UpdateProfileResponder $responder
@@ -64,49 +89,32 @@ class UpdateProfileAction
      */
     public function __invoke(RedirectionResponder $redirectionResponder, UpdateProfileResponder $responder, Request $request) : Response
     {
-        $userId = $request->attributes->get('userId'); // TODO: create a common method between handlers to check user in UserManager?
-        $identifiedUser = $this->userService->findSingleByEncodedUuid($userId);
+        // Get user from symfony security context
+        /** @var UserInterface|User $identifiedUser */
+        $identifiedUser = $this->security->getUser();
+        // Optional with ACL or voter.
         if (\is_null($identifiedUser)) {
-            throw new NotFoundHttpException();
+            throw new AccessDeniedException('No user is authenticated!');
         }
         // Set form without initial model data and set the request by binding it
         $updateProfileForm = $this->formHandler->initForm(['userToUpdate' => $identifiedUser])->bindRequest($request);
         // Process only on submit
         if ($updateProfileForm->isSubmitted()) {
             // Constraints and custom validation: call actions to perform if necessary on success
-            $isFormRequestValid = $this->formHandler->processFormRequest(['userService' => $this->userService, 'userToUpdate' => $identifiedUser]);
+            $isFormRequestValid = $this->formHandler->processFormRequest([
+                'imageService' => $this->imageService,
+                'userService'  => $this->userService,
+                'userToUpdate' => $identifiedUser
+            ]);
             if ($isFormRequestValid) {
                 return $redirectionResponder('home');
             }
         }
         $data = [
-            'uniqueUserError'  => $this->formHandler->getUniqueUserError() ?? null,
+            'uniqueUserError'   => $this->formHandler->getUniqueUserError() ?? null,
+            'userAvatarImage'   => $this->imageService->getUserAvatarImage($identifiedUser),
             'updateProfileForm' => $updateProfileForm->createView()
         ];
         return $responder($data);
-    }
-
-    /**
-     * Update user avatar using ajax.
-     *
-     * @Route("/{_locale}/update-avatar/{userId}", name="update_avatar")
-     *
-     * @param RedirectionResponder $redirectionResponder
-     * @param Request              $request
-     *
-     * @return Response
-     *
-     * @throws \Exception
-     */
-    public function EditUserAvatar(RedirectionResponder $redirectionResponder, Request $request) : Response
-    {
-        $userId = $request->attributes->get('userId');
-        $isUpdated = $this->userService->activateAccount($userId);
-        if (!$isUpdated) {
-            $this->flashBag->add('danger','Sorry, an error happened!<br>Try again or use another file to update your avatar.');
-        } else {
-            $this->flashBag->add('success','Good job!<br>Your avatar is successfully updated.');
-        }
-        return $redirectionResponder('update_profile', ['userId' => $userId]);
     }
 }

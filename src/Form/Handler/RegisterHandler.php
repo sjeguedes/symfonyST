@@ -11,6 +11,7 @@ use App\Service\Mailer\Email\EmailConfigFactory;
 use App\Service\Mailer\Email\EmailConfigFactoryInterface;
 use App\Service\Mailer\SwiftMailerManager;
 use App\Utils\Traits\CSRFTokenHelperTrait;
+use App\Utils\Traits\UserHandlingHelperTrait;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
@@ -25,6 +26,7 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 final class RegisterHandler extends AbstractFormHandler
 {
     use CSRFTokenHelperTrait;
+    use UserHandlingHelperTrait;
 
     /**
      * @var csrfTokenManagerInterface
@@ -91,7 +93,8 @@ final class RegisterHandler extends AbstractFormHandler
             throw new \Exception('Security error: CSRF form token is invalid!');
         }
         // Check UserManager instance in passed data
-        $userService = $this->checkUserServiceInstance($actionData);
+        $this->checkNecessaryData($actionData);
+        $userService = $actionData['userService'];
         // DTO is in valid state but chosen email or username (nickname) must not exist in database.
         return $this->checkUserUniqueData($userService);
     }
@@ -110,7 +113,9 @@ final class RegisterHandler extends AbstractFormHandler
     protected function addCustomAction(array $actionData) : void
     {
         // Check UserManager instance in passed data
-        $userService = $this->checkUserServiceInstance($actionData);
+        $this->checkNecessaryData($actionData);
+        /** @var UserManager $userService */
+        $userService = $actionData['userService'];
         // Create a new user in database with the validated DTO
         $newUser = $userService->createUser($this->form->getData());
         // Send email notification

@@ -29,6 +29,7 @@ services:
 
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
+    # add a simple PSR3 logger as a service
     App\Action\:
         resource: '../src/Action'
         tags: ['controller.service_arguments']
@@ -62,7 +63,7 @@ services:
         arguments:
             $formHandler: '@App\Form\Handler\RegisterHandler'
 
-    # add form handler when updating a user account
+    # add form handler when updating a user account (profile)
     App\Action\Admin\UpdateProfileAction:
         tags: ['controller.service_arguments']
         arguments:
@@ -71,14 +72,17 @@ services:
     # add logout handler
     App\Event\Handler\LogoutHandler:
 
+    # add request new password handler
     App\Form\Handler\RequestNewPasswordHandler:
         arguments:
             $emailConfigFactory: '@App\Service\Mailer\Email\EmailConfigFactory'
 
+    # add renew password handler
     App\Form\Handler\RenewPasswordHandler:
         arguments:
             $emailConfigFactory: '@App\Service\Mailer\Email\EmailConfigFactory'
 
+    # add update profile handler
     App\Form\Handler\UpdateProfileHandler:
         arguments:
             $imageUploader: '@App\Service\Medias\Upload\ImageUploader'
@@ -117,5 +121,5 @@ services:
     # add PSR3 logger as default logger for actions (controllers)
     Symfony\Component\HttpKernel\Log\Logger:
 
-    # add options resolver as a service
+    # add options resolver
     Symfony\Component\OptionsResolver\OptionsResolver:

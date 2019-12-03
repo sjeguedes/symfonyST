@@ -150,28 +150,27 @@ class User implements UserInterface, \Serializable
     /**
      * @var Collection (inverse side of entity relation)
      *
-     * @ORM\OneToMany(targetEntity=Media::class, mappedBy="user")
+     * @ORM\OneToMany(targetEntity=Media::class, cascade={"persist"}, mappedBy="user")
      */
     private $medias;
 
     /**
      * @var Collection (inverse side of entity relation)
      *
-     * @ORM\OneToMany(targetEntity=Trick::class, mappedBy="user")
+     * @ORM\OneToMany(targetEntity=Trick::class, cascade={"persist"}, mappedBy="user")
      */
     private $tricks;
 
     /**
      * User constructor.
      *
-     * @param string      $familyName
-     * @param string      $firstName
-     * @param string      $nickName
-     * @param string      $email
-     * @param string      $password an encoded password
-     * @param string      $algorithm a hash algorithm type for password
-     * @param array       $roles
-     * @param string|null $salt
+     * @param string $familyName
+     * @param string $firstName
+     * @param string $nickName
+     * @param string $email
+     * @param string $password  an encoded password
+     * @param string $algorithm a hash algorithm type for password
+     * @param array  $roles
      *
      * @return void
      *
@@ -184,8 +183,7 @@ class User implements UserInterface, \Serializable
         string $email,
         string $password,
         string $algorithm = self::DEFAULT_ALGORITHM,
-        array $roles = [self::DEFAULT_ROLE],
-        string $salt = null
+        array $roles = [self::DEFAULT_ROLE]
     ) {
         \assert(!empty($familyName),'User family name can not be empty!');
         \assert(!empty($firstName),'User first name can not be empty!');
@@ -200,7 +198,7 @@ class User implements UserInterface, \Serializable
         $this->email = strtolower($email);
         $this->password = $password;
         $this->roles = $roles;
-        $this->salt = $salt;
+        $this->salt = null; // can be updated with encoder factory
         $this->isActivated = false;
         $this->creationDate = new \DateTime();
         $this->updateDate = $this->creationDate;
@@ -347,7 +345,7 @@ class User implements UserInterface, \Serializable
         if (!$this->isNickNameValidated($userName)) {
             throw new \InvalidArgumentException('User nickname is not valid!');
         }
-        $this->nickName = strtolower($userName);
+        $this->nickName = $userName;
         return $this;
     }
 
@@ -404,6 +402,22 @@ class User implements UserInterface, \Serializable
             throw new \InvalidArgumentException('Each role must begin with "ROLE_"!');
         }
         $this->roles = array_unique($roles);
+        return $this;
+    }
+
+    /**
+     * Change salt which is used for password encoding.
+     *
+     * @param string $salt
+     *
+     * @return $this
+     */
+    public function modifySalt(string $salt) : self
+    {
+        if (empty($salt)) {
+            throw new \InvalidArgumentException('Password salt can not be empty!');
+        }
+        $this->salt = $salt;
         return $this;
     }
 

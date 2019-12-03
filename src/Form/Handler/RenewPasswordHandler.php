@@ -92,7 +92,8 @@ final class RenewPasswordHandler extends AbstractFormHandler implements InitMode
         }
         // Get allowed user who asks for a new password.
         // Check User instance in passed data
-        $identifiedUser = $this->checkUserInstance($actionData);
+        $this->checkNecessaryData($actionData);
+        $identifiedUser = $actionData['userToUpdate'];
         // Validate user matching only if username field is not disabled.
         if (!$this->form->get('userName')->isDisabled()) {
             $isUserInFormMatched = $this->isIdentifiedUserMatchedInForm($identifiedUser);
@@ -122,7 +123,9 @@ final class RenewPasswordHandler extends AbstractFormHandler implements InitMode
     protected function addCustomAction(array $actionData) : void
     {
         // Check UserManager instance in passed data
-        $userService = $this->checkUserServiceInstance($actionData);
+        $this->checkNecessaryData($actionData);
+        /** @var UserManager $userService */
+        $userService = $actionData['userService'];
         $user = $this->userToUpdate;
         // Save data
         $updatedUser = $userService->renewPassword($user, $this->form->getData()->getPasswords()); // or $this->form->get('passwords')->getData()
@@ -162,15 +165,35 @@ final class RenewPasswordHandler extends AbstractFormHandler implements InitMode
     }
 
     /**
+     * Remove initialized model data for username field after parent form creation.
+     *
+     * Override AbstractFormHandler::initForm() method from parent class.
+     *
      * {@inheritDoc}
      *
-     * @return object|RenewPasswordDTO
+     */
+    public function initForm(array $data = null, string $formType = null, array $options = null) : FormHandlerInterface
+    {
+        $currentFormHandler = parent::initForm($data, $formType, $options);
+        // if username field is disabled, remove model data already set (no way to do that before form creation in init).
+        if (false === $this->form->get('userName')->isDisabled()) {
+            // Username field is also a form type.
+            $this->form->get('userName')->setData(null);
+        }
+        return $currentFormHandler;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return object a RenewPasswordDTO instance
      *
      * @throws \Exception
      */
     public function initModelData(array $data) : object
     {
-        $user = $this->checkUserInstance($data);
+        $this->checkNecessaryData($data);
+        $user = $data['userToUpdate'];
         return new RenewPasswordDTO($user->getEmail());
     }
 

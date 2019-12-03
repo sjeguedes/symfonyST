@@ -4,7 +4,7 @@ declare(strict_types = 1);
 namespace App\Event;
 
 use App\Domain\Entity\User;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -17,7 +17,12 @@ class CustomEventFactory implements CustomEventFactoryInterface
     /**
      * Define a context label each time a user is allowed to renew his password.
      */
-    public const USER_ALLOWED_TO_RENEW_PASSWORD = 'user.allowedTo.renewPassword';
+    const USER_ALLOWED_TO_RENEW_PASSWORD = 'user.allowed.to.renew.password';
+
+    /**
+     * Define a context label each time a user submit an unchanged updated profile.
+     */
+    const USER_WITH_UNCHANGED_UPDATED_PROFILE = 'user.with.unchanged.updated.profile';
 
     /**
      * Define all the custom events configuration.
@@ -29,8 +34,20 @@ class CustomEventFactory implements CustomEventFactoryInterface
             'data'         => [ // Key order and value type must be checked for each entry.
                 'user'  => ['type' => User::class, 'value' => null]
             ]
+        ],
+        self::USER_WITH_UNCHANGED_UPDATED_PROFILE => [
+            'event'        => FormUnchangedEvent::class,
+            'eventName'    => FormUnchangedEvent::NAME,
+            'data'         => [ // Key order and value type must be checked for each entry.
+                'user'  => ['type' => User::class, 'value' => null]
+            ]
         ]
     ];
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
 
     /**
      * @var OptionsResolver
@@ -40,30 +57,40 @@ class CustomEventFactory implements CustomEventFactoryInterface
     /**
      * CustomEventFactory constructor.
      *
-     * @param OptionsResolver $optionsResolver
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param OptionsResolver          $optionsResolver
      */
-    public function __construct(OptionsResolver $optionsResolver)
+    public function __construct(EventDispatcherInterface $eventDispatcher, OptionsResolver $optionsResolver)
     {
+        $this->eventDispatcher = $eventDispatcher;
         $this->optionsResolver = $optionsResolver;
     }
 
     /**
      * {@inheritDoc}
+     *
+     * @throws \Exception
      */
-        public function createFromContext(string $eventContext, array $eventParameters) : CustomEventInterface
-    {
+     public function createFromContext(string $eventContext, array $eventParameters) : CustomEventInterface
+     {
         // Event context is unknown.
         if (!\array_key_exists($eventContext,self::CUSTOM_EVENT_LIST)) {
             throw new \InvalidArgumentException('Event context argument does not exist in list!');
         }
         $event = self::CUSTOM_EVENT_LIST[$eventContext]['event'];
-        // Prepare data to be injected as arguments with splat operator
-        $eventData = $this->buildEventDataConfiguration($eventContext, $eventParameters);
-        // Add event context as the first argument in parameters array.
-        array_unshift($eventData, $eventContext);
-        // Return an expected instance
-        return new $event(...$eventData);
-    }
+        if (isset(self::CUSTOM_EVENT_LIST[$eventContext]['data'])) {
+            // Prepare data to be injected as arguments with splat operator
+            $eventData = $this->buildEventDataConfiguration($eventContext, $eventParameters);
+            // Add event context as the first argument in parameters array.
+            array_unshift($eventData, $eventContext);
+            // Return an expected instance
+            return new $event(...$eventData);
+        } else {
+            // Return an expected instance without added data
+            return new $event($eventContext);
+        }
+
+     }
 
     /**
      * Initialize event data with resolved configuration.
@@ -72,6 +99,8 @@ class CustomEventFactory implements CustomEventFactoryInterface
      * @param array $eventParameters
      *
      * @return array
+     *
+     * @throws \Exception
      */
     private function buildEventDataConfiguration(string $eventContext, array $eventParameters) : array
     {
@@ -92,6 +121,17 @@ class CustomEventFactory implements CustomEventFactoryInterface
         });
         // Keep only a simple array with event parameters values: the next step will use this array with "splat operator".
         return array_values($eventParameters);
+    }
+
+
+    /**
+     * Get a EventDispatcherInterface instance.
+     *
+     * @return EventDispatcherInterface
+     */
+    public function getEventDispatcher() : EventDispatcherInterface
+    {
+        return $this->eventDispatcher;
     }
 
     /**

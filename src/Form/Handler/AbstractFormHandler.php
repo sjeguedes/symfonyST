@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace App\Form\Handler;
 
 use App\Domain\Entity\User;
+use App\Domain\ServiceLayer\ImageManager;
 use App\Domain\ServiceLayer\UserManager;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -20,6 +21,15 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 class AbstractFormHandler implements FormHandlerInterface
 {
     /**
+     * Define data keys and types to check which are used in form request process.
+     */
+    const DATA_CONFIG_TO_CHECK = [
+        'userToUpdate' => User::class,
+        'imageService' => ImageManager::class,
+        'userService'  => UserManager::class
+    ];
+
+    /**
      * @var FlashBagInterface
      */
     protected $flashBag;
@@ -30,7 +40,7 @@ class AbstractFormHandler implements FormHandlerInterface
     protected $form;
 
     /**
-     * @var string|array // TODO: pass this property in UserHelperTrait?
+     * @var string|array
      */
     protected $customError;
 
@@ -53,7 +63,6 @@ class AbstractFormHandler implements FormHandlerInterface
      * @var bool
      */
     private $requestHandled;
-
 
     /**
      * AbstractFormHandler constructor.
@@ -128,112 +137,27 @@ class AbstractFormHandler implements FormHandlerInterface
     }
 
     /**
-     * Check if chosen filled in data are unique as expected in database.
+     * Check validity of all data and their types passed in form request process.
      *
-     * @param UserManager $userService
-     * @param string|null $type
-     *
-     * @return bool
-     *
-     * @throws \Doctrine\ORM\NonUniqueResultException
-     *
-     * // TODO: transfer this method  as private in UserHelperTrait class!
-     */
-    protected function checkUserUniqueData(UserManager $userService, string $type = null) : bool
-    {
-        $isEmailUnique = true;
-        $isUsernameUnique = true;
-        if (\is_null($type) || 'email' === $type) {
-            // Filled in email already exists in database.
-            $emailToCheck = $this->form->getData()->getEmail(); // or $this->form->get('email')->getData()
-            $isEmailUnique = $this->isUserUnique('email', $emailToCheck, $userService);
-        }
-        // Execute second database query only if email is unique.
-        if ((\is_null($type) && $isEmailUnique) || 'username' === $type) {
-            // Filled in username already exists in database.
-            $userNameToCheck = $this->form->getData()->getUserName(); // or $this->form->get('userName')->getData()
-            $isUsernameUnique = $this->isUserUnique('username', $userNameToCheck, $userService);
-        }
-        if (false === $isEmailUnique || false === $isUsernameUnique) {
-            $this->flashBag->add('danger','Registration failed!<br>Try to request again by checking the form fields.');
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Check User instance.
+     * Please note this method can be improved with use of OptionsResolver.
      *
      * @param array $data
      *
-     * @return User
-     *
-     * @throws \Exception
-     *
-     * // TODO: transfer this method as private in UserHelperTrait class!
+     * @return void
      */
-    protected function checkUserInstance(array $data) : User
+    protected function checkNecessaryData(array $data) : void
     {
-        $object = $data['userToUpdate'] ?? null;
-        if (!$object instanceof User || \is_null($object)) {
-            throw new \InvalidArgumentException('A instance of User must be set first!');
-        }
-        return $object;
-    }
-
-    /**
-     * Check UserManager instance.
-     *
-     * @param array $data
-     *
-     * @return UserManager
-     *
-     * @throws \Exception
-     *
-     * // TODO: transfer this method as private in UserHelperTrait class!
-     */
-    protected function checkUserServiceInstance(array $data) : UserManager
-    {
-        $object = $data['userService'] ?? null;
-        if (!$object instanceof UserManager || \is_null($object)) {
-            throw new \InvalidArgumentException('A instance of UserManager must be set first!');
-        }
-        return $object;
-    }
-
-    /**
-     * Check if a user is unique according to a type property.
-     *
-     * @param string      $type
-     * @param string      $value
-     * @param UserManager $userService
-     *
-     * @return bool
-     *
-     * @throws \Exception
-     * @throws \Doctrine\ORM\NonUniqueResultException
-     *
-     * // TODO: transfer this method as private in UserHelperTrait class!
-     */
-    protected function isUserUnique(string $type, string $value, UserManager $userService) : bool
-    {
-        if (!\in_array($type, ['email', 'username'])) {
-            throw new \InvalidArgumentException('Type of value is unknown!');
-        }
-        $isUniqueUser = \is_null($userService->getRepository()->loadUserByUsername($value)) ? true : false;
-        if (false === $isUniqueUser) {
-            switch ($type) {
-                case 'email':
-                    $uniqueEmailError = 'Please choose another email address!<br>It is already used!';
-                    $this->customError = ['email' => $uniqueEmailError];
-                    break;
-                case 'username':
-                    $uniqueUserNameError = 'Please choose another username!<br>Your nickname is already used!';
-                    $this->customError =  ['username' => $uniqueUserNameError];
-                    break;
+        $dataConfig = self::DATA_CONFIG_TO_CHECK;
+        array_filter($data, function ($value, $key) use ($dataConfig) {
+            // Check data type name
+            if (!isset($dataConfig[$key])) {
+                throw new \InvalidArgumentException('Data type name used in form request process is unknown!');
             }
-        }
-        return $isUniqueUser;
+            // Check data type
+            if ($value === $dataConfig[$key]) {
+                throw new \InvalidArgumentException('Data type used in form request process is not valid (does not match with its type)!');
+            }
+        }, ARRAY_FILTER_USE_BOTH);
     }
 
     /**

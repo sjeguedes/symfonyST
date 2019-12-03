@@ -5,6 +5,9 @@ declare(strict_types = 1);
 namespace App\Form\Type\Admin;
 
 use App\Domain\DTO\UpdateProfileDTO;
+use App\Domain\ServiceLayer\UserManager;
+use App\Event\Subscriber\FormSubscriber;
+use App\Form\DataMapper\DTOMapper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -15,6 +18,9 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * Class UpdateProfileType.
@@ -23,6 +29,46 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class UpdateProfileType extends AbstractType
 {
+    /**
+     * @var PropertyAccessorInterface
+     */
+    private $propertyAccessor;
+
+    /**
+     * @var PropertyListExtractorInterface used to list properties
+     */
+    private $propertyListExtractor;
+
+    /**
+     * @var RouterInterface
+     */
+    private $router;
+
+    /**
+     * @var UserManager
+     */
+    private $userService;
+
+    /**
+     * UpdateProfileType constructor.
+     *
+     * @param PropertyAccessorInterface      $propertyAccessor
+     * @param PropertyListExtractorInterface $propertyListExtractor
+     * @param RouterInterface                $router
+     * @param UserManager                    $userService
+     */
+    public function __construct(
+        PropertyAccessorInterface $propertyAccessor,
+        PropertyListExtractorInterface $propertyListExtractor,
+        RouterInterface $router,
+        UserManager $userService
+    ) {
+        $this->propertyAccessor = $propertyAccessor;
+        $this->propertyListExtractor = $propertyListExtractor;
+        $this->router = $router;
+        $this->userService = $userService;
+    }
+
     /**
      * Configure a form builder for the type hierarchy.
      *
@@ -53,6 +99,15 @@ class UpdateProfileType extends AbstractType
             ->add('token',HiddenType::class, [
                 'inherit_data' => true
             ]);
+        // Add custom form subscriber to this form events with user service layer dependency
+        $builder->addEventSubscriber(
+            new FormSubscriber(
+                $this->propertyAccessor,
+                $this->propertyListExtractor,
+                new DTOMapper($this->propertyListExtractor),
+                $this->router,
+                $this->userService
+        ));
     }
 
     /**

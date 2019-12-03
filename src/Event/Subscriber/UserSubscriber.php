@@ -5,9 +5,11 @@ declare(strict_types = 1);
 namespace App\Event\Subscriber;
 
 use App\Action\Admin\RenewPasswordAction;
+use App\Action\Admin\UpdateProfileAction;
 use App\Domain\Entity\User;
 use App\Domain\ServiceLayer\UserManager;
 use App\Event\CustomEventFactory;
+use App\Event\FormUnchangedEvent;
 use App\Event\UserRetrievedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,7 +27,7 @@ use Symfony\Component\Security\Http\SecurityEvents;
  * Subscribe to events linked to user.
  *
  * Please note this subscriber is auto configured as a service due to services.yaml file configuration!
- * So event dispatcher does not need to register it with .
+ * So event dispatcher does not need to register it with associated event.
  */
 class UserSubscriber implements EventSubscriberInterface
 {
@@ -83,24 +85,30 @@ class UserSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents() : array
     {
         return [
-            SecurityEvents::INTERACTIVE_LOGIN => 'onSecurityInteractiveLogin',
+            FormUnchangedEvent::NAME          => 'onFormUnchanged',
             KernelEvents::REQUEST             => 'onKernelRequest',
+            SecurityEvents::INTERACTIVE_LOGIN => 'onSecurityInteractiveLogin',
             UserRetrievedEvent::NAME          => 'onUserRetrieved'
         ];
     }
 
     /**
-     * Define a callback to show a flash message with login form handler.
+     * Define a callback on form unchanged event.
      *
-     * @param InteractiveLoginEvent $event
+     * Show an info flash message to user who submitted a form without change.
+     *
+     * @param FormUnchangedEvent $event
      *
      * @return void
      */
-    public function onSecurityInteractiveLogin(InteractiveLoginEvent $event) : void
+    public function onFormUnchanged(FormUnchangedEvent $event) : void
     {
-        $user = $event->getAuthenticationToken()->getUser();
-        $userNickName = $user->getNickName();
-        $this->flashBag->add('success', sprintf('Welcome on board <strong>%s</strong>!<br>You logged in successfully.', $userNickName));
+        // Check if action corresponds to user update profile page
+        $isUpdateProfileAction = UpdateProfileAction::class === $this->request->attributes->get('_controller');
+        if ($isUpdateProfileAction) {
+            $userNickName = $event->getUser()->getNickName();
+            $this->flashBag->add('info', sprintf('Hey <strong>%s</strong>!<br>Please note you changed nothing about your profile.', $userNickName));
+        }
     }
 
     /**
@@ -121,6 +129,20 @@ class UserSubscriber implements EventSubscriberInterface
         if ($event->getRequest()->getSession()->has(self::PASSWORD_RENEWAL_FIRST_ACCESS)) {
             $this->cleanPasswordRenewalFirstAccess();
         }
+    }
+
+    /**
+     * Define a callback to show a flash message with login form handler.
+     *
+     * @param InteractiveLoginEvent $event
+     *
+     * @return void
+     */
+    public function onSecurityInteractiveLogin(InteractiveLoginEvent $event) : void
+    {
+        $user = $event->getAuthenticationToken()->getUser();
+        $userNickName = $user->getNickName();
+        $this->flashBag->add('success', sprintf('Welcome on board <strong>%s</strong>!<br>You logged in successfully.', $userNickName));
     }
 
     /**
