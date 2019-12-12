@@ -14,6 +14,7 @@ use App\Service\Medias\Upload\ImageUploader;
 use App\Utils\Traits\CSRFTokenHelperTrait;
 use App\Utils\Traits\UserHandlingHelperTrait;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
@@ -74,12 +75,13 @@ final class UpdateProfileHandler extends AbstractFormHandler implements InitMode
         RequestStack $requestStack,
         SwiftMailerManager $mailer
     ) {
-        parent::__construct($flashBag, $formFactory,UpdateProfileType::class, $requestStack);
+        parent::__construct($flashBag, $formFactory, UpdateProfileType::class, $requestStack);
         $this->csrfTokenManager = $csrfTokenManager;
         $this->customError = null;
         $this->emailConfigFactory = $emailConfigFactory;
         $this->imageUploader = $imageUploader;
         $this->mailer = $mailer;
+        $this->requestStack = $requestStack;
         $this->userToCreate = null;
     }
 
@@ -156,7 +158,8 @@ final class UpdateProfileHandler extends AbstractFormHandler implements InitMode
     {
         // Chosen email or username (nickname) must not equals existing values, to be effectively checked.
         $isEmailToCheck = $identifiedUser->getEmail() !== $this->form->getData()->getEmail(); // or $this->form->get('email')->getData()
-        $isUserNameToCheck = $identifiedUser->getNickName() !== $this->form->getData()->getUserName(); // or $this->form->get('userName')->getData()
+        // Enable the possibility for a user to be able to update the same nickname with a new mix of lowercase and/or uppercase letters!
+        $isUserNameToCheck = strtolower($identifiedUser->getNickName()) !== strtolower($this->form->getData()->getUserName()); // or $this->form->get('userName')->getData()
         $check = true;
         if ($isEmailToCheck || $isUserNameToCheck) {
             // Chosen email or username (nickname) must not exist in database.
@@ -165,10 +168,10 @@ final class UpdateProfileHandler extends AbstractFormHandler implements InitMode
                     $check = $this->checkUserUniqueData($userService);
                     break;
                 case $isEmailToCheck:
-                    $check = $this->checkUserUniqueData($userService,'email');
+                    $check = $this->checkUserUniqueData($userService, 'email');
                     break;
                 case $isUserNameToCheck:
-                    $check = $this->checkUserUniqueData($userService,'username');
+                    $check = $this->checkUserUniqueData($userService, 'username');
                     break;
             }
         }
@@ -201,9 +204,10 @@ final class UpdateProfileHandler extends AbstractFormHandler implements InitMode
             $user->getFamilyName(),
             $user->getFirstName(),
             $user->getNickName(),
-            $user->getEmail(),
-            null,
-            null // Avatar must be null in pre-populated data: after form submit it can be an Uploaded file instance.
+            $user->getEmail()
+            // Password has to be set to null in pre-populated data: it cannot be retrieved (and must not be!).
+            // Avatar must be null in pre-populated data: after form submit it can be an Uploaded file instance.
+            // Avatar removal is set to false by default.
         );
     }
 }

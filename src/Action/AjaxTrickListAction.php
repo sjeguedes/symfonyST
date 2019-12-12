@@ -42,7 +42,7 @@ class AjaxTrickListAction
     /**
      * Load tricks from ajax request.
      *
-     * @Route("/{_locale}/home-load-tricks/{offset}/{limit}", name="home_load_tricks_offset_limit", requirements={"offset":"\d+","limit":"\d+"})
+     * @Route("/{_locale}/home-load-tricks/{offset}/{limit}", name="home_load_tricks_offset_limit", requirements={"offset":"\d+", "limit":"\d+"})
      * @Route("/{_locale}/home-load-tricks/{offset}", name="home_load_tricks_offset_only", defaults={"offset"=null}, requirements={"offset"="\d+"})
      *
      * @param AjaxTrickListResponder $responder

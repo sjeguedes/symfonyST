@@ -105,7 +105,7 @@ class AbstractFormHandler implements FormHandlerInterface
     {
         // Set model data with $data parameter
         if (!\is_null($data)) {
-            if (!method_exists($this,'initModelData')) {
+            if (!method_exists($this, 'initModelData')) {
                 throw new \RuntimeException('Final form handler class must implement "InitModelDataInterface" to deal with custom data parameter!');
             }
             // Get particular model data object to pre-populate the form
@@ -175,14 +175,14 @@ class AbstractFormHandler implements FormHandlerInterface
             return false;
         }
         // Add custom validation
-        if (method_exists($this,'addCustomValidation')) {
+        if (method_exists($this, 'addCustomValidation')) {
             // Custom validation did not pass!
             if (false === $this->addCustomValidation($actionData)) {
                 return false;
             }
         }
         // Add action to perform once form is validated
-        if (method_exists($this,'addCustomAction')) {
+        if (method_exists($this, 'addCustomAction')) {
             $this->addCustomAction($actionData);
         }
         return true;

@@ -41,9 +41,14 @@ final class UpdateProfileDTO extends AbstractReadableDTO
     private $passwords;
 
     /**
-     * @var UploadedFile
+     * @var UploadedFile|null
      */
-    protected $avatar;
+    private $avatar;
+
+    /**
+     * @var bool
+     */
+    private $removeAvatar;
 
     /**
      * RegisterUserDTO constructor.
@@ -54,14 +59,16 @@ final class UpdateProfileDTO extends AbstractReadableDTO
      * @param string|null       $email
      * @param string|null       $passwords
      * @param UploadedFile|null $avatar
+     * @param bool              $removeAvatar
      */
     public function __construct(
         ?string $familyName,
         ?string $firstName,
         ?string $userName,
         ?string $email,
-        ?string $passwords,
-        ?UploadedFile $avatar
+        string $passwords = null,
+        UploadedFile $avatar = null,
+        bool $removeAvatar = false
     ) {
         $this->familyName = $familyName;
         $this->firstName = $firstName;
@@ -69,6 +76,7 @@ final class UpdateProfileDTO extends AbstractReadableDTO
         $this->email = $email;
         $this->passwords = $passwords;
         $this->avatar = $avatar;
+        $this->removeAvatar = $removeAvatar;
     }
 
     /**
@@ -78,6 +86,7 @@ final class UpdateProfileDTO extends AbstractReadableDTO
     {
         return $this->familyName;
     }
+
     /**
      * @return string|null
      */
@@ -116,6 +125,14 @@ final class UpdateProfileDTO extends AbstractReadableDTO
     public function getAvatar() : ?UploadedFile
     {
         return $this->avatar;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getRemoveAvatar() : bool
+    {
+        return $this->removeAvatar;
     }
 
     /**
@@ -181,6 +198,17 @@ final class UpdateProfileDTO extends AbstractReadableDTO
     public function setAvatar(?UploadedFile $avatar) : self
     {
         $this->avatar = $avatar;
+        return $this;
+    }
+
+    /**
+     * @param bool $removeAvatar
+     *
+     * @return UpdateProfileDTO
+     */
+    public function setRemoveAvatar(bool $removeAvatar) : self
+    {
+        $this->removeAvatar = $removeAvatar;
         return $this;
     }
 }

@@ -37,7 +37,7 @@ final class LoginHandler extends AbstractFormHandler
         FormFactoryInterface $formFactory,
         RequestStack $requestStack
     ) {
-        parent::__construct($flashBag, $formFactory,LoginType::class, $requestStack);
+        parent::__construct($flashBag, $formFactory, LoginType::class, $requestStack);
         $this->authenticationUtils = $authenticationUtils;
         $this->customError = null;
     }

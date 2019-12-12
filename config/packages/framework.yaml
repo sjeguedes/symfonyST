@@ -44,6 +44,6 @@ framework:
         #app: cache.adapter.apcu
 
     # Define a front-end base path to be used for assets
-    # Default sub directory is '/assets'
-    #assets:
-        #base_path: ''
+    # Default sub directory can be configured for instance as '/assets'
+    assets:
+        base_path: '/'

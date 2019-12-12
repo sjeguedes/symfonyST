@@ -102,11 +102,11 @@ class Image
         \DateTimeInterface $creationDate = null
     ) {
         $this->uuid = Uuid::uuid4();
-        \assert(!empty($name),'Image name can not be empty!');
+        \assert(!empty($name), 'Image name can not be empty!');
         $this->name = $name;
-        \assert(!empty($description),'Image description can not be empty!');
+        \assert(!empty($description), 'Image description can not be empty!');
         $this->description = $description;
-        \assert(!empty($format),'Image format can not be empty!');
+        \assert(!empty($format), 'Image format can not be empty!');
         $this->format = $format;
         \assert($size > 0, 'Image size must be greater than 0!');
         $this->size = $size;

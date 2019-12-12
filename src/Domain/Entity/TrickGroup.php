@@ -84,9 +84,9 @@ class TrickGroup
         \DateTimeInterface $creationDate = null
     ) {
         $this->uuid = Uuid::uuid4();
-        \assert(!empty($name),'TrickGroup name can not be empty!');
+        \assert(!empty($name), 'TrickGroup name can not be empty!');
         $this->name = $name;
-        \assert(!empty($description),'TrickGroup description can not be empty!');
+        \assert(!empty($description), 'TrickGroup description can not be empty!');
         $this->description = $description;
         $createdAt = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
         $this->creationDate = $createdAt;

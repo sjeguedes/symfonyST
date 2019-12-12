@@ -51,7 +51,7 @@ trait UserHandlingHelperTrait
             $isUsernameUnique = $this->isUserUnique('username', $userNameToCheck, $userService);
         }
         if (false === $isEmailUnique || false === $isUsernameUnique) {
-            $this->flashBag->add('danger','Registration failed!<br>Try to request again by checking the form fields.');
+            $this->flashBag->add('danger', 'Registration failed!<br>Try to request again by checking the form fields.');
             return false;
         }
         return true;

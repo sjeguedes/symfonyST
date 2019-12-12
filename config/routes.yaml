@@ -13,8 +13,8 @@ homepage:
     defaults:
         path: /en
         permanent: true
-
-disconnection:
+# logout
+disconnect:
     path:
         en: /{_locale}/logout
         fr: /{_locale}/deconnection

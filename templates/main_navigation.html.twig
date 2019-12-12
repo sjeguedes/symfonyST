@@ -8,16 +8,16 @@
             </div>
         </a>
     </li>
-    <li{{ app.request.get('_route') == 'tricks' ? ' class="uk-active uk-disabled"' }}>
-        <a href="{{ path('tricks') }}" title="Tricks">
+    <li{{ app.request.get('_route') == 'list_tricks' ? ' class="uk-active uk-disabled"' }}>
+        <a href="{{ path('list_tricks') }}" title="Tricks">
             <div>
                 <span class="uk-text-uppercase"><span uk-icon="thumbnails"></span><br class="uk-hidden@m">&nbsp;Tricks</span>
                 <div class="uk-navbar-subtitle uk-visible@m"><small><span class="uk-visible@l">Look at </span>complete list</small></div>
             </div>
         </a>
     </li>
-    <li{{ app.request.get('_route') == 'registration' ? ' class="uk-active uk-disabled"' }}>
-        <a href="{{ path('registration') }}" title="Register">
+    <li{{ app.request.get('_route') == 'register' ? ' class="uk-active uk-disabled"' }}>
+        <a href="{{ path('register') }}" title="Register">
             <div>
                 <span class="uk-text-uppercase"><span uk-icon="users"></span><br class="uk-hidden@m">&nbsp;Register</span>
                 <div class="uk-navbar-subtitle uk-visible@m"><small><span class="uk-visible@l">Create an </span>account</small></div>
@@ -25,8 +25,8 @@
         </a>
     </li>
     {% if is_granted('IS_AUTHENTICATED_FULLY') == false %}
-    <li{{ app.request.get('_route') == 'connection' ? ' class="uk-active uk-disabled"' }}>
-        <a href="{{ path('connection') }}" title="Login">
+    <li{{ app.request.get('_route') == 'connect' ? ' class="uk-active uk-disabled"' }}>
+        <a href="{{ path('connect') }}" title="Login">
             <div>
                 <span class="uk-text-uppercase"><span uk-icon="sign-in"></span><br class="uk-hidden@m">&nbsp;Login</span>
                 <div class="uk-navbar-subtitle uk-visible@m"><small><span class="uk-visible@l">Contribute as a </span>member</small></div>
@@ -46,7 +46,7 @@
     {# User profile information #}
     {% if app.user %}
     <li class="st-background-blue">
-        <a class="uk-position-relative" href="{{ path('update_profile') }}" title="{{ app.user.nickName|e('html_attr') }}'s Profile">
+        <a class="uk-position-relative" href="{{ path('update_profile', {'mainRoleLabel': app.user.mainRoleLabel|lower}) }}" title="{{ app.user.nickName|e('html_attr') }}'s Profile">
             <div>
                 <span class="uk-text-break uk-text-uppercase">
                      <small>{{ app.user.firstName~' '~app.user.familyName }} <br class="uk-hidden@m"><span uk-icon="user"></span></small>

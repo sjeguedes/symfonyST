@@ -14,7 +14,6 @@ use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -77,7 +76,7 @@ class UpdateProfileAction
     /**
      *  Show profile update form (user account) and validation errors.
      *
-     * @Route("/{_locale}/update-profile", name="update_profile")
+     * @Route("/{_locale}/{mainRoleLabel}/update-profile", name="update_profile")
      *
      * @param RedirectionResponder   $redirectionResponder
      * @param UpdateProfileResponder $responder
@@ -93,9 +92,9 @@ class UpdateProfileAction
         /** @var UserInterface|User $identifiedUser */
         $identifiedUser = $this->security->getUser();
         // Optional with ACL or voter.
-        if (\is_null($identifiedUser)) {
+        /*if (\is_null($identifiedUser)) {
             throw new AccessDeniedException('No user is authenticated!');
-        }
+        }*/
         // Set form without initial model data and set the request by binding it
         $updateProfileForm = $this->formHandler->initForm(['userToUpdate' => $identifiedUser])->bindRequest($request);
         // Process only on submit

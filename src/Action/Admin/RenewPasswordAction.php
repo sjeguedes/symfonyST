@@ -79,7 +79,7 @@ class RenewPasswordAction
             // Constraints and custom validation: call actions to perform if necessary on success
             $isFormRequestValid = $this->formHandler->processFormRequest(['userService' => $this->userService, 'userToUpdate' => $identifiedUser]);
             if ($isFormRequestValid) {
-                return $redirectionResponder('connection');
+                return $redirectionResponder('connect');
             }
         }
         $data = [

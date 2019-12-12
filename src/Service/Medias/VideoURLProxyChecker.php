@@ -67,7 +67,7 @@ class VideoURLProxyChecker
      */
     private function isContent(string $url) : bool
     {
-        $resource = @fopen($url,'r');
+        $resource = @fopen($url, 'r');
         $isResource = \is_resource($resource) ? true : false;
         fclose($resource);
         return $isResource;

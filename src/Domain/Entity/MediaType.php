@@ -126,15 +126,15 @@ class MediaType
         \DateTimeInterface $creationDate = null
     ) {
         $this->uuid = Uuid::uuid4();
-        \assert(\in_array($type,self::TYPE_CHOICES),'MediaType type does not exist!');
+        \assert(\in_array($type, self::TYPE_CHOICES), 'MediaType type does not exist!');
         $this->type = $type;
-        \assert(!empty($name),'MediaType name can not be empty!');
+        \assert(!empty($name), 'MediaType name can not be empty!');
         $this->name = $name;
-        \assert(!empty($description),'MediaType description can not be empty!');
+        \assert(!empty($description), 'MediaType description can not be empty!');
         $this->description = $description;
-        \assert($width > 0,'MediaType width must be greater than 0!');
+        \assert($width > 0, 'MediaType width must be greater than 0!');
         $this->width = $width;
-        \assert($height > 0,'MediaType height must be greater than 0!');
+        \assert($height > 0, 'MediaType height must be greater than 0!');
         $this->height = $height;
         $createdAt = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
         $this->creationDate = $createdAt;

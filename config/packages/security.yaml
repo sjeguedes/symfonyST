@@ -31,7 +31,7 @@ security:
                 authenticators:
                     - App\Service\Security\LoginFormAuthenticationManager
             logout:
-                path: disconnection
+                path: disconnect
                 success_handler: App\Event\Handler\LogoutHandler
                 invalidate_session: false
             remember_me:
@@ -48,5 +48,6 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control: # define needed paths here!
-        - { path: ^/en/update-profile/[a-zA-Z0-9]*, roles: ROLE_USER }
+        - { path: ^/en/admin/update-profile, roles: ROLE_ADMIN }
+        - { path: ^/en/member/update-profile, roles: ROLE_USER }
 

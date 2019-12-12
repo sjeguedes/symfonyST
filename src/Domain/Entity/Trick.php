@@ -149,9 +149,9 @@ class Trick
         \DateTimeInterface $creationDate = null
     ) {
         $this->uuid = Uuid::uuid4();
-        \assert(!empty($name),'Trick name can not be empty!');
+        \assert(!empty($name), 'Trick name can not be empty!');
         $this->name = $name;
-        \assert(!empty($description),'Trick description can not be empty!');
+        \assert(!empty($description), 'Trick description can not be empty!');
         $this->description = $description;
         $this->trickGroup = $trickGroup;
         $this->user = $user;

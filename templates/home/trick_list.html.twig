@@ -7,7 +7,7 @@
         <ul class="uk-slideshow-items st-home-slideshow">
             <li>
                 {% include 'all/image-header-loader.html.twig' with {'spinnerRatio': '2.5'} %}
-                <div class="uk-flex uk-flex-center uk-flex-middle uk-background-cover uk-background-blend-darken uk-invisible st-background-image-header" data-src="{{ asset('assets/images/snowboard-4.jpg') }}" style="background-position: 40% 10%; height: 600px" uk-img>
+                <div class="uk-flex uk-flex-center uk-flex-middle uk-background-cover uk-background-blend-darken uk-invisible st-background-image-header" data-src="{{ asset(globalImageDirectory~'/snowboard-4.jpg') }}" style="background-position: 40% 10%; height: 600px" uk-img>
                     <div class="uk-position-center uk-text-center uk-padding-small st-overlay-image-header-container">
                         <p class="st-color-white st-text-shadow-dark uk-text-large" uk-slideshow-parallax="x: 100,0,0; opacity: 1,1,0;">
                             Contribute to snowboard tricks learning.
@@ -21,7 +21,7 @@
             </li>
             <li>
                 {% include 'all/image-header-loader.html.twig' with {'spinnerRatio': '2.5'} %}
-                <div class="uk-flex uk-flex-center uk-flex-middle uk-background-cover uk-background-blend-darken uk-invisible st-background-image-header" data-src="{{ asset('assets/images/snowboard-2.jpg') }}" style="background-position: 10% 50%; height: 600px" uk-img>
+                <div class="uk-flex uk-flex-center uk-flex-middle uk-background-cover uk-background-blend-darken uk-invisible st-background-image-header" data-src="{{ asset(globalImageDirectory~'/snowboard-2.jpg') }}" style="background-position: 10% 50%; height: 600px" uk-img>
                     <div class="uk-position-center uk-text-center uk-padding-small st-overlay-image-header-container">
                         <p class="st-color-white st-text-shadow-dark uk-text-large" uk-slideshow-parallax="x: 100,0,0; opacity: 1,1,0;">
                             Choose the right conditions to practice
@@ -35,7 +35,7 @@
             </li>
             <li>
                 {% include 'all/image-header-loader.html.twig' with {'spinnerRatio': '2.5'} %}
-                <div class="uk-flex uk-flex-center uk-flex-middle uk-background-cover uk-background-blend-darken uk-invisible st-background-image-header" data-src="{{ asset('assets/images/snowboard-1.jpg') }}" style="background-position: 40% 30%; height: 600px" uk-img>
+                <div class="uk-flex uk-flex-center uk-flex-middle uk-background-cover uk-background-blend-darken uk-invisible st-background-image-header" data-src="{{ asset(globalImageDirectory~'/snowboard-1.jpg') }}" style="background-position: 40% 30%; height: 600px" uk-img>
                     <div class="uk-position-center uk-text-center uk-padding-small st-overlay-image-header-container">
                         <p class="st-color-white st-text-shadow-dark uk-text-large" uk-slideshow-parallax="x: 100,0,0; opacity: 1,1,0;">
                             Don't forget technique and confidence to avoid injury.
@@ -49,7 +49,7 @@
             </li>
             <li>
                 {% include 'all/image-header-loader.html.twig' with {'spinnerRatio': '2.5'} %}
-                <div class="uk-flex uk-flex-center uk-flex-middle uk-background-cover uk-background-blend-darken uk-invisible st-background-image-header" data-src="{{ asset('assets/images/snowboard-5.jpg') }}" style="background-position: 40% 10%; height: 600px" uk-img>
+                <div class="uk-flex uk-flex-center uk-flex-middle uk-background-cover uk-background-blend-darken uk-invisible st-background-image-header" data-src="{{ asset(globalImageDirectory~'/snowboard-5.jpg') }}" style="background-position: 40% 10%; height: 600px" uk-img>
                     <div class="uk-position-center uk-text-center uk-padding-small st-overlay-image-header-container">
                         <p class="st-color-white st-text-shadow-dark uk-text-large" uk-slideshow-parallax="x: 100,0,0; opacity: 1,1,0;">
                             Follow the best way to progress
@@ -95,7 +95,7 @@
                     <div class="uk-card-badge uk-label uk-text-center"><span class="st-color-red">In</span> {{ trick.trickGroup.name }}<br><span class="st-color-red">Trick #</span> {{ 'DESC' == trickLoadingMode ? trickCount - (- trick.rank - 1 + trickCount) : trickCount + (trick.rank + 1 - trickCount) }}{#  <span class="st-color-red">Rank</span> {{ trick.rank }}#} <span class="st-color-red">Added on</span> {{ trick.creationDate|date('d/m/Y') }}</div>
                     <div class="uk-card-media-top uk-position-relative st-background-black">
                         {% include 'all/trick-media-loader.html.twig' with {'spinnerRatio': '1.5'} %}
-                        <img id="st-card-image-{{ trick.rank|e('html_attr') }}" class="uk-invisible" src="{{ asset('assets/images/uploads/'~trick.medias[0].image.name|e('html_attr')~'.'~trick.medias[0].image.format|e('html_attr')) }}" alt="{{ trick.medias[0].image.description|e('html_attr') }}">
+                        <img id="st-card-image-{{ trick.rank|e('html_attr') }}" class="uk-invisible" src="{{ asset(globalImageDirectory~'/uploads/'~trick.medias[0].image.name|e('html_attr')~'.'~trick.medias[0].image.format|e('html_attr')) }}" alt="{{ trick.medias[0].image.description|e('html_attr') }}">
                     </div>
                     <div class="uk-card-body">
                         <h2 class="uk-card-title">{{ trick.name }}</h2>
@@ -103,7 +103,7 @@
                     <div class="uk-card-footer">
                         <div class="uk-flex{{ is_granted('IS_AUTHENTICATED_FULLY') ? ' uk-flex-between' : ' uk-flex-right' }}">
                             <div class="{{ is_granted('IS_AUTHENTICATED_FULLY') ? 'uk-text-left' : 'uk-text-right' }}">
-                                <a href="{{ path('single_trick', { 'slug': trick.slug|e('html_attr'), 'encodedUuid': trick.uuid|uuid_encode }) }}" class="uk-link-text" title="Read more">
+                                <a href="{{ path('show_single_trick', { 'slug': trick.slug|e('html_attr'), 'encodedUuid': trick.uuid|uuid_encode }) }}" class="uk-link-text" title="Read more">
                                     Read more<span uk-icon="icon: arrow-right; ratio: 1.3" class="uk-icon"></span>
                                 </a>
                             </div>

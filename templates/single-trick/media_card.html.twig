@@ -12,7 +12,7 @@
         {% if media.mediaType.type == mediaTypesValues['trickThumbnail'] %}
             <!-- Trick image -->
             {# Thumb image #}
-            <div id="st-card-image-{{ index }}" class="uk-position-relative uk-background-cover uk-background-blend-darken uk-invisible st-card-image st-background-image-header" data-src="{{ asset('assets/images/uploads/'~mediaForSlide|e('html_attr')) }}" style="background-position: 50% 50%; width: 100%; height: 150px" uk-img></div>
+            <div id="st-card-image-{{ index }}" class="uk-position-relative uk-background-cover uk-background-blend-darken uk-invisible st-card-image st-background-image-header" data-src="{{ asset(globalImageDirectory~'/uploads/'~mediaForSlide|e('html_attr')) }}" style="background-position: 50% 50%; width: 100%; height: 150px" uk-img></div>
             {# Modal for image #}
             <div id="st-modal-media-image-{{ index }}" class="uk-flex-top st-modal" uk-modal>
                 <div class="uk-modal-dialog uk-width-auto uk-margin-auto-vertical uk-padding-small">
@@ -20,7 +20,7 @@
                         <button class="uk-modal-close-outside" type="button" uk-close></button>
                         {# Image loading spinner #}
                         {% include 'all/trick-media-loader.html.twig' with {'spinnerRatio': '2'} %}
-                        <img id="st-modal-image-{{ index }}" class="st-modal-image" width="{{ normalImageMediaType.width }}" height="{{ normalImageMediaType.height }}" src="" data-src="{{ asset('assets/images/uploads/'~mediaToExpand|e('html_attr')) }}" alt="{{ media.image.description|e('html_attr') }}">
+                        <img id="st-modal-image-{{ index }}" class="st-modal-image" width="{{ normalImageMediaType.width }}" height="{{ normalImageMediaType.height }}" src="" data-src="{{ asset(globalImageDirectory~'/uploads/'~mediaToExpand|e('html_attr')) }}" alt="{{ media.image.description|e('html_attr') }}">
                     </div>
                 </div>
             </div>

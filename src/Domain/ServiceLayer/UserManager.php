@@ -88,6 +88,7 @@ class UserManager
      * @param EncoderFactoryInterface      $encoderFactory
      * @param EntityManagerInterface       $entityManager
      * @param RequestStack                 $requestStack
+     * @param SessionInterface             $session
      * @param UserRepository               $repository
      * @param Security                     $security
      * @param LoggerInterface              $logger
@@ -100,6 +101,7 @@ class UserManager
         EntityManagerInterface $entityManager,
         LoggerInterface $logger,
         RequestStack $requestStack,
+        SessionInterface $session,
         UserRepository $repository,
         Security $security
     ) {
@@ -108,7 +110,7 @@ class UserManager
         $this->repository = $repository;
         $this->request = $requestStack->getCurrentRequest();
         $this->requestStack = $requestStack;
-        $this->session = $this->request->getSession();
+        $this->session = $session; //$this->request->getSession();
         $this->userPasswordEncoder = $encoderFactory->getEncoder(User::class);
         $this->security = $security;
         $this->setLogger($logger);
@@ -411,6 +413,11 @@ class UserManager
             $this->removeAvatarImage($user, $imageService);
             // Save image and corresponding media instances (persistence is used in image service layer.)
             $this->setAvatarImage($user, $imageService, $dataModel->getAvatar());
+        }
+        // User does not want to keep his avatar (value is set with JavaScript thanks to image remove button): default avatar will be shown!
+        if (\is_null($dataModel->getAvatar()) && (true === $dataModel->getRemoveAvatar())) {
+            // Remove previous avatar image.
+            $this->removeAvatarImage($user, $imageService);
         }
         // Save all other user updated data
         $this->getEntityManager()->flush();

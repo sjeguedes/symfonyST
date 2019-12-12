@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace App\Form\DataMapper;
 
 use App\Domain\DTO\AbstractReadableDTO;
+use ArrayAccess;
 use IteratorAggregate;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\FormInterface;
@@ -37,42 +38,42 @@ class DTOMapper implements DataMapperInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @return array
+     *
+     * @throws \Exception
      */
-    public function mapDataToForms($data, $forms)
+    public function mapDataToForms($data, $forms) : array
     {
         // A AbstractReadableDTO instance is expected.
         if (!is_subclass_of($data, AbstractReadableDTO::class)) {
             throw new \InvalidArgumentException('Expected data instance must extend "AbstractReadableDTO"!');
-        }
-        // Check form ArrayIterator instance
-        if (!$forms instanceof FormInterface || !$forms instanceof IteratorAggregate) {
-            throw new \InvalidArgumentException('Form object must be an instance of "FormInterface" or "IteratorAggregate"!');
         }
         /** @var FormInterface[]|IteratorAggregate $forms */
         $forms = iterator_to_array($forms);
         // initialize form field values
         $dtoProperties = $this->propertyListExtractor->getProperties($data);
         for ($i = 0; $i < \count($dtoProperties); $i ++) {
-            $method = 'get'. ucfirst($dtoProperties[$i]);
-            if (!method_exists(\get_class($data), $method)) {
-                throw new \BadMethodCallException('Getter ' . $method . ' name called is unknown!');
-            }
-            // Use form instances dynamic setting with DTO dynamic corresponding getter name
-            $forms[$dtoProperties[$i]]->setData($data->$method());
+            $offset = ucfirst($dtoProperties[$i]);
+            /** @var AbstractReadableDTO|ArrayAccess $data */
+            $dtoPropertyValue = $data->offsetGet($offset);
+            // Use form instances dynamic setting with DTO dynamic returned value corresponding to getter name
+            $forms[$dtoProperties[$i]]->setData($dtoPropertyValue);
         }
         return $forms;
     }
 
     /**
      * {@inheritDoc}
+     *
+     * @return AbstractReadableDTO
+     *
+     * @throws \Exception
      */
-    public function mapFormsToData($forms, &$data)
+    public function mapFormsToData($forms, &$data) : AbstractReadableDTO
     {
-        // Check form ArrayIterator instance
-        if (!$forms instanceof FormInterface || !$forms instanceof IteratorAggregate) {
-            throw new \InvalidArgumentException('Form object must be an instance of "FormInterface" or "IteratorAggregate"!');
-        }
         // A AbstractReadableDTO instance is expected.
+        /** @var FormInterface $forms */
         $dtoClassName = $forms->getConfig()->getDataClass();
         if (!is_subclass_of($dtoClassName, AbstractReadableDTO::class)) {
             throw new \InvalidArgumentException('Data object instance to create must extend "AbstractReadableDTO"!');
@@ -80,19 +81,23 @@ class DTOMapper implements DataMapperInterface
         /** @var FormInterface[]|IteratorAggregate $forms */
         $forms = iterator_to_array($forms);
         $dtoProperties = $this->propertyListExtractor->getProperties($dtoClassName);
-        $args = [];
+        // Re-order correctly form data to map as expected for DTO properties
+        $data = array_map(function ($item) use ($data) {
+            return $data[$item];
+        }, $dtoProperties);
+        $data = array_combine(array_values($dtoProperties), array_values($data));
+        // Loop on properties
+        $dtoPropertyValues = [];
         for ($i = 0; $i < \count($dtoProperties); $i ++) {
             $key = $dtoProperties[$i];
-            if (isset($data[$key]) && \is_array($data[$key])) {
-                if (!isset($forms[$key])) {
-                    throw new \RuntimeException('Form data can not be mapped due to unmatched object property!');
-                }
-                $data[$key] = $forms[$key]->getData();
+            // Object property name and form data key to map Comparison does not match
+            if (!array_key_exists($key, $data)) {
+                throw new \RuntimeException('Form data can not be mapped due to unmatched object property!');
             }
-            // Use form dynamic value
-            $args[$i] = $data[$key];
+            // Use form dynamic value to continue feeding array from data with no needed transformation.
+            $dtoPropertyValues[$i] = $forms[$key]->getData();
         }
         // Return corresponding DTO instance
-        return new $dtoClassName(...$args);
+        return new $dtoClassName(...$dtoPropertyValues);
     }
 }

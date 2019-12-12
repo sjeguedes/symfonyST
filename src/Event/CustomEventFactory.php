@@ -74,7 +74,7 @@ class CustomEventFactory implements CustomEventFactoryInterface
      public function createFromContext(string $eventContext, array $eventParameters) : CustomEventInterface
      {
         // Event context is unknown.
-        if (!\array_key_exists($eventContext,self::CUSTOM_EVENT_LIST)) {
+        if (!\array_key_exists($eventContext, self::CUSTOM_EVENT_LIST)) {
             throw new \InvalidArgumentException('Event context argument does not exist in list!');
         }
         $event = self::CUSTOM_EVENT_LIST[$eventContext]['event'];
@@ -155,7 +155,7 @@ class CustomEventFactory implements CustomEventFactoryInterface
                 $this->optionsResolver->setDefined($dataKey);
             }
             $this->optionsResolver->setAllowedTypes($dataKey, $dataValue['type']);
-        },ARRAY_FILTER_USE_BOTH);
+        }, ARRAY_FILTER_USE_BOTH);
     }
 
     /**

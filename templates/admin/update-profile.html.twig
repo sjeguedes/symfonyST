@@ -1,10 +1,10 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}SnowTricks - Profile update form{% endblock %}
+{% block title %}SnowTricks - {{ app.user.nickName }}'s Profile update form{% endblock %}
 
 {% block header %}
     {% include 'all/image-header-loader.html.twig' with {'spinnerRatio': '2.5'} %}
-    <div class="uk-position-relative uk-flex uk-flex-center uk-flex-middle uk-background-cover uk-background-blend-darken uk-invisible st-background-image-header" data-src="{{ asset('assets/images/snowboard-4.jpg') }}" style="background-position: 40% 25%; height: 600px" uk-img>
+    <div class="uk-position-relative uk-flex uk-flex-center uk-flex-middle uk-background-cover uk-background-blend-darken uk-invisible st-background-image-header" data-src="{{ asset(globalImageDirectory~'/snowboard-4.jpg') }}" style="background-position: 40% 25%; height: 600px" uk-img>
         <div class="uk-position-center uk-text-center uk-padding-small st-overlay-image-header-container">
             <p class="st-color-white st-text-shadow-dark uk-text-large">
                 Please fill in the form to edit your personal data!
@@ -22,8 +22,9 @@
     </div>
     <div id="st-update-profile" class="uk-section uk-preserve-color">
         <div class="uk-container uk-margin-medium-bottom">
-            <h1 class="uk-heading-bullet uk-text-large uk-text-center uk-text-uppercase uk-text-bold">
-                Use this form to personalize your avatar and essential data.
+            <h1 class="uk-text-large uk-text-center uk-text-uppercase uk-text-bold">
+                <span class="st-color-blue">{{ app.user.firstName~' '~app.user.familyName }}</span>,<br>
+                <span class="uk-heading-bullet">Use this form to personalize your avatar and essential data.</span>
             </h1>
             <p class="uk-text-center uk-text-uppercase uk-text-bold st-color-red">
                 Before update your account,<br>
@@ -33,7 +34,7 @@
         <div id="st-update-profile-form" class="uk-container-expand st-update-profile-form">
             <div class="uk-text-center">
                 <h2 class="uk-display-inline-block uk-padding-small uk-box-shadow-medium st-border-white-small uk-text-small uk-text-bold uk-text-uppercase st-background-yellow">
-                    Member Profile area
+                    <span class="st-color-blue">{{ app.user.mainRoleLabel|replace({'Admin': 'Administrator'}) }}</span> Profile area
                 </h2>
             </div>
             <div class="uk-flex-center uk-grid uk-grid-collapse">
@@ -115,8 +116,8 @@
                                                     You need to use a chosen nickname.<br>
                                                     Nickname can contain only lowercase and uppercase letters, numbers, top dash "<strong>-</strong>" and underscore "<strong>_</strong>" characters.<br>
                                                     Its length is expected to be between a minimum of 3 and a maximum of 15 characters.<br>
-                                                    Please note it is case insensitive:<br>
-                                                    For instance "<strong>Miky-12_4</strong>" is the same as "<strong>mikY-12_4</strong>".
+                                                    Please note it is case sensitive:<br>
+                                                    For instance "<strong>Miky-12_4</strong>" is not the same as "<strong>mikY-12_4</strong>".
                                                 </small>
                                             </p>
                                         </div>
@@ -264,7 +265,7 @@
                                                     <span uk-icon="icon: info"></span> Avatar reminder<br>
                                                 </small>
                                                 <small>
-                                                    Your avatar image is expected to be a .jpeg, .png, .gif file.<br>
+                                                    Your avatar image is expected to be a file with any of these .jpg, .jpeg, .png, .gif formats.<br>
                                                     Its maximum size must be 100k (Kilobyte / ko).
                                                 </small>
                                             </p>
@@ -274,24 +275,47 @@
                                 {# --- end Avatar reminder --- #}
                                 <div class="uk-inline uk-flex uk-flex-middle">
                                     <div class="uk-flex-column uk-card uk-box-shadow-small uk-border-rounded uk-padding-small uk-margin-small-right st-background-white">
+                                    {% set defaultAvatarImageNamePath = globalImageDirectory~'avatar-default.svg' %}
+                                    {% set defaultAvatarImageAlt = app.user.getNickName()~'\s avatar' %}
                                     {% if userAvatarImage is not null %}
-                                        <img width="80" src="{{ asset('assets/images/uploads/avatar/'~userAvatarImage.getName()~'.'~userAvatarImage.getFormat()) }}" alt="{{ userAvatarImage.getDescription() }}">
+                                        {% set avatarImageNamePath = globalAvatarUploadDirectory~userAvatarImage.getName()~'.'~userAvatarImage.getFormat() %}
+                                        {% set avatarImageAlt = userAvatarImage.getDescription() %}
                                     {% else %}
-                                        <img width="80" src="{{ asset('assets/images/avatar-default.svg') }}" alt="{{ app.user.getNickName()~'\s avatar' }}">
+                                        {% set avatarImageNamePath = defaultAvatarImageNamePath %}
+                                        {% set avatarImageAlt = defaultAvatarImageAlt %}
                                     {% endif %}
+                                        <img id="st-avatar-preview" width="80" data-default-avatar-path="{{ asset(globalImageDirectory~'avatar-default.svg') }}" data-default-desc="{{ avatarImageAlt }}"
+                                             src="{{ asset(avatarImageNamePath) }}" alt="{{ avatarImageAlt }}">
                                     </div>
-                                    <div class="uk-flex-column" uk-form-custom>
-                                        <span class="uk-form-icon" uk-icon="icon: upload"></span>
-                                        {{ form_widget(updateProfileForm.avatar, {
-                                            'attr': {'class': 'uk-input'},
-                                            'value': updateProfileForm.avatar.vars.value})
-                                        }}
-                                        {% if updateProfileForm.avatar.vars.errors.form.submitted == 1 %}
-                                            {% set class = updateProfileForm.avatar.vars.valid == 0 ? 'uk-form-danger' : 'uk-form-success' %}
-                                            {% set icon = updateProfileForm.avatar.vars.valid == 0 ? 'warning' : 'check' %}
-                                            <span class="uk-form-icon uk-form-icon-flip {{ class }}" uk-icon="icon: {{ icon }}"></span>
+                                    <div class="uk-flex-column">
+                                        <div uk-form-custom>
+                                            {{ form_widget(updateProfileForm.avatar, {
+                                                'attr': {'class': 'uk-input'},
+                                                'value': updateProfileForm.avatar.vars.value})
+                                            }}
+                                            {% if updateProfileForm.avatar.vars.errors.form.submitted == 1 %}
+                                                {% set class = updateProfileForm.avatar.vars.valid == 0 ? 'uk-form-danger' : 'uk-form-success' %}
+                                                {% set icon = updateProfileForm.avatar.vars.valid == 0 ? 'warning' : 'check' %}
+                                                <span class="uk-form-icon uk-form-icon-flip {{ class }}" uk-icon="icon: {{ icon }}"></span>
+                                            {% endif %}
+                                            <button class="uk-button uk-button-default st-fake-file-input-button" type="button" tabindex="-1">
+                                                <span class="uk-form-icon" uk-icon="icon: upload"></span>
+                                                <span class="uk-padding-small">{{ userAvatarImage is not null ? 'Update' : 'Select' }}</span>
+                                            </button>
+                                        </div>
+                                        {% if userAvatarImage is not null %}
+                                        <div id="st-remove-avatar-container" data-remove-text-info="Please confirm removal by updating profile!">
+                                            {# Hidden field used to remove avatar with JavaScript combined to ".st-file-remove-button" button #}
+                                            {{ form_row(updateProfileForm.removeAvatar, {
+                                                'attr': {'class': 'st-remove-avatar'},
+                                                'value': 0})
+                                            }}
+                                            <button id="st-file-remove-button" class="uk-button uk-button-default uk-margin-small-top st-file-remove-button" type="button" tabindex="-1">
+                                                <span class="uk-icon" uk-icon="icon: trash"></span>
+                                                <span class="uk-padding-small">Remove</span>
+                                            </button>
+                                        </div>
                                         {% endif %}
-                                        <button class="uk-button uk-button-default" type="button" tabindex="-1"><span class="uk-padding-small">Select</span></button>
                                     </div>
                                 </div>
                             </div>

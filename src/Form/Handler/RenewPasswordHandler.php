@@ -66,7 +66,7 @@ final class RenewPasswordHandler extends AbstractFormHandler implements InitMode
         RequestStack $requestStack,
         SwiftMailerManager $mailer
     ) {
-        parent::__construct($flashBag, $formFactory,RenewPasswordType::class, $requestStack);
+        parent::__construct($flashBag, $formFactory, RenewPasswordType::class, $requestStack);
         $this->csrfTokenManager = $csrfTokenManager;
         $this->customError = null;
         $this->emailConfigFactory = $emailConfigFactory;
@@ -101,7 +101,7 @@ final class RenewPasswordHandler extends AbstractFormHandler implements InitMode
             if (!$isUserInFormMatched) {
                 $userNameError = 'Please check your credentials!<br>Your username is not allowed!';
                 $this->customError = $userNameError;
-                $this->flashBag->add('danger','Authentication failed!<br>Try to request again by checking the form fields.');
+                $this->flashBag->add('danger', 'Authentication failed!<br>Try to request again by checking the form fields.');
                 return false;
             }
         }

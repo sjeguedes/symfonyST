@@ -3,7 +3,7 @@
 {% block title %}SnowTricks - {{ trick.name }} Trick detail{% endblock %}
 
 {# Initialize needed variables #}
-{% set mainImage = asset('assets/images/snowboard-6.jpg') %}
+{% set mainImage = asset(globalImageDirectory~'/snowboard-6.jpg') %}
 {% set isMainAvailable = 0 %}
 {% set mainImageDesc = 'No description available' %}
 {% set trickImages = '' %}
@@ -15,7 +15,7 @@
     {% if media.isPublished == 1 %}
         {# Extract main image to show #}
         {% if media.isMain == 1 and media.mediaType.type == mediaTypesValues['trickNormal'] %}
-            {% set mainImage = asset('assets/images/uploads/'~media.image.name~'.'~media.image.format) %}
+            {% set mainImage = asset(globalImageDirectory~'/uploads/'~media.image.name~'.'~media.image.format) %}
             {% set isMainAvailable = 1 %}
             {% set mainImageDesc = media.image.description %}
         {# Prepare medias with concatenation #}
@@ -36,7 +36,7 @@
 
 {% block header %}
     {% include 'all/image-header-loader.html.twig' with {'spinnerRatio': '2.5'} %}
-    <div class="uk-position-relative uk-background-cover uk-background-blend-darken uk-invisible st-background-image-header" data-src="{{ asset('assets/images/snowboard-6.jpg') }}" style="background-position: 50% 50%; height: 600px" uk-img>
+    <div class="uk-position-relative uk-background-cover uk-background-blend-darken uk-invisible st-background-image-header" data-src="{{ asset(globalImageDirectory~'/snowboard-6.jpg') }}" style="background-position: 50% 50%; height: 600px" uk-img>
         <div class="uk-padding">
             <div class="uk-position-center uk-card uk-card-default uk-card-body uk-box-shadow-large uk-padding-small st-overlay-main-image-header-container">
                 {% include 'all/image-header-loader.html.twig' with {'spinnerRatio': '2.5'} %}
@@ -133,7 +133,7 @@
                                 <div class="uk-grid-small uk-flex-middle" uk-grid>
                                     <div class="uk-width-auto st-avatar-default">
                                         <div class="uk-comment-avatar uk-display-block svg-container uk-border-circle">
-                                            <object class="svg-content" type="image/svg+xml" width="100%" height="100%" data="{{ asset('assets/images/avatar-default.svg') }}"></object>
+                                            <object class="svg-content" type="image/svg+xml" width="100%" height="100%" data="{{ asset(globalImageDirectory~'/avatar-default.svg') }}"></object>
                                         </div>
                                     </div>
                                     <div class="uk-width-expand">

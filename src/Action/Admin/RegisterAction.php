@@ -51,7 +51,7 @@ class RegisterAction
     /**
      *  Show registration form (user registration) and validation errors.
      *
-     * @Route("/{_locale}/register", name="registration")
+     * @Route("/{_locale}/register", name="register")
      *
      * @param RedirectionResponder  $redirectionResponder
      * @param RegisterResponder     $responder
@@ -97,9 +97,9 @@ class RegisterAction
         $userId = $request->attributes->get('userId');
         $isActivated = $this->userService->activateAccount($userId);
         if (!$isActivated) {
-            $this->flashBag->add('danger','You are not allowed to access<br>account activation process!<br>Please contact us if necessary.');
+            $this->flashBag->add('danger', 'You are not allowed to access<br>account activation process!<br>Please contact us if necessary.');
         } else {
-            $this->flashBag->add('success','Good job!<br>Your account was successfully activated.<br>Please login to access member area.');
+            $this->flashBag->add('success', 'Good job!<br>Your account was successfully activated.<br>Please login to access member area.');
         }
         return $redirectionResponder('home');
     }

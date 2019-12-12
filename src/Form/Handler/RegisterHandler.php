@@ -66,7 +66,7 @@ final class RegisterHandler extends AbstractFormHandler
         RequestStack $requestStack,
         SwiftMailerManager $mailer
     ) {
-        parent::__construct($flashBag, $formFactory,RegisterType::class, $requestStack);
+        parent::__construct($flashBag, $formFactory, RegisterType::class, $requestStack);
         $this->csrfTokenManager = $csrfTokenManager;
         $this->customError = null;
         $this->emailConfigFactory = $emailConfigFactory;

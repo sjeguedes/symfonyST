@@ -37,10 +37,16 @@ abstract class AbstractReadableDTO implements ArrayAccess
 
     /**
      * {@inheritDoc}
+     *
+     * @throws \Exception
      */
     public function offsetGet($offset)
     {
-        return $this->{"get$offset"}();
+        $getter = "get$offset";
+        if (!method_exists(\get_class($this), $getter)) {
+            throw new \BadMethodCallException('Getter ' . $getter . ' name called is unknown!');
+        }
+        return $this->$getter();
     }
 
     /**

@@ -185,12 +185,12 @@ class User implements UserInterface, \Serializable
         string $algorithm = self::DEFAULT_ALGORITHM,
         array $roles = [self::DEFAULT_ROLE]
     ) {
-        \assert(!empty($familyName),'User family name can not be empty!');
-        \assert(!empty($firstName),'User first name can not be empty!');
-        \assert($this->isNickNameValidated($nickName),'User nickname format must be valid!');
-        \assert($this->isEmailValidated($email),'User email format must be valid!');
-        \assert($this->isPasswordValidated($password, $algorithm),'User password must be valid!');
-        \assert($this->isRolesArrayValidated($roles),'User Roles must be valid!');
+        \assert(!empty($familyName), 'User family name can not be empty!');
+        \assert(!empty($firstName), 'User first name can not be empty!');
+        \assert($this->isNickNameValidated($nickName), 'User nickname format must be valid!');
+        \assert($this->isEmailValidated($email), 'User email format must be valid!');
+        \assert($this->isPasswordValidated($password, $algorithm), 'User password must be valid!');
+        \assert($this->isRolesArrayValidated($roles), 'User Roles must be valid!');
         $this->uuid = Uuid::uuid4();
         $this->familyName = strtoupper($familyName);
         $this->firstName = ucwords(strtolower($firstName));
@@ -214,7 +214,7 @@ class User implements UserInterface, \Serializable
      */
     private function isEmailValidated(string $email) : bool
     {
-        if (empty($email) || !filter_var($email,FILTER_VALIDATE_EMAIL)) {
+        if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return false;
         }
         return true;
@@ -248,7 +248,7 @@ class User implements UserInterface, \Serializable
     private function isPasswordValidated(string $password, string $algorithm) : bool
     {
         //$encoder = $encoderFactory->getEncoder(self::class);
-        if (!\in_array($algorithm,self::HASH_ALGORITHMS)) {
+        if (!\in_array($algorithm, self::HASH_ALGORITHMS)) {
             return false;
         }
         if ('BCrypt' === $algorithm && (empty($password) || !preg_match('/^\$2[ayb]\$.{56}$/', $password))) {

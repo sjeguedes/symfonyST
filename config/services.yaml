@@ -7,7 +7,13 @@ parameters:
     app_website_name: '%env(WEBSITE_NAME)%'
     app_swift_mailer_sender_email: '%env(MAILER_SENDER_EMAIL)%' # admin email
     app_swift_mailer_sender_name: '%env(MAILER_SENDER_NAME)%' # admin email name
-    app_avatar_upload_directory: '%kernel.project_dir%/public/assets/images/uploads/avatar'
+    app_images_upload_directory: '%kernel.project_dir%/public/assets/images/uploads'
+    app_avatar_upload_directory: '%app_images_upload_directory%/avatars'
+    app_twig_assets_directory: 'assets'
+    app_twig_image_directory: '%app_twig_assets_directory%/images/'
+    app_twig_image_upload_directory: '%app_twig_image_directory%/uploads'
+    app_twig_avatar_upload_directory: '%app_twig_image_upload_directory%/avatars/'
+
 
 services:
     # default configuration for services in *this* file
@@ -69,6 +75,12 @@ services:
         arguments:
             $formHandler: '@App\Form\Handler\UpdateProfileHandler'
 
+    # add custom form subscriber
+    App\Event\Subscriber\FormSubscriber:
+        arguments:
+            $dataMapper: '@App\Form\DataMapper\DTOMapper'
+            $userService: '@App\Domain\ServiceLayer\UserManager'
+
     # add logout handler
     App\Event\Handler\LogoutHandler:
 
@@ -86,6 +98,14 @@ services:
     App\Form\Handler\UpdateProfileHandler:
         arguments:
             $imageUploader: '@App\Service\Medias\Upload\ImageUploader'
+
+    # add custom DTO mapper
+    App\Form\DataMapper\DTOMapper:
+
+    # add user update profile type
+    App\Form\Type\Admin\UpdateProfileType:
+        arguments:
+            $formSubscriber: '@App\Event\Subscriber\FormSubscriber'
 
     # add SwiftMailer manager
     App\Service\Mailer\SwiftMailerManager:

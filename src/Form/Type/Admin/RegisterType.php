@@ -34,25 +34,26 @@ class RegisterType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options) : void
     {
         $builder
-            ->add('familyName',TextType::class, [
+            ->add('familyName', TextType::class, [
             ])
-            ->add('firstName',TextType::class, [
+            ->add('firstName', TextType::class, [
             ])
-            ->add('userName',TextType::class, [
+            ->add('userName', TextType::class, [
             ])
-            ->add('email',EmailType::class, [
+            ->add('email', EmailType::class, [
             ])
-            ->add('passwords',RepeatedType::class, [
+            ->add('passwords', RepeatedType::class, [
                 'type'            => PasswordType::class,
                 'first_name'      => 'password',
                 'second_name'     => 'confirmedPassword',
-                'invalid_message' => 'Password and confirmation must match.'
+                'invalid_message' => 'Password and confirmation must match.',
+                'options'         => ['always_empty' => false]
             ])
-            ->add('agreement',CheckboxType::class, [
+            ->add('agreement', CheckboxType::class, [
                 'empty_data'   => false,
                 'false_values' => [false]
             ])
-            ->add('token',HiddenType::class, [
+            ->add('token', HiddenType::class, [
                 'inherit_data' => true
             ]);
     }

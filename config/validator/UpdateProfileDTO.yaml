@@ -49,6 +49,7 @@ App\Domain\DTO\UpdateProfileDTO:
                   maxSizeMessage: The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.
             - Image:
                   mimeTypes:
+                      - image/pjpeg
                       - image/jpeg
                       - image/gif
                       - image/png
