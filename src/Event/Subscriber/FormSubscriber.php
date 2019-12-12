@@ -265,9 +265,9 @@ class FormSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Define a callback to check if form data changed when user submitted the form.
+     * Define a callback before user submitted the form.
      *
-     * Compare valid previous model data instance with new valid model data instance with possible form change.
+     * Get possibly changed form data and cloned previous data model
      *
      * @param FormEvent $event
      *
@@ -291,6 +291,16 @@ class FormSubscriber implements EventSubscriberInterface
         }
     }
 
+    /**
+     * Define a callback when user submitted the form.
+     *
+     * Check if form data changed:
+     * Compare valid previous data model instance with new valid data model instance with possible form change.
+     *
+     * @param FormEvent $event
+     *
+     * @return void
+     */
     public function onPostSubmit(FormEvent $event) : void
     {
         $form = $event->getForm();

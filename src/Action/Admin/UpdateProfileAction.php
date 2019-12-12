@@ -76,7 +76,7 @@ class UpdateProfileAction
     /**
      *  Show profile update form (user account) and validation errors.
      *
-     * @Route("/{_locale}/{mainRoleLabel}/update-profile", name="update_profile")
+     * @Route("/{_locale}/{mainRoleLabel}/update-profile", name="update_profile", requirements={"mainRoleLabel":"admin|member"})
      *
      * @param RedirectionResponder   $redirectionResponder
      * @param UpdateProfileResponder $responder
@@ -88,13 +88,9 @@ class UpdateProfileAction
      */
     public function __invoke(RedirectionResponder $redirectionResponder, UpdateProfileResponder $responder, Request $request) : Response
     {
-        // Get user from symfony security context
+        // Get user from symfony security context: access is controlled by ACL.
         /** @var UserInterface|User $identifiedUser */
         $identifiedUser = $this->security->getUser();
-        // Optional with ACL or voter.
-        /*if (\is_null($identifiedUser)) {
-            throw new AccessDeniedException('No user is authenticated!');
-        }*/
         // Set form without initial model data and set the request by binding it
         $updateProfileForm = $this->formHandler->initForm(['userToUpdate' => $identifiedUser])->bindRequest($request);
         // Process only on submit
