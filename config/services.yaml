@@ -14,7 +14,6 @@ parameters:
     app_twig_image_upload_directory: '%app_twig_image_directory%/uploads'
     app_twig_avatar_upload_directory: '%app_twig_image_upload_directory%/avatars/'
 
-
 services:
     # default configuration for services in *this* file
     _defaults:

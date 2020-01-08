@@ -95,6 +95,9 @@
     "paragonie/random_compat": {
         "version": "v9.99.99"
     },
+    "php": {
+        "version": "7.2"
+    },
     "psr/cache": {
         "version": "1.0.1"
     },
