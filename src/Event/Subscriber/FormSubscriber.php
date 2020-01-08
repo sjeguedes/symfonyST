@@ -4,16 +4,14 @@ declare(strict_types = 1);
 
 namespace App\Event\Subscriber;
 
-use App\Domain\DTO\AbstractReadableDTO;
 use App\Domain\Entity\User;
 use App\Domain\ServiceLayer\UserManager;
 use App\Event\CustomEventFactory;
-use App\Form\Type\Admin\UpdateProfileType;
+use App\Form\Type\Admin\UpdateProfileAvatarType;
+use App\Form\Type\Admin\UpdateProfileInfosType;
 use ArrayAccess;
-use http\Exception\RuntimeException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\DataMapperInterface;
-use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
@@ -44,7 +42,8 @@ class FormSubscriber implements EventSubscriberInterface
      * Define update (edit) forms list.
      */
     const UPDATE_FORMS_LIST = [
-        UpdateProfileType::class
+        UpdateProfileAvatarType::class,
+        UpdateProfileInfosType::class
     ];
 
     /**
@@ -56,6 +55,16 @@ class FormSubscriber implements EventSubscriberInterface
      * @var DataMapperInterface
      */
     private $dataMapper;
+
+    /**
+     * @var bool
+     */
+    private $isUpdateFormAction;
+
+    /**
+     * @var bool
+     */
+    private $isUnChangedForm;
 
     /*
      * @var AbstractReadableDTO
@@ -81,16 +90,6 @@ class FormSubscriber implements EventSubscriberInterface
      * @var RouterInterface
      */
     private $router;
-
-    /**
-     * @var bool
-     */
-    private $isUpdateFormAction;
-
-    /**
-     * @var bool
-     */
-    private $isUnChangedForm;
 
     /**
      * @var UserManager
@@ -133,6 +132,8 @@ class FormSubscriber implements EventSubscriberInterface
      * @param object      $secondModel a second $className instance
      *
      * @return bool
+     *
+     * @throws \Exception
      */
     private function compareObjectsPropertiesValues(?string $className, object $firstModel, object $secondModel) : bool
     {
@@ -189,7 +190,7 @@ class FormSubscriber implements EventSubscriberInterface
      */
     private function isUpdateFormAction(FormTypeInterface $formType) : bool
     {
-        $isUpdateFormAction = \in_array(\get_class($formType), self::UPDATE_FORMS_LIST ) ? true : false;
+        $isUpdateFormAction = \in_array(\get_class($formType), self::UPDATE_FORMS_LIST) ? true : false;
         // Feed form subscriber update form action property
         $this->isUpdateFormAction = $isUpdateFormAction;
         return $isUpdateFormAction;
@@ -206,6 +207,8 @@ class FormSubscriber implements EventSubscriberInterface
      * @param ArrayAccess   $modelDataAfter
      *
      * @return bool
+     *
+     * @throws \Exception
      */
     private function isUnchangedForm(FormInterface $form, ArrayAccess $modelDataBefore, ArrayAccess $modelDataAfter) : bool
     {
@@ -238,7 +241,7 @@ class FormSubscriber implements EventSubscriberInterface
      * Redirect to current form page after submit, if form is valid and unchanged.
      *
      * This is used for:
-     * - UpdateProfileType (user profile update):
+     * - UpdateProfileInfosType (user profile update):
      * -- Redirect immediately to the same form page after submit with unchanged valid data,
      * -- to avoid the use of a success flash message with redirection to homepage.
      * -- So use an info flash message instead, created in UserSubscriber.
@@ -254,7 +257,7 @@ class FormSubscriber implements EventSubscriberInterface
         if (\is_null($this->currentForm)) {
             return $response;
         }
-        // Is an update form Matched with unchanged data?
+        // Is it an update form action with unchanged data?
         if ($this->isUpdateFormAction && $this->isUnChangedForm) {
             // Check form type to set the proper redirection
             $formType = $this->currentForm->getConfig()->getType()->getInnerType();
@@ -269,6 +272,9 @@ class FormSubscriber implements EventSubscriberInterface
      *
      * Get possibly changed form data and cloned previous data model
      *
+     * Cloning must be used carefully and be aware of principle that properties which contain object
+     * point to the same reference of object used in original instance before copy!
+     *
      * @param FormEvent $event
      *
      * @return void
@@ -277,15 +283,14 @@ class FormSubscriber implements EventSubscriberInterface
     {
         $form = $event->getForm();
         $formType = $form->getConfig()->getType()->getInnerType();
-        $dataClassName = $form->getConfig()->getDataClass();
-        // Is an update form Matched and is data model a implementation of ArrayAccess thanks to AbstractReadableDTO?
-        if (true === $this->isUpdateFormAction($formType) && is_subclass_of($dataClassName, AbstractReadableDTO::class)) {
+        // Check if an update form action matched
+        if ($this->isUpdateFormAction($formType)) {
             // Get request data (form fields data)
             $formDataWithPossibleChange = $event->getData();
-            // Get last initialized data model
-            $previousDataModel = $event->getForm()->getData(); // $form->getData()
-            // Instance provided by $event->getForm()->getData() can not be used directly to set previous data model,
-            // because it is the same object and its properties change once the next events happen.
+            // Get last initialized data model (if value is null when submitted first, instantiate manually a default empty data object)
+            $previousDataModel = $event->getForm()->getData() ?? call_user_func($form->getConfig()->getOption('empty_data'), $form); // $form->getData()
+            // Previous data model instance provided by $event->getForm()->getData() can not be set directly, because it is the same object (reference).
+            // Its properties will change (it will become the new updated model) once the next events happen.
             $this->previousDataModel = clone $previousDataModel;
             $this->nextFormData = $formDataWithPossibleChange;
         }
@@ -297,23 +302,27 @@ class FormSubscriber implements EventSubscriberInterface
      * Check if form data changed:
      * Compare valid previous data model instance with new valid data model instance with possible form change.
      *
+     * Please data mapping is not mandatory: $form->getData() retrieves new data model, if in between, no modification was applied.
+     * It is more a principle to learn about data mapping.
+     *
      * @param FormEvent $event
      *
      * @return void
+     *
+     * @throws \Exception
      */
     public function onPostSubmit(FormEvent $event) : void
     {
         $form = $event->getForm();
-        $formConfig = $form->getConfig();
         // Check previous data model is correctly set submitted and valid form context
-        if ($form->isValid() && $this->isUpdateFormAction) {
+        if ($this->isUpdateFormAction && $form->isValid()) {
             // Get the corresponding DTO based on possibly updated form data, to compare state before and after possible update
             $formDataWithPossibleChange = $this->nextFormData;
             $previousDataModel = $this->previousDataModel;
-            // Get new form data with possible change thanks to pre-submit event
-            $nextDataModel = $this->dataMapper->mapFormsToData($form, $formDataWithPossibleChange);
-            $isUnchangedForm = $this->isUnchangedForm($form, $previousDataModel, $nextDataModel);
-            if ($isUnchangedForm) {
+            // Get new form data model with possible change thanks to pre-submit event
+            // This mapping is not really necessary because $form->getData() can be used instead without data model modification.
+            $nextDataModel = $this->dataMapper->mapFormsToData($form, $formDataWithPossibleChange); // $form->getData()
+            if ($this->isUnchangedForm($form, $previousDataModel, $nextDataModel)) {
                 // A user subscriber listens to this event.
                 $this->createAndDispatchUnchangedUserProfileEvent();
             }
@@ -332,7 +341,8 @@ class FormSubscriber implements EventSubscriberInterface
         // Redirect to the correct url
         $formTypeClassName = \get_class($formType);
         switch ($formTypeClassName) {
-            case UpdateProfileType::class:
+            case UpdateProfileAvatarType::class:
+            case UpdateProfileInfosType::class:
                 /** @var User $authenticatedUser */
                 $authenticatedUser = $this->userService->getAuthenticatedMember();
                 $mainRoleLabel = lcfirst($authenticatedUser->getMainRoleLabel());

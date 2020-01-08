@@ -71,7 +71,7 @@ final class LoginHandler extends AbstractFormHandler
      *
      * @return string|null
      */
-    public function getAuthenticationError()
+    public function getAuthenticationError() : ?string
     {
         return $this->customError;
     }

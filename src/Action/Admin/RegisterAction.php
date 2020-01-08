@@ -36,7 +36,7 @@ class RegisterAction
     private $formHandler;
 
     /**
-     * RenewPasswordAction constructor.
+     * RegisterAction constructor.
      *
      * @param UserManager          $userService
      * @param FlashBagInterface    $flashBag

@@ -90,11 +90,10 @@ final class RequestNewPasswordHandler extends AbstractFormHandler
         if (false === $this->isCSRFTokenValid('request_new_password_token', $csrfToken)) {
             throw new \Exception('Security error: CSRF form token is invalid!');
         }
+        // Check UserManager instance in passed data
+        $this->checkNecessaryData($actionData);
         // Find user who asks for a new password by using a user service
-        $userService = $actionData['userService'] ?? null;
-        if (!$userService instanceof UserManager || \is_null($userService)) {
-            throw new \InvalidArgumentException('A instance of UserManager must be set first!');
-        }
+        $userService = $actionData['userService'];
         $loadedUser = $userService->getRepository()->loadUserByUsername($this->form->getData()->getUserName()); // or $this->form->get('userName')->getData()
         // DTO is in valid state but user can not be found.
         if (\is_null($loadedUser)) {
@@ -116,14 +115,14 @@ final class RequestNewPasswordHandler extends AbstractFormHandler
      *
      * @throws \ReflectionException
      * @throws \Exception
+     *
      * @see AbstractFormHandler::processFormRequest()
      */
     protected function addCustomAction(array $actionData) : void
     {
+        // Check UserManager instance in passed data
+        $this->checkNecessaryData($actionData);
         $userService = $actionData['userService'];
-        if (!$userService instanceof UserManager || \is_null($userService)) {
-            throw new \InvalidArgumentException('A instance of UserManager must be set first!');
-        }
         $user = $this->userToUpdate;
         // Save data
         /** @var User $updatedUser */
@@ -155,7 +154,7 @@ final class RequestNewPasswordHandler extends AbstractFormHandler
      *
      * @return string|null
      */
-    public function getUserError()
+    public function getUserError() : ?string
     {
         return $this->customError;
     }

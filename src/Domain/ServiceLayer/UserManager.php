@@ -4,7 +4,8 @@ declare(strict_types = 1);
 namespace App\Domain\ServiceLayer;
 
 use App\Domain\DTO\RegisterUserDTO;
-use App\Domain\DTO\UpdateProfileDTO;
+use App\Domain\DTO\UpdateProfileAvatarDTO;
+use App\Domain\DTO\UpdateProfileInfosDTO;
 use App\Domain\Entity\Image;
 use App\Domain\Entity\User;
 use App\Domain\Repository\UserRepository;
@@ -16,7 +17,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -369,31 +369,62 @@ class UserManager
     /**
      * Set user avatar image.
      *
-     * @param User         $user
-     * @param ImageManager $imageService
-     * @param UploadedFile $avatarFile
+     * @param UpdateProfileAvatarDTO $dataModel
+     * @param User                   $user
+     * @param ImageManager           $imageService
      *
-     * @return Image
+     * @return Image|null
      *
      * @throws \Exception
      */
-    private function setAvatarImage(User $user, ImageManager $imageService, UploadedFile $avatarFile) : Image
+    private function setAvatarImage(UpdateProfileAvatarDTO $dataModel, User $user, ImageManager $imageService) : ?Image
     {
-        return $imageService->createUserAvatar($user, $avatarFile);
+        return $imageService->createUserAvatar($dataModel, $user);
+    }
+
+    /**
+     * Update a user profile avatar.
+     *
+     * @param ImageManager           $imageService
+     * @param UpdateProfileAvatarDTO $dataModel
+     * @param User                   $user
+     *
+     * @return bool
+     *
+     * @throws \Exception
+     */
+    public function updateUserProfileAvatar(UpdateProfileAvatarDTO $dataModel, User $user, ImageManager $imageService) : bool
+    {
+        // Data are saved thanks to image service which calls entity manager in both cases, no need to flush change here!
+        // Update avatar image media attached to user
+        if (!\is_null($dataModel->getAvatar())) {
+            // Remove previous avatar image if it exists
+            $this->removeAvatarImage($user, $imageService);
+            // Save image and corresponding media instances (persistence is used in image service layer.)
+            $isAvatarSet = $this->setAvatarImage($dataModel, $user, $imageService);
+            if (\is_null($isAvatarSet)) {
+                return false;
+            }
+        }
+        // User does not want to keep his avatar (value is set with JavaScript thanks to image remove button): default avatar will be shown!
+        if (\is_null($dataModel->getAvatar()) && (true === $dataModel->getRemoveAvatar())) {
+            // Remove previous avatar image.
+            $this->removeAvatarImage($user, $imageService);
+        }
+        return true;
     }
 
     /**
      * Update a user profile account.
      *
-     * @param ImageManager     $imageService
-     * @param UpdateProfileDTO $dataModel
-     * @param User             $user
+     * @param UpdateProfileInfosDTO $dataModel
+     * @param User                  $user
      *
      * @return void
      *
      * @throws \Exception
      */
-    public function updateUserProfile(UpdateProfileDTO $dataModel, User $user, ImageManager $imageService) : void
+    public function updateUserProfileInfos(UpdateProfileInfosDTO $dataModel, User $user) : void
     {
         // Update user
         $user->modifyFamilyName($dataModel->getFamilyName())
@@ -407,19 +438,7 @@ class UserManager
             $updatedPassword = $this->userPasswordEncoder->encodePassword($dataModel->getPasswords(), null);
             $user->modifyPassword($updatedPassword, 'BCrypt');
         }
-        // Update avatar image media
-        if (!\is_null($dataModel->getAvatar())) {
-            // Remove previous avatar image if it exists
-            $this->removeAvatarImage($user, $imageService);
-            // Save image and corresponding media instances (persistence is used in image service layer.)
-            $this->setAvatarImage($user, $imageService, $dataModel->getAvatar());
-        }
-        // User does not want to keep his avatar (value is set with JavaScript thanks to image remove button): default avatar will be shown!
-        if (\is_null($dataModel->getAvatar()) && (true === $dataModel->getRemoveAvatar())) {
-            // Remove previous avatar image.
-            $this->removeAvatarImage($user, $imageService);
-        }
-        // Save all other user updated data
+        // Save all user updated data
         $this->getEntityManager()->flush();
     }
 

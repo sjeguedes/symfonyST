@@ -4,13 +4,11 @@ declare(strict_types = 1);
 
 namespace App\Form\Type\Admin;
 
-use App\Domain\DTO\UpdateProfileDTO;
+use App\Domain\DTO\UpdateProfileInfosDTO;
 use App\Domain\ServiceLayer\UserManager;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
@@ -23,11 +21,11 @@ use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
- * Class UpdateProfileType.
+ * Class UpdateProfileInfosType.
  *
- * Build a user profile update form type.
+ * Build a user profile infos (without avatar) update form type.
  */
-class UpdateProfileType extends AbstractType
+class UpdateProfileInfosType extends AbstractType
 {
     /**
      * @var EventSubscriberInterface
@@ -55,7 +53,7 @@ class UpdateProfileType extends AbstractType
     private $userService;
 
     /**
-     * UpdateProfileType constructor.
+     * UpdateProfileInfosType constructor.
      *
      * @param EventSubscriberInterface       $formSubscriber
      * @param PropertyAccessorInterface      $propertyAccessor
@@ -75,40 +73,6 @@ class UpdateProfileType extends AbstractType
         $this->propertyListExtractor = $propertyListExtractor;
         $this->router = $router;
         $this->userService = $userService;
-    }
-
-    /**
-     * Add String to boolean model transformer to a form data.
-     *
-     * @param FormBuilderInterface $formBuilder
-     * @param string               $formName    a Form instance name
-     *
-     * @return void
-     */
-    private function addStringToBoolCustomDataTransformer(FormBuilderInterface $formBuilder, string $formName) : void
-    {
-        $formBuilder
-            ->get($formName)
-            ->addViewTransformer(
-            new CallbackTransformer(
-                //  View data (transform)
-                function ($boolAsString) {
-                    if (\is_null($boolAsString)) {
-                        $boolAsString = false;
-                    }
-                    // Transform the bool to string
-                    return (false === $boolAsString || 0 === $boolAsString) ? '0' : '1';
-                },
-                // Normalized data (reverse transform)
-                function ($stringAsBool) {
-                    if (!\in_array($stringAsBool, ['false', '0', 'true', '1'])) {
-                        return false;
-                    }
-                    // Transform the string back to a bool
-                    return ('0' === $stringAsBool || 'false' === $stringAsBool) ? false : true;
-                }
-            )
-        );
     }
 
     /**
@@ -137,15 +101,9 @@ class UpdateProfileType extends AbstractType
                 'invalid_message' => 'Password and confirmation must match.',
                 'options'         => ['always_empty' => false]
             ])
-            ->add('avatar', FileType::class, [
-              ])
-            ->add('removeAvatar', HiddenType::class, [
-            ])
             ->add('token', HiddenType::class, [
                 'inherit_data' => true
             ]);
-        // Add data transformer to "removeAvatar" data.
-        $this->addStringToBoolCustomDataTransformer($builder, 'removeAvatar');
         // Add custom form subscriber to this form events with dependencies
         $builder->addEventSubscriber($this->formSubscriber);
     }
@@ -160,21 +118,19 @@ class UpdateProfileType extends AbstractType
     public function configureOptions(OptionsResolver $resolver) : void
     {
         $resolver->setDefaults([
-            'data_class'     => UpdateProfileDTO::class,
+            'data_class'     => UpdateProfileInfosDTO::class,
             'empty_data'     => function (FormInterface $form) {
-                return new UpdateProfileDTO(
+                return new UpdateProfileInfosDTO(
                     $form->get('familyName')->getData(),
                     $form->get('firstName')->getData(),
                     $form->get('userName')->getData(),
                     $form->get('email')->getData(),
-                    $form->get('passwords')->getData(),
-                    $form->get('avatar')->getData(),
-                    $form->get('removeAvatar')->getData()
+                    $form->get('passwords')->getData()
                 );
             },
             'required'        => false,
             'csrf_field_name' => 'token',
-            'csrf_token_id'   => 'update_profile_token',
+            'csrf_token_id'   => 'update_profile_infos_token',
         ]);
     }
 }

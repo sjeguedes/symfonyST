@@ -11,6 +11,7 @@ use App\Domain\ServiceLayer\UserManager;
 use App\Event\CustomEventFactory;
 use App\Event\FormUnchangedEvent;
 use App\Event\UserRetrievedEvent;
+use App\Form\Type\Admin\UpdateProfileInfosType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -107,7 +108,8 @@ class UserSubscriber implements EventSubscriberInterface
         $isUpdateProfileAction = UpdateProfileAction::class === $this->request->attributes->get('_controller');
         if ($isUpdateProfileAction) {
             $userNickName = $event->getUser()->getNickName();
-            $this->flashBag->add('info', sprintf('Hey <strong>%s</strong>!<br>Please note you changed nothing about your profile.', $userNickName));
+            $text = !empty($this->request->files->all()) ? 'avatar' : 'infos';
+            $this->flashBag->add('info', sprintf('Hey <strong>%s</strong>!<br>Please note you changed nothing about your profile %s.', $userNickName, $text));
         }
     }
 
@@ -188,7 +190,7 @@ class UserSubscriber implements EventSubscriberInterface
         $key = $identifiedUser->getRenewalToken();
         $value = $identifiedUser->getRenewalRequestDate();
         // Custom identified user var in custom session var is not set, then add it!
-        if (!array_key_exists($key, $customSessionVar)) {
+        if (!\array_key_exists($key, $customSessionVar)) {
             // Update custom session var after user entry was created.
             $customSessionVar[$key] = $value;
             $this->session->set($customSessionKey, $customSessionVar);

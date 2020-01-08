@@ -91,10 +91,10 @@ class DTOMapper implements DataMapperInterface
         for ($i = 0; $i < \count($dtoProperties); $i ++) {
             $key = $dtoProperties[$i];
             // Object property name and form data key to map Comparison does not match
-            if (!array_key_exists($key, $data)) {
+            if (!\array_key_exists($key, $data)) {
                 throw new \RuntimeException('Form data can not be mapped due to unmatched object property!');
             }
-            // Use form dynamic value to continue feeding array from data with no needed transformation.
+            // Use form dynamic value to feed array from data with no needed transformation.
             $dtoPropertyValues[$i] = $forms[$key]->getData();
         }
         // Return corresponding DTO instance

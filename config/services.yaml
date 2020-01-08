@@ -69,11 +69,11 @@ services:
         arguments:
             $formHandler: '@App\Form\Handler\RegisterHandler'
 
-    # add form handler when updating a user account (profile)
+    # add form handler when updating a user avatar or account (profile)
     App\Action\Admin\UpdateProfileAction:
         tags: ['controller.service_arguments']
         arguments:
-            $formHandler: '@App\Form\Handler\UpdateProfileHandler'
+            $formHandlers: ['@App\Form\Handler\UpdateProfileAvatarHandler', '@App\Form\Handler\UpdateProfileInfosHandler']
 
     # add custom form subscriber
     App\Event\Subscriber\FormSubscriber:
@@ -94,16 +94,26 @@ services:
         arguments:
             $emailConfigFactory: '@App\Service\Mailer\Email\EmailConfigFactory'
 
-    # add update profile handler
-    App\Form\Handler\UpdateProfileHandler:
+    # add update profile avatar handler
+    App\Form\Handler\UpdateProfileAvatarHandler:
+        arguments:
+            $imageUploader: '@App\Service\Medias\Upload\ImageUploader'
+
+    # add update profile infos handler
+    App\Form\Handler\UpdateProfileInfosHandler:
         arguments:
             $imageUploader: '@App\Service\Medias\Upload\ImageUploader'
 
     # add custom DTO mapper
     App\Form\DataMapper\DTOMapper:
 
-    # add user update profile type
-    App\Form\Type\Admin\UpdateProfileType:
+    # add user update profile avatar type
+    App\Form\Type\Admin\UpdateProfileAvatarType:
+        arguments:
+            $formSubscriber: '@App\Event\Subscriber\FormSubscriber'
+
+    # add user update profile infos type
+    App\Form\Type\Admin\UpdateProfileInfosType:
         arguments:
             $formSubscriber: '@App\Event\Subscriber\FormSubscriber'
 

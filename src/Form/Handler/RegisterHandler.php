@@ -144,9 +144,9 @@ final class RegisterHandler extends AbstractFormHandler
     /**
      * Get the authentication error.
      *
-     * @return string|null
+     * @return array|null
      */
-    public function getUniqueUserError()
+    public function getUniqueUserError() : ?array
     {
         return $this->customError;
     }

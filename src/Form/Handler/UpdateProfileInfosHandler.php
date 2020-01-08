@@ -4,28 +4,25 @@ declare(strict_types = 1);
 
 namespace App\Form\Handler;
 
-use App\Domain\DTO\UpdateProfileDTO;
+use App\Domain\DTO\UpdateProfileInfosDTO;
 use App\Domain\Entity\User;
 use App\Domain\ServiceLayer\UserManager;
-use App\Form\Type\Admin\UpdateProfileType;
-use App\Service\Mailer\Email\EmailConfigFactoryInterface;
-use App\Service\Mailer\SwiftMailerManager;
+use App\Form\Type\Admin\UpdateProfileInfosType;
 use App\Service\Medias\Upload\ImageUploader;
 use App\Utils\Traits\CSRFTokenHelperTrait;
 use App\Utils\Traits\UserHandlingHelperTrait;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 /**
- * Class UpdateProfileHandler.
+ * Class UpdateProfileInfosHandler.
  *
- * Handle the form request when a user tries to update his profile (account).
+ * Handle the form request when a user tries to update his profile infos (without avatar).
  * Call any additional validations and actions.
  */
-final class UpdateProfileHandler extends AbstractFormHandler implements InitModelDataInterface
+final class UpdateProfileInfosHandler extends AbstractFormHandler implements InitModelDataInterface
 {
     use CSRFTokenHelperTrait;
     use UserHandlingHelperTrait;
@@ -36,19 +33,9 @@ final class UpdateProfileHandler extends AbstractFormHandler implements InitMode
     private $csrfTokenManager;
 
     /**
-     * @var EmailConfigFactoryInterface
-     */
-    private $emailConfigFactory;
-
-    /**
      * @var ImageUploader
      */
     private $imageUploader;
-
-    /**
-     * @var SwiftMailerManager
-     */
-    private $mailer;
 
     /**
      * @var null
@@ -56,32 +43,25 @@ final class UpdateProfileHandler extends AbstractFormHandler implements InitMode
     private $userToCreate;
 
     /**
-     * RegisterHandler constructor.
+     * UpdateProfileInfosHandler constructor.
      *
      * @param CsrfTokenManagerInterface   $csrfTokenManager
-     * @param EmailConfigFactoryInterface $emailConfigFactory
      * @param FlashBagInterface           $flashBag
      * @param FormFactoryInterface        $formFactory
      * @param ImageUploader               $imageUploader
-     * @param SwiftMailerManager          $mailer
      * @param RequestStack                $requestStack
      */
     public function __construct(
         csrfTokenManagerInterface $csrfTokenManager,
-        EmailConfigFactoryInterface $emailConfigFactory,
         FlashBagInterface $flashBag,
         FormFactoryInterface $formFactory,
         ImageUploader $imageUploader,
-        RequestStack $requestStack,
-        SwiftMailerManager $mailer
+        RequestStack $requestStack
     ) {
-        parent::__construct($flashBag, $formFactory, UpdateProfileType::class, $requestStack);
+        parent::__construct($flashBag, $formFactory, UpdateProfileInfosType::class, $requestStack);
         $this->csrfTokenManager = $csrfTokenManager;
         $this->customError = null;
-        $this->emailConfigFactory = $emailConfigFactory;
         $this->imageUploader = $imageUploader;
-        $this->mailer = $mailer;
-        $this->requestStack = $requestStack;
         $this->userToCreate = null;
     }
 
@@ -98,9 +78,9 @@ final class UpdateProfileHandler extends AbstractFormHandler implements InitMode
      */
     protected function addCustomValidation(array $actionData) : bool
     {
-        $csrfToken = $this->request->request->get('update_profile')['token'];
+        $csrfToken = $this->request->request->get('update_profile_infos')['token'];
         // CSRF token is not valid.
-        if (false === $this->isCSRFTokenValid('update_profile_token', $csrfToken)) {
+        if (false === $this->isCSRFTokenValid('update_profile_infos_token', $csrfToken)) {
             throw new \Exception('Security error: CSRF form token is invalid!');
         }
         // Check UserManager and User instances in passed data
@@ -124,16 +104,15 @@ final class UpdateProfileHandler extends AbstractFormHandler implements InitMode
      */
     protected function addCustomAction(array $actionData) : void
     {
-        // Check UserManager, User, and ImageManager instances in passed data
+        // Check UserManager and User instances in passed data
         $this->checkNecessaryData($actionData);
         $userService = $actionData['userService'];
         $identifiedUser = $actionData['userToUpdate'];
-        $imageService = $actionData['imageService'];
         // Update a user in database with the validated DTO
-        $userService->updateUserProfile(
+        /** @var UserManager $userService */
+        $userService->updateUserProfileInfos(
             $this->form->getData(),
-            $identifiedUser,
-            $imageService
+            $identifiedUser
         );
         $this->flashBag->add(
             'success',
@@ -179,11 +158,11 @@ final class UpdateProfileHandler extends AbstractFormHandler implements InitMode
     }
 
     /**
-     * Get the authentication error.
+     * Get the non unique user error.
      *
-     * @return string|null
+     * @return array|null
      */
-    public function getUniqueUserError()
+    public function getUniqueUserError() : ?array
     {
         return $this->customError;
     }
@@ -191,7 +170,7 @@ final class UpdateProfileHandler extends AbstractFormHandler implements InitMode
     /**
      * {@inheritDoc}
      *
-     * @return object a UpdateProfileDTO instance
+     * @return object a UpdateProfileInfosDTO instance
      *
      * @throws \Exception
      */
@@ -200,14 +179,12 @@ final class UpdateProfileHandler extends AbstractFormHandler implements InitMode
         // Check User instance in passed data
         $this->checkNecessaryData($data);
         $user = $data['userToUpdate'];
-        return new UpdateProfileDTO(
+        return new UpdateProfileInfosDTO(
             $user->getFamilyName(),
             $user->getFirstName(),
             $user->getNickName(),
             $user->getEmail()
             // Password has to be set to null in pre-populated data: it cannot be retrieved (and must not be!).
-            // Avatar must be null in pre-populated data: after form submit it can be an Uploaded file instance.
-            // Avatar removal is set to false by default.
         );
     }
 }

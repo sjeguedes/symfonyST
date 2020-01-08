@@ -1,6 +1,6 @@
 # https://symfony.com/doc/current/validation.html#validation-constraints
 # https://symfony.com/doc/current/validation/groups.html
-App\Domain\DTO\UpdateProfileDTO:
+App\Domain\DTO\UpdateProfileInfosDTO:
     properties:
         familyName:
             - NotBlank:
@@ -42,17 +42,3 @@ App\Domain\DTO\UpdateProfileDTO:
                 # (password with at least 1 special, 1 number, 1 upper and 1 lower letter)
                 pattern: '/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W]).{8,20}$/'
                 message: Please use a valid password format.
-
-        avatar:
-            - File:
-                  maxSize: 100k
-                  maxSizeMessage: The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.
-            - Image:
-                  mimeTypes:
-                      - image/pjpeg
-                      - image/jpeg
-                      - image/gif
-                      - image/png
-                      - image/svg+xml
-                  mimeTypesMessage: This file is not a valid image.
-

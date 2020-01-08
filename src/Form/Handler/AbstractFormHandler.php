@@ -150,11 +150,11 @@ class AbstractFormHandler implements FormHandlerInterface
         $dataConfig = self::DATA_CONFIG_TO_CHECK;
         array_filter($data, function ($value, $key) use ($dataConfig) {
             // Check data type name
-            if (!isset($dataConfig[$key])) {
+            if (\is_object($value) && !isset($dataConfig[$key])) {
                 throw new \InvalidArgumentException('Data type name used in form request process is unknown!');
             }
             // Check data type
-            if ($value === $dataConfig[$key]) {
+            if (\is_object($value) && !$value instanceof $dataConfig[$key]) {
                 throw new \InvalidArgumentException('Data type used in form request process is not valid (does not match with its type)!');
             }
         }, ARRAY_FILTER_USE_BOTH);
@@ -171,7 +171,9 @@ class AbstractFormHandler implements FormHandlerInterface
         // Check constraints validation
         if (!$this->form->isValid()) {
             // Validation failed.
-            $this->flashBag->add('danger', 'Validation failed!<br>Try to login again by checking the form fields.');
+            $message = 'Validation failed!<br>Try to submit again by checking the form fields.';
+            // Do not create a flash message in case of ajax form validation
+            !$this->request->isXmlHttpRequest() ? $this->flashBag->add('danger', $message) : $this->customError = ['formError' => ['notification' => $message]];
             return false;
         }
         // Add custom validation

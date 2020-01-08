@@ -4,16 +4,14 @@ declare(strict_types = 1);
 
 namespace App\Domain\DTO;
 
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-
 /**
- * Class UpdateProfileDTO.
+ * Class UpdateProfileInfosDTO.
  *
- * Data Transfer Object used to register a new user.
+ * Data Transfer Object used to update user profile infos (without avatar).
  *
- * @see validation constraints UpdateProfileDTO.yaml file
+ * @see validation constraints UpdateProfileInfosDTO.yaml file
  */
-final class UpdateProfileDTO extends AbstractReadableDTO
+final class UpdateProfileInfosDTO extends AbstractReadableDTO
 {
     /**
      * @var string|null
@@ -41,16 +39,6 @@ final class UpdateProfileDTO extends AbstractReadableDTO
     private $passwords;
 
     /**
-     * @var UploadedFile|null
-     */
-    private $avatar;
-
-    /**
-     * @var bool
-     */
-    private $removeAvatar;
-
-    /**
      * RegisterUserDTO constructor.
      *
      * @param string|null       $familyName
@@ -58,25 +46,19 @@ final class UpdateProfileDTO extends AbstractReadableDTO
      * @param string|null       $userName
      * @param string|null       $email
      * @param string|null       $passwords
-     * @param UploadedFile|null $avatar
-     * @param bool              $removeAvatar
      */
     public function __construct(
         ?string $familyName,
         ?string $firstName,
         ?string $userName,
         ?string $email,
-        string $passwords = null,
-        UploadedFile $avatar = null,
-        bool $removeAvatar = false
+        string $passwords = null
     ) {
         $this->familyName = $familyName;
         $this->firstName = $firstName;
         $this->userName = $userName;
         $this->email = $email;
         $this->passwords = $passwords;
-        $this->avatar = $avatar;
-        $this->removeAvatar = $removeAvatar;
     }
 
     /**
@@ -120,25 +102,9 @@ final class UpdateProfileDTO extends AbstractReadableDTO
     }
 
     /**
-     * @return UploadedFile|null
-     */
-    public function getAvatar() : ?UploadedFile
-    {
-        return $this->avatar;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getRemoveAvatar() : bool
-    {
-        return $this->removeAvatar;
-    }
-
-    /**
      * @param string|null $familyName
      *
-     * @return UpdateProfileDTO
+     * @return UpdateProfileInfosDTO
      */
     public function setFamilyName(?string $familyName) : self
     {
@@ -149,7 +115,7 @@ final class UpdateProfileDTO extends AbstractReadableDTO
     /**
      * @param string|null $firstName
      *
-     * @return UpdateProfileDTO
+     * @return UpdateProfileInfosDTO
      */
     public function setFirstName(?string $firstName) : self
     {
@@ -160,7 +126,7 @@ final class UpdateProfileDTO extends AbstractReadableDTO
     /**
      * @param string|null $nickName
      *
-     * @return UpdateProfileDTO
+     * @return UpdateProfileInfosDTO
      */
     public function setUserName(?string $nickName) : self
     {
@@ -171,7 +137,7 @@ final class UpdateProfileDTO extends AbstractReadableDTO
     /**
      * @param string|null $email
      *
-     * @return UpdateProfileDTO
+     * @return UpdateProfileInfosDTO
      */
     public function setEmail(?string $email) : self
     {
@@ -182,33 +148,11 @@ final class UpdateProfileDTO extends AbstractReadableDTO
     /**
      * @param string|null $passwords
      *
-     * @return UpdateProfileDTO
+     * @return UpdateProfileInfosDTO
      */
     public function setPasswords(?string $passwords) : self
     {
         $this->passwords = $passwords;
-        return $this;
-    }
-
-    /**
-     * @param UploadedFile $avatar
-     *
-     * @return UpdateProfileDTO
-     */
-    public function setAvatar(?UploadedFile $avatar) : self
-    {
-        $this->avatar = $avatar;
-        return $this;
-    }
-
-    /**
-     * @param bool $removeAvatar
-     *
-     * @return UpdateProfileDTO
-     */
-    public function setRemoveAvatar(bool $removeAvatar) : self
-    {
-        $this->removeAvatar = $removeAvatar;
         return $this;
     }
 }

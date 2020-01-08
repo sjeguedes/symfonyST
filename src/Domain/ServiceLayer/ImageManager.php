@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Domain\ServiceLayer;
 
+use App\Domain\DTO\UpdateProfileAvatarDTO;
 use App\Domain\Entity\Image;
 use App\Domain\Entity\MediaType;
 use App\Domain\Entity\User;
@@ -81,21 +82,25 @@ class ImageManager
     /**
      * Create avatar image file with its parameters by uploading it on server.
      *
-     * @param User         $user
-     * @param UploadedFile $avatar
+     * @param UpdateProfileAvatarDTO $dataModel
+     * @param User                   $user
      *
-     * @return Image
+     * @return Image|null
      *
      * @throws \Exception
      *
      * // TODO: Review Image, MediaType, Media entity
      */
-    public function createUserAvatar(User $user, UploadedFile $avatar) : Image
+    public function createUserAvatar(UpdateProfileAvatarDTO $dataModel, User $user) : ?Image
     {
         // Get avatar necessary parameters
-        $parameters = $this->getAvatarParameters($user, $avatar);
-        // Upload file on server and get created file name
-        $avatarName = $this->imageUploader->upload($avatar, ImageUploader::AVATAR_DIRECTORY_KEY, $parameters['identifierName'], $parameters['dimensionsFormat']);
+        $parameters = $this->getAvatarParameters($dataModel, $user);
+        // Upload file on server and get created file name with possible crop option
+        $isCropped = !\is_null($dataModel->getCropJSONData()) ? true : false;
+        $avatarName = $this->imageUploader->upload($dataModel->getAvatar(), ImageUploader::AVATAR_DIRECTORY_KEY, $parameters, $isCropped);
+        if (\is_null($avatarName)) {
+            return null;
+        }
         // Create avatar media image entity
         $image = new Image($avatarName, $user->getNickName() . '\'s avatar', $parameters['extension'], $parameters['size']);
         // Create mandatory media which references image
@@ -110,15 +115,18 @@ class ImageManager
     /**
      * Get user avatar parameters.
      *
-     * @param User $user
-     * @param UploadedFile $avatar
+     * @param UpdateProfileAvatarDTO $dataModel
+     * @param User                   $user
      *
      * @return array
      *
      * @throws \Exception
      */
-    public function getAvatarParameters(User $user, UploadedFile $avatar) : array
+    public function getAvatarParameters(UpdateProfileAvatarDTO $dataModel, User $user) : array
     {
+        $avatar = $dataModel->getAvatar();
+        $cropJSONData = $dataModel->getCropJSONData();
+        $avatarMediaType = $this->mediaTypeManager->findSingleByUniqueType('u_avatar');
         // Use iconv() conversion to use nickname as slug
         $cleanNickName = $this->cleanAvatarNickNameForSlug($user->getNickName());
         $avatarIdentifierName = $cleanNickName . '-avatar';
@@ -128,6 +136,8 @@ class ImageManager
         $avatarExtension = $avatar->guessExtension();
         $avatarSize = $avatar->getSize();
         return [
+            'cropJSONData'     => $cropJSONData,
+            'resizeFormat'     => ['width' => $avatarMediaType->getWidth(), 'height' =>$avatarMediaType->getHeight()],
             'identifierName'   => $avatarIdentifierName,
             'width'            => $avatarWidth,
             'height'           => $avatarHeight,

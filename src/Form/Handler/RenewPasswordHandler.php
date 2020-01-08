@@ -159,7 +159,7 @@ final class RenewPasswordHandler extends AbstractFormHandler implements InitMode
      *
      * @return string|null
      */
-    public function getUserNameError()
+    public function getUserNameError() : ?string
     {
         return $this->customError;
     }
