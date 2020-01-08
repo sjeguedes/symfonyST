@@ -3,7 +3,7 @@
 {% block title %}SnowTricks - Complete trick list with pagination{% endblock %}
 
 {% block header %}
-    {% include 'all/image-header-loader.html.twig' with {'spinnerRatio': '2.5'} %}
+    {% include 'all/image_header_loader.html.twig' with {'spinnerRatio': '2.5'} %}
     <div class="uk-position-relative uk-flex uk-flex-center uk-flex-middle uk-background-cover uk-background-blend-darken uk-invisible st-background-image-header" data-src="{{ asset(globalImageDirectory~'/snowboard-4.jpg') }}" style="background-position: 40% 25%; height: 600px" uk-img>
         <div class="uk-position-center uk-text-center uk-padding-small st-overlay-image-header-container">
             <p class="st-color-white st-text-shadow-dark uk-text-large">
@@ -37,7 +37,7 @@
                 <div class="uk-card uk-card-primary uk-box-shadow-medium uk-box-shadow-hover-large st-border-white-small">
                     <div class="uk-card-badge uk-label uk-text-center"><span class="st-color-red">In</span> {{ trick.trickGroup.name }}<br><span class="st-color-red">Trick #</span> {{ 'DESC' == trickLoadingMode ? trickCount - (- trick.rank - 1 + trickCount) : trickCount + (trick.rank + 1 - trickCount) }}{#  <span class="st-color-red">Rank</span> {{ trick.rank }}#} <span class="st-color-red">Added on</span> {{ trick.creationDate|date('d/m/Y') }}</div>
                     <div class="uk-card-media-top uk-position-relative st-background-black">
-                        {% include 'all/trick-media-loader.html.twig' with {'spinnerRatio': '1.5'} %}
+                        {% include 'all/trick_media_loader.html.twig' with {'spinnerRatio': '1.5'} %}
                         <img id="st-card-image-{{ trick.rank|e('html_attr') }}" class="uk-invisible" src="{{ asset(globalImageDirectory~'/uploads/'~trick.medias[0].image.name|e('html_attr')~'.'~trick.medias[0].image.format|e('html_attr')) }}" alt="{{ trick.medias[0].image.description|e('html_attr') }}">
                     </div>
                     <div class="uk-card-body">

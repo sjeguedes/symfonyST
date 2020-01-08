@@ -35,11 +35,11 @@
 {% endfor %}
 
 {% block header %}
-    {% include 'all/image-header-loader.html.twig' with {'spinnerRatio': '2.5'} %}
+    {% include 'all/image_header_loader.html.twig' with {'spinnerRatio': '2.5'} %}
     <div class="uk-position-relative uk-background-cover uk-background-blend-darken uk-invisible st-background-image-header" data-src="{{ asset(globalImageDirectory~'/snowboard-6.jpg') }}" style="background-position: 50% 50%; height: 600px" uk-img>
         <div class="uk-padding">
             <div class="uk-position-center uk-card uk-card-default uk-card-body uk-box-shadow-large uk-padding-small st-overlay-main-image-header-container">
-                {% include 'all/image-header-loader.html.twig' with {'spinnerRatio': '2.5'} %}
+                {% include 'all/image_header_loader.html.twig' with {'spinnerRatio': '2.5'} %}
                 <div class="uk-background-cover uk-background-blend-darken st-background-image-header" data-src="{{ mainImage }}" style="background-position: 50% 50%; display: table-cell; width: 100%; height: 100%" uk-img>
                     <div class="uk-position-center uk-text-center">
                         <p class="st-color-white st-text-shadow-dark uk-text-large">

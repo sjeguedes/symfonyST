@@ -60,11 +60,11 @@ final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateB
             ],
             [
                 'class' => 'App\\Responder\\Admin\\RequestNewPasswordResponder',
-                'name'  => 'admin/request-new-password.html.twig'
+                'name'  => 'admin/request_new_password.html.twig'
             ],
             [
                 'class' => 'App\\Responder\\Admin\\RenewPasswordResponder',
-                'name'  => 'admin/renew-password.html.twig'
+                'name'  => 'admin/renew_password.html.twig'
             ],
             [
                 'class' => 'App\\Responder\\Admin\\RegisterResponder',
@@ -72,20 +72,20 @@ final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateB
             ],
             [
                 'class' => 'App\\Responder\\Admin\\UpdateProfileResponder',
-                'name'  => 'admin/update-profile.html.twig'
+                'name'  => 'admin/update_profile.html.twig'
             ],
             // Emails
             [
                 'class' => 'App\\Action\\Admin\\RequestNewPasswordAction',
-                'name'  => 'admin/mailing/mail-request-new-password.html.twig'
+                'name'  => 'admin/mailing/mail_request_new_password.html.twig'
             ],
             [
                 'class' => 'App\\Action\\Admin\\RenewPasswordAction',
-                'name'  => 'admin/mailing/mail-renew-password.html.twig'
+                'name'  => 'admin/mailing/mail_renew_password.html.twig'
             ],
             [
                 'class' => 'App\\Action\\Admin\\RegisterAction',
-                'name'  => 'admin/mailing/mail-register.html.twig'
+                'name'  => 'admin/mailing/mail_register.html.twig'
             ]
         ];
     }
