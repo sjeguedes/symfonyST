@@ -44,7 +44,7 @@ class PaginatedTrickListAction
     /**
      * Show complete list directly on dedicated page "tricks".
      *
-     * @Route("/{_locale}/trick-list/{page}", name="tricks", defaults={"page"=1}, requirements={"page"="\d+"})
+     * @Route("/{_locale}/trick-list/{page}", name="list_tricks", defaults={"page"=1}, requirements={"page"="\d+"})
      *
      * @param PaginatedTrickListResponder $responder
      * @param RedirectionResponder        $redirectionResponder
@@ -58,10 +58,10 @@ class PaginatedTrickListAction
     {
         // Particular redirection (optional)
         if ('/' . $request->get('_locale') . '/trick-list/1' === $request->getPathInfo()) {
-            return $redirectionResponder('tricks');
+            return $redirectionResponder('list_tricks');
         }
         // Get necessary data to create pagination filtering wrong parameters if necessary
-        $pageIndex = $this->trickService->filterPaginationRequestAttribute($request, 'tricks');
+        $pageIndex = $this->trickService->filterPaginationRequestAttribute($request, 'list_tricks');
         $paginationParameters = $this->trickService->getPaginationParameters($pageIndex);
         if (\is_null($paginationParameters)) {
             $this->logger->error("[trace app snowTricks] PaginatedTrickListAction/__invoke => pagination parameters: null");

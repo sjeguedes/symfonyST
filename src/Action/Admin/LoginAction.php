@@ -53,16 +53,15 @@ class LoginAction
     /**
      *  Show login form (user connection) and validation or authentication errors.
      *
-     * @Route("/{_locale}/login", name="connection")
+     * @Route("/{_locale}/login", name="connect")
      *
      * @param RedirectionResponder $redirectionResponder
-     * @param LoginResponder $responder
-     * @param Request $request
+     * @param LoginResponder       $responder
+     * @param Request              $request
      *
      * @return Response
      *
      * @throws \Exception
-     *
      */
     public function __invoke(RedirectionResponder $redirectionResponder, LoginResponder $responder, Request $request) : Response
     {

@@ -243,7 +243,7 @@ class TrickManager
             switch ($condition) {
                 // Error: check if $offset or $limit values are wrong:
                 // so reset list to default parameters for descending order
-                case array_key_exists('descendingOrderAndWrongParameters', $condition):
+                case \array_key_exists('descendingOrderAndWrongParameters', $condition):
                     $parameters['offset'] = $maxOffset + 1 - $this->getListDefaultParameters()['numberPerLoading'];
                     $parameters['limit'] = $this->getListDefaultParameters()['numberPerLoading'];
                     $parameters['error'] = true;
@@ -251,7 +251,7 @@ class TrickManager
                     break;
                 // Error: check if $offset or $limit values are wrong:
                 // so reset list to default parameters for ascending order
-                case array_key_exists('ascendingOrderAndWrongParameters', $condition):
+                case \array_key_exists('ascendingOrderAndWrongParameters', $condition):
                     $parameters['offset'] = 0;
                     $parameters['limit'] = $this->getListDefaultParameters()['numberPerLoading'];
                     $parameters['error'] = true;
@@ -259,7 +259,7 @@ class TrickManager
                     break;
                 // Particular case: check if calculated $offset is not under $minOffset:
                 // lowest $offset must be 0 for descending order
-                case array_key_exists('descendingOrderUnderMinimumOffset', $condition):
+                case \array_key_exists('descendingOrderUnderMinimumOffset', $condition):
                     $modulo = $count % $this->getListDefaultParameters()['numberPerLoading'];
                     $parameters['offset'] = $minOffset;
                     $parameters['limit'] = $modulo == 0 ? 1 : $modulo; // recalculate $limit to show last tricks
@@ -268,7 +268,7 @@ class TrickManager
                     break;
                 // Particular case: check if calculated $offset + $limit is not over $maxOffset:
                 // highest offset must be equal to (total count - 1) for ascending order
-                case array_key_exists('ascendingOrderOverMaxOffset', $condition):
+                case \array_key_exists('ascendingOrderOverMaxOffset', $condition):
                     $parameters['limit'] = $maxOffset + 1 - $offset; // recalculate $limit to show last tricks
                     $this->logger->info("[trace app snowTricks] TrickManager/filterParametersWithOrder - ascendingOrderOverMaxOffset => parameters: " . serialize($parameters));
                     $parameters['error'] = false;

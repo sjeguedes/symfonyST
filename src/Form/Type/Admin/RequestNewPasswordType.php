@@ -30,9 +30,9 @@ class RequestNewPasswordType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options) : void
     {
         $builder
-            ->add('userName',TextType::class, [
+            ->add('userName', TextType::class, [
             ])
-            ->add('token',HiddenType::class, [
+            ->add('token', HiddenType::class, [
                 'inherit_data' => true
             ]);
     }

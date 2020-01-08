@@ -76,7 +76,7 @@ class LoginFormAuthenticationManager extends AbstractFormLoginAuthenticator
      */
     public function supports(Request $request) : bool
     {
-        return 'connection' === $request->attributes->get('_route')
+        return 'connect' === $request->attributes->get('_route')
             && $request->isMethod('POST');
     }
 
@@ -165,7 +165,7 @@ class LoginFormAuthenticationManager extends AbstractFormLoginAuthenticator
      */
     protected function getLoginUrl() : string
     {
-        return $this->router->generate('connection');
+        return $this->router->generate('connect');
     }
 
     /**

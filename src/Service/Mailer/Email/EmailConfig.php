@@ -101,7 +101,7 @@ class EmailConfig implements EmailConfigInterface
 
     /**
      * Check if an array respects the expected format:
-     * it has a unique value.
+     * It has a unique value.
      * It has a key formatted with an email address.
      * It has a string value associated to email key.
      *
@@ -111,7 +111,7 @@ class EmailConfig implements EmailConfigInterface
      */
     private function checkArrayFormat(array $value) : bool
     {
-        return 1 == \count($value) && false === !filter_var(array_keys($value)[0],FILTER_VALIDATE_EMAIL) && \is_string(array_values($value)[0]);
+        return 1 == \count($value) && false === !filter_var(array_keys($value)[0], FILTER_VALIDATE_EMAIL) && \is_string(array_values($value)[0]);
     }
 
     /**
@@ -124,17 +124,17 @@ class EmailConfig implements EmailConfigInterface
         // Set configuration
         $this->optionsResolver->setRequired(['sender', 'receiver', 'subject', 'templateData'])
             ->setDefault('sender', [$this->parameterBag->get('app_swift_mailer_sender_email') => $this->parameterBag->get('app_swift_mailer_sender_name')])
-            ->setAllowedTypes('sender','array')
+            ->setAllowedTypes('sender', 'array')
             ->setAllowedValues('sender', function ($value) {
                 return $this->checkArrayFormat($value);
             })
             ->setDefined('receiver')
-            ->setAllowedTypes('receiver','array')
+            ->setAllowedTypes('receiver', 'array')
             ->setAllowedValues('receiver', function ($value) {
                 return $this->checkArrayFormat($value);
             })
             ->setDefault('subject', EmailConfigFactory::CUSTOM_PARAMETERS_CONFIG[$this->actionClassName][$this->actionContext]['subject'])
-            ->setAllowedTypes('subject','string');
+            ->setAllowedTypes('subject', 'string');
         // Configure template data separately with defined configuration constant CUSTOM_PARAMETERS which is an array.
         $this->initTemplateDataOptions();
     }
@@ -158,7 +158,7 @@ class EmailConfig implements EmailConfigInterface
                     $templateDataResolver->setDefined($parameterKey);
                 }
                 $templateDataResolver->setAllowedTypes($parameterKey, $parameterValue['type']);
-            },ARRAY_FILTER_USE_BOTH);
+            }, ARRAY_FILTER_USE_BOTH);
         });
 
     }

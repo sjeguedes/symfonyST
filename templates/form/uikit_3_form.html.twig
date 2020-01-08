@@ -24,10 +24,10 @@
         {# Attribute "required" is not supported #}
         {%- set required = false -%}
     {%- endif -%}
-    <input type="{{ type }}" {{ block('widget_attributes') }} {% if data is not empty %}value="{{ data }}" {% endif %}/>
+    <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
 {%- endblock form_widget_simple -%}
 
 {# Checkboxes #}
 {%- block checkbox_widget -%}
-    <input type="checkbox" {{ block('widget_attributes') }}{% if data is not empty %}value="{{ data }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
+    <input type="checkbox" {{ block('widget_attributes') }}{% if value is not empty %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
 {%- endblock checkbox_widget -%}

@@ -55,7 +55,7 @@ class MediaFixtures extends BaseFixture implements DependentFixtureInterface
             $proxy3 = $this->getReference(Trick::class . '_' . $data[$i]['references']['trick']);
             $proxy4 = $this->getReference(User::class . '_' . $data[$i]['references']['user']);
             switch ($data[$i]['references']) {
-                case array_key_exists('image', $data[$i]['references']):
+                case \array_key_exists('image', $data[$i]['references']):
                     $proxy = $this->getReference(Image::class . '_' . $data[$i]['references']['image']);
                     return Media::createNewInstanceWithImage(
                         $proxy,
@@ -67,7 +67,7 @@ class MediaFixtures extends BaseFixture implements DependentFixtureInterface
                         new \DateTime(sprintf("+%d days", $i - 1))
                     );
                     break;
-                case array_key_exists('video', $data[$i]['references']):
+                case \array_key_exists('video', $data[$i]['references']):
                     $proxy = $this->getReference(Video::class . '_' . $data[$i]['references']['video']);
                     return Media::createNewInstanceWithVideo(
                         $proxy,

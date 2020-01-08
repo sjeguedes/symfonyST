@@ -38,11 +38,6 @@ final class RequestNewPasswordHandler extends AbstractFormHandler
     private $emailConfigFactory;
 
     /**
-     * @var string
-     */
-    private $customError;
-
-    /**
      * @var SwiftMailerManager
      */
     private $mailer;
@@ -70,7 +65,7 @@ final class RequestNewPasswordHandler extends AbstractFormHandler
         RequestStack $requestStack,
         SwiftMailerManager $mailer
     ) {
-        parent::__construct($flashBag, $formFactory,requestNewPasswordType::class, $requestStack);
+        parent::__construct($flashBag, $formFactory, RequestNewPasswordType::class, $requestStack);
         $this->csrfTokenManager = $csrfTokenManager;
         $this->customError = null;
         $this->emailConfigFactory = $emailConfigFactory;
@@ -95,17 +90,16 @@ final class RequestNewPasswordHandler extends AbstractFormHandler
         if (false === $this->isCSRFTokenValid('request_new_password_token', $csrfToken)) {
             throw new \Exception('Security error: CSRF form token is invalid!');
         }
+        // Check UserManager instance in passed data
+        $this->checkNecessaryData($actionData);
         // Find user who asks for a new password by using a user service
-        $userService = $actionData['userService'] ?? null;
-        if (!$userService instanceof UserManager || \is_null($userService)) {
-            throw new \InvalidArgumentException('A instance of UserManager must be set first!');
-        }
+        $userService = $actionData['userService'];
         $loadedUser = $userService->getRepository()->loadUserByUsername($this->form->getData()->getUserName()); // or $this->form->get('userName')->getData()
         // DTO is in valid state but user can not be found.
         if (\is_null($loadedUser)) {
             $userError = 'Please check your credentials!<br>User can not be found.';
             $this->customError = $userError;
-            $this->flashBag->add('danger', 'Form authentication failed!<br>Try to request again by checking the fields.');
+            $this->flashBag->add('danger', 'Authentication failed!<br>Try to request again by checking the form fields.');
             return false;
         }
         $this->userToUpdate = $loadedUser;
@@ -121,14 +115,14 @@ final class RequestNewPasswordHandler extends AbstractFormHandler
      *
      * @throws \ReflectionException
      * @throws \Exception
+     *
      * @see AbstractFormHandler::processFormRequest()
      */
     protected function addCustomAction(array $actionData) : void
     {
+        // Check UserManager instance in passed data
+        $this->checkNecessaryData($actionData);
         $userService = $actionData['userService'];
-        if (!$userService instanceof UserManager || \is_null($userService)) {
-            throw new \InvalidArgumentException('A instance of UserManager must be set first!');
-        }
         $user = $this->userToUpdate;
         // Save data
         /** @var User $updatedUser */
@@ -149,7 +143,10 @@ final class RequestNewPasswordHandler extends AbstractFormHandler
         if (!$isEmailSent) {
             throw new \Exception(sprintf('Notification failed: email was not sent to %s due to technical error or wrong parameters!', $updatedUser->getEmail()));
         }
-        $this->flashBag->add('success','An email was sent successfully!<br>Please check your box and<br>use your personalized link<br>to renew your password.');
+        $this->flashBag->add(
+            'success',
+            'An email was sent successfully!<br>Please check your box and<br>use your personalized link<br>to renew your password.'
+        );
     }
 
     /**
@@ -157,7 +154,7 @@ final class RequestNewPasswordHandler extends AbstractFormHandler
      *
      * @return string|null
      */
-    public function getUserError()
+    public function getUserError() : ?string
     {
         return $this->customError;
     }

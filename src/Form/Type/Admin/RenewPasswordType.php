@@ -33,16 +33,17 @@ class RenewPasswordType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options) : void
     {
         $builder
-            ->add('userName',TextType::class, [
-                'disabled'        => true
+            ->add('userName', TextType::class, [
+                'disabled'        => false
             ])
-            ->add('passwords',RepeatedType::class, [
+            ->add('passwords', RepeatedType::class, [
                 'type'            => PasswordType::class,
                 'first_name'      => 'password',
                 'second_name'     => 'confirmedPassword',
-                'invalid_message' => 'Password and confirmation fields<br>must match.'
+                'invalid_message' => 'Password and confirmation must match.',
+                'options'         => ['always_empty' => false]
             ])
-            ->add('token',HiddenType::class, [
+            ->add('token', HiddenType::class, [
                 'inherit_data'    => true
             ]);
     }

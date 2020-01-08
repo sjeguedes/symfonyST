@@ -4,6 +4,11 @@ framework:
     #csrf_protection: true
     #http_method_override: true
 
+    # Enables property info component service auto-configuration
+    # https://symfony.com/doc/4.2/components/property_info.html#extractable-information
+    property_info:
+        enabled: true
+
     # Enables validation constraints with annotations
     validation: { enable_annotations: true }
 
@@ -39,6 +44,6 @@ framework:
         #app: cache.adapter.apcu
 
     # Define a front-end base path to be used for assets
-    # Default sub directory is '/assets'
-    #assets:
-        #base_path: ''
+    # Default sub directory can be configured for instance as '/assets'
+    assets:
+        base_path: '/'

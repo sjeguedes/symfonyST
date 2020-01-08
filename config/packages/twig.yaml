@@ -8,5 +8,12 @@ twig:
     form_themes: ['form/uikit_3_form.html.twig']
     # Global custom variables
     globals:
+        # Texts to show configuration
+        globalUrlLForHostedLogo: '%env(ABSOLUTE_URL_FOR_HOSTED_LOGO)%'
+        globalContactEmail: '%env(MAILER_SENDER_EMAIL)%'
         globalMediaTextError: 'Media loading Error'
-
+        # Assets and Images paths config (from services.yaml)
+        globalAssetsDirectory: '%app_twig_assets_directory%'
+        globalImageDirectory: '%app_twig_image_directory%'
+        globalImageUploadDirectory: '%app_twig_image_upload_directory%'
+        globalAvatarUploadDirectory: '%app_twig_avatar_upload_directory%'

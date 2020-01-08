@@ -150,29 +150,27 @@ class User implements UserInterface, \Serializable
     /**
      * @var Collection (inverse side of entity relation)
      *
-     * @ORM\OneToMany(targetEntity=Media::class, mappedBy="user")
+     * @ORM\OneToMany(targetEntity=Media::class, cascade={"persist"}, mappedBy="user")
      */
     private $medias;
 
     /**
      * @var Collection (inverse side of entity relation)
      *
-     * @ORM\OneToMany(targetEntity=Trick::class, mappedBy="user")
+     * @ORM\OneToMany(targetEntity=Trick::class, cascade={"persist"}, mappedBy="user")
      */
     private $tricks;
 
     /**
      * User constructor.
      *
-     * @param string                  $familyName
-     * @param string                  $firstName
-     * @param string                  $nickName
-     * @param string                  $email
-     * @param string                  $password an encoded password
-     * @param string                  $algorithm a hash algorithm type for password
-     * @param array                   $roles
-     * @param string|null             $salt
-     * @param \DateTimeInterface|null $creationDate
+     * @param string $familyName
+     * @param string $firstName
+     * @param string $nickName
+     * @param string $email
+     * @param string $password  an encoded password
+     * @param string $algorithm a hash algorithm type for password
+     * @param array  $roles
      *
      * @return void
      *
@@ -185,64 +183,26 @@ class User implements UserInterface, \Serializable
         string $email,
         string $password,
         string $algorithm = self::DEFAULT_ALGORITHM,
-        array $roles = [self::DEFAULT_ROLE],
-        string $salt = null,
-        \DateTimeInterface $creationDate = null
+        array $roles = [self::DEFAULT_ROLE]
     ) {
+        \assert(!empty($familyName), 'User family name can not be empty!');
+        \assert(!empty($firstName), 'User first name can not be empty!');
+        \assert($this->isNickNameValidated($nickName), 'User nickname format must be valid!');
+        \assert($this->isEmailValidated($email), 'User email format must be valid!');
+        \assert($this->isPasswordValidated($password, $algorithm), 'User password must be valid!');
+        \assert($this->isRolesArrayValidated($roles), 'User Roles must be valid!');
         $this->uuid = Uuid::uuid4();
-        \assert(!empty($familyName),'User family name can not be empty!');
-        $this->familyName = $familyName;
-        \assert(!empty($firstName),'User first name can not be empty!');
-        $this->firstName = $firstName;
-        \assert(!empty($nickName),'User nickname can not be empty!');
+        $this->familyName = strtoupper($familyName);
+        $this->firstName = ucwords(strtolower($firstName));
         $this->nickName = $nickName;
-        \assert($this->isEmailValidated($email),'User email format must be valid!');
-        $this->email = $email;
-        \assert($this->isPasswordValidated($password, $algorithm),'User password must be valid!');
+        $this->email = strtolower($email);
         $this->password = $password;
         $this->roles = $roles;
-        $this->salt = $salt;
+        $this->salt = null; // can be updated with encoder factory
         $this->isActivated = false;
-        $createdAt = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
-        $this->creationDate = $createdAt;
-        $this->updateDate = $createdAt;
+        $this->creationDate = new \DateTime();
+        $this->updateDate = $this->creationDate;
         $this->medias = new ArrayCollection();
-    }
-
-    /**
-     * Change family name after creation.
-     *
-     * @param string $familyName
-     *
-     * @return User
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function modifyFamilyName(string $familyName) : self
-    {
-        if (empty($familyName)) {
-            throw new \InvalidArgumentException('User family name can not be empty!');
-        }
-        $this->familyName = $familyName;
-        return $this;
-    }
-
-    /**
-     * Change first name after creation.
-     *
-     * @param string $firstName
-     *
-     * @return User
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function modifyFirstName(string $firstName) : self
-    {
-        if (empty($firstName)) {
-            throw new \InvalidArgumentException('User first name can not be empty!');
-        }
-        $this->firstName = $firstName;
-        return $this;
     }
 
     /**
@@ -254,7 +214,22 @@ class User implements UserInterface, \Serializable
      */
     private function isEmailValidated(string $email) : bool
     {
-        if (empty($email) || !filter_var($email,FILTER_VALIDATE_EMAIL)) {
+        if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Validate nickname (username) format.
+     *
+     * @param string $username
+     *
+     * @return bool
+     */
+    private function isNickNameValidated(string $username) : bool
+    {
+        if (empty($username) || !preg_match('/^[\w-]{3,15}$/u', $username)) {
             return false;
         }
         return true;
@@ -267,9 +242,12 @@ class User implements UserInterface, \Serializable
      * @param string $algorithm
      *
      * @return bool
+     *
+     * // TODO: use EncoderFactoryInterface $encoderFactory
      */
     private function isPasswordValidated(string $password, string $algorithm) : bool
     {
+        //$encoder = $encoderFactory->getEncoder(self::class);
         if (!\in_array($algorithm, self::HASH_ALGORITHMS)) {
             return false;
         }
@@ -281,23 +259,18 @@ class User implements UserInterface, \Serializable
     }
 
     /**
-     * Change password after creation.
+     * Validate renewal token format.
      *
-     * @param string $algorithm
-     * @param string $password
+     * @param string $renewalToken|null
      *
-     * @return User
-     *
-     * @throws \InvalidArgumentException
+     * @return bool
      */
-    public function modifyPassword(string $password, string $algorithm) : self
+    private function isRenewalTokenValidated(?string $renewalToken) : bool
     {
-        // BCrypt encoded password
-        if (!$this->isPasswordValidated($password, $algorithm)) {
-            throw new \InvalidArgumentException('User password is not valid!');
+        if (!\is_null($renewalToken) && !preg_match('/^[a-z0-9]{15}$/', $renewalToken)) {
+            return false;
         }
-        $this->password = $password;
-        return $this;
+        return true;
     }
 
     /**
@@ -315,10 +288,103 @@ class User implements UserInterface, \Serializable
         $roles = array_unique($roles);
         foreach ($roles as $role) {
             if (substr($role, 0, 5) !== 'ROLE_') {
-               return false;
+                return false;
             }
         }
         return true;
+    }
+
+
+    /**
+     * Change family name after creation.
+     *
+     * @param string $familyName
+     *
+     * @return User
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function modifyFamilyName(string $familyName) : self
+    {
+        if (empty($familyName)) {
+            throw new \InvalidArgumentException('User family name can not be empty!');
+        }
+        $this->familyName = strtoupper($familyName);
+        return $this;
+    }
+
+    /**
+     * Change first name after creation.
+     *
+     * @param string $firstName
+     *
+     * @return User
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function modifyFirstName(string $firstName) : self
+    {
+        if (empty($firstName)) {
+            throw new \InvalidArgumentException('User first name can not be empty!');
+        }
+        $this->firstName = ucwords(strtolower($firstName));
+        return $this;
+    }
+
+    /**
+     * Change nickname (username) after creation.
+     *
+     * @param string $userName
+     *
+     * @return User
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function modifyNickName(string $userName) : self
+    {
+        if (!$this->isNickNameValidated($userName)) {
+            throw new \InvalidArgumentException('User nickname is not valid!');
+        }
+        $this->nickName = $userName;
+        return $this;
+    }
+
+    /**
+     * Change email after creation.
+     *
+     * @param string $email
+     *
+     * @return User
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function modifyEmail(string $email) : self
+    {
+        if (!$this->isEmailValidated($email)) {
+            throw new \InvalidArgumentException('User email is not valid!');
+        }
+        $this->email = strtolower($email);
+        return $this;
+    }
+
+    /**
+     * Change password after creation.
+     *
+     * @param string $algorithm
+     * @param string $password
+     *
+     * @return User
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function modifyPassword(string $password, string $algorithm) : self
+    {
+        // BCrypt encoded password
+        if (!$this->isPasswordValidated($password, $algorithm)) {
+            throw new \InvalidArgumentException('User password format is not valid!');
+        }
+        $this->password = $password;
+        return $this;
     }
 
     /**
@@ -336,6 +402,22 @@ class User implements UserInterface, \Serializable
             throw new \InvalidArgumentException('Each role must begin with "ROLE_"!');
         }
         $this->roles = array_unique($roles);
+        return $this;
+    }
+
+    /**
+     * Change salt which is used for password encoding.
+     *
+     * @param string $salt
+     *
+     * @return $this
+     */
+    public function modifySalt(string $salt) : self
+    {
+        if (empty($salt)) {
+            throw new \InvalidArgumentException('Password salt can not be empty!');
+        }
+        $this->salt = $salt;
         return $this;
     }
 
@@ -358,15 +440,15 @@ class User implements UserInterface, \Serializable
      * User has forgotten his password, so this token is used to renew it.
      * Token format is generated with: substr(hash('sha256', bin2hex(openssl_random_pseudo_bytes(8))), 0, 15);
      *
-     * @param string|null $renewalToken
+     * @param string $renewalToken
      *
-     * @return User
+     * @return User|null
      *
      * @throws \InvalidArgumentException
      */
     public function updateRenewalToken(?string $renewalToken) : self
     {
-        if (!\is_null($renewalToken) && !preg_match('/^[a-z0-9]{15}$/', $renewalToken)) {
+        if (!$this->isRenewalTokenValidated($renewalToken)) {
             throw new \InvalidArgumentException('User password renewal token must be valid!');
         }
         $this->renewalToken = $renewalToken;

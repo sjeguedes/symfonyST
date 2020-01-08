@@ -35,10 +35,8 @@ class LogoutHandler implements LogoutSuccessHandlerInterface
      *
      * @return void
      */
-    public function __construct(
-        FlashBagInterface $flashBag,
-        RouterInterface $router
-    ) {
+    public function __construct(FlashBagInterface $flashBag, RouterInterface $router)
+    {
         $this->flashBag = $flashBag;
         $this->router = $router;
     }
@@ -49,7 +47,7 @@ class LogoutHandler implements LogoutSuccessHandlerInterface
      */
     public function onLogoutSuccess(Request $request) : RedirectResponse
     {
-        $this->flashBag->add('success','You logged out!<br>Hope to see you soon.');
+        $this->flashBag->add('success', 'You logged out!<br>Hope to see you soon.');
         return new RedirectResponse($this->router->generate('home'));
     }
 }

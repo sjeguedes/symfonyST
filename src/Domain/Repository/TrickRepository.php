@@ -117,7 +117,7 @@ class TrickRepository extends ServiceEntityRepository
             ->addFieldResult('t', 'name', 'name')
             ->addFieldResult('t', 'slug', 'slug')
             ->addFieldResult('t', 'creation_date', 'creationDate')
-            ->addScalarResult('rank', 'rank','integer');
+            ->addScalarResult('rank', 'rank', 'integer');
         $this->resultSetMapping->addJoinedEntityResult(TrickGroup::class , 'tg', 't', 'trickGroup')
             ->addFieldResult('tg', 'tg_uuid', 'uuid')
             ->addFieldResult('tg', 'tg_name', 'name');

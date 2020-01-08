@@ -14,12 +14,12 @@ namespace App\Domain\DTO;
 final class LoginUserDTO
 {
     /**
-     * @var string
+     * @var string|null
      */
     private $userName;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $password;
 

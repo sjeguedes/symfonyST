@@ -37,15 +37,15 @@ interface FormHandlerInterface
     /**
      * Initialize a form by creating it with a form factory.
      *
-     * @param array|null  $data
-     * @param string|null $formType the class name as F.Q.C.N
+     * @param array|null  $modelData
+     * @param string|null $formType  the class name as F.Q.C.N
      * @param array|null  $options
      *
      * @return FormHandlerInterface
      *
      * @throws \RuntimeException
      */
-    public function initForm(array $data = null, string $formType = null, array $options = null) : FormHandlerInterface;
+    public function initForm(array $modelData = null, string $formType = null, array $options = null) : FormHandlerInterface;
 
     /**
      * Check if form handles current request.

@@ -29,7 +29,7 @@ final class RenewPasswordDTO
      * @param string|null $userName
      * @param string|null $passwords
      */
-    public function __construct(string $userName = null, string $passwords = null)
+    public function __construct(?string $userName, string $passwords = null)
     {
         $this->userName = $userName;
         $this->passwords = $passwords;

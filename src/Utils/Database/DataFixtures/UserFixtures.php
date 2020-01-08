@@ -36,8 +36,7 @@ class UserFixtures extends BaseFixture
                 $data[$i]['fields']['email'],
                 $data[$i]['fields']['password'],
                 User::DEFAULT_ALGORITHM,
-                $data[$i]['fields']['roles'],
-                $data[$i]['fields']['salt']
+                $data[$i]['fields']['roles']
             );
             $user->modifyIsActivated(true);
             return $user;

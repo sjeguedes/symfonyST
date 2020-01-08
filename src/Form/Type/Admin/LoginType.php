@@ -25,22 +25,23 @@ class LoginType extends AbstractType
      * Configure a form builder for the type hierarchy.
      *
      * @param FormBuilderInterface $builder
-     * @param array $options
+     * @param array                $options
      *
      * @return void
      */
     public function buildForm(FormBuilderInterface $builder, array $options) : void
     {
         $builder
-            ->add('userName',TextType::class, [
+            ->add('userName', TextType::class, [
             ])
-            ->add('password',PasswordType::class, [
+            ->add('password', PasswordType::class, [
+                'always_empty' => false
             ])
-            ->add('rememberMe',CheckboxType::class, [
+            ->add('rememberMe', CheckboxType::class, [
                 'empty_data'   => false,
                 'false_values' => [false]
             ])
-            ->add('token',HiddenType::class, [
+            ->add('token', HiddenType::class, [
                 'inherit_data' => true
             ]);
     }

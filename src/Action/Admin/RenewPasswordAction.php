@@ -72,14 +72,14 @@ class RenewPasswordAction
             $this->flashBag->add('danger', 'You are not allowed to access<br>password renewal process!<br>Please ask for a new request.');
             return $redirectionResponder('request_new_password');
         }
-        // Set form with initial model data and set the request by binding it
+        // Set form with initial username model data and set the request by binding it
         $renewPasswordForm = $this->formHandler->initForm(['userToUpdate' => $identifiedUser])->bindRequest($request);
         // Process only on submit
         if ($renewPasswordForm->isSubmitted()) {
             // Constraints and custom validation: call actions to perform if necessary on success
             $isFormRequestValid = $this->formHandler->processFormRequest(['userService' => $this->userService, 'userToUpdate' => $identifiedUser]);
             if ($isFormRequestValid) {
-                return $redirectionResponder('connection');
+                return $redirectionResponder('connect');
             }
         }
         $data = [

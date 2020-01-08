@@ -60,22 +60,33 @@ final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateB
             ],
             [
                 'class' => 'App\\Responder\\Admin\\RequestNewPasswordResponder',
-                'name'  => 'admin/request-new-password.html.twig'
+                'name'  => 'admin/request_new_password.html.twig'
             ],
             [
                 'class' => 'App\\Responder\\Admin\\RenewPasswordResponder',
-                'name'  => 'admin/renew-password.html.twig'
+                'name'  => 'admin/renew_password.html.twig'
+            ],
+            [
+                'class' => 'App\\Responder\\Admin\\RegisterResponder',
+                'name'  => 'admin/register.html.twig'
+            ],
+            [
+                'class' => 'App\\Responder\\Admin\\UpdateProfileResponder',
+                'name'  => 'admin/update_profile.html.twig'
             ],
             // Emails
             [
                 'class' => 'App\\Action\\Admin\\RequestNewPasswordAction',
-                'name'  => 'admin/mailing/mail-request-new-password.html.twig'
+                'name'  => 'admin/mailing/mail_request_new_password.html.twig'
             ],
             [
                 'class' => 'App\\Action\\Admin\\RenewPasswordAction',
-                'name'  => 'admin/mailing/mail-renew-password.html.twig'
+                'name'  => 'admin/mailing/mail_renew_password.html.twig'
+            ],
+            [
+                'class' => 'App\\Action\\Admin\\RegisterAction',
+                'name'  => 'admin/mailing/mail_register.html.twig'
             ]
-
         ];
     }
 
@@ -117,7 +128,7 @@ final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateB
             ++ $i;
             $hasBlock = !isset($template['block']) ? false : true;
             $isMatched = $className !== $template['class'] ? false : true;
-            if ($i === count($this->templates) && false === $isMatched) {
+            if ($i === \count($this->templates) && false === $isMatched) {
                 throw new \RuntimeException('No template name was found: try to use another rendering method!');
             }
             if (true === $hasBlock || false === $isMatched) {
@@ -167,7 +178,7 @@ final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateB
             ++ $i;
             $hasBlock = !isset($template['block']) ? false : true;
             $isMatched = $className !== $template['class'] ? false : true;
-            if ($i === count($this->templates) && false === $isMatched) {
+            if ($i === \count($this->templates) && false === $isMatched) {
                 throw new \RuntimeException('No template block name was found: try to use another rendering method!');
             }
             if (false === $hasBlock || false === $isMatched) {

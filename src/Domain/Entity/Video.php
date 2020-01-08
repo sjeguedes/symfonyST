@@ -62,7 +62,7 @@ class Video
     /**
      * @var Collection (inverse side of entity relation)
      *
-     * @ORM\OneToMany(targetEntity=Media::class, mappedBy="video")
+     * @ORM\OneToMany(targetEntity=Media::class, cascade={"persist", "remove"}, orphanRemoval=true, mappedBy="video")
      */
     private $medias;
 
@@ -83,9 +83,9 @@ class Video
         \DateTimeInterface $creationDate = null
     ) {
         $this->uuid = Uuid::uuid4();
-        \assert(!empty($url),'Video URL can not be empty!');
+        \assert(!empty($url), 'Video URL can not be empty!');
         $this->url = $url;
-        \assert(!empty($description),'Video description can not be empty!');
+        \assert(!empty($description), 'Video description can not be empty!');
         $this->description = $description;
         $createdAt = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
         $this->creationDate = $createdAt;

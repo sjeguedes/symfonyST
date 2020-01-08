@@ -4,6 +4,9 @@ declare(strict_types = 1);
 
 namespace App\Form\Handler;
 
+use App\Domain\Entity\User;
+use App\Domain\ServiceLayer\ImageManager;
+use App\Domain\ServiceLayer\UserManager;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,6 +21,15 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 class AbstractFormHandler implements FormHandlerInterface
 {
     /**
+     * Define data keys and types to check which are used in form request process.
+     */
+    const DATA_CONFIG_TO_CHECK = [
+        'userToUpdate' => User::class,
+        'imageService' => ImageManager::class,
+        'userService'  => UserManager::class
+    ];
+
+    /**
      * @var FlashBagInterface
      */
     protected $flashBag;
@@ -26,6 +38,11 @@ class AbstractFormHandler implements FormHandlerInterface
      * @var FormInterface
      */
     protected $form;
+
+    /**
+     * @var string|array
+     */
+    protected $customError;
 
     /**
      * @var FormFactoryInterface
@@ -46,7 +63,6 @@ class AbstractFormHandler implements FormHandlerInterface
      * @var bool
      */
     private $requestHandled;
-
 
     /**
      * AbstractFormHandler constructor.
@@ -89,7 +105,7 @@ class AbstractFormHandler implements FormHandlerInterface
     {
         // Set model data with $data parameter
         if (!\is_null($data)) {
-            if (!method_exists($this,'initModelData')) {
+            if (!method_exists($this, 'initModelData')) {
                 throw new \RuntimeException('Final form handler class must implement "InitModelDataInterface" to deal with custom data parameter!');
             }
             // Get particular model data object to pre-populate the form
@@ -121,6 +137,30 @@ class AbstractFormHandler implements FormHandlerInterface
     }
 
     /**
+     * Check validity of all data and their types passed in form request process.
+     *
+     * Please note this method can be improved with use of OptionsResolver.
+     *
+     * @param array $data
+     *
+     * @return void
+     */
+    protected function checkNecessaryData(array $data) : void
+    {
+        $dataConfig = self::DATA_CONFIG_TO_CHECK;
+        array_filter($data, function ($value, $key) use ($dataConfig) {
+            // Check data type name
+            if (\is_object($value) && !isset($dataConfig[$key])) {
+                throw new \InvalidArgumentException('Data type name used in form request process is unknown!');
+            }
+            // Check data type
+            if (\is_object($value) && !$value instanceof $dataConfig[$key]) {
+                throw new \InvalidArgumentException('Data type used in form request process is not valid (does not match with its type)!');
+            }
+        }, ARRAY_FILTER_USE_BOTH);
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function processFormRequest(array $actionData = null) : bool
@@ -131,18 +171,20 @@ class AbstractFormHandler implements FormHandlerInterface
         // Check constraints validation
         if (!$this->form->isValid()) {
             // Validation failed.
-            $this->flashBag->add('danger', 'Form validation failed!<br>Try to login again by checking the fields.');
+            $message = 'Validation failed!<br>Try to submit again by checking the form fields.';
+            // Do not create a flash message in case of ajax form validation
+            !$this->request->isXmlHttpRequest() ? $this->flashBag->add('danger', $message) : $this->customError = ['formError' => ['notification' => $message]];
             return false;
         }
         // Add custom validation
-        if (method_exists($this,'addCustomValidation')) {
+        if (method_exists($this, 'addCustomValidation')) {
             // Custom validation did not pass!
             if (false === $this->addCustomValidation($actionData)) {
                 return false;
             }
         }
         // Add action to perform once form is validated
-        if (method_exists($this,'addCustomAction')) {
+        if (method_exists($this, 'addCustomAction')) {
             $this->addCustomAction($actionData);
         }
         return true;

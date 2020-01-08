@@ -3,14 +3,15 @@
 {% block title %}SnowTricks - Error{% endblock %}
 
 {% block header %}
-    {% include 'all/image-header-loader.html.twig' with {'spinnerRatio': '2.5'} %}
-    <div class="uk-position-relative uk-flex uk-flex-center uk-flex-middle uk-background-cover uk-background-blend-darken uk-invisible st-background-image-header" data-src="{{ asset('assets/images/error-snowboard.jpg') }}" style="background-position: 40% 25%; height: 600px" uk-img>
+    {% include 'all/image_header_loader.html.twig' with {'spinnerRatio': '2.5'} %}
+    <div class="uk-position-relative uk-flex uk-flex-center uk-flex-middle uk-background-cover uk-background-blend-darken uk-invisible st-background-image-header" data-src="{{ asset(globalImageDirectory~'/error-snowboard.jpg') }}" style="background-position: 40% 25%; height: 600px" uk-img>
         <div class="uk-position-center uk-text-center uk-padding-small st-overlay-image-header-container">
             <p class="st-color-white st-text-shadow-dark uk-text-large">
                 Oups, it seems to be a bad way...
             </p>
             <p class="st-color-white st-text-shadow-dark uk-text-medium uk-visible@m">
-                There are so many reasons to reach such a dead end (technical issue, expired link, outdated data...)! <br class="uk-visible@l">
+                There are so many reasons to reach such a dead end! <br class="uk-visible@l">
+                These can be a technical issue, no authentication or authorization, an expired link, an outdated data... <br class="uk-visible@l">
                 Maybe, you did something wrong.<br class="uk-visible@l">
                 Try another page, you will find the desired data.
             </p>

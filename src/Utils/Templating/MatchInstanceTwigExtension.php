@@ -11,7 +11,8 @@ use Twig\TwigFunction;
  * Class MatchInstanceTwigExtension.
  *
  * Create a Twig function extension to match an expected object instance in template.
- * TODO: caution!! This is not used in app yet - make a decision to keep or remove class!
+ *
+ * // TODO: caution!! This is not used in app yet - make a decision to keep or remove class!
  */
 class MatchInstanceTwigExtension extends AbstractExtension
 {

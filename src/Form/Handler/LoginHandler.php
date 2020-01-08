@@ -24,11 +24,6 @@ final class LoginHandler extends AbstractFormHandler
     private $authenticationUtils;
 
     /**
-     * @var string
-     */
-    private $customError;
-
-    /**
      * LoginHandler constructor.
      *
      * @param AuthenticationUtils  $authenticationUtils
@@ -42,7 +37,7 @@ final class LoginHandler extends AbstractFormHandler
         FormFactoryInterface $formFactory,
         RequestStack $requestStack
     ) {
-        parent::__construct($flashBag, $formFactory,LoginType::class, $requestStack);
+        parent::__construct($flashBag, $formFactory, LoginType::class, $requestStack);
         $this->authenticationUtils = $authenticationUtils;
         $this->customError = null;
     }
@@ -65,7 +60,7 @@ final class LoginHandler extends AbstractFormHandler
         // DTO is in valid state but with authentication error.
         if (!\is_null($authenticationError)) {
             $this->customError = $authenticationError;
-            $this->flashBag->add('danger', 'Form authentication failed!<br>Try to login again by checking the fields.');
+            $this->flashBag->add('danger', 'Authentication failed!<br>Try to login again by checking the form fields.');
             return false;
         }
         return true;
@@ -76,7 +71,7 @@ final class LoginHandler extends AbstractFormHandler
      *
      * @return string|null
      */
-    public function getAuthenticationError()
+    public function getAuthenticationError() : ?string
     {
         return $this->customError;
     }
