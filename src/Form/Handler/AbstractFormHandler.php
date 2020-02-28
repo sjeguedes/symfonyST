@@ -26,6 +26,7 @@ class AbstractFormHandler implements FormHandlerInterface
     const DATA_CONFIG_TO_CHECK = [
         'userToUpdate' => User::class,
         'imageService' => ImageManager::class,
+        'request'      => Request::class,
         'userService'  => UserManager::class
     ];
 

@@ -47,6 +47,7 @@ class TrickRepository extends ServiceEntityRepository
      * @return int
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws \Doctrine\ORM\NoResultException
      */
     public function countAll() : int
     {
@@ -54,8 +55,7 @@ class TrickRepository extends ServiceEntityRepository
         return (int) $queryBuilder
             ->select($queryBuilder->expr()->count('t.uuid' ))
             ->getQuery()
-            ->getSingleScalarResult()
-        ;
+            ->getSingleScalarResult();
     }
 
     /**
@@ -185,9 +185,8 @@ class TrickRepository extends ServiceEntityRepository
             ->addOrderBy('v.creationDate', 'DESC')
             ->setParameter(1, $uuid->getBytes())
             ->getQuery()
-            ->getResult()
-        ;
-        if(empty($result)) {
+            ->getResult();
+        if (empty($result)) {
             return null;
         }
         return $result[0];

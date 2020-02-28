@@ -44,19 +44,41 @@ class MediaManager
      * @param ImageRepository        $repository
      * @param MediaTypeManager       $mediaTypeManager
      * @param LoggerInterface        $logger
-     *
-     * @return void
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         ImageRepository $repository,
         MediaTypeManager $mediaTypeManager,
-        LoggerInterface $logger)
-    {
+        LoggerInterface $logger
+    ) {
         $this->entityManager = $entityManager;
         $this->mediaTypeManager = $mediaTypeManager;
         $this->repository = $repository;
         $this->setLogger($logger);
+    }
+
+    /**
+     * Create user avatar media reference which corresponds to user avatar created image.
+     *
+     * @param Image     $image
+     * @param MediaType $mediaType
+     * @param User      $user
+     * @param bool      $isMain
+     * @param bool      $isPublished
+     *
+     * @return Media
+     *
+     * @throws \Exception
+     */
+    private function createAndSaveImageMediaWithType(Image $image, MediaType $mediaType, User $user, bool $isMain, bool $isPublished) : Media
+    {
+        // Create media with necessary associated instances and parameters
+        $media = Media::createNewInstanceWithImage($image, $mediaType, null, $user, $isMain, $isPublished);
+        // Persist media and its dependencies thanks to cascade option
+        $this->entityManager->persist($media);
+        // Save data
+        $this->entityManager->flush();
+        return $media;
     }
 
     /**
@@ -75,12 +97,32 @@ class MediaManager
     {
         // Select a media type
         $mediaType = $this->mediaTypeManager->findSingleByUniqueType(MediaType::TYPE_CHOICES['userAvatar']);
-        // Create media with necessary associated instances and parameters
-        $media = Media::createNewInstanceWithImage($image, $mediaType, null, $user, $isMain, $isPublished);
-        // Persist media and its dependencies thanks to cascade option
-        $this->entityManager->persist($media);
-        // Save data
-        $this->entityManager->flush();
+        // Create and save the needed media
+        $media = $this->createAndSaveImageMediaWithType($image, $mediaType, $user, $isMain, $isPublished);
+        return $media;
+    }
+
+    /**
+     * Save a trick media reference which corresponds to one created image which will dedicated to trick entity.
+     *
+     * Please not this method can create a standalone trick media (e.g. which appears in gallery), or a media effectively associated to a trick entity!
+     *
+     * @param Image  $image
+     * @param string $mediaTypeKey
+     * @param User   $user
+     * @param bool   $isMain
+     * @param bool   $isPublished
+     *
+     * @return Media
+     *
+     * @throws \Exception
+     */
+    public function createTrickMedia(Image $image, string $mediaTypeKey, User $user, bool $isMain, bool $isPublished) : Media
+    {
+        // Select a media type
+        $mediaType = $this->mediaTypeManager->findSingleByUniqueType(MediaType::TYPE_CHOICES[$mediaTypeKey]);
+        // Create and save the needed media
+        $media = $this->createAndSaveImageMediaWithType($image, $mediaType, $user, $isMain, $isPublished);
         return $media;
     }
 

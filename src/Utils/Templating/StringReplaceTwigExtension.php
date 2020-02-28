@@ -10,7 +10,7 @@ use Twig\TwigFunction;
 /*
  * Class RegExpReplaceTwigExtension.
  *
- * Create a Twig function extension to encode uuid directly in template.
+ * Create a Twig function extension to replace a pattern in string.
  */
 class StringReplaceTwigExtension extends AbstractExtension
 {

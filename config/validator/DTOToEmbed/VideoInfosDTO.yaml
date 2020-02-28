@@ -1,0 +1,12 @@
+# https://symfony.com/doc/current/validation.html#validation-constraints
+# https://symfony.com/doc/current/validation/groups.html
+App\Domain\DTOToEmbed\VideoInfosDTO:
+    properties:
+        url:
+            - Url: ~
+            - NotBlank:
+                message: Please fill in a description.
+
+        description:
+            - NotBlank:
+                message: Please fill in a description.

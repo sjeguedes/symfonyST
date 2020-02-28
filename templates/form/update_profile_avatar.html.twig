@@ -2,7 +2,7 @@
 {{ form_start(updateProfileAvatarForm, {
     'attr': {
         'id': 'st-ajax-avatar-update-form',
-        'class': 'uk-grid uk-grid-collpase',
+        'class': 'uk-grid uk-grid-collapse',
         'data-ajax-mode': avatarUploadAjaxMode ? '1' : '0',
         'data-avatar-upload-path': path('update_profile', {'mainRoleLabel': app.user.mainRoleLabel|lower}),
         'data-technical-error': 'Sorry, a technical error happened<br>during upload!<br>Please try again later.<br>',
@@ -13,7 +13,7 @@
         {# Actual avatar #}
         <div id="st-current-avatar"{{ userAvatarImage is not null ? '' : ' class="uk-hidden"' }}">
         <div class="uk-inline uk-flex uk-flex-middle uk-flex-center">
-            {% set defaultAvatarImageNamePath = globalImageDirectory~'avatar-default.svg' %}
+            {% set defaultAvatarImageNamePath = globalImageDirectory~'profile-default-avatar.png' %}
             {% set defaultAvatarImageAlt = app.user.getNickName()~'\'s avatar' %}
             {% if userAvatarImage is not null %}
                 {% set avatarImageNamePath = globalAvatarUploadDirectory~userAvatarImage.getName()~'.'~userAvatarImage.getFormat() %}
@@ -60,14 +60,14 @@
         </div>
         {# --- end Avatar reminder --- #}
         {# Avatar preview #}
-        <div class="uk-inline uk-flex uk-flex-middle">
+        <div class="uk-inline uk-flex uk-flex-middle uk-border-rounded uk-padding-small st-background-blue st-box-shadow-full-small">
             <div class="uk-flex-column uk-position-relative uk-box-shadow-small uk-border-rounded uk-padding-small uk-margin-small-right st-background-white">
                 {# Avatar upload progress #}
                 <div id="st-avatar-upload-progress" class="uk-position-center uk-border-circle uk-box-shadow-medium uk-text-center uk-hidden st-background-yellow st-avatar-upload-progress">
                     <small id="st-avatar-upload-loaded-percent" class="uk-text-bold st-color-blue st-avatar-upload-loaded-percent">0%</small>
                 </div>
                 {# Avatar image preview #}
-                <img id="st-avatar-preview" class="st-avatar-preview" width="80" data-default-avatar-path="{{ asset(globalImageDirectory~'avatar-default.svg') }}" data-default-desc="{{ avatarImageAlt }}"
+                <img id="st-avatar-preview" class="st-avatar-preview" width="80" data-default-avatar-path="{{ asset(globalImageDirectory~'profile-default-avatar.png') }}" data-default-desc="{{ avatarImageAlt }}"
                      src="{{ asset(avatarImageNamePath) }}" alt="{{ avatarImageAlt }}">
             </div>
             <div id="st-avatar-action" class="uk-flex-column">
@@ -78,17 +78,17 @@
                         'attr': {'class': 'uk-input st-file-input', 'data-error': 'Please select first<br>an image file for your avatar!'},
                         'value': updateProfileAvatarForm.avatar.vars.value})
                     }}
-                    {% if updateProfileAvatarForm.avatar.vars.errors.form.submitted == 1 %}
-                        {% set class = updateProfileAvatarForm.avatar.vars.valid == 0 ? 'uk-form-danger' : 'uk-form-success' %}
-                        {% set icon = updateProfileAvatarForm.avatar.vars.valid == 0 ? 'warning' : 'check' %}
-                        <span class="uk-form-icon uk-form-icon-flip {{ class }}" uk-icon="icon: {{ icon }}"></span>
-                    {% endif %}
                     {# Avatar change button #}
                     <button class="uk-button uk-button-default st-fake-file-input-button" type="button" tabindex="-1">
                         <span class="uk-form-icon" uk-icon="icon: upload"></span>
                         <span id="st-avatar-change-button-label" class="uk-padding-small" data-select-label="Select" data-change-label="Change">
                             {{ userAvatarImage is not null ? 'Change' : 'Select' }}
                         </span>
+                        {% if updateProfileAvatarForm.avatar.vars.errors.form.submitted == 1 %}
+                            {% set class = updateProfileAvatarForm.avatar.vars.valid == 0 ? 'uk-form-danger' : 'uk-form-success' %}
+                            {% set icon = updateProfileAvatarForm.avatar.vars.valid == 0 ? 'warning' : 'check' %}
+                            <span class="uk-form-icon uk-form-icon-flip {{ class }}" uk-icon="icon: {{ icon }}"></span>
+                        {% endif %}
                     </button>
                 </div>
                 {# Avatar crop modal: opened when avatar file input changes #}
@@ -103,12 +103,12 @@
                         </ul>
                         </p>
                         <div id="st-cropper-container" class="uk-flex uk-flex-center uk-border-rounded uk-margin-auto st-cropper-container st-box-shadow-full-small">
-                            <div id="st-cropper-container-content" class="uk-responsive uk-margin-top uk-margin-right uk-margin-bottom uk-margin-left">
+                            <div id="st-cropper-container-content" class="uk-responsive uk-margin-top uk-margin-right uk-margin-bottom uk-margin-left st-cropper-container-content">
                                 <img id="st-cropper-preview" class="uk-responsive st-cropper-preview" src="" alt="Crop preview">
                             </div>
                         </div>
                         <div class="uk-flex uk-flex-center uk-margin-top">
-                            <button id="st-crop-button" class="uk-button uk-button-secondary uk-border-rounded uk-box-shadow-hover-medium uk-text-bold" title="Validate">
+                            <button id="st-crop-button" class="uk-button uk-button-secondary uk-border-rounded uk-box-shadow-hover-medium uk-text-bold st-crop-button" title="Validate">
                                 Crop <span uk-icon="icon: chevron-right; ratio: 1.3"></span>
                             </button>
                         </div>

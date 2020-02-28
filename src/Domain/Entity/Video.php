@@ -82,14 +82,13 @@ class Video
         string $description,
         \DateTimeInterface $creationDate = null
     ) {
-        $this->uuid = Uuid::uuid4();
         \assert(!empty($url), 'Video URL can not be empty!');
-        $this->url = $url;
         \assert(!empty($description), 'Video description can not be empty!');
+        $this->uuid = Uuid::uuid4();
+        $this->url = $url;
         $this->description = $description;
-        $createdAt = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
-        $this->creationDate = $createdAt;
-        $this->updateDate = $createdAt;
+        $this->creationDate = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
+        $this->updateDate = $this->creationDate;
         $this->medias = new ArrayCollection();
     }
 

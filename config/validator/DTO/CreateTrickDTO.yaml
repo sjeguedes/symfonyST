@@ -1,0 +1,24 @@
+# https://symfony.com/doc/current/validation.html#validation-constraints
+# https://symfony.com/doc/current/validation/groups.html
+App\Domain\DTO\CreateTrickDTO:
+    properties:
+        group:
+            - NotNull:
+                message: Please select a group as expected.
+
+        name:
+            - NotBlank:
+                message: Please fill in a name which is a title.
+
+        description:
+            - NotBlank:
+                message: Please fill in a description.
+
+        # a "Slug" field is not managed (personalized) by form since it is based on name property and created automatically.
+        #slug:
+
+        images:
+            - Valid: ~
+
+        videos:
+            - Valid: ~

@@ -148,17 +148,16 @@ class Trick
         string $slug = null,
         \DateTimeInterface $creationDate = null
     ) {
-        $this->uuid = Uuid::uuid4();
         \assert(!empty($name), 'Trick name can not be empty!');
-        $this->name = $name;
         \assert(!empty($description), 'Trick description can not be empty!');
+        $this->uuid = Uuid::uuid4();
+        $this->name = $name;
         $this->description = $description;
         $this->trickGroup = $trickGroup;
         $this->user = $user;
-        !\is_null($slug) ? $this->customizeSlug($slug) : $this->customizeSlug($name);
-        $createdAt = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
-        $this->creationDate = $createdAt;
-        $this->updateDate = $createdAt;
+        $this->slug = !\is_null($slug) ? $this->makeSlug($slug) : $this->makeSlug($name);
+        $this->creationDate = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
+        $this->updateDate = $this->creationDate;
         $this->rank = null;
         $this->medias = new ArrayCollection();
     }
@@ -209,7 +208,7 @@ class Trick
         if (empty($slug)) {
             throw new \InvalidArgumentException('Trick slug can not be empty!');
         }
-        $this->slug = $this->stringToSlug($slug);
+        $this->slug = $this->makeSlug($slug);
         return $this;
     }
 

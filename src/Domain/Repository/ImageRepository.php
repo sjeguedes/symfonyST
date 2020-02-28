@@ -26,4 +26,22 @@ class ImageRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Image::class);
     }
+
+    /**
+     * Find a Image entity with query based on its name.
+     *
+     * @param string $name
+     *
+     * @return Image|null
+     *
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function findOneByName(string $name) : ?Image
+    {
+        return $this->createQueryBuilder('i')
+            ->where('i.name = :name')
+            ->setParameter('name', $name)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

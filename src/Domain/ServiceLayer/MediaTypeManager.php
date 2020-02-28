@@ -38,6 +38,19 @@ class MediaTypeManager
     }
 
     /**
+     * get a particular media type based on its key.
+     *
+     * @param string $mediaTypeKey
+     *
+     * @return string|null
+     */
+    public function getType(string $mediaTypeKey) : ?string
+    {
+        $type = $this->getMandatoryDefaultTypes()[$mediaTypeKey] ?? null;
+        return $type;
+    }
+
+    /**
      * Find MediaType by type.
      *
      * @param string $type

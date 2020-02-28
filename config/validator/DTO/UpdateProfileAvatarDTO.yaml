@@ -1,0 +1,32 @@
+# https://symfony.com/doc/current/validation.html#validation-constraints
+# https://symfony.com/doc/current/validation/groups.html
+App\Domain\DTO\UpdateProfileAvatarDTO:
+    properties:
+        avatar:
+            - Image:
+                mimeTypes:
+                    - image/pjpeg
+                    - image/jpeg
+                    - image/gif
+                    - image/png
+                    # The use of a svg sanitizer service is necessary to accept this image type.
+                    #- image/svg+xml
+                mimeTypesMessage: This file is not a valid image.
+                # Max size is inherited from File constraint
+                maxSize: 100k
+                maxSizeMessage: The file is too large ({{ size }} {{ suffix }}).<br>Allowed maximum size is {{ limit }} {{ suffix }}.
+                minWidth: 80
+                minWidthMessage: The image width is too small ({{ width }} px).<br>Minimum width expected is {{ min_width }} px.
+                minHeight: 80
+                minHeightMessage: The image height is too small ({{ height }} px).<br>Minimum height expected is {{ min_height }} px.
+
+        removeAvatar:
+            - Type:
+                type: bool
+                message: A technical error happened! Existing image can not be removed.
+
+        cropJSONData:
+            # Data can be null or field can be blank because image is not mandatory!
+            # Upgrade is necessary to use JSON validator: https://symfony.com/blog/new-in-symfony-4-3-json-validation or custom validation callback must be used!
+            #- Json:
+                #message: A technical error happened! Invalid data are used to upload image.

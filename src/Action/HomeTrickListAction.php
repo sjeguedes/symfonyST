@@ -51,6 +51,7 @@ class HomeTrickListAction
      * @return Response
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws \Doctrine\ORM\NoResultException
      */
     public function __invoke(HomeTrickListResponder $responder, Request $request) : Response
     {

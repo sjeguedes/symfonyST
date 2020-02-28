@@ -8,7 +8,6 @@ use App\Domain\DTO\UpdateProfileInfosDTO;
 use App\Domain\Entity\User;
 use App\Domain\ServiceLayer\UserManager;
 use App\Form\Type\Admin\UpdateProfileInfosType;
-use App\Service\Medias\Upload\ImageUploader;
 use App\Utils\Traits\CSRFTokenHelperTrait;
 use App\Utils\Traits\UserHandlingHelperTrait;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -33,36 +32,22 @@ final class UpdateProfileInfosHandler extends AbstractFormHandler implements Ini
     private $csrfTokenManager;
 
     /**
-     * @var ImageUploader
-     */
-    private $imageUploader;
-
-    /**
-     * @var null
-     */
-    private $userToCreate;
-
-    /**
      * UpdateProfileInfosHandler constructor.
      *
      * @param CsrfTokenManagerInterface   $csrfTokenManager
      * @param FlashBagInterface           $flashBag
      * @param FormFactoryInterface        $formFactory
-     * @param ImageUploader               $imageUploader
      * @param RequestStack                $requestStack
      */
     public function __construct(
         csrfTokenManagerInterface $csrfTokenManager,
         FlashBagInterface $flashBag,
         FormFactoryInterface $formFactory,
-        ImageUploader $imageUploader,
         RequestStack $requestStack
     ) {
         parent::__construct($flashBag, $formFactory, UpdateProfileInfosType::class, $requestStack);
         $this->csrfTokenManager = $csrfTokenManager;
         $this->customError = null;
-        $this->imageUploader = $imageUploader;
-        $this->userToCreate = null;
     }
 
     /**

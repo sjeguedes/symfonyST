@@ -26,7 +26,7 @@ class UuidTwigExtension extends AbstractExtension
      *
      * @return array
      */
-    public function getFilters(): array
+    public function getFilters() : array
     {
         return [
             new TwigFilter(

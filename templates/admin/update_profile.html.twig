@@ -4,7 +4,7 @@
 
 {% block header %}
     {% include 'all/image_header_loader.html.twig' with {'spinnerRatio': '2.5'} %}
-    <div class="uk-position-relative uk-flex uk-flex-center uk-flex-middle uk-background-cover uk-background-blend-darken uk-invisible st-background-image-header" data-src="{{ asset(globalImageDirectory~'/snowboard-4.jpg') }}" style="background-position: 40% 25%; height: 600px" uk-img>
+    <div class="uk-position-relative uk-flex uk-flex-center uk-flex-middle uk-background-cover uk-background-blend-darken uk-invisible st-background-image-header" data-src="{{ asset(globalImageDirectory~'snowboard-4.jpg') }}" style="background-position: 40% 25%; height: 600px" uk-img>
         <div class="uk-position-center uk-text-center uk-padding-small st-overlay-image-header-container">
             <p class="st-color-white st-text-shadow-dark uk-text-large">
                 Please fill in the form to edit your personal data!
@@ -63,7 +63,7 @@
                         <!-- //------------------------------------------------------------------------------------------------------------------------------------// -->
                         {# Update profile infos form #}
                         {% form_theme updateProfileInfosForm 'form/uikit_3_form.html.twig' %}
-                        {{ form_start(updateProfileInfosForm, {'attr': {'class': 'uk-grid uk-grid-collpase', 'novalidate': ''}}) }}
+                        {{ form_start(updateProfileInfosForm, {'attr': {'class': 'uk-grid uk-grid-collapse', 'novalidate': ''}}) }}
                             {# Family name #}
                             <div class="uk-width-1-1 uk-margin-small-bottom">
                                 {% if updateProfileInfosForm.familyName.vars.valid == 0 %}

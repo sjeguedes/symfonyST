@@ -74,6 +74,7 @@ class TrickManager
      * @return array
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws \Doctrine\ORM\NoResultException
      */
     public function getDefaultTrickList() : array
     {
@@ -92,6 +93,7 @@ class TrickManager
      * @return array
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws \Doctrine\ORM\NoResultException
      */
     public function getFilteredList(
         int $offset = null,
@@ -132,6 +134,7 @@ class TrickManager
      * @return array|null
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws \Doctrine\ORM\NoResultException
      */
     public function getPaginationParameters(int $pageIndex) : ?array
     {
@@ -173,6 +176,7 @@ class TrickManager
      * @return int
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws \Doctrine\ORM\NoResultException
      */
     public function getStartOffset() : int
     {
@@ -190,6 +194,7 @@ class TrickManager
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      * @throws \UnexpectedValueException
+     * @throws \Doctrine\ORM\NoResultException
      */
     public function countAll() : int
     {
@@ -204,13 +209,14 @@ class TrickManager
      * Filter allowed $offset and $limit values depending on sort direction,
      * and redefine them if it is possible, to avoid issues.
      *
-     * @param int    $offset
-     * @param int    $limit
+     * @param int $offset
+     * @param int $limit
      * @param string $order
      *
      * @return array
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws \Doctrine\ORM\NoResultException
      */
     public function filterParametersWithOrder(
         int $offset,

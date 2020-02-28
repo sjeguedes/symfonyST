@@ -4,7 +4,7 @@
 
 {% block header %}
     {% include 'all/image_header_loader.html.twig' with {'spinnerRatio': '2.5'} %}
-    <div class="uk-position-relative uk-flex uk-flex-center uk-flex-middle uk-background-cover uk-background-blend-darken uk-invisible st-background-image-header" data-src="{{ asset(globalImageDirectory~'/snowboard-4.jpg') }}" style="background-position: 40% 25%; height: 600px" uk-img>
+    <div class="uk-position-relative uk-flex uk-flex-center uk-flex-middle uk-background-cover uk-background-blend-darken uk-invisible st-background-image-header" data-src="{{ asset(globalImageDirectory~'snowboard-4.jpg') }}" style="background-position: 40% 25%; height: 600px" uk-img>
         <div class="uk-position-center uk-text-center uk-padding-small st-overlay-image-header-container">
             <p class="st-color-white st-text-shadow-dark uk-text-large">
                 Please fill in the form to be correctly authenticated!
@@ -52,7 +52,7 @@
                     {# Login form #}
                     <div id="st-form" class="uk-card-body uk-padding-medium{{ loginForm.vars.valid == 1 and lastAuthenticationError == false ?: ' st-form-error' }}">
                         {% form_theme loginForm 'form/uikit_3_form.html.twig' %}
-                        {{ form_start(loginForm, {'attr': {'class': 'uk-grid uk-grid-collpase', 'novalidate': ''}}) }}
+                        {{ form_start(loginForm, {'attr': {'class': 'uk-grid uk-grid-collapse', 'novalidate': ''}}) }}
                             {# Username #}
                             <div class="uk-width-1-1 uk-margin-small-bottom">
                                 {% if loginForm.userName.vars.valid == 0 %}

@@ -88,9 +88,8 @@ class TrickGroup
         $this->name = $name;
         \assert(!empty($description), 'TrickGroup description can not be empty!');
         $this->description = $description;
-        $createdAt = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
-        $this->creationDate = $createdAt;
-        $this->updateDate = $createdAt;
+        $this->creationDate = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
+        $this->updateDate = $this->creationDate;
         $this->tricks = new ArrayCollection();
     }
 

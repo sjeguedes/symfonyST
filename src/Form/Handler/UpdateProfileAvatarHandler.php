@@ -38,11 +38,6 @@ final class UpdateProfileAvatarHandler extends AbstractFormHandler
     private $imageUploader;
 
     /**
-     * @var null
-     */
-    private $userToCreate;
-
-    /**
      * UpdateProfileAvatarHandler constructor.
      *
      * @param CsrfTokenManagerInterface   $csrfTokenManager
@@ -62,7 +57,6 @@ final class UpdateProfileAvatarHandler extends AbstractFormHandler
         $this->csrfTokenManager = $csrfTokenManager;
         $this->customError = null;
         $this->imageUploader = $imageUploader;
-        $this->userToCreate = null;
     }
 
     /**
@@ -170,7 +164,8 @@ final class UpdateProfileAvatarHandler extends AbstractFormHandler
             throw new \InvalidArgumentException('Crop data is an invalid json string!');
         }
         $avatar = $dataModel->getAvatar();
-        $isFileMatched = $avatar->getClientOriginalName() === $cropData[0]->imageName;
+        // Use stripslashes() function to remove added "\" (by Javascript) to make a correct comparison
+        $isFileMatched = urldecode($avatar->getClientOriginalName()) === str_replace('\\', '', $cropData[0]->imageName);
         $areCropAreaDataWithIntegerType = \is_int($cropData[0]->x) && \is_int($cropData[0]->y) && \is_int($cropData[0]->width) && \is_int($cropData[0]->height);
         if (!$isFileMatched || !$areCropAreaDataWithIntegerType) {
             throw new \InvalidArgumentException('Retrieved image crop data are invalid due to possible technical error, or user input tampered data!');

@@ -164,13 +164,14 @@ class User implements UserInterface, \Serializable
     /**
      * User constructor.
      *
-     * @param string $familyName
-     * @param string $firstName
-     * @param string $nickName
-     * @param string $email
-     * @param string $password  an encoded password
-     * @param string $algorithm a hash algorithm type for password
-     * @param array  $roles
+     * @param string                  $familyName
+     * @param string                  $firstName
+     * @param string                  $nickName
+     * @param string                  $email
+     * @param string                  $password     an encoded password
+     * @param string                  $algorithm    a hash algorithm type for password
+     * @param array                   $roles
+     * @param \DateTimeInterface|null $creationDate
      *
      * @return void
      *
@@ -183,7 +184,8 @@ class User implements UserInterface, \Serializable
         string $email,
         string $password,
         string $algorithm = self::DEFAULT_ALGORITHM,
-        array $roles = [self::DEFAULT_ROLE]
+        array $roles = [self::DEFAULT_ROLE],
+        \DateTimeInterface $creationDate = null
     ) {
         \assert(!empty($familyName), 'User family name can not be empty!');
         \assert(!empty($firstName), 'User first name can not be empty!');
@@ -200,7 +202,7 @@ class User implements UserInterface, \Serializable
         $this->roles = $roles;
         $this->salt = null; // can be updated with encoder factory
         $this->isActivated = false;
-        $this->creationDate = new \DateTime();
+        $this->creationDate = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
         $this->updateDate = $this->creationDate;
         $this->medias = new ArrayCollection();
     }

@@ -8,11 +8,17 @@ parameters:
     app_swift_mailer_sender_email: '%env(MAILER_SENDER_EMAIL)%' # admin email
     app_swift_mailer_sender_name: '%env(MAILER_SENDER_NAME)%' # admin email name
     app_images_upload_directory: '%kernel.project_dir%/public/assets/images/uploads'
-    app_avatar_upload_directory: '%app_images_upload_directory%/avatars'
+    app_avatar_image_upload_directory: '%app_images_upload_directory%/avatars'
+    #app_trick_image_upload_directory: '%app_images_upload_directory%/tricks'
+    # TODO: delete trick test upload directory reference!
+    app_trick_image_upload_directory: '%app_images_upload_directory%/tricks-test'
     app_twig_assets_directory: 'assets'
     app_twig_image_directory: '%app_twig_assets_directory%/images/'
     app_twig_image_upload_directory: '%app_twig_image_directory%/uploads'
     app_twig_avatar_upload_directory: '%app_twig_image_upload_directory%/avatars/'
+    #app_twig_trick_upload_directory: '%app_twig_image_upload_directory%/tricks/'
+    # TODO: delete trick test upload directory reference!
+    app_twig_trick_upload_directory: '%app_twig_image_upload_directory%/tricks-test/'
 
 services:
     # default configuration for services in *this* file
@@ -43,6 +49,12 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    # add form handler when creating a new trick
+    App\Action\Admin\CreateTrickAction:
+        tags: ['controller.service_arguments']
+        arguments:
+            $formHandler: '@App\Form\Handler\CreateTrickHandler'
 
     # add form handler when calling login
     App\Action\Admin\LoginAction:
@@ -83,13 +95,16 @@ services:
     # add logout handler
     App\Event\Handler\LogoutHandler:
 
-    # add request new password handler
-    App\Form\Handler\RequestNewPasswordHandler:
-        arguments:
-            $emailConfigFactory: '@App\Service\Mailer\Email\EmailConfigFactory'
+    # add trick creation handler
+    App\Form\Handler\CreateTrickHandler:
 
     # add renew password handler
     App\Form\Handler\RenewPasswordHandler:
+        arguments:
+            $emailConfigFactory: '@App\Service\Mailer\Email\EmailConfigFactory'
+
+    # add request new password handler
+    App\Form\Handler\RequestNewPasswordHandler:
         arguments:
             $emailConfigFactory: '@App\Service\Mailer\Email\EmailConfigFactory'
 
@@ -100,11 +115,14 @@ services:
 
     # add update profile infos handler
     App\Form\Handler\UpdateProfileInfosHandler:
-        arguments:
-            $imageUploader: '@App\Service\Medias\Upload\ImageUploader'
 
     # add custom DTO mapper
     App\Form\DataMapper\DTOMapper:
+
+    # add (trick) image to crop creation type
+    App\Form\TypeToEmbed\ImageToCropType:
+        arguments:
+            $dataMapper: '@App\Form\DataMapper\DTOMapper'
 
     # add user update profile avatar type
     App\Form\Type\Admin\UpdateProfileAvatarType:
@@ -115,6 +133,9 @@ services:
     App\Form\Type\Admin\UpdateProfileInfosType:
         arguments:
             $formSubscriber: '@App\Event\Subscriber\FormSubscriber'
+
+    # add custom constraint validator as concerns ImageToCropDTO class
+    App\Form\Validator\ImageToCropConstraintValidator:
 
     # add SwiftMailer manager
     App\Service\Mailer\SwiftMailerManager:
@@ -140,9 +161,15 @@ services:
     App\Service\Templating\TemplateRendererInterface: '@App\Service\Templating\TwigTemplateRenderer'
     App\Service\Templating\TemplateBlockRendererInterface: '@App\Service\Templating\TwigTemplateRenderer'
 
-    # custom Twig extensions
+    # add "preg_replace" function
+    App\Utils\Templating\StringReplaceTwigExtension:
+        public: false
+        tags: ['twig.extension']
+
     # add "uuid_encode" filter
     App\Utils\Templating\UuidTwigExtension:
+        public: false
+        tags: ['twig.extension']
 
     # add ResultSetMappingBuilder as a service for native queries
     Doctrine\ORM\Query\ResultSetMappingBuilder:
@@ -152,3 +179,11 @@ services:
 
     # add options resolver
     Symfony\Component\OptionsResolver\OptionsResolver:
+
+    # Activate StringLoader Twig extension
+    # enable the use of template_string() function
+    # https://stackoverflow.com/questions/19478219/activate-stringloader-twig-extension-in-symfony
+    # https://twig.symfony.com/doc/2.x/functions/template_from_string.html
+    Twig\Extension\StringLoaderExtension:
+        public: false
+        tags: ['twig.extension']

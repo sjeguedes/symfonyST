@@ -53,6 +53,7 @@ class PaginatedTrickListAction
      * @return Response
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws \Doctrine\ORM\NoResultException
      */
     public function __invoke(PaginatedTrickListResponder $responder, RedirectionResponder $redirectionResponder, Request $request) : Response
     {

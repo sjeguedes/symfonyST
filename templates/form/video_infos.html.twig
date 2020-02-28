@@ -1,0 +1,17 @@
+{# rootForm var is provided by root form template which calls this template #}
+{# TODO: modify this prototype with widget and create editable template like images! #}
+{% set formName = '__'~rootForm.vars.name~'__' %}
+{% set videoIndex = '__imageIndex__' %}
+<div class="st-video-infos">
+    <label>Video {{ videoIndex }}</label>
+    <div id="{{ formName }}_videos_{{ videoIndex }}">
+        <div>
+            <label for="{{ formName }}_videos_{{ videoIndex }}_url">Url</label>
+            <input type="text" id="{{ formName }}_videos_{{ videoIndex }}_url" name="{{ formName }}[videos][{{ videoIndex }}][url]" inputmode="url" />
+        </div>
+        <div>
+            <label for="{{ formName }}_videos_{{ videoIndex }}_description">Description</label>
+            <input type="text" id="{{ formName }}_videos_{{ videoIndex }}_description" name="{{ formName }}[videos][{{ videoIndex }}][description]" />
+        </div>
+    </div>
+</div>

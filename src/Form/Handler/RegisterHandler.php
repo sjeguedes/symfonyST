@@ -44,11 +44,6 @@ final class RegisterHandler extends AbstractFormHandler
     private $mailer;
 
     /**
-     * @var null
-     */
-    private $userToCreate;
-
-    /**
      * RegisterHandler constructor.
      *
      * @param CsrfTokenManagerInterface   $csrfTokenManager
@@ -71,7 +66,6 @@ final class RegisterHandler extends AbstractFormHandler
         $this->customError = null;
         $this->emailConfigFactory = $emailConfigFactory;
         $this->mailer = $mailer;
-        $this->userToCreate = null;
     }
 
     /**
@@ -142,7 +136,7 @@ final class RegisterHandler extends AbstractFormHandler
     }
 
     /**
-     * Get the authentication error.
+     * Get the unique user error.
      *
      * @return array|null
      */

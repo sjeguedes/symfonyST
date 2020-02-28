@@ -101,18 +101,17 @@ class Image
         int $size,
         \DateTimeInterface $creationDate = null
     ) {
-        $this->uuid = Uuid::uuid4();
         \assert(!empty($name), 'Image name can not be empty!');
-        $this->name = $name;
         \assert(!empty($description), 'Image description can not be empty!');
-        $this->description = $description;
         \assert(!empty($format), 'Image format can not be empty!');
-        $this->format = $format;
         \assert($size > 0, 'Image size must be greater than 0!');
+        $this->uuid = Uuid::uuid4();
+        $this->name = $name;
+        $this->description = $description;
+        $this->format = $format;
         $this->size = $size;
-        $createdAt = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
-        $this->creationDate = $createdAt;
-        $this->updateDate = $createdAt;
+        $this->creationDate = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
+        $this->updateDate = $this->creationDate;
         $this->medias = new ArrayCollection();
     }
 
@@ -122,6 +121,8 @@ class Image
      * @param string $name
      *
      * @return Image
+     *
+     * @throws \Exception
      */
     public function modifyName(string $name) : self
     {
@@ -138,6 +139,8 @@ class Image
     * @param string $description
     *
     * @return Image
+    *
+    * @throws \Exception
     */
     public function modifyDescription(string $description) : self
     {
@@ -154,6 +157,8 @@ class Image
      * @param \DateTimeInterface $updateDate
      *
      * @return Image
+     *
+     * @throws \Exception
      */
     public function modifyUpdateDate(\DateTimeInterface $updateDate) : self
     {

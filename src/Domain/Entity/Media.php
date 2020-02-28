@@ -129,9 +129,8 @@ class Media
         $this->user = $user;
         $this->isMain = $isMain;
         $this->isPublished = $isPublished;
-        $createdAt = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
-        $this->creationDate = $createdAt;
-        $this->updateDate = $createdAt;
+        $this->creationDate = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
+        $this->updateDate = $this->creationDate;
     }
 
     /**

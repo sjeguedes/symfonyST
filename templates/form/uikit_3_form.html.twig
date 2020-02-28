@@ -6,8 +6,8 @@
         <ul class="uk-list">
             {%- for error in errors -%}
                 <li>
-                    <div class="uk-label uk-form-danger uk-box-shadow-large uk-text-bold uk-text">
-                        <p class="uk-margin-remove uk-text-center">
+                    <div class="uk-label uk-display-inline-block uk-form-danger uk-box-shadow-large uk-text-bold uk-text">
+                        <p class="uk-display-inline-block uk-margin-remove uk-text-center">
                             <span uk-icon="icon: arrow-down"></span> {{ error.message|raw }}
                         </p>
                     </div>
@@ -24,10 +24,37 @@
         {# Attribute "required" is not supported #}
         {%- set required = false -%}
     {%- endif -%}
-    <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
+        <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}"{% endif %}/>
 {%- endblock form_widget_simple -%}
 
 {# Checkboxes #}
 {%- block checkbox_widget -%}
-    <input type="checkbox" {{ block('widget_attributes') }}{% if value is not empty %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
+    <input type="checkbox" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
 {%- endblock checkbox_widget -%}
+
+{# Images Collection field #}
+{#{%- block _create_trick_images_widget -%}
+    #}{# the inner ImageToCropType #}{#
+    Ceci est un test.
+    {{- block('_create_trick_images_entry_image_to_crop_widget') -}}
+{%- endblock -%}#}
+
+{#{% block _create_trick_images_entry_image_to_crop_widget %}
+    {{- block('_create_trick_images_entry_image_to_crop_entry_image_widget') -}}
+{% endblock %}#}
+
+{#{% block _create_trick_images_entry_image_to_crop_entry_image_widget %}
+    #}{# the inner image field #}{#
+    {{- block('form_widget_simple') -}}
+    {{ full_name }}
+{% endblock %}#}
+
+{#{% block _create_trick_images_entry_image_to_crop_entry_description_widget %}
+    #}{# the inner image field #}{#
+    <textarea {{ block('widget_attributes') }}>{{ value }}</textarea>
+    {{ full_name }}
+{% endblock %}#}
+
+{#{% block _task_manager_task_lists_entry_tasks_entry_name_* %}
+    #}{# the field of TaskType #}{#
+{% endblock %}#}
