@@ -7,18 +7,16 @@ parameters:
     app_website_name: '%env(WEBSITE_NAME)%'
     app_swift_mailer_sender_email: '%env(MAILER_SENDER_EMAIL)%' # admin email
     app_swift_mailer_sender_name: '%env(MAILER_SENDER_NAME)%' # admin email name
+    # PHP paths retrieved with parameter bag:
     app_images_upload_directory: '%kernel.project_dir%/public/assets/images/uploads'
     app_avatar_image_upload_directory: '%app_images_upload_directory%/avatars'
-    #app_trick_image_upload_directory: '%app_images_upload_directory%/tricks'
-    # TODO: delete trick test upload directory reference!
-    app_trick_image_upload_directory: '%app_images_upload_directory%/tricks-test'
+    app_trick_image_upload_directory: '%app_images_upload_directory%/tricks'
+    # Twig paths:
     app_twig_assets_directory: 'assets'
     app_twig_image_directory: '%app_twig_assets_directory%/images/'
-    app_twig_image_upload_directory: '%app_twig_image_directory%/uploads'
-    app_twig_avatar_upload_directory: '%app_twig_image_upload_directory%/avatars/'
-    #app_twig_trick_upload_directory: '%app_twig_image_upload_directory%/tricks/'
-    # TODO: delete trick test upload directory reference!
-    app_twig_trick_upload_directory: '%app_twig_image_upload_directory%/tricks-test/'
+    app_twig_image_upload_directory: '%app_twig_image_directory%uploads/'
+    app_twig_avatar_upload_directory: '%app_twig_image_upload_directory%avatars/'
+    app_twig_trick_upload_directory: '%app_twig_image_upload_directory%tricks/'
 
 services:
     # default configuration for services in *this* file

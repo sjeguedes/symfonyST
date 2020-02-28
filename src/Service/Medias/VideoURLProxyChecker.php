@@ -59,7 +59,7 @@ class VideoURLProxyChecker
     }
 
     /**
-     * Get URL as resource to check if a content can be loaded.
+     * Request URL to check if a content can be loaded.
      *
      * @param string $url
      *
@@ -67,10 +67,17 @@ class VideoURLProxyChecker
      */
     private function isContent(string $url) : bool
     {
-        $resource = @fopen($url, 'r');
-        $isResource = \is_resource($resource) ? true : false;
-        fclose($resource);
-        return $isResource;
+        $handle = curl_init($url);
+        curl_setopt($handle, CURLOPT_RETURNTRANSFER, 1);
+        // Avoid content loading by getting the headers only
+        curl_setopt($handle, CURLOPT_NOBODY, 1);
+        // Request with cURL
+        curl_exec($handle);
+        $httpCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
+        // Check resource availability with HTTP response status code
+        $isContentFound = 404 !== $httpCode ? true : false;
+        curl_close($handle);
+        return $isContentFound;
     }
 
     /**

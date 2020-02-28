@@ -4,6 +4,7 @@
     "require": {
         "php": "^7.2.14",
         "ext-ctype": "*",
+        "ext-curl": "*",
         "ext-gd": "*",
         "ext-gmp": "*",
         "ext-http": "*",
