@@ -59,8 +59,6 @@ class AjaxVideoURLCheckAction
         // Check if URL value is null!
         $url = $this->trickVideoChecker->filterURLAttribute($request);
         if (\is_null($url)) {
-            // Set URL to empty string to use this expected type above.
-            $url = '';
             $this->logger->error("[trace app snowTricks] AjaxVideoURLCheckAction/__invoke => url: null");
         }
         $data = $this->trickVideoChecker->verify($url);

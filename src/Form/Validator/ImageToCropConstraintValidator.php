@@ -254,10 +254,10 @@ class ImageToCropConstraintValidator extends ConstraintValidator
         $object = $context->getObject();
         // Saved image name (which is a kind of identifier) is automatically feed each time a image is uploaded in corresponding "image to crop" box.
         if (!\is_null($object->getSavedImageName())) {
-            // Check if a real image which correspond to saved image name is present on server.
+            // Check if a real image which corresponds to saved image name is present on server.
             $isImageFileFound = $this->imageService->getImageUploader()->checkFileUploadOnServer($object->getSavedImageName());
             // Image file may not have been created physically yet, so we check if "cropJSONData" identifier is the same as "savedImageName" value!
-            if (!$isImageFileFound) {
+            if (!$isImageFileFound && !\is_null($object->getCropJSONData())) {
                 $dataObjectFromJSONData = json_decode($object->getCropJSONData());
                 if (json_last_error() !== JSON_ERROR_NONE && property_exists(\get_class($dataObjectFromJSONData[0]),'identifier')) {
                     $imageJSONIdentifier = $dataObjectFromJSONData[0]->identifier;

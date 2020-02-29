@@ -20,8 +20,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -45,11 +43,6 @@ class ImageToCropType extends AbstractType
     private $imageService;
 
     /**
-     * @var Request
-     */
-    private $request;
-
-    /**
      * @var Security
      */
     private $security;
@@ -64,22 +57,19 @@ class ImageToCropType extends AbstractType
      *
      * @param DataMapperInterface $dataMapper
      * @param ImageManager        $imageService
-     * @param RequestStack        $requestStack
      * @param Security            $security
      * @param ValidatorInterface  $validator
      */
     public function __construct(
         DataMapperInterface $dataMapper,
         ImageManager $imageService,
-        RequestStack $requestStack,
         Security $security,
         ValidatorInterface $validator
     ) {
+        $this->dataMapper = $dataMapper;
         $this->imageService = $imageService;
-        $this->request = $requestStack->getCurrentRequest();
         $this->security = $security;
         $this->validator = $validator;
-        $this->dataMapper = $dataMapper;
     }
 
     /**
@@ -98,15 +88,15 @@ class ImageToCropType extends AbstractType
             ->add('description', TextType::class, [
             ])
             ->add('cropJSONData', HiddenType::class, [
-                // maintain validation state to the child form level, to be able to show errors near field
+                // maintain validation state at the child form level, to be able to show errors near field
                 'error_bubbling' => false
             ])
             ->add('imagePreviewDataURI', HiddenType::class, [
-                // maintain validation state to the child form level, to be able to show errors near field
+                // maintain validation state at the child form level, to be able to show errors near field
                 'error_bubbling' => false
             ])
             ->add('savedImageName', HiddenType::class, [
-                // maintain validation state to the child form level, to be able to show errors near field
+                // maintain validation state at the child form level, to be able to show errors near field
                 'error_bubbling' => false
             ])
             ->add('isMain', CheckboxType::class, [
@@ -133,20 +123,18 @@ class ImageToCropType extends AbstractType
             $imageToCropDataModel = $this->prepareAndCheckDataModelForDirectUpload($currentImageToCropForm, $formData, $rootFormHandler);
             // Image or/and cropJSON Data are not valid, so direct upload must no be enabled!
             if (\is_null($imageToCropDataModel)) {
-                // TODO: delete method here and setData()!
-                // Cancel preview, crop JSON data and possibly already saved image name
-                //$formData = $this->resetInvalidPersistentImageData($formData);
-                // Update global current "image to crop" form data to reset corresponding values
-                //$event->setData($formData);
                 return;
             }
-            // TODO: maybe prepare switch() here!
             // if no expected violation is found, save directly the uploaded file as a standalone media without complete root form validation
-            if ($currentImageToCropForm->getRoot()->getConfig()->getType()->getInnerType() instanceof CreateTrickType) {
+            $rootFormType = $currentImageToCropForm->getRoot()->getConfig()->getType()->getInnerType();
+            switch ($rootFormType) {
                 // Create a Trick image with the highest expected format
-                $createdImageOnServer = $this->imageService->createTrickImage($imageToCropDataModel, 'trickBig', $authenticatedUser, true);
-            } else {
-                return;
+                case $rootFormType instanceof CreateTrickType:
+                    $createdImageOnServer = $this->imageService->createTrickImage($imageToCropDataModel, 'trickBig', $authenticatedUser, true);
+                    break;
+                // Stop process for other root form types
+                default:
+                    return;
             }
             // Upload is a success: update mandatory form data associated to image to make a persistence until complete form validation
             if (!\is_null($createdImageOnServer)) {
@@ -221,22 +209,6 @@ class ImageToCropType extends AbstractType
             }
         }
         return $imageToCropDataModel;
-    }
-
-    /**
-     * Reset all mandatory data associated to uploaded image for a persistence reference.
-     *
-     * @param array $formData
-     *
-     * @return array the updated form data
-     */
-    private function resetInvalidPersistentImageData(array $formData) : array
-    {
-        // Cancel all image persistent data, but not UploadedFile to keep its violation(s) and show error(s) in form
-        $formData['imagePreviewDataURI'] = null;
-        $formData['cropJSONData'] = null;
-        $formData['savedImageName'] = null;
-        return $formData;
     }
 
     /**

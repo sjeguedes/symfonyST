@@ -15,9 +15,9 @@ use Symfony\Component\HttpFoundation\Request;
 class VideoURLProxyChecker
 {
     const ALLOWED_URL_PATTERNS = [
-        '/^https?\:\/\/www\.youtube\.com\/embed\/.+$/',
-        '/^https?\:\/\/player\.vimeo\.com\/video\/.+$/',
-        '/^https?\:\/\/www\.dailymotion\.com\/embed\/video\/.+$/'
+        '/^https?:\/\/www\.youtube\.com\/embed\/.+$/',
+        '/^https?:\/\/player\.vimeo\.com\/video\/.+$/',
+        '/^https?:\/\/www\.dailymotion\.com\/embed\/video\/.+$/'
     ];
 
     /**
@@ -67,6 +67,7 @@ class VideoURLProxyChecker
      */
     private function isContent(string $url) : bool
     {
+        // Use cURL
         $handle = curl_init($url);
         curl_setopt($handle, CURLOPT_RETURNTRANSFER, 1);
         // Avoid content loading by getting the headers only
@@ -85,16 +86,16 @@ class VideoURLProxyChecker
      *
      * Value 1 means URL can be loaded and value 0 means error context must be used!
      *
-     * @param string $url
+     * @param string|null $url
      *
      * @return array
      *
      * @see https://symfony.com/doc/current/controller.html#returning-json-response
      */
-    public function verify(string $url) : array
+    public function verify(?string $url) : array
     {
         // Prepare array to be converted in JSON string with Symfony JsonResponse object (no need to use "json_encode" here)
-        if (empty($url)) {
+        if (\is_null($url)) {
             return ['status' => 0];
         }
         return $this->allow($url) && $this->isContent($url) ? ['status' => 1] : ['status' => 0];
