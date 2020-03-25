@@ -64,6 +64,8 @@ class VideoURLProxyChecker
      * @param string $url
      *
      * @return bool
+     *
+     * @see https://stackoverflow.com/questions/408405/easy-way-to-test-a-url-for-404-in-php
      */
     private function isContent(string $url) : bool
     {

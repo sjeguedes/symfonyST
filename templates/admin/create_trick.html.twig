@@ -162,7 +162,7 @@
                                             </a>
                                             <p class="uk-margin-remove uk-text-center st-line-height-normal">
                                                 <small class="uk-display-block uk-margin-small-top uk-margin-small-bottom uk-text-bold">
-                                                    <span uk-icon="icon: info"></span> Name reminder<br>
+                                                    <span uk-icon="icon: info"></span> Description reminder<br>
                                                 </small>
                                                 <small>
                                                     Trick description illustrates the way to execute the figure.
@@ -209,7 +209,11 @@
                                                 </small>
                                                 <small>
                                                     Trick images are present on its dedicated page.
-                                                    No maximum number is defined. We encourage you to add images with high resolution!
+                                                    No maximum length is defined.<br>
+                                                    Each image is expected to be a file with one of these extensions:<br><span class="uk-text-bold">.jpg, .jpeg, .png, .gif</span><br>
+                                                    Its minimum format must be:<br><span class="uk-text-bold">1600px (width) x 900px (height)</span><br>
+                                                    and its maximum size must be:<br><span class="uk-text-bold">2MB (MegaByte / Mo)</span>.<br>
+                                                    One image in set must be promoted as "<span class="uk-text-bold">Main image</span>" on trick header page.
                                                 </small>
                                             </p>
                                         </div>
@@ -223,7 +227,7 @@
                                     {% set imageIndex = createTrickForm.images.vars.prototype.vars.name %}
                                     <div id="st-images-collection" class="st-images-collection" data-prototype="{{ imageToCropTemplate }}" data-prototype-name="{{ imageIndex }}">
                                     {% if createTrickForm.images.children is not empty %}
-                                        {# TODO: loop on children and get array keys which corresponds to image index name #}
+                                        {# Loop on children to retrieve all associated images (with corresponding box) on the way to be possibly created #}
                                         {% for imageIndex, formView in createTrickForm.images.children %}
                                             {# index = imageIndex, value = formView  #}
                                             {{ include('form/editable_image_to_crop.html.twig', {

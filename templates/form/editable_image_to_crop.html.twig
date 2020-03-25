@@ -16,6 +16,11 @@
             'data-image-index-name': imageIndex
         }
     }) }}
+    {# Main image indicator #}
+    {% set isMainHiddenClass = imageToCropForm.isMain.vars.checked == 0 ? 'uk-hidden ' : '' %}
+    <span id="st-main-image-indicator-{{ imageIndex }}" class="{{ isMainHiddenClass }}uk-text-small uk-text-uppercase uk-text-bold uk-display-inline-block uk-margin-small-left st-main-image-indicator">
+        <span class="st-color-blue st-background-yellow st-svg-icon-padding">Main image</span>
+    </span>
     {# Image fields #}
     <div class="uk-grid uk-grid-collapse">
         {# Image file #}
@@ -40,7 +45,7 @@
                     {% set isImageDescription = imageToCropForm.description.vars.value != '' ? true : false %}
                     {% set imageNamePath = isImagePreview ? imageToCropForm.imagePreviewDataURI.vars.value : asset(globalImageDirectory~'image-crop-box-default-thumb.png') %}
                     {% set imageDescription = isImageDescription ? 'Description will be: '~imageToCropForm.description.vars.value : 'Image description must be filled in!' %}
-                    <img id="st-image-preview-{{ imageIndex }}" class="st-image-preview" width="142" src="{{ imageNamePath|e('html_attr') }}" alt="{{ imageDescription|e('html_attr') }}" >
+                    <img id="st-image-preview-{{ imageIndex }}" class="st-image-preview" width="142" src="{{ imageNamePath|e('html_attr') }}" data-default-image-path="{{ asset(globalImageDirectory~'image-crop-box-default-thumb.png') }}" alt="{{ imageDescription|e('html_attr') }}" >
                     {{ form_row(imageToCropForm.imagePreviewDataURI, {
                         'attr': {'class': 'st-image-preview-data-uri'},
                         'value': imageToCropForm.imagePreviewDataURI.vars.value})
@@ -53,7 +58,10 @@
                             {{ form_widget(imageToCropForm.image, {
                                 'attr': {
                                     'class': 'uk-input st-file-input',
-                                    'data-error': 'Please select first<br>an image file which is allowed!'
+                                    'data-error': 'Please select first<br>an image file which is allowed!',
+                                    'data-error-2': 'Please select another file!<br>This one will be refused due to invalid dimensions!',
+                                    'data-error-3': 'Please select another file!<br>This one will be refused due to invalid size!',
+                                    'data-error-4': 'Crop aborted!<br>Please select another image to crop<br>to validate the form!'
                                 },
                                 'value': imageToCropForm.image.vars.value})
                             }}
@@ -145,24 +153,18 @@
             </div>
             {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
             {# Show as main image? #}
-            <div class="uk-width-1-1 uk-margin-small-top uk-margin-small-bottom">
+            <div id="st-is-main-image-{{ imageIndex }}" class="uk-width-1-1 uk-margin-small-top uk-margin-small-bottom">
                 <div class="uk-inline">
                     {% if imageToCropForm.isMain.vars.valid == 0 %}
                         {{ form_errors(imageToCropForm.isMain) }}
                     {% endif %}
-                    {# TODO: add Javascript logic and custom callback validation to check all the values which can not be set to false at the same time! #}
-                    {# Please note this can be changed via JavaScript to update all image to crop boxes to false when one is set to true! #}
+                    {# Please note this can be changed via JavaScript to update all other "image to crop" boxes to false when one is set to true! #}
                     {{ form_widget(imageToCropForm.isMain, {
-                        'attr': {'class': imageToCropForm.isMain.vars.valid == 0 ? 'uk-checkbox uk-form-error' : 'uk-checkbox'},
+                        'attr': {'class': imageToCropForm.isMain.vars.valid == 0 ? 'uk-checkbox uk-form-error st-is-main-image' : 'uk-checkbox st-is-main-image'},
                         'value': imageToCropForm.isMain.vars.value})
                     }}
                     {{ form_label(imageToCropForm.isMain, 'Show as main image?', {'label_attr': {'class': 'uk-form-label'}}) }}
                 </div>
-                <p class="uk-margin-small-top">
-                    <small>
-                        "Main image" option will promote this image on trick header page.
-                    </small>
-                </p>
             </div>
             {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
         </div>

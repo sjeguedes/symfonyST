@@ -142,8 +142,8 @@ class ImageToCropConstraintValidator extends ConstraintValidator
         // "image" field can not be null (no uploaded image) when "savedImageName" field is also null.
         // This equals "NotNull" constraint.
         if (\is_null($object->getImage()) && \is_null($object->getSavedImageName())) {
-            $addedText = !\is_null($object->getCropJSONData()) ? 'new file to validate.' : 'image as expected.';
-            $context->buildViolation('Please select a ' . $addedText)
+            $addedText = !\is_null($object->getCropJSONData()) ? 'a new file to validate.' : 'an image as expected.';
+            $context->buildViolation('Please select ' . $addedText)
                 ->atPath('image')
                 ->addViolation();
         }

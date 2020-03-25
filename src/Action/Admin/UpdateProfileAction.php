@@ -153,7 +153,7 @@ class UpdateProfileAction
             if ($isFormRequestValid) {
                 $redirectionURL = $this->generateURLFromRoute($routeName, $routeParameters);
                 $response = new JsonResponse(['redirectionURL' => $redirectionURL]);
-                // Return a JSON response to show an invalid form or a custom check error notification
+            // Return a JSON response to show an invalid form or a custom check error notification
             } else {
                 $avatarUploadError = $this->formHandlers[0]->getUserAvatarError();
                 $response = new JsonResponse($avatarUploadError);

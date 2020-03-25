@@ -51,8 +51,8 @@
                             <span uk-icon="icon: info"></span> Avatar reminder<br>
                         </small>
                         <small>
-                            Your avatar image is expected to be a file with any of these .jpg, .jpeg, .png, .gif formats.<br>
-                            Its maximum size must be 100k (Kilobyte / ko).
+                            Your avatar image is expected to be a file with one of these extensions:<br><span class="uk-text-bold">.jpg, .jpeg, .png, .gif</span><br>
+                            Its minimum format must be:<br><span class="uk-text-bold">80px (width) x 80px (height)</span><br>and its maximum size must be:<br><span class="uk-text-bold">100KB (KiloByte / Ko)</span>.
                         </small>
                     </p>
                 </div>
@@ -67,7 +67,7 @@
                     <small id="st-avatar-upload-loaded-percent" class="uk-text-bold st-color-blue st-avatar-upload-loaded-percent">0%</small>
                 </div>
                 {# Avatar image preview #}
-                <img id="st-avatar-preview" class="st-avatar-preview" width="80" data-default-avatar-path="{{ asset(globalImageDirectory~'profile-default-avatar.png') }}" data-default-desc="{{ avatarImageAlt }}"
+                <img id="st-avatar-preview" class="st-avatar-preview" width="80" data-default-image-path="{{ asset(globalImageDirectory~'profile-default-avatar.png') }}" data-default-desc="{{ avatarImageAlt }}"
                      src="{{ asset(avatarImageNamePath) }}" alt="{{ avatarImageAlt }}">
             </div>
             <div id="st-avatar-action" class="uk-flex-column">
@@ -75,7 +75,14 @@
                 <div id="st-change-avatar-container" data-change-text-info="Please confirm avatar change by updating profile!" uk-form-custom>
                     {# Avatar file input #}
                     {{ form_widget(updateProfileAvatarForm.avatar, {
-                        'attr': {'class': 'uk-input st-file-input', 'data-error': 'Please select first<br>an image file for your avatar!'},
+                        'attr': {
+                            'class': 'uk-input st-file-input',
+                            'data-error': 'Please select first<br>an image file which is allowed!',
+                            'data-error-2': 'Please select another file!<br>This one will be refused due to invalid dimensions!',
+                            'data-error-3': 'Please select another file!<br>This one will be refused due to invalid size!',
+                            'data-error-4': 'Crop aborted!<br>Please select another image to crop<br>to validate the form!',
+                            'data-error-5': 'File type, size and dimensions must be checked!'
+                        },
                         'value': updateProfileAvatarForm.avatar.vars.value})
                     }}
                     {# Avatar change button #}

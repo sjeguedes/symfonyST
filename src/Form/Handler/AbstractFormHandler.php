@@ -174,7 +174,9 @@ class AbstractFormHandler implements FormHandlerInterface
             // Validation failed.
             $message = 'Validation failed!<br>Try to submit again by checking the form fields.';
             // Do not create a flash message in case of ajax form validation
-            !$this->request->isXmlHttpRequest() ? $this->flashBag->add('danger', $message) : $this->customError = ['formError' => ['notification' => $message]];
+            !$this->request->isXmlHttpRequest()
+                ? $this->flashBag->add('danger', $message)
+                : $this->customError = ['formError' => ['notification' => $message]];
             return false;
         }
         // Add custom validation

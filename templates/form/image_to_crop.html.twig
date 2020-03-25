@@ -14,6 +14,11 @@
             'data-image-index-name': imageIndex
         }
     }) }}
+    {# Main image indicator #}
+    {% set isMainHiddenClass = rootForm.images.vars.prototype.isMain.vars.checked == 0 ? 'uk-hidden ' : '' %}
+    <span id="st-main-image-indicator-{{ imageIndex }}" class="{{ isMainHiddenClass }}uk-text-small uk-text-uppercase uk-text-bold uk-display-inline-block uk-margin-small-left st-main-image-indicator">
+        <span class="st-color-blue st-background-yellow st-svg-icon-padding">Main image</span>
+    </span>
     {# Image fields #}
     <div class="uk-grid uk-grid-collapse">
         {# Image file #}
@@ -23,7 +28,7 @@
                 <div class="uk-flex-column uk-position-relative uk-box-shadow-small uk-border-rounded uk-padding-small uk-margin-small-right st-background-white">
                     {# TODO: change calls to variables! #}
                     {# Image preview #}
-                    <img id="st-image-preview-{{ imageIndex }}" class="st-image-preview" width="142" src="{{ asset(globalImageDirectory~'image-crop-box-default-thumb.png') }}" alt="Image description must be filled in!" >
+                    <img id="st-image-preview-{{ imageIndex }}" class="st-image-preview" width="142" src="{{ asset(globalImageDirectory~'image-crop-box-default-thumb.png') }}" data-default-image-path="{{ asset(globalImageDirectory~'image-crop-box-default-thumb.png') }}" alt="Image description must be filled in!" >
                     {{ form_row(rootForm.images.vars.prototype.imagePreviewDataURI, {
                         'attr': {'class': 'st-image-preview-data-uri'},
                         'value': rootForm.images.vars.prototype.imagePreviewDataURI.vars.value
@@ -37,7 +42,10 @@
                             {{ form_widget(rootForm.images.vars.prototype.image, {
                                 'attr': {
                                     'class': 'uk-input st-file-input',
-                                    'data-error': 'Please select first<br>an image file which is allowed!'
+                                    'data-error': 'Please select first<br>an image file which is allowed!',
+                                    'data-error-2': 'Please select another file!<br>This one will be refused due to invalid dimensions!',
+                                    'data-error-3': 'Please select another file!<br>This one will be refused due to invalid size!',
+                                    'data-error-4': 'Crop aborted!<br>Please select another image to crop<br>to validate the form!'
                                 },
                                 'value': rootForm.images.vars.prototype.image.vars.value})
                             }}
@@ -110,19 +118,15 @@
             </div>
             {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
             {# Show as main image? #}
-            <div class="uk-width-1-1 uk-margin-small-top uk-margin-small-bottom">
+            <div id="st-is-main-image-{{ imageIndex }}" class="uk-width-1-1 uk-margin-small-top uk-margin-small-bottom">
                 <div class="uk-inline">
+                    {# Please note this can be changed via JavaScript to update all other "image to crop" boxes to false when one is set to true! #}
                     {{ form_widget(rootForm.images.vars.prototype.isMain, {
-                        'attr': {'class': 'uk-checkbox'},
+                        'attr': {'class': 'uk-checkbox st-is-main-image'},
                         'value': rootForm.images.vars.prototype.isMain.vars.value})
                     }}
                     {{ form_label(rootForm.images.vars.prototype.isMain, 'Show as main image?', {'label_attr': {'class': 'uk-form-label'}}) }}
                 </div>
-                <p class="uk-margin-small-top">
-                    <small>
-                        "Main image" option will promote this image on trick header page.
-                    </small>
-                </p>
             </div>
             {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
         </div>
