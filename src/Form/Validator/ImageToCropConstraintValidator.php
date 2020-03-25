@@ -7,6 +7,8 @@ namespace App\Form\Validator;
 use App\Domain\DTOToEmbed\ImageToCropDTO;
 use App\Domain\ServiceLayer\ImageManager;
 use App\Form\Validator\Constraint\ImageToCropConstraint;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Validator\Constraint;
@@ -84,8 +86,10 @@ class ImageToCropConstraintValidator extends ConstraintValidator
         $this->validateCropJSONData($this->context);
         // Check valid image preview data URI (crop view thumb) field value
         $this->validateImagePreviewDataURI($this->context);
-        // check valid saved image name (standalone saved image) field value
+        // Check valid saved image name (standalone saved image) field value
         $this->validateSavedImageName($this->context);
+        // Check valid "is main" (checkbox) field value
+        $this->validateIsMain($this->context);
     }
 
     /**
@@ -279,6 +283,47 @@ class ImageToCropConstraintValidator extends ConstraintValidator
             $context->buildViolation('Saved image name can not be null!')
                 ->atPath('savedImageName')
                 ->addViolation();
+        }
+    }
+
+    /**
+     * Apply an intermediate custom validation constraint callback on "isMain" property.
+     *
+     * @param ExecutionContextInterface $context
+     * @param mixed|null                $payload
+     *
+     * @return void
+     *
+     * @throws \Exception
+     */
+    public function validateIsMain(ExecutionContextInterface $context, $payload = null) : void
+    {
+        // Get current validated object (ImageToCropDTO)
+        $object = $context->getObject();
+        if (false === $object->getIsMain()) {
+            /** @var Form|FormInterface $globalImagesForm */
+            $globalImagesForm = $context->getRoot()->get('images');
+            $countedImages = $globalImagesForm->count();
+            $isMainImageNotSet = false;
+            // Only the current image box exists!
+            if (1 == $countedImages) {
+                $isMainImageNotSet = true;
+
+            // Loop on all existing image boxes
+            } else {
+                foreach ($globalImagesForm as $form) {
+                    $isMainImageNotSet = !$form->getData()->getIsMain() ? true : false;
+                    if (true === $form->getData()->getIsMain()) {
+                        break;
+                    }
+                }
+            }
+            // One unique image or all image boxes is (are) not defined as main image!
+            if (true === $isMainImageNotSet) {
+                $context->buildViolation('Please define the main image.')
+                    ->atPath('isMain')
+                    ->addViolation();
+            }
         }
     }
 }
