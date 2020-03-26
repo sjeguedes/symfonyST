@@ -300,30 +300,35 @@ class ImageToCropConstraintValidator extends ConstraintValidator
     {
         // Get current validated object (ImageToCropDTO)
         $object = $context->getObject();
-        if (false === $object->getIsMain()) {
-            /** @var Form|FormInterface $globalImagesForm */
-            $globalImagesForm = $context->getRoot()->get('images');
-            $countedImages = $globalImagesForm->count();
-            $isMainImageNotSet = false;
-            // Only the current image box exists!
-            if (1 == $countedImages) {
-                $isMainImageNotSet = true;
-
-            // Loop on all existing image boxes
-            } else {
-                foreach ($globalImagesForm as $form) {
-                    $isMainImageNotSet = !$form->getData()->getIsMain() ? true : false;
-                    if (true === $form->getData()->getIsMain()) {
-                        break;
-                    }
+        $isMainImageNotSet = $object->getIsMain() ? false : true;
+        /** @var Form|FormInterface $globalImagesForm */
+        $globalImagesForm = $context->getRoot()->get('images');
+        $countedImages = $globalImagesForm->count();
+        // Loop on all existing image boxes
+        if (1 != $countedImages) {
+            foreach ($globalImagesForm as $key => $form) {
+                // Exclude current object to avoid issue by creating an unexpected violation in next condition with one object (current)
+                if (preg_match("/$key/", $context->getPropertyPath())) {
+                    continue;
+                }
+                // Data was tampered by malicious user! At least two images (two checkboxes) are defined as main.
+                if (false === $isMainImageNotSet && true === $form->getData()->getIsMain() && true === $object->getIsMain()) {
+                    $context->buildViolation('You are not allowed to tamper the main image!<br>Only one must be set.')
+                        ->atPath('isMain')
+                        ->addViolation();
+                    break;
+                }
+                // Update state of "$isMainImageNotSet", if needed to have a correct test for next iterations
+                if (true === $form->getData()->getIsMain()) {
+                    $isMainImageNotSet = false;
                 }
             }
-            // One unique image or all image boxes is (are) not defined as main image!
-            if (true === $isMainImageNotSet) {
-                $context->buildViolation('Please define the main image.')
-                    ->atPath('isMain')
-                    ->addViolation();
-            }
+        }
+        // One unique image or all image boxes is (are) not defined as main image!
+        if (true === $isMainImageNotSet) {
+            $context->buildViolation('Please define the main image.')
+                ->atPath('isMain')
+                ->addViolation();
         }
     }
 }

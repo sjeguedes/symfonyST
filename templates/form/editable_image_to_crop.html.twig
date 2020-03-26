@@ -54,10 +54,13 @@
                 <div id="st-add-image-actions-{{ imageIndex }}" class="uk-flex-column">
                     <div id="st-add-image-container-{{ imageIndex }}" data-change-text-info="Please confirm image change by validating creation!" uk-form-custom>
                         {# Image file input #}
+                        {% set fileInputCssClass = (imageToCropForm.savedImageName.vars.value != '') and (imageToCropForm.savedImageName.vars.valid == 1)
+                            and (imageToCropForm.imagePreviewDataURI.vars.valid == 0) and (imageToCropForm.cropJSONData.vars.valid == 1)
+                            ? 'uk-input st-file-input uk-hidden' : 'uk-input st-file-input' %}
                         <div class="uk-inline">
                             {{ form_widget(imageToCropForm.image, {
                                 'attr': {
-                                    'class': 'uk-input st-file-input',
+                                    'class': fileInputCssClass,
                                     'data-error': 'Please select first<br>an image file which is allowed!',
                                     'data-error-2': 'Please select another file!<br>This one will be refused due to invalid dimensions!',
                                     'data-error-3': 'Please select another file!<br>This one will be refused due to invalid size!',
@@ -66,9 +69,11 @@
                                 'value': imageToCropForm.image.vars.value})
                             }}
                             {# image change button #}
-                            <button class="uk-button uk-button-default st-fake-file-input-button" type="button" tabindex="-1">
+                            {% set isDisabled = (imageToCropForm.savedImageName.vars.value != '') and (imageToCropForm.savedImageName.vars.valid == 1)
+                                and (imageToCropForm.imagePreviewDataURI.vars.valid == 0) and (imageToCropForm.cropJSONData.vars.valid == 1) %}
+                            <button class="uk-button uk-button-default{% if isDisabled == 1 %} uk-disabled{% endif %} st-fake-file-input-button" type="button" tabindex="-1"{% if isDisabled == 1 %} disabled{% endif %}>
                                 <span class="uk-form-icon" uk-icon="icon: upload"></span>
-                                <span id="st-image-change-button-label-{{ imageIndex }}" class="uk-padding-small" data-select-label="Select" data-change-label="Change">Select</span>
+                                <span id="st-image-change-button-label-{{ imageIndex }}" class="uk-padding-small">{% if isDisabled == 1 %}Locked{% else %}Select{% endif %}</span>
                                 {# Image file input icon errors #}
                                 {% if imageToCropForm.image.vars.errors.form.submitted == 1 %}
                                     {% set class = (imageToCropForm.image.vars.valid == 0) or (imageToCropForm.imagePreviewDataURI.vars.valid == 0) or
