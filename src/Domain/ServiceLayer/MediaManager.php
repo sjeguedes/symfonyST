@@ -65,15 +65,23 @@ class MediaManager
      * @param User      $user
      * @param bool      $isMain
      * @param bool      $isPublished
+     * @param int       $showListRank
      *
      * @return Media
      *
      * @throws \Exception
      */
-    private function createAndSaveImageMediaWithType(Image $image, MediaType $mediaType, User $user, bool $isMain, bool $isPublished) : Media
+    private function createAndSaveImageMediaWithType(
+        Image $image,
+        MediaType $mediaType,
+        User $user,
+        bool $isMain,
+        bool $isPublished,
+        int $showListRank = null
+    ) : Media
     {
         // Create media with necessary associated instances and parameters
-        $media = Media::createNewInstanceWithImage($image, $mediaType, null, $user, $isMain, $isPublished);
+        $media = Media::createNewInstanceWithImage($image, $mediaType, null, $user, $isMain, $isPublished, $showListRank);
         // Persist media and its dependencies thanks to cascade option
         $this->entityManager->persist($media);
         // Save data
@@ -93,12 +101,17 @@ class MediaManager
      *
      * @throws \Exception
      */
-    public function createUserAvatarMedia(Image $image, User $user, bool $isMain, bool $isPublished) : Media
+    public function createUserAvatarMedia(
+        Image $image,
+        User $user, bool
+        $isMain,
+        bool $isPublished
+    ) : Media
     {
         // Select a media type
         $mediaType = $this->mediaTypeManager->findSingleByUniqueType(MediaType::TYPE_CHOICES['userAvatar']);
         // Create and save the needed media
-        $media = $this->createAndSaveImageMediaWithType($image, $mediaType, $user, $isMain, $isPublished);
+        $media = $this->createAndSaveImageMediaWithType($image, $mediaType, $user, $isMain, $isPublished); // $showListRank is unnecessary here!
         return $media;
     }
 
@@ -112,17 +125,25 @@ class MediaManager
      * @param User   $user
      * @param bool   $isMain
      * @param bool   $isPublished
+     * @param int    $showListRank
      *
      * @return Media
      *
      * @throws \Exception
      */
-    public function createTrickMedia(Image $image, string $mediaTypeKey, User $user, bool $isMain, bool $isPublished) : Media
+    public function createTrickMedia(
+        Image $image,
+        string $mediaTypeKey,
+        User $user,
+        bool $isMain,
+        bool $isPublished,
+        int $showListRank = null
+    ) : Media
     {
         // Select a media type
         $mediaType = $this->mediaTypeManager->findSingleByUniqueType(MediaType::TYPE_CHOICES[$mediaTypeKey]);
         // Create and save the needed media
-        $media = $this->createAndSaveImageMediaWithType($image, $mediaType, $user, $isMain, $isPublished);
+        $media = $this->createAndSaveImageMediaWithType($image, $mediaType, $user, $isMain, $isPublished, $showListRank);
         return $media;
     }
 

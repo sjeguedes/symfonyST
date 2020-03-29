@@ -85,7 +85,7 @@ class Trick
      *
      * @var \DateTimeInterface
      *
-     * @ORM\Column(type="datetime", name="creation_date")
+     * @ORM\Column(type="datetime")
      */
     private $creationDate;
 
@@ -93,7 +93,7 @@ class Trick
      *
      * @var \DateTimeInterface
      *
-     * @ORM\Column(type="datetime", name="update_date")
+     * @ORM\Column(type="datetime")
      */
     private $updateDate;
 
@@ -155,7 +155,7 @@ class Trick
         $this->description = $description;
         $this->trickGroup = $trickGroup;
         $this->user = $user;
-        $this->slug = !\is_null($slug) ? $this->makeSlug($slug) : $this->makeSlug($name);
+        $this->slug = !\is_null($slug) && !empty($slug) ? $this->makeSlug($slug) : $this->makeSlug($name);
         $this->creationDate = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
         $this->updateDate = $this->creationDate;
         $this->rank = null;

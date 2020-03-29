@@ -26,17 +26,25 @@ final class VideoInfosDTO
     private $description;
 
     /**
+     * @var int
+     */
+    private $showListRank;
+
+    /**
      * VideoInfosDTO constructor.
      *
      * @param string|null $url
      * @param string|null $description
+     * @param int         $showListRank
      */
     public function __construct(
-        string $url = null,
-        string $description = null
+        ?string $url,
+        ?string $description,
+        int $showListRank
     ) {
         $this->url = $url;
         $this->description = $description;
+        $this->showListRank = $showListRank;
     }
 
     /**
@@ -53,5 +61,13 @@ final class VideoInfosDTO
     public function getDescription() : ?string
     {
         return $this->description;
+    }
+
+    /**
+     * @return int
+     */
+    public function getShowListRank() : int
+    {
+        return $this->showListRank;
     }
 }

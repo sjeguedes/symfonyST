@@ -99,7 +99,7 @@ class DTOMapper implements DataMapperInterface
             $value = \is_string($value) && 0 === strlen($value) ? null : $value;
             $dtoPropertyValues[$i] = $value;
         }
-        // Return corresponding DTO instance
+        // Return corresponding DTO instance with splat operator
         return new $dtoClassName(...$dtoPropertyValues);
     }
 }

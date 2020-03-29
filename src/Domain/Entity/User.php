@@ -127,7 +127,7 @@ class User implements UserInterface, \Serializable
      *
      * @var \DateTimeInterface
      *
-     * @ORM\Column(type="datetime", name="creation_date")
+     * @ORM\Column(type="datetime")
      */
     private $creationDate;
 
@@ -135,7 +135,7 @@ class User implements UserInterface, \Serializable
      *
      * @var \DateTimeInterface
      *
-     * @ORM\Column(type="datetime", name="update_date")
+     * @ORM\Column(type="datetime")
      */
     private $updateDate;
 

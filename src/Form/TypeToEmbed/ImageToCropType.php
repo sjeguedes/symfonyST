@@ -11,6 +11,7 @@ use App\Domain\Entity\User;
 use App\Domain\ServiceLayer\ImageManager;
 use App\Form\Type\Admin\CreateTrickType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -73,6 +74,40 @@ class ImageToCropType extends AbstractType
     }
 
     /**
+     * Add string to integer model transformer to a form data.
+     *
+     * This transformer aims at using the same DTO if "multiple" form option changes.
+     *
+     * @param FormBuilderInterface $formBuilder
+     * @param string               $formName    a Form instance name
+     *
+     * @return void
+     */
+    private function addStringToIntegerCustomDataTransformer(FormBuilderInterface $formBuilder, string $formName) : void
+    {
+        /** @var FormBuilderInterface $form */
+        $form = $formBuilder->get($formName);
+        $form->addModelTransformer(
+            new CallbackTransformer(
+                // Normalized data (transform)
+                function ($value) {
+                    // Do not transform the string or null value
+                    return !\is_null($value) ? $value : null;
+                },
+                // Model data (reverse transform)
+                function ($value) {
+                    // Transform the string into a real int
+                    if (ctype_digit((string) $value)) {
+                        return (int) $value;
+                    }
+                    // The string does not contain an int, so define the value to 0 to be checked and filtered in validator!
+                    return 0;
+                }
+            )
+        );
+    }
+
+    /**
      * Configure a form builder for the type hierarchy.
      *
      * @param FormBuilderInterface $builder
@@ -102,13 +137,21 @@ class ImageToCropType extends AbstractType
             ->add('isMain', CheckboxType::class, [
                 'empty_data'   => false,
                 'false_values' => [false]
+            ])
+            // Please "isPublished" property (set to true by default) because it is not managed in project at this level!
+            ->add('showListRank', HiddenType::class, [
+                // maintain validation state at the child form level, to be able to show errors near field
+                'error_bubbling' => false
             ]);
+
+        // Add data transformer to "showListRank" data.
+        $this->addStringToIntegerCustomDataTransformer($builder, 'showListRank');
 
         // Retrieve root form handler passed in parent form entry_options parameter
         $rootFormHandler = $options['rootFormHandler'];
 
         // Use submit form event for image to crop type to save each uploaded image on server without global validation!
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use ($rootFormHandler) {
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use ($builder, $rootFormHandler) {
             // User must be authenticated to upload a standalone file in application "gallery"!
             /** @var User|UserInterface $authenticatedUser */
             $authenticatedUser = $this->security->getUser();
@@ -117,8 +160,10 @@ class ImageToCropType extends AbstractType
             }
             // Get current "image to crop" form
             $currentImageToCropForm = $event->getForm();
+
             // Get current image form data
             $formData = $event->getData();
+
             // Get the data model based on form data
             $imageToCropDataModel = $this->prepareAndCheckDataModelForDirectUpload($currentImageToCropForm, $formData, $rootFormHandler);
             // Image or/and cropJSON Data are not valid, so direct upload must no be enabled!
@@ -163,6 +208,7 @@ class ImageToCropType extends AbstractType
                     $form->get('cropJSONData')->getData(),
                     $form->get('imagePreviewDataURI')->getData(),
                     $form->get('savedImageName')->getData(),
+                    $form->get('showListRank')->getData(),
                     $form->get('isMain')->getData()
                 );
             },
@@ -185,6 +231,8 @@ class ImageToCropType extends AbstractType
      */
     private function prepareAndCheckDataModelForDirectUpload(FormInterface $imageToCropForm, array $formData, object $rootFormHandler) : ?ImageToCropDTO
     {
+        // Turn show list rank string into a real int, or if it the value is not an int define the value to 0 to be checked in validator!
+        $formData['showListRank'] = ctype_digit((string) $formData['showListRank']) ? (int) $formData['showListRank'] : 0;
         // Get into account checkbox case which has no value when unchecked!
         $formData['isMain'] = isset($formData['isMain']) ? (bool) $formData['isMain'] : false;
         // Get current feed imageToCropDTO instance with custom data mapper

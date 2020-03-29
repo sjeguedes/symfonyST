@@ -88,6 +88,8 @@ class ImageToCropConstraintValidator extends ConstraintValidator
         $this->validateImagePreviewDataURI($this->context);
         // Check valid saved image name (standalone saved image) field value
         $this->validateSavedImageName($this->context);
+        // Check valid "show list rank" (sortable block) field value
+        $this->validateShowListRank($this->context);
         // Check valid "is main" (checkbox) field value
         $this->validateIsMain($this->context);
     }
@@ -287,6 +289,56 @@ class ImageToCropConstraintValidator extends ConstraintValidator
     }
 
     /**
+     * Apply an intermediate custom validation constraint callback on "showListRank" property.
+     *
+     * @param ExecutionContextInterface $context
+     * @param mixed|null                $payload
+     *
+     * @return void
+     *
+     * @see For information: root namespace special compiled functions: https://github.com/FriendsOfPHP/PHP-CS-Fixer/issues/3048
+     *
+     * @throws \Exception
+     */
+    public function validateShowListRank(ExecutionContextInterface $context, $payload = null) : void
+    {
+        // Get current validated object (ImageToCropDTO)
+        $object = $context->getObject();
+        /** @var Form|FormInterface $imagesCollectionForm */
+        $imagesCollectionForm = $context->getRoot()->get('images');
+        $countedImages = $imagesCollectionForm->count();
+        $isRankTampered = false;
+        // Data was tampered by malicious user! Current sortable order is not an int, or rank equals 0, or is not a positive integer, or greater than images boxes length.
+        if (!ctype_digit(trim((string) $object->getShowListRank())) || 0 >= $object->getShowListRank() || $countedImages < $object->getShowListRank()) {
+            $isRankTampered = true;
+        } else {
+            // Loop on all existing image boxes
+            if (1 != $countedImages) {
+                $result = [];
+                foreach ($imagesCollectionForm as $key => $form) {
+                    $rank = $form->getData()->getShowListRank();
+                    // Data was tampered by malicious user!
+                    // Rank equals 0, or is not a positive integer, or greater than images boxes length, or result array does not contain unique values!
+                    if (!ctype_digit(trim((string) $rank)) || 0 >= $rank || $countedImages < $rank || \in_array($rank, $result)) {
+                        // Add constraint violation  only for current "image to crop" box when it is is involved in violation!
+                        if ($object->getShowListRank() === $rank) {
+                            $isRankTampered = true;
+                        }
+                        break;
+                    }
+                    // Push rank in this array to check uniques values later
+                    array_push($result, $rank);
+                }
+            }
+        }
+        if (true === $isRankTampered) {
+            $context->buildViolation('You are not allowed to tamper show list rank!<br>Image list was reordered by default.')
+                ->atPath('showListRank')
+                ->addViolation();
+        }
+    }
+
+    /**
      * Apply an intermediate custom validation constraint callback on "isMain" property.
      *
      * @param ExecutionContextInterface $context
@@ -301,12 +353,12 @@ class ImageToCropConstraintValidator extends ConstraintValidator
         // Get current validated object (ImageToCropDTO)
         $object = $context->getObject();
         $isMainImageNotSet = $object->getIsMain() ? false : true;
-        /** @var Form|FormInterface $globalImagesForm */
-        $globalImagesForm = $context->getRoot()->get('images');
-        $countedImages = $globalImagesForm->count();
+        /** @var Form|FormInterface $imagesCollectionForm */
+        $imagesCollectionForm = $context->getRoot()->get('images');
+        $countedImages = $imagesCollectionForm->count();
         // Loop on all existing image boxes
         if (1 != $countedImages) {
-            foreach ($globalImagesForm as $key => $form) {
+            foreach ($imagesCollectionForm as $key => $form) {
                 // Exclude current object to avoid issue by creating an unexpected violation in next condition with one object (current)
                 if (preg_match("/$key/", $context->getPropertyPath())) {
                     continue;

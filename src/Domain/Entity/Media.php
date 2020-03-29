@@ -87,9 +87,17 @@ class Media
 
     /**
      *
+     * @var int
+     *
+     * @ORM\Column(type="smallint", nullable=true, options={"unsigned":true})
+     */
+    private $showListRank;
+
+    /**
+     *
      * @var \DateTimeInterface
      *
-     * @ORM\Column(type="datetime", name="creation_date")
+     * @ORM\Column(type="datetime")
      */
     private $creationDate;
 
@@ -97,7 +105,7 @@ class Media
      *
      * @var \DateTimeInterface
      *
-     * @ORM\Column(type="datetime", name="update_date")
+     * @ORM\Column(type="datetime")
      */
     private $updateDate;
 
@@ -109,6 +117,7 @@ class Media
      * @param User|null               $user
      * @param bool                    $isMain
      * @param bool                    $isPublished
+     * @param int                     $showListRank
      * @param \DateTimeInterface|null $creationDate
      *
      * @return void
@@ -121,14 +130,17 @@ class Media
         User $user = null,
         bool $isMain = false,
         bool $isPublished = false,
+        int $showListRank = null,
         \DateTimeInterface $creationDate = null
     ) {
+        \assert(0 < $showListRank, 'Show list rank must be greater than 0!');
         $this->uuid = Uuid::uuid4();
         $this->mediaType = $mediaType;
         $this->trick = $trick;
         $this->user = $user;
         $this->isMain = $isMain;
         $this->isPublished = $isPublished;
+        $this->showListRank = $showListRank;
         $this->creationDate = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
         $this->updateDate = $this->creationDate;
     }
@@ -142,6 +154,7 @@ class Media
      * @param User|null               $user
      * @param bool                    $isMain
      * @param bool                    $isPublished
+     * @param int                     $showListRank
      * @param \DateTimeInterface|null $creationDate
      *
      * @return Media
@@ -155,10 +168,11 @@ class Media
         User $user = null,
         bool $isMain = false,
         bool $isPublished = false,
+        int $showListRank = null,
         \DateTimeInterface $creationDate = null
     ) : Media
     {
-        $self = new self($mediaType, $trick, $user, $isMain, $isPublished, $creationDate);
+        $self = new self($mediaType, $trick, $user, $isMain, $isPublished, $showListRank, $creationDate);
         $self->image = $image;
         $self->video = null;
         return $self;
@@ -173,6 +187,7 @@ class Media
      * @param User|null               $user
      * @param bool                    $isMain
      * @param bool                    $isPublished
+     * @param int                     $showListRank
      * @param \DateTimeInterface|null $creationDate
      *
      * @return Media
@@ -186,10 +201,11 @@ class Media
         User $user = null,
         bool $isMain = false,
         bool $isPublished = false,
+        int $showListRank = null,
         \DateTimeInterface $creationDate = null
     ) : Media
     {
-        $self = new self($mediaType, $trick, $user, $isMain, $isPublished, $creationDate);
+        $self = new self($mediaType, $trick, $user, $isMain, $isPublished, $showListRank, $creationDate);
         $self->video = $video;
         $self->image = null;
         return $self;
@@ -264,7 +280,7 @@ class Media
     /**
      * Change main state after creation.
      *
-     * This media is the media to show in trick lists, if it is set to true.
+     * This media is the media to promote in single trick page header, if it is set to true.
      *
      * @param bool $isMain
      *
@@ -292,6 +308,24 @@ class Media
             throw new \RuntimeException('You can not un-publish this media, if it is used as main at the same time!');
         }
         $this->isPublished = $isPublished;
+        return $this;
+    }
+
+    /**
+     * Change show list rank after creation.
+     *
+     * This rank is the position used by this media to be shown in images or videos list on single trick page.
+     *
+     * @param int $showListRank
+     *
+     * @return Media
+     */
+    public function modifyShowListRank(int $showListRank) : self
+    {
+        if (0 >= $showListRank) {
+            throw new \RuntimeException('Show list rank must be greater than 0!');
+        }
+        $this->showListRank = $showListRank;
         return $this;
     }
 
@@ -365,6 +399,14 @@ class Media
     public function getIsPublished() : bool
     {
         return $this->isPublished;
+    }
+
+    /**
+     * @return int
+     */
+    public function getShowListRank() : int
+    {
+        return $this->showListRank;
     }
 
     /**

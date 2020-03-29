@@ -4,174 +4,194 @@
 {% set imageToCropForm = editableImageToCropForm %}
 {# Get existing index value for editable image box, provided by form template which calls this template #}
 {% set imageIndex = editableImageIndexName %}
-<div id="{{ rootFormName }}_images_{{ imageIndex }}" class="uk-position-relative uk-border-rounded uk-padding-small uk-margin-small-bottom st-image-to-crop st-background-blue st-box-shadow-full-small">
-    {# Image block removal #}
-    <a href="#" class="uk-position-top-right uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-margin-small-top uk-margin-small-right st-image-remove-button" title="Cancel">
-        <span uk-icon="icon: trash; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-delete st-svg-icon-actions"></span>
-    </a>
-    {# form label for imageToCrop form entry type #}
-    {{ form_label(imageToCropForm, 'Image N° '~rank, {
-        'label_attr': {
-            'class': 'uk-form-label uk-text-uppercase st-image-to-crop-label',
-            'data-image-index-name': imageIndex
-        }
-    }) }}
-    {# Main image indicator #}
-    {% set isMainHiddenClass = imageToCropForm.isMain.vars.checked == 0 ? 'uk-hidden ' : '' %}
-    <span id="st-main-image-indicator-{{ imageIndex }}" class="{{ isMainHiddenClass }}uk-text-small uk-text-uppercase uk-text-bold uk-display-inline-block uk-margin-small-left st-main-image-indicator">
-        <span class="st-color-blue st-background-yellow st-svg-icon-padding">Main image</span>
-    </span>
-    {# Image fields #}
-    <div class="uk-grid uk-grid-collapse">
-        {# Image file #}
-        <div class="uk-width-1-1 uk-margin-small-bottom">
-            {% if (imageToCropForm.image.vars.valid == 0) %}
-                {{ form_errors(imageToCropForm.image) }}
-            {% endif %}
-            {% if (imageToCropForm.cropJSONData.vars.valid == 0) %}
-                {{ form_errors(imageToCropForm.cropJSONData) }}
-            {% endif %}
-            {% if (imageToCropForm.imagePreviewDataURI.vars.valid == 0) %}
-                {{ form_errors(imageToCropForm.imagePreviewDataURI) }}
-            {% endif %}
-            {% if (imageToCropForm.savedImageName.vars.valid == 0) %}
-                {{ form_errors(imageToCropForm.savedImageName) }}
-            {% endif %}
-            {{ form_label(imageToCropForm.image, 'Image file', {'label_attr': {'class': 'uk-form-label'}}) }}
-            <div class="uk-inline uk-flex uk-flex-middle">
-                <div class="uk-flex-column uk-position-relative uk-box-shadow-small uk-border-rounded uk-padding-small uk-margin-small-right st-background-white">
-                    {# Image preview (with JavaScript cropped area data URI #}
-                    {% set isImagePreview = (imageToCropForm.imagePreviewDataURI.vars.value != '') and (imageToCropForm.imagePreviewDataURI.vars.valid == 1) ? true : false %}
-                    {% set isImageDescription = imageToCropForm.description.vars.value != '' ? true : false %}
-                    {% set imageNamePath = isImagePreview ? imageToCropForm.imagePreviewDataURI.vars.value : asset(globalImageDirectory~'image-crop-box-default-thumb.png') %}
-                    {% set imageDescription = isImageDescription ? 'Description will be: '~imageToCropForm.description.vars.value : 'Image description must be filled in!' %}
-                    <img id="st-image-preview-{{ imageIndex }}" class="st-image-preview" width="142" src="{{ imageNamePath|e('html_attr') }}" data-default-image-path="{{ asset(globalImageDirectory~'image-crop-box-default-thumb.png') }}" alt="{{ imageDescription|e('html_attr') }}" >
-                    {{ form_row(imageToCropForm.imagePreviewDataURI, {
-                        'attr': {'class': 'st-image-preview-data-uri'},
-                        'value': imageToCropForm.imagePreviewDataURI.vars.value})
-                    }}
+<div id="st-image-to-crop-wrapper-{{ imageIndex }}" class="st-image-to-crop-wrapper">
+    <div id="{{ rootFormName }}_images_{{ imageIndex }}" class="uk-position-relative uk-border-rounded uk-padding-small uk-margin-small-bottom st-image-to-crop st-background-blue st-box-shadow-full-small">
+        {# Image block removal #}
+        <a href="#" class="uk-position-top-right uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-margin-small-top uk-margin-small-right st-image-remove-button" title="Cancel">
+            <span uk-icon="icon: trash; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-delete st-svg-icon-actions"></span>
+        </a>
+        {# Image block sortable #}
+        <a href="#" class="uk-position-bottom-right uk-sortable-handle uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-margin-small-bottom uk-margin-small-right" title="Sort vertically">
+            <span uk-icon="icon: list; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-actions"></span>
+        </a>
+        {# form label for imageToCrop form entry type #}
+        {{ form_label(imageToCropForm, 'Image N° '~rank, {
+            'label_attr': {
+                'class': 'uk-form-label uk-text-uppercase st-image-to-crop-label',
+                'data-image-index-name': imageIndex
+            }
+        }) }}
+        {# Main image indicator #}
+        {% set isMainHiddenClass = imageToCropForm.isMain.vars.checked == 0 ? 'uk-hidden ' : '' %}
+        <span id="st-main-image-indicator-{{ imageIndex }}" class="{{ isMainHiddenClass }}uk-text-small uk-text-uppercase uk-text-bold uk-display-inline-block uk-margin-small-left st-main-image-indicator">
+            <span class="st-color-blue st-background-yellow st-svg-icon-padding">Main image</span>
+        </span>
+        {# Image fields #}
+        <div class="uk-grid uk-grid-collapse">
+            {# Image file #}
+            <div class="uk-width-1-1 uk-margin-small-bottom">
+                {% if (imageToCropForm.image.vars.valid == 0) %}
+                    {{ form_errors(imageToCropForm.image) }}
+                {% endif %}
+                {% if (imageToCropForm.cropJSONData.vars.valid == 0) %}
+                    {{ form_errors(imageToCropForm.cropJSONData) }}
+                {% endif %}
+                {% if (imageToCropForm.imagePreviewDataURI.vars.valid == 0) %}
+                    {{ form_errors(imageToCropForm.imagePreviewDataURI) }}
+                {% endif %}
+                {% if (imageToCropForm.savedImageName.vars.valid == 0) %}
+                    {{ form_errors(imageToCropForm.savedImageName) }}
+                {% endif %}
+                {% if (imageToCropForm.showListRank.vars.valid == 0) %}
+                    {{ form_errors(imageToCropForm.showListRank) }}
+                {% endif %}
+                {{ form_label(imageToCropForm.image, 'Image file', {'label_attr': {'class': 'uk-form-label'}}) }}
+                <div class="uk-inline uk-flex uk-flex-middle">
+                    <div class="uk-flex-column uk-position-relative uk-box-shadow-small uk-border-rounded uk-padding-small uk-margin-small-right st-background-white">
+                        {# Image preview (with JavaScript cropped area data URI #}
+                        {% set isImagePreview = (imageToCropForm.imagePreviewDataURI.vars.value != '') and (imageToCropForm.imagePreviewDataURI.vars.valid == 1) ? true : false %}
+                        {% set isImageDescription = imageToCropForm.description.vars.value != '' ? true : false %}
+                        {% set imageNamePath = isImagePreview ? imageToCropForm.imagePreviewDataURI.vars.value : asset(globalImageDirectory~'image-crop-box-default-thumb.png') %}
+                        {% set imageDescription = isImageDescription ? 'Description will be: '~imageToCropForm.description.vars.value : 'Image description must be filled in!' %}
+                        <img id="st-image-preview-{{ imageIndex }}" class="st-image-preview" width="142" src="{{ imageNamePath|e('html_attr') }}" data-default-image-path="{{ asset(globalImageDirectory~'image-crop-box-default-thumb.png') }}" alt="{{ imageDescription|e('html_attr') }}" >
+                        {{ form_row(imageToCropForm.imagePreviewDataURI, {
+                            'attr': {'class': 'st-image-preview-data-uri'},
+                            'value': imageToCropForm.imagePreviewDataURI.vars.value})
+                        }}
+                    </div>
+                    <div id="st-add-image-actions-{{ imageIndex }}" class="uk-flex-column st-add-image-actions">
+                        <div id="st-add-image-container-{{ imageIndex }}" class="st-add-image-container" data-change-text-info="Please confirm image change by validating creation!" uk-form-custom>
+                            {# Image file input #}
+                            {% set fileInputCssClass = (imageToCropForm.savedImageName.vars.value != '') and (imageToCropForm.savedImageName.vars.valid == 1)
+                                and (imageToCropForm.imagePreviewDataURI.vars.valid == 0) and (imageToCropForm.cropJSONData.vars.valid == 1)
+                                ? 'uk-input st-file-input uk-hidden' : 'uk-input st-file-input' %}
+                            <div class="uk-inline">
+                                {{ form_widget(imageToCropForm.image, {
+                                    'attr': {
+                                        'class': fileInputCssClass,
+                                        'data-error': 'Please select first<br>an image file which is allowed!',
+                                        'data-error-2': 'Please select another file!<br>This one will be refused due to invalid dimensions!',
+                                        'data-error-3': 'Please select another file!<br>This one will be refused due to invalid size!',
+                                        'data-error-4': 'Crop aborted!<br>Please select another image to crop<br>to validate the form!'
+                                    },
+                                    'value': imageToCropForm.image.vars.value})
+                                }}
+                                {# image change button #}
+                                {% set isDisabled = (imageToCropForm.savedImageName.vars.value != '') and (imageToCropForm.savedImageName.vars.valid == 1)
+                                    and (imageToCropForm.imagePreviewDataURI.vars.valid == 0) and (imageToCropForm.cropJSONData.vars.valid == 1) %}
+                                <button class="uk-button uk-button-default{% if isDisabled == 1 %} uk-disabled{% endif %} st-fake-file-input-button" type="button" tabindex="-1"{% if isDisabled == 1 %} disabled{% endif %}>
+                                    <span class="uk-form-icon" uk-icon="icon: upload"></span>
+                                    <span id="st-image-change-button-label-{{ imageIndex }}" class="uk-padding-small st-image-change-button-label">{% if isDisabled == 1 %}Locked{% else %}Select{% endif %}</span>
+                                    {# Image file input icon errors #}
+                                    {% if imageToCropForm.image.vars.errors.form.submitted == 1 %}
+                                        {% set class = (imageToCropForm.image.vars.valid == 0) or (imageToCropForm.imagePreviewDataURI.vars.valid == 0) or
+                                                       (imageToCropForm.savedImageName.vars.valid == 0) or (imageToCropForm.cropJSONData.vars.valid == 0)
+                                            ? 'uk-form-danger' : 'uk-form-success' %}
+                                        {% set icon = (imageToCropForm.image.vars.valid == 0) or (imageToCropForm.imagePreviewDataURI.vars.valid == 0) or
+                                                      (imageToCropForm.savedImageName.vars.valid == 0) or (imageToCropForm.cropJSONData.vars.valid == 0)
+                                            ? 'warning' : 'check' %}
+                                        <span class="uk-form-icon uk-form-icon-flip {{ class }}" uk-icon="icon: {{ icon }}"></span>
+                                    {% endif %}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div id="st-add-image-actions-{{ imageIndex }}" class="uk-flex-column">
-                    <div id="st-add-image-container-{{ imageIndex }}" data-change-text-info="Please confirm image change by validating creation!" uk-form-custom>
-                        {# Image file input #}
-                        {% set fileInputCssClass = (imageToCropForm.savedImageName.vars.value != '') and (imageToCropForm.savedImageName.vars.valid == 1)
-                            and (imageToCropForm.imagePreviewDataURI.vars.valid == 0) and (imageToCropForm.cropJSONData.vars.valid == 1)
-                            ? 'uk-input st-file-input uk-hidden' : 'uk-input st-file-input' %}
-                        <div class="uk-inline">
-                            {{ form_widget(imageToCropForm.image, {
-                                'attr': {
-                                    'class': fileInputCssClass,
-                                    'data-error': 'Please select first<br>an image file which is allowed!',
-                                    'data-error-2': 'Please select another file!<br>This one will be refused due to invalid dimensions!',
-                                    'data-error-3': 'Please select another file!<br>This one will be refused due to invalid size!',
-                                    'data-error-4': 'Crop aborted!<br>Please select another image to crop<br>to validate the form!'
-                                },
-                                'value': imageToCropForm.image.vars.value})
-                            }}
-                            {# image change button #}
-                            {% set isDisabled = (imageToCropForm.savedImageName.vars.value != '') and (imageToCropForm.savedImageName.vars.valid == 1)
-                                and (imageToCropForm.imagePreviewDataURI.vars.valid == 0) and (imageToCropForm.cropJSONData.vars.valid == 1) %}
-                            <button class="uk-button uk-button-default{% if isDisabled == 1 %} uk-disabled{% endif %} st-fake-file-input-button" type="button" tabindex="-1"{% if isDisabled == 1 %} disabled{% endif %}>
-                                <span class="uk-form-icon" uk-icon="icon: upload"></span>
-                                <span id="st-image-change-button-label-{{ imageIndex }}" class="uk-padding-small">{% if isDisabled == 1 %}Locked{% else %}Select{% endif %}</span>
-                                {# Image file input icon errors #}
-                                {% if imageToCropForm.image.vars.errors.form.submitted == 1 %}
-                                    {% set class = (imageToCropForm.image.vars.valid == 0) or (imageToCropForm.imagePreviewDataURI.vars.valid == 0) or
-                                                   (imageToCropForm.savedImageName.vars.valid == 0) or (imageToCropForm.cropJSONData.vars.valid == 0)
-                                        ? 'uk-form-danger' : 'uk-form-success' %}
-                                    {% set icon = (imageToCropForm.image.vars.valid == 0) or (imageToCropForm.imagePreviewDataURI.vars.valid == 0) or
-                                                  (imageToCropForm.savedImageName.vars.valid == 0) or (imageToCropForm.cropJSONData.vars.valid == 0)
-                                        ? 'warning' : 'check' %}
-                                    <span class="uk-form-icon uk-form-icon-flip {{ class }}" uk-icon="icon: {{ icon }}"></span>
-                                {% endif %}
+                {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+                {# Image description #}
+                <div class="uk-width-1-1 uk-margin-small-top">
+                    {% if imageToCropForm.description.vars.valid == 0 %}
+                        {{ form_errors(imageToCropForm.description) }}
+                    {% endif %}
+                    {{ form_label(imageToCropForm.description, 'Image description ("alt" html attribute)', {'label_attr': {'class': 'uk-form-label'}}) }}
+                    <div class="uk-inline uk-flex">
+                        <span class="uk-form-icon st-textarea-icon" uk-icon="icon: code"></span>
+                        {{ form_widget(imageToCropForm.description, {
+                            'attr': {'class': 'uk-input'},
+                            'value': imageToCropForm.description.vars.value})
+                        }}
+                        {# Image file input icon errors #}
+                        {% if imageToCropForm.description.vars.errors.form.submitted == 1 %}
+                            {% set class = imageToCropForm.description.vars.valid == 0 ? 'uk-form-danger' : 'uk-form-success' %}
+                            {% set icon = imageToCropForm.description.vars.valid == 0 ? 'warning' : 'check' %}
+                            <span class="uk-form-icon uk-form-icon-flip {{ class }}" uk-icon="icon: {{ icon }}"></span>
+                        {% endif %}
+                    </div>
+                </div>
+                {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+                {# Image crop modal: opened when image file input changes #}
+                <div id="st-cropper-modal-{{ imageIndex }}" class="uk-flex-top st-cropper-modal" uk-modal="esc-close: false; bg-close: false">
+                    <div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical">
+                        <button class="uk-modal-close-outside" type="button" uk-close></button>
+                        <h3 class="uk-modal-title uk-text-lead uk-text-center uk-text-bold uk-text-uppercase st-color-black">Resize your image</h3>
+                        <p class="uk-flex uk-flex-center uk-flex-column">
+                        <ul class="uk-list uk-text-small">
+                            <li><span class="uk-icon st-color-blue" uk-icon="icon: move"></span> Allowed format: <strong>16/9 selection</strong></li>
+                            <li><span class="uk-icon st-color-blue" uk-icon="icon: image"></span> Exported dimensions: <strong>width: 1600px</strong> X <strong>height: 900px</strong></li>
+                        </ul>
+                        </p>
+                        <div id="st-cropper-container-{{ imageIndex }}" class="uk-flex uk-flex-center uk-border-rounded uk-margin-auto st-cropper-container st-box-shadow-full-small">
+                            <div id="st-cropper-container-content-{{ imageIndex }}" class="uk-responsive uk-margin-top uk-margin-right uk-margin-bottom uk-margin-left st-cropper-container-content">
+                                <img id="st-cropper-preview-{{ imageIndex }}" class="uk-responsive st-cropper-preview" src="" alt="Crop preview">
+                            </div>
+                        </div>
+                        <div class="uk-flex uk-flex-center uk-margin-top">
+                            <button id="st-crop-button-{{ imageIndex }}" class="uk-button uk-button-secondary uk-border-rounded uk-box-shadow-hover-medium uk-text-bold st-crop-button" title="Validate">
+                                Crop <span uk-icon="icon: chevron-right; ratio: 1.3"></span>
                             </button>
                         </div>
+                        <p class="uk-margin-small-top"><small>Validate crop by clicking on button or closing window.</small></p>
                     </div>
                 </div>
-            </div>
-            {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
-            {# Image description #}
-            <div class="uk-width-1-1 uk-margin-small-top">
-                {% if imageToCropForm.description.vars.valid == 0 %}
-                    {{ form_errors(imageToCropForm.description) }}
-                {% endif %}
-                {{ form_label(imageToCropForm.description, 'Image description ("alt" html attribute)', {'label_attr': {'class': 'uk-form-label'}}) }}
-                <div class="uk-inline uk-flex">
-                    <span class="uk-form-icon st-textarea-icon" uk-icon="icon: code"></span>
-                    {{ form_widget(imageToCropForm.description, {
-                        'attr': {'class': 'uk-input'},
-                        'value': imageToCropForm.description.vars.value})
+                {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+                {# Image crop JSON data #}
+                <div id="st-crop-data-{{ imageIndex }}">
+                    {# Hidden field used to store crop data after crop action #}
+                    {{ form_row(imageToCropForm.cropJSONData, {
+                        'attr': {'class': 'st-crop-data'},
+                        'value': imageToCropForm.cropJSONData.vars.value})
                     }}
-                    {# Image file input icon errors #}
-                    {% if imageToCropForm.description.vars.errors.form.submitted == 1 %}
-                        {% set class = imageToCropForm.description.vars.valid == 0 ? 'uk-form-danger' : 'uk-form-success' %}
-                        {% set icon = imageToCropForm.description.vars.valid == 0 ? 'warning' : 'check' %}
-                        <span class="uk-form-icon uk-form-icon-flip {{ class }}" uk-icon="icon: {{ icon }}"></span>
-                    {% endif %}
                 </div>
-            </div>
-            {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
-            {# Image crop modal: opened when image file input changes #}
-            <div id="st-cropper-modal-{{ imageIndex }}" class="uk-flex-top" uk-modal="esc-close: false; bg-close: false">
-                <div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical">
-                    <button class="uk-modal-close-outside" type="button" uk-close></button>
-                    <h3 class="uk-modal-title uk-text-lead uk-text-center uk-text-bold uk-text-uppercase st-color-black">Resize your image</h3>
-                    <p class="uk-flex uk-flex-center uk-flex-column">
-                    <ul class="uk-list uk-text-small">
-                        <li><span class="uk-icon st-color-blue" uk-icon="icon: move"></span> Allowed format: <strong>16/9 selection</strong></li>
-                        <li><span class="uk-icon st-color-blue" uk-icon="icon: image"></span> Exported dimensions: <strong>width: 1600px</strong> X <strong>height: 900px</strong></li>
-                    </ul>
-                    </p>
-                    <div id="st-cropper-container-{{ imageIndex }}" class="uk-flex uk-flex-center uk-border-rounded uk-margin-auto st-cropper-container st-box-shadow-full-small">
-                        <div id="st-cropper-container-content-{{ imageIndex }}" class="uk-responsive uk-margin-top uk-margin-right uk-margin-bottom uk-margin-left st-cropper-container-content">
-                            <img id="st-cropper-preview-{{ imageIndex }}" class="uk-responsive st-cropper-preview" src="" alt="Crop preview">
-                        </div>
-                    </div>
-                    <div class="uk-flex uk-flex-center uk-margin-top">
-                        <button id="st-crop-button-{{ imageIndex }}" class="uk-button uk-button-secondary uk-border-rounded uk-box-shadow-hover-medium uk-text-bold st-crop-button" title="Validate">
-                            Crop <span uk-icon="icon: chevron-right; ratio: 1.3"></span>
-                        </button>
-                    </div>
-                    <p class="uk-margin-small-top"><small>Validate crop by clicking on button or closing window.</small></p>
-                </div>
-            </div>
-            {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
-            {# Image crop JSON data #}
-            <div id="st-crop-data-{{ imageIndex }}">
-                {# Hidden field used to store crop data after crop action #}
-                {{ form_row(imageToCropForm.cropJSONData, {
-                    'attr': {'class': 'st-crop-data'},
-                    'value': imageToCropForm.cropJSONData.vars.value})
-                }}
-            </div>
-            {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
-            {# Saved image name (must correspond to a standalone uploaded image) #}
-            <div id="st-save-image-name-{{ imageIndex }}">
-                 {# Hidden field used to store saved uploaded image during validation:
-                    Please note this field is used because non persistence of image file,
-                    so we upload the temporary file (on server) as a standalone media in a kind of global image gallery,
-                    to keep in memory the last uploaded file until root form entire validation! #}
-                {{ form_row(imageToCropForm.savedImageName, {
-                    'attr': {'class': 'st-saved-image-name'},
-                    'value': imageToCropForm.savedImageName.vars.value})
-                }}
-            </div>
-            {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
-            {# Show as main image? #}
-            <div id="st-is-main-image-{{ imageIndex }}" class="uk-width-1-1 uk-margin-small-top uk-margin-small-bottom">
-                <div class="uk-inline">
-                    {% if imageToCropForm.isMain.vars.valid == 0 %}
-                        {{ form_errors(imageToCropForm.isMain) }}
-                    {% endif %}
-                    {# Please note this can be changed via JavaScript to update all other "image to crop" boxes to false when one is set to true! #}
-                    {{ form_widget(imageToCropForm.isMain, {
-                        'attr': {'class': imageToCropForm.isMain.vars.valid == 0 ? 'uk-checkbox uk-form-error st-is-main-image' : 'uk-checkbox st-is-main-image'},
-                        'value': imageToCropForm.isMain.vars.value})
+                {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+                {# Saved image name (must correspond to a standalone uploaded image) #}
+                <div id="st-save-image-name-{{ imageIndex }}">
+                     {# Hidden field used to store saved uploaded image during validation:
+                        Please note this field is used because non persistence of image file,
+                        so we upload the temporary file (on server) as a standalone media in a kind of global image gallery,
+                        to keep in memory the last uploaded file until root form entire validation! #}
+                    {{ form_row(imageToCropForm.savedImageName, {
+                        'attr': {'class': 'st-saved-image-name'},
+                        'value': imageToCropForm.savedImageName.vars.value})
                     }}
-                    {{ form_label(imageToCropForm.isMain, 'Show as main image?', {'label_attr': {'class': 'uk-form-label'}}) }}
                 </div>
+                {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+                {# Show as main image? #}
+                <div id="st-is-main-image-{{ imageIndex }}" class="uk-width-1-1 uk-margin-small-top uk-margin-small-bottom">
+                    <div class="uk-inline">
+                        {% if imageToCropForm.isMain.vars.valid == 0 %}
+                            {{ form_errors(imageToCropForm.isMain) }}
+                        {% endif %}
+                        {# Please note this can be changed via JavaScript to update all other "image to crop" boxes to false when one is set to true! #}
+                        {{ form_widget(imageToCropForm.isMain, {
+                            'attr': {'class': imageToCropForm.isMain.vars.valid == 0 ? 'uk-checkbox uk-form-error st-is-main-image' : 'uk-checkbox st-is-main-image'},
+                            'value': imageToCropForm.isMain.vars.value})
+                        }}
+                        {{ form_label(imageToCropForm.isMain, 'Show as main image?', {'label_attr': {'class': 'uk-form-label'}}) }}
+                    </div>
+                </div>
+                {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+                {# Show list rank (sortable order) #}
+                <div id="st-show-list-rank-{{ imageIndex }}" class="uk-width-1-1 uk-margin-small-top uk-margin-small-bottom">
+                    <div class="uk-inline">
+                        {# Please note this can be changed via JavaScript to update this and all other "image to crop" boxes order when sortable/remove action is made! #}
+                        {{ form_widget(imageToCropForm.showListRank, {
+                            'attr': {'class': 'st-show-list-rank'},
+                            'value': imageToCropForm.showListRank.vars.value})
+                        }}
+                    </div>
+                </div>
+                {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
             </div>
-            {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
         </div>
     </div>
 </div>

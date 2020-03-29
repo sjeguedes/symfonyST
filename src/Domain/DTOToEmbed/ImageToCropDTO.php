@@ -44,6 +44,11 @@ final class ImageToCropDTO extends AbstractReadableDTO
     private $savedImageName;
 
     /**
+     * @var int
+     */
+    private $showListRank;
+
+    /**
      * @var bool
      */
     private $isMain;
@@ -56,6 +61,7 @@ final class ImageToCropDTO extends AbstractReadableDTO
      * @param string|null       $cropJSONData
      * @param string|null       $imagePreviewDataURI
      * @param string|null       $savedImageName
+     * @param int               $showListRank
      * @param bool              $isMain
      */
     public function __construct(
@@ -64,6 +70,7 @@ final class ImageToCropDTO extends AbstractReadableDTO
         ?string $cropJSONData,
         ?string $imagePreviewDataURI,
         ?string $savedImageName,
+        int $showListRank,
         bool $isMain = false
     ) {
         $this->image = $image;
@@ -71,6 +78,7 @@ final class ImageToCropDTO extends AbstractReadableDTO
         $this->imagePreviewDataURI = $imagePreviewDataURI;
         $this->cropJSONData = $cropJSONData;
         $this->savedImageName = $savedImageName;
+        $this->showListRank = $showListRank;
         $this->isMain = $isMain;
     }
 
@@ -115,60 +123,18 @@ final class ImageToCropDTO extends AbstractReadableDTO
     }
 
     /**
+     * @return int
+     */
+    public function getShowListRank() : int
+    {
+        return $this->showListRank;
+    }
+
+    /**
      * @return bool
      */
     public function getIsMain() : bool
     {
         return $this->isMain;
     }
-
-    /**
-     * @param UploadedFile|null $image
-     *
-     * @return void
-     */
-    /*public function setImage(?UploadedFile $image) : void
-    {
-        $this->image = $image;
-    }*/
-
-    /**
-     * @param string|null $description
-     *
-     * @return void
-     */
-    /*public function setDescription(?string $description) : void
-    {
-        $this->description = $description;
-    }*/
-
-    /**
-     * @param string|null $cropJSONData
-     *
-     * @return void
-     */
-    /*public function setCropJSONData(?string $cropJSONData) : void
-    {
-        $this->cropJSONData = $cropJSONData;
-    }*/
-
-    /**
-     * @param string|null $imagePreviewDataURI
-     *
-     * @return void
-     */
-    /*public function setImagePreviewDataURI(?string $imagePreviewDataURI) : void
-    {
-        $this->imagePreviewDataURI = $imagePreviewDataURI;
-    }*/
-
-    /**
-     * @param string|null $savedImageName
-     *
-     * @return void
-     */
-    /*public function setSavedImageName(?string $savedImageName) : void
-    {
-        $this->savedImageName = $savedImageName;
-    }*/
 }

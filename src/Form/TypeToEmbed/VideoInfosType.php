@@ -6,6 +6,7 @@ namespace App\Form\TypeToEmbed;
 
 use App\Domain\DTOToEmbed\VideoInfosDTO;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -33,6 +34,11 @@ class VideoInfosType extends AbstractType
             ->add('url', UrlType::class, [
             ])
             ->add('description', TextType::class, [
+            ])
+            // Please "isPublished" property (set to true by default) because it is not managed in project at this level!
+            ->add('showListRank', HiddenType::class, [
+                // maintain validation state at the child form level, to be able to show errors near field
+                'error_bubbling' => false
             ]);
     }
 
@@ -50,7 +56,8 @@ class VideoInfosType extends AbstractType
             'empty_data'     => function (FormInterface $form) {
                 return new VideoInfosDTO(
                     $form->get('url')->getData(),
-                    $form->get('description')->getData()
+                    $form->get('description')->getData(),
+                    $form->get('showListRank')->getData()
                 );
             },
             'required' => false

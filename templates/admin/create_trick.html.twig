@@ -226,19 +226,21 @@
                                     {# Get "prototype_name" option value from images Collection #}
                                     {% set imageIndex = createTrickForm.images.vars.prototype.vars.name %}
                                     <div id="st-images-collection" class="st-images-collection" data-prototype="{{ imageToCropTemplate }}" data-prototype-name="{{ imageIndex }}">
-                                    {% if createTrickForm.images.children is not empty %}
-                                        {# Loop on children to retrieve all associated images (with corresponding box) on the way to be possibly created #}
-                                        {% for imageIndex, formView in createTrickForm.images.children %}
-                                            {# index = imageIndex, value = formView  #}
-                                            {{ include('form/editable_image_to_crop.html.twig', {
-                                                    rootForm: createTrickForm,
-                                                    rank: loop.index,
-                                                    editableImageToCropForm: formView,
-                                                    editableImageIndexName: imageIndex
-                                                })
-                                            }}
-                                        {% endfor %}
-                                    {% endif %}
+                                        <div id="st-images-collection-sortable-wrapper">
+                                            {% if createTrickForm.images.children is not empty %}
+                                                {# Loop on children to retrieve all associated images (with corresponding box) on the way to be possibly created #}
+                                                {% for imageIndex, formView in createTrickForm.images.children %}
+                                                    {# index = imageIndex, value = formView  #}
+                                                    {{ include('form/editable_image_to_crop.html.twig', {
+                                                            rootForm: createTrickForm,
+                                                            rank: loop.index,
+                                                            editableImageToCropForm: formView,
+                                                            editableImageIndexName: imageIndex
+                                                        })
+                                                    }}
+                                                {% endfor %}
+                                            {% endif %}
+                                        </div>
                                         <!-- Here is added prototype template each time a new "image to crop" box is added! -->
                                         {# Image add button #}
                                         <button id="st-image-add-button" class="uk-button uk-button-default uk-margin-small-top st-image-add-button" type="button" tabindex="-1">

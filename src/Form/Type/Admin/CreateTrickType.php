@@ -12,14 +12,11 @@ use App\Form\TypeToEmbed\ImageToCropType;
 use App\Form\TypeToEmbed\VideoInfosType;
 use App\Utils\Traits\UuidHelperTrait;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -30,7 +27,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  *
  * Build a trick creation form type.
  */
-class CreateTrickType extends AbstractType
+class CreateTrickType extends AbstractTrickType
 {
     use UuidHelperTrait;
 
@@ -54,39 +51,6 @@ class CreateTrickType extends AbstractType
     {
         $this->request = $requestStack->getCurrentRequest();
         $this->trickGroupService = $trickGroupService;
-    }
-
-    /**
-     * Add single entity to array model transformer to a form data.
-     *
-     * This transformer aims at using the same DTO if "multiple" form option changes.
-     *
-     * @param FormBuilderInterface $formBuilder
-     * @param string               $formName    a Form instance name
-     *
-     * @return void
-     */
-    private function addSingleEntityToArrayCustomDataTransformer(FormBuilderInterface $formBuilder, string $formName) : void
-    {
-        /** @var FormBuilderInterface$form */
-        $form = $formBuilder->get($formName);
-        $form->addModelTransformer(
-            new CallbackTransformer(
-                // Normalized data (transform)
-                function ($uuidStrings) {
-                    // Do not transform the (encoded) uuid string(s): (encoded) uuid strings can be a single or several (encoded) uuid strings in array
-                    return !\is_null($uuidStrings) ? $uuidStrings : null;
-                },
-                // Model data (reverse transform)
-                function ($entities) use ($form) {
-                    if (\is_null($entities)) {
-                        return null;
-                    }
-                    // Transform a single entity into an array: $entities can be a single entity or an array (collection) of several entities
-                    return !$form->getOption('multiple') ? [$entities] : $entities;
-                }
-            )
-        );
     }
 
     /**
@@ -117,12 +81,12 @@ class CreateTrickType extends AbstractType
                         ->orderBy('tr.name', 'ASC');
                 },
                 // Show group names in select
-                'choice_label' => 'name',
+                'choice_label'   => 'name',
                 // Use encoded uuid value to query entities
-                'choice_value' => function (TrickGroup $trickGroup = null) {
+                'choice_value'   => function (TrickGroup $trickGroup = null) {
                     return !\is_null($trickGroup) ? $this->encode($trickGroup->getUuid()) : '';
                 },
-                'placeholder'  => 'Choose an existing category'
+                'placeholder'    => 'Choose an existing category'
             ])
             ->add('name', TextType::class, [
             ])
@@ -137,18 +101,14 @@ class CreateTrickType extends AbstractType
                 // Custom root form options passed to entry type form
                 'entry_options'  => [
                     'rootFormHandler' =>  $options['formHandler']
-                ],
-                //'by_reference'   => false,
-                //'error_bubbling' => false
+                ]
             ])
             ->add('videos', CollectionType::class, [
                 'entry_type'     => VideoInfosType::class,
                 'allow_add'      => true,
                 'prototype_name' => '__videoIndex__',
                 // Used here to access fields in templates and customize a particular prototype
-                'prototype'      => true,
-                //'by_reference'   => false
-                //'error_bubbling' => false
+                'prototype'      => true
             ]);
 
         // Add data transformer to "group" data.
