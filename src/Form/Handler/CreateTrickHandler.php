@@ -66,11 +66,17 @@ final class CreateTrickHandler extends AbstractUploadFormHandler
         }
         // Check TrickManager instance in passed data
         $this->checkNecessaryData($actionData);
+        /** @var TrickManager $trickService */
         $trickService = $actionData['trickService'];
-        // TODO: add all custom validations by feeding potential custom error with return state and flashbag in case of failure!
-        // DTO is in valid state but:
-        // 1. trick name (title) must not exist in database, so it is unique!
-        return false;
+        // DTO is in valid state but filled in trick name (title) already exist in database: it must be unique!
+        $isTrickNameUnique = \is_null($trickService->findSingleByName($this->form->getData()->getName())) ? true : false; // or $this->form->get('name')->getData()
+        if (!$isTrickNameUnique) {
+            $trickNameError = 'Please check chosen title!<br>A trick with the same name already exists!';
+            $this->customError = $trickNameError;
+            $this->flashBag->add('danger', 'Trick creation failed!<br>Try to request again by checking the form fields.');
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -110,9 +116,9 @@ final class CreateTrickHandler extends AbstractUploadFormHandler
     /**
      * Get the trick creation error.
      *
-     * @return array|null
+     * @return string|null
      */
-    public function getTrickCreationError() : ?array
+    public function getTrickCreationError() : ?string
     {
         return $this->customError;
     }

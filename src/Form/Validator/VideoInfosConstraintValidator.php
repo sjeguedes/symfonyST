@@ -8,7 +8,6 @@ use App\Domain\DTOToEmbed\VideoInfosDTO;
 use App\Form\Validator\Constraint\VideoInfosConstraint;
 use App\Service\Medias\VideoURLProxyChecker;
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
@@ -18,9 +17,8 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  * This class manages a custom constraint validation callback as concerns VideoInfosDTO instance.
  *
  * @see https://symfony.com/doc/current/validation/custom_constraint.html
- * @see https://symfony.com/index.php/doc/4.2/reference/constraints/Callback.html
  */
-class VideoInfosConstraintValidator extends AbstractTrickCollectionConstraintValidator
+final class VideoInfosConstraintValidator extends AbstractTrickCollectionConstraintValidator
 {
     /**
      * @var VideoURLProxyChecker
@@ -34,6 +32,7 @@ class VideoInfosConstraintValidator extends AbstractTrickCollectionConstraintVal
      */
     public function __construct(VideoURLProxyChecker $videoURLProxyChecker)
     {
+        // Use this service to check video validity and existence
         $this->videoURLProxyChecker = $videoURLProxyChecker;
     }
 
@@ -42,12 +41,10 @@ class VideoInfosConstraintValidator extends AbstractTrickCollectionConstraintVal
      *
      * {@inheritDoc}
      *
-     * @return ConstraintViolationListInterface
-     *
      * @throws \Exception
      * @throws \Symfony\Component\Validator\Exception\UnexpectedTypeException
      */
-    public function validate($object, Constraint $constraint)
+    public function validate($object, Constraint $constraint) : void
     {
         if (!$object instanceof VideoInfosDTO) {
             throw new \InvalidArgumentException('Object to validate must be an instance of "VideoInfosDTO"!');
@@ -55,10 +52,10 @@ class VideoInfosConstraintValidator extends AbstractTrickCollectionConstraintVal
         if (!$constraint instanceof VideoInfosConstraint) {
             throw new UnexpectedTypeException($constraint, VideoInfosConstraint::class);
         }
-        // Check valid "show list rank" (sortable block) field value
-        $this->validateShowListRank($this->context);
         // Check valid "url" by controlling video accessible content
         $this->validateUrl($this->context);
+        // Check valid "show list rank" (sortable block) field value
+        $this->validateShowListRank($this->context);
     }
 
     /**
@@ -76,17 +73,20 @@ class VideoInfosConstraintValidator extends AbstractTrickCollectionConstraintVal
         // Get current validated object (VideoInfosDTO)
         $object = $context->getObject();
         $url = $object->getUrl();
-        // Video URL is not allowed! Please note video URL format could also have been checked thanks to basic Regex validation constraint!
-        if (false === $this->videoURLProxyChecker->isAllowed($url)) {
-            $context->buildViolation('Video url is not allowed!<br>Please check source URL.')
-                ->atPath('url')
-                ->addViolation();
-        } else {
-            // Video content can not be retrieved or does not exist!
-            if (false === $this->videoURLProxyChecker->isContent($url)) {
-                $context->buildViolation('Video content is not available!<br>Please check source URL.')
+        // If URL is empty, a basic "NotBlank" constraint violation is applied!
+        if (!\is_null($url)) {
+            // Video URL is not allowed! Please note video URL format could also have been checked thanks to basic "Regex" validation constraint!
+            if (false === $this->videoURLProxyChecker->isAllowed($url)) {
+                $context->buildViolation('Video url is not allowed!<br>Please check source URL.')
                     ->atPath('url')
                     ->addViolation();
+            } else {
+                // Video content can not be retrieved or does not exist!
+                if (false === $this->videoURLProxyChecker->isContent($url)) {
+                    $context->buildViolation('Video content is not available!<br>Please check source URL.')
+                        ->atPath('url')
+                        ->addViolation();
+                }
             }
         }
     }

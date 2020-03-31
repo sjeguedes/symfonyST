@@ -151,6 +151,39 @@ class TrickRepository extends ServiceEntityRepository
     }
 
     /**
+     * Find a Trick entity with query based on its name.
+     *
+     * @param string $name
+     *
+     * @return Trick|null
+     */
+    public function findOneByName(string $name) : ?Trick
+    {
+        // TODO: complete query later with users messages or use Message Repository to limit result!
+        $queryBuilder = $this->createQueryBuilder('t' );
+        // No need to join media types and trick group due to no particular filter on data
+        // trick group and media type data are added automatically thanks to lazy loading!
+        // Specifying joins reduces query numbers!
+        $result = $queryBuilder
+            ->select(['t', 'tg', 'm', 'mt', 'i', 'v'])
+            ->leftJoin('t.trickGroup', 'tg', 'WITH', 't.trickGroup = tg.uuid')
+            ->leftJoin('t.medias', 'm', 'WITH', 'm.trick = t.uuid')
+            ->leftJoin('m.mediaType', 'mt', 'WITH', 'm.mediaType = mt.uuid')
+            ->leftJoin('m.image', 'i', 'WITH', 'm.image = i.uuid')
+            ->leftJoin('m.video', 'v', 'WITH', 'm.video = v.uuid')
+            ->where('t.name = ?1')
+            ->orderBy('i.creationDate', 'DESC')
+            ->addOrderBy('v.creationDate', 'DESC')
+            ->setParameter(1, $name)
+            ->getQuery()
+            ->getResult();
+        if (empty($result)) {
+            return null;
+        }
+        return $result[0];
+    }
+
+    /**
      * Find a Trick entity with query based on its uuid.
      *
      * @param UuidInterface $uuid
@@ -170,8 +203,8 @@ class TrickRepository extends ServiceEntityRepository
     {
         // TODO: complete query later with users messages or use Message Repository to limit result!
         $queryBuilder = $this->createQueryBuilder('t' );
-        // No need to join media_types and trick_groups due to no particular filter on data
-        // trick group and media type data is added automatically thanks to lazy loading!
+        // No need to join media types and trick group due to no particular filter on data
+        // trick group and media type data are added automatically thanks to lazy loading!
         // Specifying joins reduces query numbers!
         $result = $queryBuilder
             ->select(['t', 'tg', 'm', 'mt', 'i', 'v'])

@@ -133,7 +133,10 @@ class Media
         int $showListRank = null,
         \DateTimeInterface $creationDate = null
     ) {
-        \assert(0 < $showListRank, 'Show list rank must be greater than 0!');
+        // Show list rank can be null, when the media entity to create, is based on an Image entity generated during image direct upload
+        if (!\is_null($showListRank)) {
+            \assert($showListRank > 0, 'Show list rank must be greater than 0!');
+        }
         $this->uuid = Uuid::uuid4();
         $this->mediaType = $mediaType;
         $this->trick = $trick;

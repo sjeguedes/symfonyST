@@ -11,6 +11,17 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 abstract class AbstractTrickCollectionConstraintValidator extends ConstraintValidator
 {
+    /**
+     * Validate each item rank in Collections.
+     *
+     * @param string $collectionName
+     * @param ExecutionContextInterface $context
+     * @param null $payload
+     *
+     * @return void
+     *
+     * @see For information: root namespace special compiled functions: https://github.com/FriendsOfPHP/PHP-CS-Fixer/issues/3048
+     */
     protected function validateItemCollectionRank(string $collectionName, ExecutionContextInterface $context, $payload = null) : void
     {
         // Get current validated object (ImageToCropDTO or VideoInfosDTO)

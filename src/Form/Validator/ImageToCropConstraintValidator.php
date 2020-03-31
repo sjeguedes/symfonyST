@@ -13,8 +13,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Callback;
-use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
@@ -26,7 +24,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  * @see https://symfony.com/doc/current/validation/custom_constraint.html
  * @see https://symfony.com/index.php/doc/4.2/reference/constraints/Callback.html
  */
-class ImageToCropConstraintValidator extends AbstractTrickCollectionConstraintValidator
+final class ImageToCropConstraintValidator extends AbstractTrickCollectionConstraintValidator
 {
     /**
      * @var DenormalizerInterface
@@ -66,13 +64,11 @@ class ImageToCropConstraintValidator extends AbstractTrickCollectionConstraintVa
      *
      * {@inheritDoc}
      *
-     * @return ConstraintViolationListInterface
-     *
      * @throws \Exception
      * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
      * @throws \Symfony\Component\Validator\Exception\UnexpectedTypeException
      */
-    public function validate($object, Constraint $constraint)
+    public function validate($object, Constraint $constraint) : void
     {
         if (!$object instanceof ImageToCropDTO) {
             throw new \InvalidArgumentException('Object to validate must be an instance of "ImageToCropDTO"!');
@@ -104,7 +100,7 @@ class ImageToCropConstraintValidator extends AbstractTrickCollectionConstraintVa
      *
      * @return void
      */
-    public function validateImage(ExecutionContextInterface $context, $payload = null): void
+    public function validateImage(ExecutionContextInterface $context, $payload = null) : void
     {
         // Get current validated object (ImageToCropDTO)
         $object = $context->getObject();
@@ -163,7 +159,7 @@ class ImageToCropConstraintValidator extends AbstractTrickCollectionConstraintVa
      *
      * @return void
      */
-    public function validateCropJSONData(ExecutionContextInterface $context, $payload = null): void
+    public function validateCropJSONData(ExecutionContextInterface $context, $payload = null) : void
     {
         // Get current validated object (ImageToCropDTO)
         $object = $context->getObject();
@@ -218,7 +214,7 @@ class ImageToCropConstraintValidator extends AbstractTrickCollectionConstraintVa
      *
      * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
      */
-    public function validateImagePreviewDataURI(ExecutionContextInterface $context, $payload = null): void
+    public function validateImagePreviewDataURI(ExecutionContextInterface $context, $payload = null) : void
     {
         // Get current validated object (ImageToCropDTO)
         $object = $context->getObject();
@@ -295,8 +291,6 @@ class ImageToCropConstraintValidator extends AbstractTrickCollectionConstraintVa
      * @param mixed|null                $payload
      *
      * @return void
-     *
-     * @see For information: root namespace special compiled functions: https://github.com/FriendsOfPHP/PHP-CS-Fixer/issues/3048
      */
     public function validateShowListRank(ExecutionContextInterface $context, $payload = null) : void
     {
@@ -311,8 +305,6 @@ class ImageToCropConstraintValidator extends AbstractTrickCollectionConstraintVa
      * @param mixed|null                $payload
      *
      * @return void
-     *
-     * @throws \Exception
      */
     public function validateIsMain(ExecutionContextInterface $context, $payload = null) : void
     {

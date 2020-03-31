@@ -149,8 +149,10 @@ class ImageUploader
      */
     private function generateImage($newImageToCreateResource, string $imageType, string $newImageNamePath) : bool
     {
-        // Use the highest possible compression quality
-        $qualityParameters = ['png' => 0, 'jpeg' => 100, 'jpg' => 100];
+        // Define the compression quality
+        // png: -1 default compiled in zlib library, 0 no compression, 1-9 where 9 is the maximum compression
+        //jp(e)g: 80% (0-100)
+        $qualityParameters = ['png' => 2, 'jpeg' => 80, 'jpg' => 80];
         $arguments = [$newImageToCreateResource, $newImageNamePath];
         if (isset($qualityParameters[$imageType])) array_push($arguments, $qualityParameters[$imageType]);
         // Call the adapted function which depends on image type (imagepng(), imagegif(), imagejpeg())

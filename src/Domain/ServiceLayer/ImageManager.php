@@ -120,7 +120,7 @@ class ImageManager
             return null;
         }
         // Get image necessary parameters
-        $parameters = $this->getTrickImageParameters($dataModel, $mediaTypeKey);
+        $parameters = $this->getTrickImageParameters($dataModel, $mediaTypeKey, $isDirectUpload);
         // Upload file on server and get created file name with possible crop option
         $isCropped = property_exists(\get_class($dataModel), 'cropJSONData') ? true : false;
         // Check uploaded "image" data or retrieve "savedImageName" value to create image entity directly without upload (use this method in form handler when trick is created)
@@ -188,12 +188,13 @@ class ImageManager
      *
      * @param ImageToCropDTO $dataModel
      * @param string         $mediaTypeKey
+     * @param bool           $isDirectUpload
      *
      * @return array
      *
      * @throws \Exception
      */
-    public function getTrickImageParameters(ImageToCropDTO $dataModel, string $mediaTypeKey) : array
+    public function getTrickImageParameters(ImageToCropDTO $dataModel, string $mediaTypeKey, bool $isDirectUpload = false) : array
     {
         if (is_null($type = $this->mediaTypeManager->getType($mediaTypeKey))) {
             throw new \RuntimeException("Media type key $mediaTypeKey is unknown!");
@@ -209,7 +210,6 @@ class ImageManager
         $originalNameWithoutExtension = preg_replace($pattern, '', $trickImage->getClientOriginalName());
         // Clean original name to avoid issues with special characters
         $trickImageIdentifierName = $this->sanitizeString($originalNameWithoutExtension);
-        //$trickImageIdentifierName = $this->makeSlug($originalNameWithoutExtension);
         $trickImageData = $this->prepareImageData($trickImage);
         return [
             'cropJSONData'     => $cropJSONData,

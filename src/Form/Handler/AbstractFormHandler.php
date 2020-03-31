@@ -6,6 +6,7 @@ namespace App\Form\Handler;
 
 use App\Domain\Entity\User;
 use App\Domain\ServiceLayer\ImageManager;
+use App\Domain\ServiceLayer\TrickManager;
 use App\Domain\ServiceLayer\UserManager;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -27,7 +28,8 @@ class AbstractFormHandler implements FormHandlerInterface
         'userToUpdate' => User::class,
         'imageService' => ImageManager::class,
         'request'      => Request::class,
-        'userService'  => UserManager::class
+        'userService'  => UserManager::class,
+        'trickService' => TrickManager::class
     ];
 
     /**

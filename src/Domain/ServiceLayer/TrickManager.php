@@ -54,6 +54,18 @@ class TrickManager
     }
 
     /**
+     * Find Trick by name string.
+     *
+     * @param string $name
+     *
+     * @return Trick|null
+     */
+    public function findSingleByName(string $name) : ?Trick
+    {
+        return $this->repository->findOneByName($name);
+    }
+
+    /**
      * Find Trick by encoded uuid string.
      *
      * @param string $encodedUuid

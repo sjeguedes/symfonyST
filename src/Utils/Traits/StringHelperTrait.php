@@ -36,7 +36,7 @@ trait StringHelperTrait
           $clean = str_replace((array) $replace, ' ', $clean);
         }
         // Delete all characters which are not in this list (delimiter is excluded.)
-        $clean = preg_replace("/[^a-z0-9\/_|+\s-]/i", '', $clean);
+        $clean = preg_replace("/[^a-z0-9\/_|+-]/i", '', $clean);
         // Format string with lowercase letters
         $clean = strtolower($clean);
         // Replace this characters list with delimiter
@@ -60,8 +60,8 @@ trait StringHelperTrait
      */
     public function sanitizeString(string $string, string $delimiter = '-') : ?string
     {
-        // Replace latin characters and lower-case string, remove non spacing mark and punctuation...
-        $string = transliterator_transliterate("Any-Latin; NFD; [:Nonspacing Mark:] Remove; NFC; [:Punctuation:] Remove; Lower();", $string);
+        // Replace latin characters and lower-case string, remove non spacing mark but not punctuation...
+        $string = transliterator_transliterate("Any-Latin; Latin-ASCII; NFD; [:Nonspacing Mark:] Remove; NFC; Lower();", $string);
         // Delete all characters which are not in this list (delimiter is excluded.)
         $string = preg_replace('/[^a-z0-9\/_|+\s-]/i', '', $string);
         // Replace this characters list with delimiter

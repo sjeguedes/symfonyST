@@ -43,12 +43,15 @@ class VideoURLProxyChecker
     /**
      * Check if URL format is allowed.
      *
-     * @param string $url
+     * @param string|null $url
      *
      * @return bool
      */
-    public function isAllowed(string $url) : bool
+    public function isAllowed(?string $url) : bool
     {
+        if (\is_null($url)) {
+            return false;
+        }
         $patterns = self::ALLOWED_URL_PATTERNS;
         for ($i = 0; $i < count($patterns); $i ++) {
             if (preg_match( $patterns[$i], $url)) {
@@ -61,7 +64,7 @@ class VideoURLProxyChecker
     /**
      * Request URL to check if a content can be loaded.
      *
-     * @param string $url
+     * @param string|null $url
      *
      * @return bool
      *
@@ -71,8 +74,11 @@ class VideoURLProxyChecker
      * @see https://stackoverflow.com/questions/50948387/curl-error-ssl-certificate-error-self-signed-certificate-in-certificate-chain
      * @see https://www.php.net/manual/en/function.curl-error.php
      */
-    public function isContent(string $url) : bool
+    public function isContent(?string $url) : bool
     {
+        if (\is_null($url)) {
+            return false;
+        }
         // Use cURL
         $handle = curl_init($url);
         curl_setopt($handle, CURLOPT_RETURNTRANSFER, 1);
