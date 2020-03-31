@@ -285,6 +285,8 @@ class Media
      * @param bool $isMain
      *
      * @return Media
+     *
+     * @throws \Exception
      */
     public function modifyIsMain(bool $isMain) : self
     {
@@ -301,6 +303,8 @@ class Media
      * @param bool $isPublished
      *
      * @return Media
+     *
+     * @throws \Exception
      */
     public function modifyIsPublished(bool $isPublished) : self
     {
@@ -319,6 +323,8 @@ class Media
      * @param int $showListRank
      *
      * @return Media
+     *
+     * @throws \Exception
      */
     public function modifyShowListRank(int $showListRank) : self
     {
@@ -335,6 +341,8 @@ class Media
      * @param \DateTimeInterface $updateDate
      *
      * @return Media
+     *
+     * @throws \Exception
      */
     public function modifyUpdateDate(\DateTimeInterface $updateDate) : self
     {

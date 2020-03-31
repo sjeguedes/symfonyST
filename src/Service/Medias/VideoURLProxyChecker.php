@@ -47,7 +47,7 @@ class VideoURLProxyChecker
      *
      * @return bool
      */
-    private function allow(string $url) : bool
+    public function isAllowed(string $url) : bool
     {
         $patterns = self::ALLOWED_URL_PATTERNS;
         for ($i = 0; $i < count($patterns); $i ++) {
@@ -66,8 +66,12 @@ class VideoURLProxyChecker
      * @return bool
      *
      * @see https://stackoverflow.com/questions/408405/easy-way-to-test-a-url-for-404-in-php
+     * @see https://aboutssl.org/fix-ssl-certificate-problem-unable-to-get-local-issuer-certificate/
+     * @see https://blog.petehouston.com/fix-ssl-certificate-problem-with-php-curl/
+     * @see https://stackoverflow.com/questions/50948387/curl-error-ssl-certificate-error-self-signed-certificate-in-certificate-chain
+     * @see https://www.php.net/manual/en/function.curl-error.php
      */
-    private function isContent(string $url) : bool
+    public function isContent(string $url) : bool
     {
         // Use cURL
         $handle = curl_init($url);
@@ -77,8 +81,8 @@ class VideoURLProxyChecker
         // Request with cURL
         curl_exec($handle);
         $httpCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
-        // Check resource availability with HTTP response status code
-        $isContentFound = 404 !== $httpCode ? true : false;
+        // Check resource availability with HTTP response status code which is not a 404 value and also an empty error string returned
+        $isContentFound = 404 !== $httpCode && 0 === strlen(curl_error($handle)) ? true : false;
         curl_close($handle);
         return $isContentFound;
     }
@@ -100,7 +104,7 @@ class VideoURLProxyChecker
         if (\is_null($url)) {
             return ['status' => 0];
         }
-        return $this->allow($url) && $this->isContent($url) ? ['status' => 1] : ['status' => 0];
+        return $this->isAllowed($url) && $this->isContent($url) ? ['status' => 1] : ['status' => 0];
     }
 
 }

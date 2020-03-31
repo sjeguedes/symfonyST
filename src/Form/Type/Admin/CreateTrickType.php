@@ -12,7 +12,6 @@ use App\Form\TypeToEmbed\ImageToCropType;
 use App\Form\TypeToEmbed\VideoInfosType;
 use App\Utils\Traits\UuidHelperTrait;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;

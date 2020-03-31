@@ -304,7 +304,7 @@ class User implements UserInterface, \Serializable
      *
      * @return User
      *
-     * @throws \InvalidArgumentException
+     * @throws \Exception
      */
     public function modifyFamilyName(string $familyName) : self
     {
@@ -322,7 +322,7 @@ class User implements UserInterface, \Serializable
      *
      * @return User
      *
-     * @throws \InvalidArgumentException
+     * @throws \Exception
      */
     public function modifyFirstName(string $firstName) : self
     {
@@ -340,7 +340,7 @@ class User implements UserInterface, \Serializable
      *
      * @return User
      *
-     * @throws \InvalidArgumentException
+     * @throws \Exception
      */
     public function modifyNickName(string $userName) : self
     {
@@ -358,7 +358,7 @@ class User implements UserInterface, \Serializable
      *
      * @return User
      *
-     * @throws \InvalidArgumentException
+     * @throws \Exception
      */
     public function modifyEmail(string $email) : self
     {
@@ -377,7 +377,7 @@ class User implements UserInterface, \Serializable
      *
      * @return User
      *
-     * @throws \InvalidArgumentException
+     * @throws \Exception
      */
     public function modifyPassword(string $password, string $algorithm) : self
     {
@@ -396,7 +396,7 @@ class User implements UserInterface, \Serializable
      *
      * @return User
      *
-     * @throws \InvalidArgumentException
+     * @throws \Exception
      */
     public function modifyRoles(array $roles) : self
     {
@@ -413,6 +413,8 @@ class User implements UserInterface, \Serializable
      * @param string $salt
      *
      * @return $this
+     *
+     * @throws \Exception
      */
     public function modifySalt(string $salt) : self
     {
@@ -446,7 +448,7 @@ class User implements UserInterface, \Serializable
      *
      * @return User|null
      *
-     * @throws \InvalidArgumentException
+     * @throws \Exception
      */
     public function updateRenewalToken(?string $renewalToken) : self
     {
@@ -464,7 +466,7 @@ class User implements UserInterface, \Serializable
      *
      * @return User
      *
-     * @throws \RuntimeException
+     * @throws \Exception
      */
     public function modifyUpdateDate(\DateTimeInterface $updateDate) : self
     {
@@ -484,7 +486,7 @@ class User implements UserInterface, \Serializable
      *
      * @return User
      *
-     * @throws \RuntimeException
+     * @throws \Exception
      */
     public function updateRenewalRequestDate(?\DateTimeInterface $renewalRequestDate) : self
     {

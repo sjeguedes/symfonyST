@@ -188,6 +188,7 @@
                             </div>
                             {# Images #}
                             <div class="uk-width-1-1 uk-margin-small-bottom">
+                                <hr class="uk-margin-small-top uk-padding-small-bottom">
                                 {# Avoid "images" Collection type to be rendered automatically when using form_start() function #}
                                 {# or use form_end(createTrickForm, {'render_rest': false}) function but do not rendered all the fields not called! #}
                                 {# see: https://stackoverflow.com/questions/32585047/symfony-form-prevent-form-fields-from-being-generated-automaticly #}
@@ -221,7 +222,7 @@
                                 </div>
                                 {# --- end Images reminder --- #}
                                 <div class="uk-inline uk-display-block uk-flex">
-                                    {# Image collection #}
+                                    {# Images collection #}
                                     {% set imageToCropTemplate = include('form/image_to_crop.html.twig', { rootForm: createTrickForm })|e('html_attr') %}
                                     {# Get "prototype_name" option value from images Collection #}
                                     {% set imageIndex = createTrickForm.images.vars.prototype.vars.name %}
@@ -253,11 +254,76 @@
                             </div>
                             {# Videos #}
                             <div class="uk-width-1-1 uk-margin-small-bottom">
-                                {# TODO: do stuff to manage and show videos boxes like images boxes! #}
+                                <hr class="uk-margin-small-top uk-padding-small-bottom">
                                 {# Avoid "videos" Collection type to be rendered automatically when using form_start() function #}
                                 {# or use form_end(createTrickForm, {'render_rest': false}) function but do not rendered all the fields not called! #}
                                 {# see: https://stackoverflow.com/questions/32585047/symfony-form-prevent-form-fields-from-being-generated-automaticly #}
                                 {% do createTrickForm.videos.setRendered %}
+                                {{ form_label(createTrickForm.videos, 'Associated videos to show', {'label_attr': {'class': 'uk-form-label'}}) }}
+                                {# --- Videos reminder --- #}
+                                <div class="uk-inline">
+                                    <a href="#" class="uk-button-link">
+                                        <span class="st-color-yellow" uk-icon="icon: question; ratio: 1.25"></span>
+                                    </a>
+                                    <div uk-drop="mode: click; pos: top-center; animation: uk-animation-slide-top-small; duration: 500">
+                                        <div class="uk-inline uk-position-relative uk-padding-small uk-border-rounded uk-box-shadow-medium st-background-yellow st-color-black">
+                                            <a href="#" class="uk-drop-close uk-position-absolute uk-padding-small">
+                                                <span class="st-color-blue" uk-icon="icon: close"></span>
+                                            </a>
+                                            <p class="uk-margin-remove uk-text-center st-line-height-normal">
+                                                <small class="uk-display-block uk-margin-small-top uk-margin-small-bottom uk-text-bold">
+                                                    <span uk-icon="icon: info"></span> Associated videos reminder<br>
+                                                </small>
+                                                <small>
+                                                    Trick videos are present on its dedicated page thanks to iframe.
+                                                    No maximum length is defined.<br>
+                                                    Each video is expected to come from <span class="uk-text-bold">Youtube, Vimeo, or Dailymotion</span> providers.<br>
+                                                    Iframe Integration source URL must be used one of these:<br>
+                                                    <span class="uk-text-bold uk-text-break">
+                                                        https://www.youtube.com/embed/<em><span class="st-color-blue">videoId</span></em>
+                                                    </span><br>
+                                                    <span class="uk-text-bold uk-text-break">
+                                                        https://player.vimeo.com/video/<em><span class="st-color-blue">videoId</span></em>
+                                                    </span><br>
+                                                    <span class="uk-text-bold uk-text-break">
+                                                        https://www.dailymotion.com/embed/video/<em><span class="st-color-blue">videoId</span></em>
+                                                    </span>
+                                                </small>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                {# --- end Videos reminder --- #}
+                                <div class="uk-inline uk-display-block uk-flex">
+                                    {# Videos collection #}
+                                    {% set videoInfosTemplate = include('form/video_infos.html.twig', { rootForm: createTrickForm })|e('html_attr') %}
+                                    {# Get "prototype_name" option value from videos Collection #}
+                                    {% set videoIndex = createTrickForm.videos.vars.prototype.vars.name %}
+                                    <div id="st-videos-collection" class="st-images-collection" data-prototype="{{ videoInfosTemplate }}" data-prototype-name="{{ videoIndex }}">
+                                        <div id="st-videos-collection-sortable-wrapper">
+                                            {% if createTrickForm.videos.children is not empty %}
+                                                {# Loop on children to retrieve all associated videos (with corresponding box) on the way to be possibly created #}
+                                                {% for videoIndex, formView in createTrickForm.videos.children %}
+                                                    {# index = videoIndex, value = formView  #}
+                                                    {{ include('form/editable_video_infos.html.twig', {
+                                                        rootForm: createTrickForm,
+                                                        rank: loop.index,
+                                                        editableVideoInfosForm: formView,
+                                                        editableVideoIndexName: videoIndex
+                                                    })
+                                                    }}
+                                                {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                        <!-- Here is added prototype template each time a new "video infos" box is added! -->
+                                        {# Video add button #}
+                                        <button id="st-video-add-button" class="uk-button uk-button-default uk-margin-small-top st-video-add-button" type="button" tabindex="-1">
+                                            <span class="uk-icon" uk-icon="icon: plus-circle"></span>
+                                            <span class="uk-padding-small">Add a new video</span>
+                                            <span class="uk-icon" uk-icon="icon: play-circle"></span>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                             {# CSRF token #}
                             {{ form_row(createTrickForm.token, {'value': csrf_token('create_trick_token')}) }}

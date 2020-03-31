@@ -15,7 +15,7 @@ use Symfony\Component\Form\FormView;
  *
  * Define common methods for trick management (creation/update) form types.
  */
-class AbstractTrickType extends AbstractType
+abstract class AbstractTrickType extends AbstractType
 {
     /**
      * Add single entity to array model transformer to a form data.
@@ -33,7 +33,7 @@ class AbstractTrickType extends AbstractType
         $form = $formBuilder->get($formName);
         $form->addModelTransformer(
             new CallbackTransformer(
-            // Normalized data (transform)
+                // Normalized data (transform)
                 function ($uuidStrings) {
                     // Do not transform the (encoded) uuid string(s): (encoded) uuid strings can be a single or several (encoded) uuid strings in array
                     return !\is_null($uuidStrings) ? $uuidStrings : null;
@@ -56,40 +56,71 @@ class AbstractTrickType extends AbstractType
      * Please note hidden inputs values can be redefined and collections order may be changed
      * in case of tampered rank(s) by malicious user, and to be sure to loop these based on a correct show list rank
      *
-     * @param FormView $view
+     * @param FormView      $view
      * @param FormInterface $form
-     * @param array $options
+     * @param array         $options
      *
      * @return void
      */
     public function finishView(FormView $view, FormInterface $form, array $options) : void
     {
+        // Reorder images and videos collections and redefine ranks if necessary
         $this->reOrderImagesCollectionDataAndShowListRank($view, $form);
-        // TODO: add same logic to video collection!
+        $this->reOrderVideosCollectionDataAndShowListRank($view, $form);
     }
 
     /**
      * Maintain a correct order for images collection form view to be sure to loop correctly on view data
      * and adapt show list ranks data depending on their validity.
      *
-     * @param FormView $view
+     * @param FormView      $view
      * @param FormInterface $form
      *
      * @return void
      */
     private function reOrderImagesCollectionDataAndShowListRank(FormView $view, FormInterface $form) : void
     {
-        $isImagesShowListRankValid = true;
+        // Reorder "image to crop" boxes data in images collection and redefine rank if necessary
+        $this->updateCollectionOrderAndRanks('images', $view, $form);
+    }
+
+    /**
+     * Maintain a correct order for videos collection form view to be sure to loop correctly on view data
+     * and adapt show list ranks data depending on their validity.
+     *
+     * @param FormView      $view
+     * @param FormInterface $form
+     *
+     * @return void
+     */
+    private function reOrderVideosCollectionDataAndShowListRank(FormView $view, FormInterface $form) : void
+    {
+        // Reorder "video infos" boxes data in videos collection and redefine rank if necessary
+        $this->updateCollectionOrderAndRanks('videos', $view, $form);
+    }
+
+    /**
+     * Reorder collection and redefine each rank if necessary.
+     *
+     * @param string        $collectionName
+     * @param FormView      $view
+     * @param FormInterface $form
+     *
+     * @return void
+     */
+    private function updateCollectionOrderAndRanks(string $collectionName, FormView $view, FormInterface $form) : void
+    {
+        $isShowListRankValid = true;
         // Check if at least one show list rank was tampered by malicious user thanks to custom validator!
-        foreach ($form->get('images')->all() as $form) {
+        foreach ($form->get($collectionName)->all() as $form) {
             if (!$form->get('showListRank')->isValid()) {
-                $isImagesShowListRankValid = false;
+                $isShowListRankValid = false;
                 break;
             }
         }
-        $array = $view->children['images']->children;
-        // Sort children to be sure to have image to crop boxes in ascending order by their show list rank when a loop is made on collection in template
-        if ($isImagesShowListRankValid) {
+        $array = $view->children[$collectionName]->children;
+        // Sort children to be sure to have collection boxes in ascending order by their show list rank when a loop is made on collection in template
+        if ($isShowListRankValid) {
             uasort($array, function ($a, $b) {
                 return strcmp($a->children['showListRank']->vars['value'], $b->children['showListRank']->vars['value']);
             });
@@ -99,14 +130,14 @@ class AbstractTrickType extends AbstractType
                 return strcmp($a->vars['name'], $b->vars['name']);
             });
             // Redefine show list ranks
-            // Loop on all "image to crop" boxes form views to keep a coherent order permanently between 1 and "image to crop" boxes length!
+            // Loop on all collection boxes form views to keep a coherent order permanently between 1 and collection boxes length!
             $i = 1;
             foreach ($array as $formView) {
                 $formView->children['showListRank']->vars['value'] = $i;
                 $i ++;
             }
         }
-        // Update images collection array order to guarantee coherent loop on view
-        $view->children['images']->children = $array;
+        // Update collection array order to guarantee coherent loop on view
+        $view->children[$collectionName]->children = $array;
     }
 }

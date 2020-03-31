@@ -4,6 +4,8 @@ declare(strict_types = 1);
 
 namespace App\Domain\DTOToEmbed;
 
+use App\Domain\DTO\AbstractReadableDTO;
+
 /**
  * Class VideoInfosDTO.
  *
@@ -13,7 +15,7 @@ namespace App\Domain\DTOToEmbed;
  *
  * @see validation constraints VideoInfosDTO.yaml file
  */
-final class VideoInfosDTO
+final class VideoInfosDTO extends AbstractReadableDTO
 {
     /**
      * @var string|null
@@ -50,7 +52,7 @@ final class VideoInfosDTO
     /**
      * @return string|null
      */
-    public function getImage() : ?string
+    public function getUrl() : ?string
     {
         return $this->url;
     }

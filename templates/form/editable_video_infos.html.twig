@@ -1,0 +1,82 @@
+{# rootForm var is provided by form template which calls this template #}
+{% set rootFormName = rootForm.vars.name %}
+{# Get form view for an existing image which exists, or (partially/completely) filled in, furthermore validated or not #}
+{% set videoInfosForm = editableVideoInfosForm %}
+{# Get existing index value for editable video box, provided by form template which calls this template #}
+{% set videoIndex = editableVideoIndexName %}
+<div id="st-video-infos-wrapper-{{ videoIndex }}" class="st-video-infos-wrapper">
+    <div id="{{ rootFormName }}_videos_{{ videoIndex }}" class="uk-position-relative uk-border-rounded uk-padding-small uk-margin-small-bottom st-video-infos st-background-blue st-box-shadow-full-small">
+        {# Video block removal #}
+        <a href="#" class="uk-position-top-right uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-margin-small-top uk-margin-small-right st-video-remove-button" title="Cancel">
+            <span uk-icon="icon: trash; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-delete st-svg-icon-actions"></span>
+        </a>
+        {# Video block sortable #}
+        <a href="#" class="uk-position-bottom-right uk-sortable-handle uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-margin-small-bottom uk-margin-small-right" title="Sort vertically">
+            <span uk-icon="icon: list; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-actions"></span>
+        </a>
+        {# form label for videoInfos form entry type #}
+        {{ form_label(videoInfosForm, 'Video N° '~rank, {
+            'label_attr': {
+                'class': 'uk-form-label uk-text-uppercase st-video-infos-label',
+                'data-video-index-name': videoIndex
+            }
+        }) }}
+        {# Video fields #}
+        <div class="uk-grid uk-grid-collapse">
+            <div class="uk-width-1-1 uk-margin-small-bottom">
+                {% if (videoInfosForm.url.vars.valid == 0) %}
+                    {{ form_errors(videoInfosForm.url) }}
+                {% endif %}
+                {% if (videoInfosForm.showListRank.vars.valid == 0) %}
+                    {{ form_errors(videoInfosForm.showListRank) }}
+                {% endif %}
+                {# Video URL #}
+                {{ form_label(videoInfosForm.url, 'Video URL (iframe "src" attribute)', {'label_attr': {'class': 'uk-form-label'}}) }}
+                <div class="uk-inline uk-position-relative uk-flex">
+                    <span class="uk-form-icon st-textarea-icon" uk-icon="icon: link"></span>
+                    {{ form_widget(videoInfosForm.url, {
+                        'attr': {'class': 'uk-textarea', 'rows': 2},
+                        'value': videoInfosForm.url.vars.value})
+                    }}
+                    {# Video URL input icon errors #}
+                    {% if videoInfosForm.url.vars.errors.form.submitted == 1 %}
+                        {% set class = videoInfosForm.url.vars.valid == 0 ? 'uk-form-danger' : 'uk-form-success' %}
+                        {% set icon = videoInfosForm.url.vars.valid == 0 ? 'warning' : 'check' %}
+                        <span class="uk-form-icon uk-form-icon-flip {{ class }} st-textarea-icon" uk-icon="icon: {{ icon }}"></span>
+                    {% endif %}
+                </div>
+            </div>
+            {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+            {# Video description #}
+            <div class="uk-width-1-1 uk-margin-small-top uk-margin-large-bottom">
+                {% if videoInfosForm.description.vars.valid == 0 %}
+                    {{ form_errors(videoInfosForm.description) }}
+                {% endif %}
+                {{ form_label(videoInfosForm.description, 'Video description (a kind of short title)', {'label_attr': {'class': 'uk-form-label'}}) }}
+                <div class="uk-inline uk-flex">
+                    <span class="uk-form-icon" uk-icon="icon: bookmark"></span>
+                    {{ form_widget(videoInfosForm.description, {
+                        'attr': {'class': 'uk-input'},
+                        'value': videoInfosForm.description.vars.value})
+                    }}
+                    {# Video description input icon errors #}
+                    {% if videoInfosForm.description.vars.errors.form.submitted == 1 %}
+                        {% set class = videoInfosForm.description.vars.valid == 0 ? 'uk-form-danger' : 'uk-form-success' %}
+                        {% set icon = videoInfosForm.description.vars.valid == 0 ? 'warning' : 'check' %}
+                        <span class="uk-form-icon uk-form-icon-flip {{ class }}" uk-icon="icon: {{ icon }}"></span>
+                    {% endif %}
+                </div>
+            </div>
+            {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+            {# Show list rank (sortable order) #}
+            <div id="st-show-list-rank-{{ videoIndex }}">
+                {# Please note this can be changed via JavaScript to update this and all other "video infos" boxes order when sortable/remove action is made! #}
+                {{ form_row(videoInfosForm.showListRank, {
+                    'attr': {'class': 'st-show-list-rank'},
+                    'value': videoInfosForm.showListRank.vars.value})
+                }}
+            </div>
+            {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+        </div>
+    </div>
+</div>

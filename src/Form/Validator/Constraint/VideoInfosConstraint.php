@@ -4,20 +4,20 @@ declare(strict_types = 1);
 
 namespace App\Form\Validator\Constraint;
 
-use App\Form\Validator\ImageToCropConstraintValidator;
+use App\Form\Validator\VideoInfosConstraintValidator;
 use Symfony\Component\Validator\Constraint;
 
 /**
- * Class ImageToCropConstraint.
+ * Class VideoInfosConstraint.
  *
- * This class manages a custom validation constraint as concerns imageToCropDTO instance.
+ * This class manages a custom validation constraint as concerns VideoInfosDTO instance.
  *
  * @see https://symfony.com/doc/current/validation/custom_constraint.html
  */
-class ImageToCropConstraint extends Constraint
+class VideoInfosConstraint extends Constraint
 {
     /**
-     * Apply this custom constraint to a class (ImageToCropDTO).
+     * Apply this custom constraint to a class (VideoInfosDTO).
      *
      * @return string
      */
@@ -33,6 +33,6 @@ class ImageToCropConstraint extends Constraint
      */
     public function validatedBy() : string
     {
-        return ImageToCropConstraintValidator::class;
+        return VideoInfosConstraintValidator::class;
     }
 }

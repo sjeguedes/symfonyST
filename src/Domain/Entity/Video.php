@@ -98,6 +98,8 @@ class Video
     * @param string $url
     *
     * @return Video
+    *
+    * @throws \Exception
     */
     public function modifyUrl(string $url) : self
     {
@@ -114,6 +116,8 @@ class Video
      * @param string $description
      *
      * @return Video
+     *
+     * @throws \Exception
      */
     public function modifyDescription(string $description) : self
     {
@@ -130,6 +134,8 @@ class Video
      * @param \DateTimeInterface $updateDate
      *
      * @return Video
+     *
+     * @throws \Exception
      */
     public function modifyUpdateDate(\DateTimeInterface $updateDate) : self
     {
@@ -151,7 +157,7 @@ class Video
     {
         if (!$this->medias->contains($media)) {
             $this->medias->add($media);
-            $media->modifyImage($this);
+            $media->modifyVideo($this);
         }
         return $this;
     }

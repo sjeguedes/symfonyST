@@ -26,7 +26,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  * @see https://symfony.com/doc/current/validation/custom_constraint.html
  * @see https://symfony.com/index.php/doc/4.2/reference/constraints/Callback.html
  */
-class ImageToCropConstraintValidator extends ConstraintValidator
+class ImageToCropConstraintValidator extends AbstractTrickCollectionConstraintValidator
 {
     /**
      * @var DenormalizerInterface
@@ -297,45 +297,11 @@ class ImageToCropConstraintValidator extends ConstraintValidator
      * @return void
      *
      * @see For information: root namespace special compiled functions: https://github.com/FriendsOfPHP/PHP-CS-Fixer/issues/3048
-     *
-     * @throws \Exception
      */
     public function validateShowListRank(ExecutionContextInterface $context, $payload = null) : void
     {
-        // Get current validated object (ImageToCropDTO)
-        $object = $context->getObject();
-        /** @var Form|FormInterface $imagesCollectionForm */
-        $imagesCollectionForm = $context->getRoot()->get('images');
-        $countedImages = $imagesCollectionForm->count();
-        $isRankTampered = false;
-        // Data was tampered by malicious user! Current sortable order is not an int, or rank equals 0, or is not a positive integer, or greater than images boxes length.
-        if (!ctype_digit(trim((string) $object->getShowListRank())) || 0 >= $object->getShowListRank() || $countedImages < $object->getShowListRank()) {
-            $isRankTampered = true;
-        } else {
-            // Loop on all existing image boxes
-            if (1 != $countedImages) {
-                $result = [];
-                foreach ($imagesCollectionForm as $key => $form) {
-                    $rank = $form->getData()->getShowListRank();
-                    // Data was tampered by malicious user!
-                    // Rank equals 0, or is not a positive integer, or greater than images boxes length, or result array does not contain unique values!
-                    if (!ctype_digit(trim((string) $rank)) || 0 >= $rank || $countedImages < $rank || \in_array($rank, $result)) {
-                        // Add constraint violation  only for current "image to crop" box when it is is involved in violation!
-                        if ($object->getShowListRank() === $rank) {
-                            $isRankTampered = true;
-                        }
-                        break;
-                    }
-                    // Push rank in this array to check uniques values later
-                    array_push($result, $rank);
-                }
-            }
-        }
-        if (true === $isRankTampered) {
-            $context->buildViolation('You are not allowed to tamper show list rank!<br>Image list was reordered by default.')
-                ->atPath('showListRank')
-                ->addViolation();
-        }
+        // Validate current collection item show list rank by checking ImageToCropDTO data
+        $this->validateItemCollectionRank('images', $context, $payload);
     }
 
     /**

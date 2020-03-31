@@ -5,10 +5,9 @@ declare(strict_types = 1);
 namespace App\Form\TypeToEmbed;
 
 use App\Domain\DTOToEmbed\VideoInfosDTO;
-use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -18,7 +17,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  *
  * Build a video form type to be embedded in CollectionType form type.
  */
-class VideoInfosType extends AbstractType
+class VideoInfosType extends AbstractTrickCollectionEntryType
 {
     /**
      * Configure a form builder for the type hierarchy.
@@ -31,7 +30,7 @@ class VideoInfosType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options) : void
     {
         $builder
-            ->add('url', UrlType::class, [
+            ->add('url', TextareaType::class, [
             ])
             ->add('description', TextType::class, [
             ])
@@ -40,6 +39,9 @@ class VideoInfosType extends AbstractType
                 // maintain validation state at the child form level, to be able to show errors near field
                 'error_bubbling' => false
             ]);
+
+        // Add data transformer to "showListRank" data.
+        $this->addStringToIntegerCustomDataTransformer($builder, 'showListRank');
     }
 
     /**

@@ -99,6 +99,8 @@ class TrickGroup
      * @param string $name
      *
      * @return TrickGroup
+     *
+     * @throws \Exception
      */
     public function modifyName(string $name) : self
     {
@@ -115,6 +117,8 @@ class TrickGroup
     * @param string $description
     *
     * @return TrickGroup
+    *
+    * @throws \Exception
     */
     public function modifyDescription(string $description) : self
     {
@@ -131,6 +135,8 @@ class TrickGroup
      * @param \DateTimeInterface $updateDate
      *
      * @return TrickGroup
+     *
+     * @throws \Exception
      */
     public function modifyUpdateDate(\DateTimeInterface $updateDate) : self
     {

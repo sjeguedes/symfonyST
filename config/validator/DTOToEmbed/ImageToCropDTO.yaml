@@ -32,6 +32,6 @@ App\Domain\DTOToEmbed\ImageToCropDTO:
         # - "imagePreviewDataURI" field: base64 encoded small image preview
         # - "savedImageName" field: identifier to retrieve created image (highest cropped format) on server (based on "image" uploaded file)
         # - "isMain" field: determine which image must be promoted
-        # - "showListRank" field: determine sortable order for each image
+        # - "showListRank" field: check coherent sortable order for each image
         - App\Form\Validator\Constraint\ImageToCropConstraint: ~
 

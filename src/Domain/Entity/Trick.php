@@ -168,6 +168,8 @@ class Trick
      * @param string $name
      *
      * @return Trick
+     *
+     * @throws \Exception
      */
     public function modifyName(string $name) : self
     {
@@ -184,6 +186,8 @@ class Trick
      * @param string $description
      *
      * @return Trick
+     *
+     * @throws \Exception
      */
     public function modifyDescription(string $description) : self
     {
@@ -218,6 +222,8 @@ class Trick
      * @param \DateTimeInterface $updateDate
      *
      * @return Trick
+     *
+     * @throws \Exception
      */
     public function modifyUpdateDate(\DateTimeInterface $updateDate) : self
     {
@@ -294,7 +300,7 @@ class Trick
      *
      * @return Trick
      *
-     * @throws \InvalidArgumentException
+     * @throws \Exception
      */
     public function assignRank(int $rank) : self
     {

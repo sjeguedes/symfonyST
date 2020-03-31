@@ -10,8 +10,6 @@ use App\Domain\Entity\Image;
 use App\Domain\Entity\User;
 use App\Domain\ServiceLayer\ImageManager;
 use App\Form\Type\Admin\CreateTrickType;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -31,7 +29,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  *
  * Build a image to crop form type to be embedded in CollectionType form type.
  */
-class ImageToCropType extends AbstractType
+class ImageToCropType extends AbstractTrickCollectionEntryType
 {
     /**
      * @var DataMapperInterface
@@ -71,40 +69,6 @@ class ImageToCropType extends AbstractType
         $this->imageService = $imageService;
         $this->security = $security;
         $this->validator = $validator;
-    }
-
-    /**
-     * Add string to integer model transformer to a form data.
-     *
-     * This transformer aims at using the same DTO if "multiple" form option changes.
-     *
-     * @param FormBuilderInterface $formBuilder
-     * @param string               $formName    a Form instance name
-     *
-     * @return void
-     */
-    private function addStringToIntegerCustomDataTransformer(FormBuilderInterface $formBuilder, string $formName) : void
-    {
-        /** @var FormBuilderInterface $form */
-        $form = $formBuilder->get($formName);
-        $form->addModelTransformer(
-            new CallbackTransformer(
-                // Normalized data (transform)
-                function ($value) {
-                    // Do not transform the string or null value
-                    return !\is_null($value) ? $value : null;
-                },
-                // Model data (reverse transform)
-                function ($value) {
-                    // Transform the string into a real int
-                    if (ctype_digit((string) $value)) {
-                        return (int) $value;
-                    }
-                    // The string does not contain an int, so define the value to 0 to be checked and filtered in validator!
-                    return 0;
-                }
-            )
-        );
     }
 
     /**

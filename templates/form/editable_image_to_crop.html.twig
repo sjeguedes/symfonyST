@@ -105,7 +105,7 @@
                     {% endif %}
                     {{ form_label(imageToCropForm.description, 'Image description ("alt" html attribute)', {'label_attr': {'class': 'uk-form-label'}}) }}
                     <div class="uk-inline uk-flex">
-                        <span class="uk-form-icon st-textarea-icon" uk-icon="icon: code"></span>
+                        <span class="uk-form-icon" uk-icon="icon: code"></span>
                         {{ form_widget(imageToCropForm.description, {
                             'attr': {'class': 'uk-input'},
                             'value': imageToCropForm.description.vars.value})
@@ -181,14 +181,12 @@
                 </div>
                 {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
                 {# Show list rank (sortable order) #}
-                <div id="st-show-list-rank-{{ imageIndex }}" class="uk-width-1-1 uk-margin-small-top uk-margin-small-bottom">
-                    <div class="uk-inline">
-                        {# Please note this can be changed via JavaScript to update this and all other "image to crop" boxes order when sortable/remove action is made! #}
-                        {{ form_widget(imageToCropForm.showListRank, {
-                            'attr': {'class': 'st-show-list-rank'},
-                            'value': imageToCropForm.showListRank.vars.value})
-                        }}
-                    </div>
+                <div id="st-show-list-rank-{{ imageIndex }}">
+                    {# Please note this can be changed via JavaScript to update this and all other "image to crop" boxes order when sortable/remove action is made! #}
+                    {{ form_row(imageToCropForm.showListRank, {
+                        'attr': {'class': 'st-show-list-rank'},
+                        'value': imageToCropForm.showListRank.vars.value})
+                    }}
                 </div>
                 {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
             </div>

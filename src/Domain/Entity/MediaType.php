@@ -147,6 +147,8 @@ class MediaType
      * @param string $name
      *
      * @return MediaType
+     *
+     * @throws \Exception
      */
     public function modifyName(string $name) : self
     {
@@ -163,6 +165,8 @@ class MediaType
     * @param string $description
     *
     * @return MediaType
+    *
+    * @throws \Exception
     */
     public function modifyDescription(string $description) : self
     {
@@ -179,6 +183,8 @@ class MediaType
      * @param \DateTimeInterface $updateDate
      *
      * @return MediaType
+     *
+     * @throws \Exception
      */
     public function modifyUpdateDate(\DateTimeInterface $updateDate) : self
     {
