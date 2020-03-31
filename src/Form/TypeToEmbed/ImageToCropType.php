@@ -87,24 +87,24 @@ class ImageToCropType extends AbstractTrickCollectionEntryType
             ->add('description', TextType::class, [
             ])
             ->add('cropJSONData', HiddenType::class, [
-                // maintain validation state at the child form level, to be able to show errors near field
+                // Maintain validation state at the child form level, to be able to show errors near field
                 'error_bubbling' => false
             ])
             ->add('imagePreviewDataURI', HiddenType::class, [
-                // maintain validation state at the child form level, to be able to show errors near field
+                // Maintain validation state at the child form level, to be able to show errors near field
                 'error_bubbling' => false
             ])
             ->add('savedImageName', HiddenType::class, [
-                // maintain validation state at the child form level, to be able to show errors near field
+                // Maintain validation state at the child form level, to be able to show errors near field
                 'error_bubbling' => false
             ])
             ->add('isMain', CheckboxType::class, [
-                'empty_data'   => false,
-                'false_values' => [false]
+                'empty_data'     => false,
+                'false_values'   => [false]
             ])
             // Please "isPublished" property (set to true by default) because it is not managed in project at this level!
             ->add('showListRank', HiddenType::class, [
-                // maintain validation state at the child form level, to be able to show errors near field
+                // Maintain validation state at the child form level, to be able to show errors near field
                 'error_bubbling' => false
             ]);
 

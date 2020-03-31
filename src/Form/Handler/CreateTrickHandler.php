@@ -67,9 +67,9 @@ final class CreateTrickHandler extends AbstractUploadFormHandler
         // Check TrickManager instance in passed data
         $this->checkNecessaryData($actionData);
         $trickService = $actionData['trickService'];
-        // TODO: add all custom validations by feeding potential custom error with return state and flasbag in case of failure!
+        // TODO: add all custom validations by feeding potential custom error with return state and flashbag in case of failure!
         // DTO is in valid state but:
-        // 1. trick name (title) must not exist in database.
+        // 1. trick name (title) must not exist in database, so it is unique!
         return false;
     }
 

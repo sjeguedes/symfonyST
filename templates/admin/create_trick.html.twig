@@ -40,7 +40,7 @@
                 <div class="uk-width-5-6 uk-width-3-5@s uk-width-2-5@m uk-width-2-5@l uk-width-1-3@xl uk-card uk-card-primary uk-box-shadow-medium st-border-white-small">
                     {% if trickCreationError %}
                     <div class="uk-card-header uk-padding-small uk-text-center">
-                        {# trick creation errors #}
+                        {# Trick creation errors #}
                         <div class="uk-label uk-form-danger uk-box-shadow-large uk-text-bold">
                             <p class="uk-margin-remove">
                                 <span uk-icon="icon: warning; ratio: 0.8"></span>
@@ -189,6 +189,9 @@
                             {# Images #}
                             <div class="uk-width-1-1 uk-margin-small-bottom">
                                 <hr class="uk-margin-small-top uk-padding-small-bottom">
+                                {% if (createTrickForm.images.vars.valid == 0) %}
+                                    {{ form_errors(createTrickForm.images) }}
+                                {% endif %}
                                 {# Avoid "images" Collection type to be rendered automatically when using form_start() function #}
                                 {# or use form_end(createTrickForm, {'render_rest': false}) function but do not rendered all the fields not called! #}
                                 {# see: https://stackoverflow.com/questions/32585047/symfony-form-prevent-form-fields-from-being-generated-automaticly #}
@@ -255,6 +258,9 @@
                             {# Videos #}
                             <div class="uk-width-1-1 uk-margin-small-bottom">
                                 <hr class="uk-margin-small-top uk-padding-small-bottom">
+                                {% if (createTrickForm.videos.vars.valid == 0) %}
+                                    {{ form_errors(createTrickForm.videos) }}
+                                {% endif %}
                                 {# Avoid "videos" Collection type to be rendered automatically when using form_start() function #}
                                 {# or use form_end(createTrickForm, {'render_rest': false}) function but do not rendered all the fields not called! #}
                                 {# see: https://stackoverflow.com/questions/32585047/symfony-form-prevent-form-fields-from-being-generated-automaticly #}

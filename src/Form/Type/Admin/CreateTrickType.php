@@ -100,14 +100,18 @@ class CreateTrickType extends AbstractTrickType
                 // Custom root form options passed to entry type form
                 'entry_options'  => [
                     'rootFormHandler' =>  $options['formHandler']
-                ]
+                ],
+                // Maintain validation state at the collection form level, to be able to show errors near field
+                'error_bubbling' => false
             ])
             ->add('videos', CollectionType::class, [
                 'entry_type'     => VideoInfosType::class,
                 'allow_add'      => true,
                 'prototype_name' => '__videoIndex__',
                 // Used here to access fields in templates and customize a particular prototype
-                'prototype'      => true
+                'prototype'      => true,
+                // Maintain validation state at the collection form level, to be able to show errors near field
+                'error_bubbling' => false
             ]);
 
         // Add data transformer to "group" data.

@@ -15,7 +15,7 @@ use App\Domain\DTO\AbstractReadableDTO;
  * @see https://dev.to/drearytown/collection-objects-in-php-1cbk
  * @see https://medium.com/2dotstwice-connecting-the-dots/creating-strictly-typed-arrays-and-collections-in-php-37036718c921
  */
-class DTOCollection implements \IteratorAggregate
+class DTOCollection implements \IteratorAggregate, \Countable
 {
     /*
      * @var array
