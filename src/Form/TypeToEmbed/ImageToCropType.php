@@ -19,6 +19,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -139,7 +140,10 @@ class ImageToCropType extends AbstractTrickCollectionEntryType
             switch ($rootFormType) {
                 // Create a Trick image with the highest expected format
                 case $rootFormType instanceof CreateTrickType:
-                    $createdImageOnServer = $this->imageService->createTrickImage($imageToCropDataModel, 'trickBig', $authenticatedUser, true);
+                    // At this level, Trick slug can't be used due to not validated Trick name,
+                    // so we used a image basic identifier name to replace it later on Trick creation or update actions.
+                    $imageIdentifierName = 'unnamed-trick-image';
+                    $createdImageOnServer = $this->imageService->createTrickImage($imageToCropDataModel, 'trickBig', $authenticatedUser, $imageIdentifierName,true);
                     break;
                 // Stop process for other root form types
                 default:
@@ -180,6 +184,32 @@ class ImageToCropType extends AbstractTrickCollectionEntryType
         ]);
         // Check "rootFormHandler" option passed in parent form type entry_options parameter
         $resolver->setRequired('rootFormHandler');
+    }
+
+    /**
+     * Use finished view to reset (purge) invalid hidden crop/uploaded image data for the current managed image
+     * which have no reason to be handled by user unless he is a malicious one!
+     *
+     * @param FormView      $view
+     * @param FormInterface $form
+     * @param array         $options
+     *
+     * @return void
+     */
+    public function finishView(FormView $view, FormInterface $form, array $options) : void
+    {
+        // Apply this reset only if form index name is set, to avoid issue
+        if (ctype_digit($form->getName())) { // Form name is a string!
+            foreach ($form->all() as $childForm) {
+                // "image", "description", "isMain" values are user inputs and must remain unchanged!
+                // "showListRank" can be changed in root form (e.g. Trick creation or update form) finishView() method.
+                $array = ['cropJSONData', 'imagePreviewDataURI', 'savedImageName'];
+                if ($childForm->isSubmitted() && !$childForm->isValid() && \in_array($childForm->getName(), $array)) {
+                    // Purge value
+                    $view->children[$childForm->getName()]->vars['value'] = '';
+                }
+            }
+        }
     }
 
     /**

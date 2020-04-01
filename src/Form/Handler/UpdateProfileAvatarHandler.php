@@ -10,7 +10,6 @@ use App\Form\Type\Admin\UpdateProfileAvatarType;
 use App\Service\Medias\Upload\ImageUploader;
 use App\Utils\Traits\CSRFTokenHelperTrait;
 use App\Utils\Traits\UserHandlingHelperTrait;
-use http\Exception\InvalidArgumentException;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
@@ -22,7 +21,7 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
  * Handle the form request when a user tries to update his profile avatar.
  * Call any additional validations and actions.
  */
-final class UpdateProfileAvatarHandler extends AbstractFormHandler
+final class UpdateProfileAvatarHandler extends AbstractUploadFormHandler
 {
     use CSRFTokenHelperTrait;
     use UserHandlingHelperTrait;
@@ -145,43 +144,17 @@ final class UpdateProfileAvatarHandler extends AbstractFormHandler
     }
 
     /**
-     * Check if crop data are valid.
+     * Check if user avatar JSON crop data are valid.
      *
      * @param UpdateProfileAvatarDTO $dataModel
      *
      * @return bool
      *
      * @throws \Exception
-     *
-     * @see https://medium.com/@ideneal/how-to-handle-json-requests-using-forms-on-symfony-4-and-getting-a-clean-code-67dd796f3d2f
      */
     private function checkAvatarCropData(UpdateProfileAvatarDTO $dataModel) : bool
     {
-        // Get an array of crop data objects (This array is useful in case of multiple uploads.)
-        $cropData = json_decode($dataModel->getCropJSONData());
-        // Optional with Symfony 4.3 JSON validation constraint
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \InvalidArgumentException('Crop data is an invalid json string!');
-        }
-        $avatar = $dataModel->getAvatar();
-        // Use stripslashes() function to remove added "\" (by Javascript) to make a correct comparison
-        $isFileMatched = urldecode($avatar->getClientOriginalName()) === str_replace('\\', '', $cropData[0]->imageName);
-        $areCropAreaDataWithIntegerType = \is_int($cropData[0]->x) && \is_int($cropData[0]->y) && \is_int($cropData[0]->width) && \is_int($cropData[0]->height);
-        if (!$isFileMatched || !$areCropAreaDataWithIntegerType) {
-            throw new \InvalidArgumentException('Retrieved image crop data are invalid due to possible technical error, or user input tampered data!');
-        }
-        // Get the corresponding instance of stdClass
-        $cropDataX = $cropData[0]->x;
-        $cropDataY = $cropData[0]->y;
-        $cropDataWidth = $cropData[0]->width;
-        $cropDataHeight = $cropData[0]->height;
-        // Get uploaded image dimensions to evaluate crop data
-        $imageSize = getimagesize($avatar->getPathname());
-        $imageWidth = $imageSize[0];
-        $imageHeight = $imageSize[1];
-        // Check top left coords for future crop area and its width / height to be contained in uploaded image natural dimensions
-        $coherentCropData = ($cropDataX + $cropDataWidth <= $imageWidth) && ($cropDataY + $cropDataHeight <= $imageHeight);
-        return $coherentCropData;
+        return $this->checkCropData($dataModel->getAvatar(), $dataModel->getCropJSONData());
     }
 
     /**

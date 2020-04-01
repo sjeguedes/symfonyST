@@ -107,20 +107,27 @@ class ImageManager
      * @param ImageToCropDTO $dataModel
      * @param string         $mediaTypeKey
      * @param User           $user
+     * @param string         $identifierName a name to use for uploaded image (slug, custom string...)
      * @param bool           $isDirectUpload
      *
      * @return Image|null
      *
      * @throws \Exception
      */
-    public function createTrickImage(ImageToCropDTO $dataModel, string $mediaTypeKey, User $user, bool $isDirectUpload = false) : ?Image
+    public function createTrickImage(
+        ImageToCropDTO $dataModel,
+        string $mediaTypeKey,
+        User $user,
+        string $identifierName = null,
+        bool $isDirectUpload = false
+    ) : ?Image
     {
         // No image was uploaded!
         if (\is_null($dataModel->getImage())) {
             return null;
         }
         // Get image necessary parameters
-        $parameters = $this->getTrickImageParameters($dataModel, $mediaTypeKey, $isDirectUpload);
+        $parameters = $this->getTrickImageParameters($dataModel, $mediaTypeKey, $identifierName);
         // Upload file on server and get created file name with possible crop option
         $isCropped = property_exists(\get_class($dataModel), 'cropJSONData') ? true : false;
         // Check uploaded "image" data or retrieve "savedImageName" value to create image entity directly without upload (use this method in form handler when trick is created)
@@ -188,13 +195,13 @@ class ImageManager
      *
      * @param ImageToCropDTO $dataModel
      * @param string         $mediaTypeKey
-     * @param bool           $isDirectUpload
+     * @param string         $identifierName a name to use for uploaded image (slug, custom string...)
      *
      * @return array
      *
      * @throws \Exception
      */
-    public function getTrickImageParameters(ImageToCropDTO $dataModel, string $mediaTypeKey, bool $isDirectUpload = false) : array
+    public function getTrickImageParameters(ImageToCropDTO $dataModel, string $mediaTypeKey, string $identifierName = null) : array
     {
         if (is_null($type = $this->mediaTypeManager->getType($mediaTypeKey))) {
             throw new \RuntimeException("Media type key $mediaTypeKey is unknown!");
@@ -203,13 +210,18 @@ class ImageManager
         $cropJSONData = $dataModel->getCropJSONData();
         $mediaTypeToFind = $this->mediaTypeManager->getType($mediaTypeKey);
         $trickBigImageMediaType = $this->mediaTypeManager->findSingleByUniqueType($mediaTypeToFind);
-        // Use image original name (without extension) as image name with slug format
-        $allowedImageExtensions = implode("|", ImageUploader::ALLOWED_IMAGE_FORMATS);
-        // No need to use preg_quote() to escape, extensions are considered as "regex safe"!
-        $pattern = '/\.(' . $allowedImageExtensions . ')/i';
-        $originalNameWithoutExtension = preg_replace($pattern, '', $trickImage->getClientOriginalName());
-        // Clean original name to avoid issues with special characters
-        $trickImageIdentifierName = $this->sanitizeString($originalNameWithoutExtension);
+        if (\is_null($identifierName)) {
+            // Use image original name (without extension) as image name with slug format
+            $allowedImageExtensions = implode("|", ImageUploader::ALLOWED_IMAGE_FORMATS);
+            // No need to use preg_quote() to escape, extensions are considered as "regex safe"!
+            $pattern = '/\.(' . $allowedImageExtensions . ')/i';
+            $originalNameWithoutExtension = preg_replace($pattern, '', $trickImage->getClientOriginalName());
+            // Clean original name to avoid issues with special characters
+            $trickImageIdentifierName = $this->sanitizeString($originalNameWithoutExtension);
+        } else {
+            // Sanitize passed identifier name
+            $trickImageIdentifierName = $this->sanitizeString($identifierName);
+        }
         $trickImageData = $this->prepareImageData($trickImage);
         return [
             'cropJSONData'     => $cropJSONData,

@@ -7,8 +7,10 @@
 <div id="st-video-infos-wrapper-{{ videoIndex }}" class="st-video-infos-wrapper">
     <div id="{{ rootFormName }}_videos_{{ videoIndex }}" class="uk-position-relative uk-border-rounded uk-padding-small uk-margin-small-bottom st-video-infos st-background-blue st-box-shadow-full-small">
         {# Video block removal #}
+        {# TODO: complete var setting with a test which checks video existence by looping on trick videos here, and add removal confirmation modal for update form! #}
+        {% set removalIcon = (rootFormName == 'update_trick') ? 'trash' : 'close' %}
         <a href="#" class="uk-position-top-right uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-margin-small-top uk-margin-small-right st-video-remove-button" title="Cancel">
-            <span uk-icon="icon: trash; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-delete st-svg-icon-actions"></span>
+            <span uk-icon="icon: {{ removalIcon }}; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-delete st-svg-icon-actions"></span>
         </a>
         {# Video block sortable #}
         <a href="#" class="uk-position-bottom-right uk-sortable-handle uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-margin-small-bottom uk-margin-small-right" title="Sort vertically">

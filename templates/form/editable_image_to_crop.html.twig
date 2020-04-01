@@ -7,8 +7,10 @@
 <div id="st-image-to-crop-wrapper-{{ imageIndex }}" class="st-image-to-crop-wrapper">
     <div id="{{ rootFormName }}_images_{{ imageIndex }}" class="uk-position-relative uk-border-rounded uk-padding-small uk-margin-small-bottom st-image-to-crop st-background-blue st-box-shadow-full-small">
         {# Image block removal #}
+        {# TODO: complete var setting with a test which checks image existence by looping on trick images here, and add removal confirmation modal for update form! #}
+        {% set removalIcon = (rootFormName == 'update_trick') ? 'trash' : 'close' %}
         <a href="#" class="uk-position-top-right uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-margin-small-top uk-margin-small-right st-image-remove-button" title="Cancel">
-            <span uk-icon="icon: trash; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-delete st-svg-icon-actions"></span>
+            <span uk-icon="icon: {{ removalIcon }}; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-delete st-svg-icon-actions"></span>
         </a>
         {# Image block sortable #}
         <a href="#" class="uk-position-bottom-right uk-sortable-handle uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-margin-small-bottom uk-margin-small-right" title="Sort vertically">
@@ -62,13 +64,11 @@
                     <div id="st-add-image-actions-{{ imageIndex }}" class="uk-flex-column st-add-image-actions">
                         <div id="st-add-image-container-{{ imageIndex }}" class="st-add-image-container" data-change-text-info="Please confirm image change by validating creation!" uk-form-custom>
                             {# Image file input #}
-                            {% set fileInputCssClass = (imageToCropForm.savedImageName.vars.value != '') and (imageToCropForm.savedImageName.vars.valid == 1)
-                                and (imageToCropForm.imagePreviewDataURI.vars.valid == 0) and (imageToCropForm.cropJSONData.vars.valid == 1)
-                                ? 'uk-input st-file-input uk-hidden' : 'uk-input st-file-input' %}
+                            {% set isHidden = (imageToCropForm.savedImageName.vars.value != '') and (imageToCropForm.savedImageName.vars.valid == 1) %}
                             <div class="uk-inline">
                                 {{ form_widget(imageToCropForm.image, {
                                     'attr': {
-                                        'class': fileInputCssClass,
+                                        'class': isHidden ? 'uk-input st-file-input uk-hidden' : 'uk-input st-file-input',
                                         'data-error': 'Please select first<br>an image file which is allowed!',
                                         'data-error-2': 'Please select another file!<br>This one will be refused due to invalid dimensions!',
                                         'data-error-3': 'Please select another file!<br>This one will be refused due to invalid size!',
@@ -77,8 +77,7 @@
                                     'value': imageToCropForm.image.vars.value})
                                 }}
                                 {# image change button #}
-                                {% set isDisabled = (imageToCropForm.savedImageName.vars.value != '') and (imageToCropForm.savedImageName.vars.valid == 1)
-                                    and (imageToCropForm.imagePreviewDataURI.vars.valid == 0) and (imageToCropForm.cropJSONData.vars.valid == 1) %}
+                                {% set isDisabled = (imageToCropForm.savedImageName.vars.value != '') and (imageToCropForm.savedImageName.vars.valid == 1) %}
                                 <button class="uk-button uk-button-default{% if isDisabled == 1 %} uk-disabled{% endif %} st-fake-file-input-button" type="button" tabindex="-1"{% if isDisabled == 1 %} disabled{% endif %}>
                                     <span class="uk-form-icon" uk-icon="icon: upload"></span>
                                     <span id="st-image-change-button-label-{{ imageIndex }}" class="uk-padding-small st-image-change-button-label">{% if isDisabled == 1 %}Locked{% else %}Select{% endif %}</span>
@@ -127,7 +126,7 @@
                         <p class="uk-flex uk-flex-center uk-flex-column">
                         <ul class="uk-list uk-text-small">
                             <li><span class="uk-icon st-color-blue" uk-icon="icon: move"></span> Allowed format: <strong>16/9 selection</strong></li>
-                            <li><span class="uk-icon st-color-blue" uk-icon="icon: image"></span> Exported dimensions: <strong>width: 1600px</strong> X <strong>height: 900px</strong></li>
+                            <li><span class="uk-icon st-color-blue" uk-icon="icon: image"></span> Exported dimensions: <strong>width: 1600px</strong> X <strong>height: 900px</strong> or <strong>higher</strong></li>
                         </ul>
                         </p>
                         <div id="st-cropper-container-{{ imageIndex }}" class="uk-flex uk-flex-center uk-border-rounded uk-margin-auto st-cropper-container st-box-shadow-full-small">

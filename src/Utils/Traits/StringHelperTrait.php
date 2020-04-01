@@ -18,11 +18,11 @@ trait StringHelperTrait
      * @param array  $replace
      * @param string $delimiter
      *
-     * @return null|string
+     * @return string
      *
      * @throws \Exception
      */
-    public function makeSlug(string $string, array $replace = [], string $delimiter = '-') : ?string
+    public function makeSlug(string $string, array $replace = [], string $delimiter = '-') : string
     {
         if (!extension_loaded('iconv')) {
           throw new \Exception('Sorry, "iconv" module is not loaded!');
@@ -31,7 +31,7 @@ trait StringHelperTrait
         $oldLocale = setlocale(LC_ALL, '0');
         setlocale(LC_ALL, 'en_US.UTF-8');
         $clean = iconv('UTF-8', 'ASCII//TRANSLIT', $string);
-        // No very useful but kept!
+        // Not very useful but kept!
         if (!empty($replace)) {
           $clean = str_replace((array) $replace, ' ', $clean);
         }

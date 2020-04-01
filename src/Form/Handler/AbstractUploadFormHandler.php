@@ -48,6 +48,8 @@ class AbstractUploadFormHandler extends AbstractFormHandler
      * @return bool
      *
      * @see https://medium.com/@ideneal/how-to-handle-json-requests-using-forms-on-symfony-4-and-getting-a-clean-code-67dd796f3d2f
+     *
+     * @throws \Exception
      */
     public function checkCropData(UploadedFile $image, ?string $cropJSONData) : bool
     {
@@ -61,7 +63,6 @@ class AbstractUploadFormHandler extends AbstractFormHandler
             throw new \InvalidArgumentException('Crop data is an invalid json string!');
         }
         // Use str_replace() function to remove added "\" (by Javascript) to make a correct comparison
-        // TODO: refactor avatar upload form handler with this abstract class and method!
         $isFileMatched = urldecode($image->getClientOriginalName()) === str_replace('\\', '', $cropData[0]->imageName);
         $areCropAreaDataWithIntegerType = \is_int($cropData[0]->x) && \is_int($cropData[0]->y) && \is_int($cropData[0]->width) && \is_int($cropData[0]->height);
         if (!$isFileMatched || !$areCropAreaDataWithIntegerType) {
@@ -73,6 +74,7 @@ class AbstractUploadFormHandler extends AbstractFormHandler
         $cropDataWidth = $cropData[0]->width;
         $cropDataHeight = $cropData[0]->height;
         // Get uploaded image dimensions to evaluate crop data
+        // Please note uploaded file validity (size, mime type...) was already checked here thanks to field constraints!
         $imageSize = getimagesize($image->getPathname());
         $imageWidth = $imageSize[0];
         $imageHeight = $imageSize[1];

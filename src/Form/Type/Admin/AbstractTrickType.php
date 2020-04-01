@@ -54,7 +54,7 @@ abstract class AbstractTrickType extends AbstractType
      * Use finished view to redefine show list rank for images/videos collections.
      *
      * Please note hidden inputs values can be redefined and collections order may be changed
-     * in case of tampered rank(s) by malicious user, and to be sure to loop these based on a correct show list rank
+     * in case of tampered rank(s) by malicious user, and to be sure to loop these based on a correct show list rank.
      *
      * @param FormView      $view
      * @param FormInterface $form

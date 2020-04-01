@@ -152,6 +152,50 @@ final class ImageToCropConstraintValidator extends AbstractTrickCollectionConstr
     }
 
     /**
+     * Apply an intermediate custom validation constraint callback on "imagePreviewDataURI" property.
+     *
+     * @param ExecutionContextInterface $context
+     * @param mixed|null                $payload
+     *
+     * @return void
+     *
+     * @see File info: https://www.php.net/manual/fr/function.finfo-file.php
+     *
+     * @throws \Exception
+     * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
+     */
+    public function validateImagePreviewDataURI(ExecutionContextInterface $context, $payload = null) : void
+    {
+        // Get current validated object (ImageToCropDTO)
+        $object = $context->getObject();
+        // Image preview data URI is automatically feed by JavaScript, each time a image is uploaded in corresponding "image to crop" box.
+        if (!\is_null($object->getImagePreviewDataURI())) {
+            try {
+                // Check if a real image is present in base 64 encoded string.
+                $this->dataUriDeNormalizer->denormalize($object->getImagePreviewDataURI(), 'SplFileObject');
+            } catch (\Exception $exception) {
+                // This condition is useful in case of Trick update when the image used in preview is not a base 64 encoded image!
+                // If a normal image present on server is found here, that means the field data was feed by initial injected model data to update
+                $isImageFileFound = $this->imageService->getImageUploader()->checkFileUploadOnServer($object->getImagePreviewDataURI());
+                // Data was tampered by malicious user: image source is not a base 64 encoded string and image does not exist on server!
+                if (false === $isImageFileFound) {
+                    $context->buildViolation('You are not allowed to tamper image preview data URI!')
+                        ->atPath('imagePreviewDataURI')
+                        ->addViolation();
+                }
+            }
+            // Image preview data URI can not be null when a corresponding file was uploaded at the same time!
+            // It's really too much to validate "image" field for the preview because the preview is simply a UI data...
+        } else {
+            if ($object->getImage() instanceof UploadedFile) {
+                $context->buildViolation('Image preview data URI can not be null!')
+                    ->atPath('imagePreviewDataURI')
+                    ->addViolation();
+            }
+        }
+    }
+
+    /**
      * Apply an intermediate custom validation constraint callback on "cropJSONData" property.
      *
      * @param ExecutionContextInterface $context
@@ -194,48 +238,12 @@ final class ImageToCropConstraintValidator extends AbstractTrickCollectionConstr
                         break;
                     }
                 }
-                // "cropJSONData" field can not be null when "savedImageName" field is valid or not null!
+                // "cropJSONData" field can not be null when an uploaded file is present or when "savedImageName" field is valid or not null!
                 if ($object->getImage() instanceof UploadedFile || (false === $isSavedImageNameViolation && !\is_null($context->getObject()->getSavedImageName()))) {
                     $context->buildViolation('Image crop JSON data can not be null!')
                         ->atPath('cropJSONData')
                         ->addViolation();
                 }
-            }
-        }
-    }
-
-    /**
-     * Apply an intermediate custom validation constraint callback on "imagePreviewDataURI" property.
-     *
-     * @param ExecutionContextInterface $context
-     * @param mixed|null                $payload
-     *
-     * @return void
-     *
-     * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
-     */
-    public function validateImagePreviewDataURI(ExecutionContextInterface $context, $payload = null) : void
-    {
-        // Get current validated object (ImageToCropDTO)
-        $object = $context->getObject();
-        // Image preview data URI is automatically feed by JavaScript, each time a image is uploaded in corresponding "image to crop" box.
-        if (!\is_null($object->getImagePreviewDataURI())) {
-            try {
-                // Check if a real image is present in base 64 encoded string.
-                $this->dataUriDeNormalizer->denormalize($object->getImagePreviewDataURI(), 'SplFileObject');
-            } catch (\Exception $exception) {
-                // Data was tampered by malicious user!
-                $context->buildViolation('You are not allowed to tamper image preview data URI!')
-                    ->atPath('imagePreviewDataURI')
-                    ->addViolation();
-            }
-            // Image preview data URI can not be null when a corresponding file was uploaded at the same time!
-            // It's really too much to validate "image" field for the preview because the preview is simply a UI data...
-        } else {
-            if ($object->getImage() instanceof UploadedFile) {
-                $context->buildViolation('Image preview data URI can not be null!')
-                    ->atPath('imagePreviewDataURI')
-                    ->addViolation();
             }
         }
     }
