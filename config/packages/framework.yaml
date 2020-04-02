@@ -21,7 +21,9 @@ framework:
         # configure cookies for http or https protocol
         # https://symfony.com/doc/current/reference/configuration/framework.html#cookie-secure
         # https://symfony.com/blog/new-in-symfony-4-2-auto-secure-cookies
-        cookie_secure: 'auto'
+        # https://www.freecodecamp.org/news/session-hijacking-and-how-to-stop-it-711e3683d1ac/
+        # https://www.mon-code.net/article/103/Securiser-les-cookies-de-son-application-web
+        cookie_secure: true # 'auto' seems not to work correctly!
 
     #esi: true
     #fragments: true
