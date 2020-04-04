@@ -40,10 +40,11 @@ class AjaxTrickListAction
     }
 
     /**
-     * Load tricks from ajax request.
+     * Load tricks from AJAX request.
      *
-     * @Route("/{_locale}/home-load-tricks/{offset}/{limit}", name="home_load_tricks_offset_limit", requirements={"offset":"\d+", "limit":"\d+"})
-     * @Route("/{_locale}/home-load-tricks/{offset}", name="home_load_tricks_offset_only", defaults={"offset"=null}, requirements={"offset"="\d+"})
+     * Please not url is always the same even if language changed. This is a simple AJAX request and not a public indexed URL.
+     *
+     * @Route("/home-load-tricks/{offset?<\d+>}/{limit?<\d+>}", name="home_load_tricks_offset_limit")
      *
      * @param AjaxTrickListResponder $responder
      * @param Request                $request

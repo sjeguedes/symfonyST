@@ -13,7 +13,7 @@ App\Domain\DTO\UpdateProfileAvatarDTO:
                     #- image/svg+xml
                 mimeTypesMessage: This file is not a valid image.
                 # Max size is inherited from File constraint
-                maxSize: 100k
+                maxSize: 2M
                 maxSizeMessage: The file is too large ({{ size }} {{ suffix }}).<br>Allowed maximum size is {{ limit }} {{ suffix }}.
                 minWidth: 80
                 minWidthMessage: The image width is too small ({{ width }} px).<br>Minimum width expected is {{ min_width }} px.

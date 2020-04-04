@@ -52,8 +52,9 @@ class RenewPasswordAction
     /**
      * Show password renewal form and validation.
      *
-     * @Route("/{_locale}/renew-password", name="renew_password")
-     * @Route("/{_locale}/renew-password/{userId}/{renewalToken}", name="renew_password_with_personal_link")
+     * @Route({
+     *     "en": "/{_locale<en>}/renew-password/{userId}/{renewalToken}"
+     * }, name="renew_password_with_personal_link")
      *
      * @param RedirectionResponder     $redirectionResponder
      * @param RenewPasswordResponder   $responder
@@ -65,11 +66,13 @@ class RenewPasswordAction
      */
     public function __invoke(RedirectionResponder $redirectionResponder, RenewPasswordResponder $responder, Request $request) : Response
     {
+        // Try to identify user in personal link
         $identifiedUser = $this->userService->getUserFoundInPasswordRenewalRequest();
-        // User can not be retrieved.
-        // Personal requested token does not match user token or renewal request date (forgotten password process) is outdated.
+        // User can not be retrieved or
+        // personal requested token does not match user token or renewal request date (forgotten password process) is outdated.
         if (\is_null($identifiedUser) || !$this->userService->isPasswordRenewalRequestTokenAllowed($identifiedUser)) {
             $this->flashBag->add('danger', 'You are not allowed to access<br>password renewal process!<br>Please ask for a new request.');
+            // Redirect to new password request page
             return $redirectionResponder('request_new_password');
         }
         // Set form with initial username model data and set the request by binding it
@@ -79,6 +82,7 @@ class RenewPasswordAction
             // Constraints and custom validation: call actions to perform if necessary on success
             $isFormRequestValid = $this->formHandler->processFormRequest(['userService' => $this->userService, 'userToUpdate' => $identifiedUser]);
             if ($isFormRequestValid) {
+                // Redirect to login page
                 return $redirectionResponder('connect');
             }
         }

@@ -51,7 +51,9 @@ class RegisterAction
     /**
      *  Show registration form (user registration) and validation errors.
      *
-     * @Route("/{_locale}/register", name="register")
+     * @Route({
+     *     "en": "/{_locale<en>}/register"
+     * }, name="register")
      *
      * @param RedirectionResponder  $redirectionResponder
      * @param RegisterResponder     $responder
@@ -83,7 +85,9 @@ class RegisterAction
     /**
      * Activate user account after registration.
      *
-     * @Route("/{_locale}/validate-account/{userId}", name="validate_account")
+     * @Route({
+     *     "en": "/{_locale<en>}/validate-account/{userId}"
+     * }, name="validate_account")
      *
      * @param RedirectionResponder $redirectionResponder
      * @param Request              $request

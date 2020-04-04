@@ -43,7 +43,9 @@ class HomeTrickListAction
     /**
      * Show homepage with starting list of tricks.
      *
-     * @Route("/{_locale}", name="home")
+     * @Route({
+     *     "en": "/en"
+     * }, name="home")
      *
      * @param HomeTrickListResponder $responder
      * @param Request                $request
@@ -65,7 +67,7 @@ class HomeTrickListAction
         $data = [
             'listEnded'             => 'No more trick to load!',
             'technicalError'        => 'Sorry, something wrong happened<br>during trick list loading!<br>Please contact us or try again later.<br>',
-            'trickAjaxLoadingPath'  => $this->trickService->generateURLFromRoute('home_load_tricks_offset_only', []),
+            'trickAjaxLoadingPath'  => $this->trickService->generateURLFromRoute('home_load_tricks_offset_limit', []),
             'trickCount'            => $this->trickService->countAll(),
             'trickLoadingMode'      => $this->trickService->getListDefaultParameters()['loadingMode'],
             'trickNumberPerLoading' => $parameters['limit'],

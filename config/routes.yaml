@@ -1,20 +1,27 @@
-#index:
-#    path: /
-#    controller: App\Controller\DefaultController::index
 # config/routes.yaml
 controllers:
     resource: '../src/Action/'
     type: annotation
 
-# redirecting the homepage to route which contains default locale
+# redirecting the homepage to route which contains default locale which is the english version
 homepage:
     path: /
+    # redirection using a URL
     controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction
+    # redirection using a route name
+    #controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController::redirectAction
     defaults:
+        # redirection using a URL
         path: /en
+        # redirection using a route name combined to default locale parameter
+        #route: home
         permanent: true
+
 # logout
+# Logout action is called internally, so route annotation can not be used for paths definition!
+# https://symfony.com/doc/4.2/translation/locale.html
 disconnect:
     path:
-        en: /{_locale}/logout
-        fr: /{_locale}/deconnection
+        en: /en/logout
+        # This is an example to show how translate route accordingly to locale parameter.
+        #fr: /fr/deconnection

@@ -44,7 +44,9 @@ class RequestNewPasswordAction
     /**
      * Show password renewal request form and validation.
      *
-     * @Route("/{_locale}/request-new-password", name="request_new_password")
+     * @Route({
+     *     "en": "/{_locale<en>}/request-new-password"
+     * }, name="request_new_password")
      *
      * @param RedirectionResponder        $redirectionResponder
      * @param RequestNewPasswordResponder $responder

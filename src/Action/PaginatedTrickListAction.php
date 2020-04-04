@@ -44,7 +44,9 @@ class PaginatedTrickListAction
     /**
      * Show complete list directly on dedicated page "tricks".
      *
-     * @Route("/{_locale}/trick-list/{page}", name="list_tricks", defaults={"page"=1}, requirements={"page"="\d+"})
+     * @Route({
+     *     "en": "/{_locale<en>}/trick-list/{page?<\d+>}"
+     * }, name="list_tricks")
      *
      * @param PaginatedTrickListResponder $responder
      * @param RedirectionResponder        $redirectionResponder
@@ -57,9 +59,9 @@ class PaginatedTrickListAction
      */
     public function __invoke(PaginatedTrickListResponder $responder, RedirectionResponder $redirectionResponder, Request $request) : Response
     {
-        // Particular redirection (optional)
-        if ('/' . $request->get('_locale') . '/trick-list/1' === $request->getPathInfo()) {
-            return $redirectionResponder('list_tricks');
+        // Particular redirection (optional) to indicate page 1 by default in URL
+        if (!preg_match('/^\d+/', $request->get('page'))) {
+            return $redirectionResponder('list_tricks', ['page' => 1]);
         }
         // Get necessary data to create pagination filtering wrong parameters if necessary
         $pageIndex = $this->trickService->filterPaginationRequestAttribute($request, 'list_tricks');

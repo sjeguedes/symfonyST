@@ -80,7 +80,9 @@ class UpdateProfileAction
     /**
      *  Show profile update forms (user avatar, account) and validation errors.
      *
-     * @Route("/{_locale}/{mainRoleLabel}/update-profile", name="update_profile", requirements={"mainRoleLabel":"admin|member"})
+     * @Route({
+     *     "en": "/{_locale<en>}/{mainRoleLabel<admin|member>}/update-profile"
+     * }, name="update_profile")
      *
      * @param RedirectionResponder   $redirectionResponder
      * @param UpdateProfileResponder $responder

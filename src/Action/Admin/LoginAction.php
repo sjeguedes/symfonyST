@@ -53,7 +53,9 @@ class LoginAction
     /**
      *  Show login form (user connection) and validation or authentication errors.
      *
-     * @Route("/{_locale}/login", name="connect")
+     * @Route({
+     *     "en": "/{_locale<en>}/login"
+     * }, name="connect")
      *
      * @param RedirectionResponder $redirectionResponder
      * @param LoginResponder       $responder

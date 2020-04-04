@@ -5,6 +5,7 @@
         "php": "^7.2.14",
         "ext-ctype": "*",
         "ext-curl": "*",
+        "ext-fileinfo": "*",
         "ext-gd": "*",
         "ext-gmp": "*",
         "ext-http": "*",
@@ -31,8 +32,7 @@
         "symfony/swiftmailer-bundle": "^3.2",
         "symfony/twig-bundle": "^4.2",
         "symfony/validator": "^4.2",
-        "symfony/yaml": "^4.2",
-        "ext-fileinfo": "*"
+        "symfony/yaml": "^4.2"
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^3.0",

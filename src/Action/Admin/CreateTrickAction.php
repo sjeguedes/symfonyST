@@ -51,7 +51,9 @@ class CreateTrickAction
     /**
      *  Show trick creation form and validation errors.
      *
-     * @Route("/{_locale}/{mainRoleLabel}/create-trick", name="create_trick", requirements={"mainRoleLabel":"admin|member"})
+     * @Route({
+     *     "en": "/{_locale<en>}/{mainRoleLabel<admin|member>}/create-trick"
+     * }, name="create_trick")
      *
      * @param RedirectionResponder  $redirectionResponder
      * @param CreateTrickResponder  $responder

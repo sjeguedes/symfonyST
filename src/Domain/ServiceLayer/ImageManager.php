@@ -107,8 +107,8 @@ class ImageManager
      * @param ImageToCropDTO $dataModel
      * @param string         $mediaTypeKey
      * @param User           $user
-     * @param string         $identifierName a name to use for uploaded image (slug, custom string...)
      * @param bool           $isDirectUpload
+     * @param string         $identifierName a name to use for uploaded image (slug, custom string...)
      *
      * @return Image|null
      *
@@ -118,8 +118,8 @@ class ImageManager
         ImageToCropDTO $dataModel,
         string $mediaTypeKey,
         User $user,
-        string $identifierName = null,
-        bool $isDirectUpload = false
+        bool $isDirectUpload = false,
+        string $identifierName = null
     ) : ?Image
     {
         // No image was uploaded!
@@ -134,12 +134,12 @@ class ImageManager
         if ($isDirectUpload) {
             // Particular case for trick: upload image without complete form validation
             $trickImageName = $this->imageUploader->upload($dataModel->getImage(), ImageUploader::TRICK_IMAGE_DIRECTORY_KEY, $parameters, $isCropped);
-            // Image description may not have been set due to direct image upload (to insure persistence) without complete form validation for other fields (e.g. description)!
-            $imageDescription = !$isDirectUpload ? $dataModel->getDescription() : self::DEFAULT_IMAGE_DESCRIPTION_TEXT;
+            // Image description is set with default text at this level without possible complete form validation!
+            $imageDescription = self::DEFAULT_IMAGE_DESCRIPTION_TEXT;
             // Create image media entity with image entity
             $image = new Image($trickImageName, $imageDescription, $parameters['extension'], $parameters['size']);
-            // Image main option may not have been set due to possible direct image upload like description!
-            $isMainOption = !$isDirectUpload ? $dataModel->getIsMain() : false;
+            // Image main option is set to default value at this level without possible complete form validation like description!
+            $isMainOption = false;
             // Create mandatory media which references image
             $this->mediaManager->createTrickMedia($image, $mediaTypeKey, $user, $isMainOption, true);
             // Save data (image, media and media type instances):
@@ -155,7 +155,7 @@ class ImageManager
         if (\is_null($trickImageName)) {
             return null;
         }
-        // Return image entity
+        // Return Image entity
         return $newTrickImage;
     }
 

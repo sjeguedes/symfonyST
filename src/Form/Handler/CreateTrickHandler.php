@@ -76,8 +76,7 @@ final class CreateTrickHandler extends AbstractUploadFormHandler
             $this->flashBag->add('danger', 'Trick creation failed!<br>Try to request again by checking the form fields.');
             return false;
         }
-        //return true;
-        return false;
+        return true;
     }
 
     /**

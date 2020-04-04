@@ -42,10 +42,11 @@ class AjaxVideoURLCheckAction
     }
 
     /**
-     * Check if single trick video URL can be loaded from ajax request.
+     * Check if single trick video URL can be loaded from AJAX request.
      *
-     * @Route("/{_locale}/load-trick-video/{url}", name="load_trick_video_url_check", requirements={"url"="(.+)?"})
-     * @Route("/{_locale}/load-trick-video", name="load_trick_video_url_query_check")
+     * Please not url is always the same even if language changed. This is a simple AJAX request and not a public indexed URL.
+     *
+     * @Route("/load-trick-video/{url<(.+)?>}", name="load_trick_video_url_check")
      *
      * @param AjaxVideoURLCheckResponder $responder
      * @param Request                    $request

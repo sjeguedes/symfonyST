@@ -143,7 +143,7 @@ class ImageToCropType extends AbstractTrickCollectionEntryType
                     // At this level, Trick slug can't be used due to not validated Trick name,
                     // so we used a image basic identifier name to replace it later on Trick creation or update actions.
                     $imageIdentifierName = 'unnamed-trick-image';
-                    $createdImageOnServer = $this->imageService->createTrickImage($imageToCropDataModel, 'trickBig', $authenticatedUser, $imageIdentifierName,true);
+                    $createdImageOnServer = $this->imageService->createTrickImage($imageToCropDataModel, 'trickBig', $authenticatedUser, true, $imageIdentifierName);
                     break;
                 // Stop process for other root form types
                 default:

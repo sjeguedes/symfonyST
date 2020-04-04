@@ -25,7 +25,7 @@
             <p class="uk-margin-remove uk-text-center">
                 <span class="uk-display-block uk-margin-small-bottom"><small class="uk-text-uppercase">current avatar</small></span>
                 <span class="uk-display-inline-block uk-box-shadow-small uk-border-circle uk-padding-small st-background-white">
-                     <img id="st-saved-avatar" class="" width="60" src="{{ asset(avatarImageNamePath) }}" alt="{{ avatarImageAlt }}">
+                     <img id="st-saved-avatar" class="uk-border-circle" width="60" src="{{ asset(avatarImageNamePath) }}" alt="{{ avatarImageAlt }}">
                 </span>
                 <span class="uk-display-block uk-margin-small-top st-color-yellow">{{ app.user.firstName~' '~app.user.familyName }}</span>
             </p>
@@ -52,7 +52,7 @@
                         </small>
                         <small>
                             Your avatar image is expected to be a file with one of these extensions:<br><span class="uk-text-bold">.jpg, .jpeg, .png, .gif</span><br>
-                            Its minimum format must be:<br><span class="uk-text-bold">80px (width) x 80px (height)</span><br>and its maximum size must be:<br><span class="uk-text-bold">100KB (KiloByte / Ko)</span>.
+                            Its minimum format must be:<br><span class="uk-text-bold">80px (width) x 80px (height)</span><br>and its maximum size must be:<br><span class="uk-text-bold">2MB (MegaByte / Mo)</span>.
                         </small>
                     </p>
                 </div>

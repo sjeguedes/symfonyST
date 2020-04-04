@@ -152,6 +152,7 @@ class ImageUploader
         // Define the compression quality
         // png: -1 default compiled in zlib library, 0 no compression, 1-9 where 9 is the maximum compression
         //jp(e)g: 80% (0-100)
+        // gif: no change is used here (https://stackoverflow.com/questions/3708947/compress-gif-images-quality-in-php)
         $qualityParameters = ['png' => 2, 'jpeg' => 80, 'jpg' => 80];
         $arguments = [$newImageToCreateResource, $newImageNamePath];
         if (isset($qualityParameters[$imageType])) array_push($arguments, $qualityParameters[$imageType]);
@@ -219,9 +220,59 @@ class ImageUploader
     }
 
     /**
+     * Resize an image resource as expected by preserving transparency if needed.
+     *
+     * Please take into account ratio is not checked and considered correct due to crop process!
+     * Sadly, there is no type hint for a "gd" image resource!
+     *
+     * @param       $imageResource
+     * @param array $parameters
+     *
+     * @see https://www.php.net/manual/en/function.imagecolortransparent.php
+     * 2 very old but useful posts:
+     * @see https://stackoverflow.com/questions/6819822/how-to-allow-upload-transparent-gif-or-png-with-php
+     * @see http://www.akemapa.com/2008/07/10/php-gd-resize-transparent-image-png-gif/comment-page-2/
+     *
+     * @return resource|null a "gd" image resource
+     */
+    private function resizeImageResourceAndPreserveTransparency($imageResource, array $parameters) // No available return type hint for resource
+    {
+        $imageType = $parameters['extension'];
+        // Get expected final format (dimensions)
+        $width = $parameters['resizeFormat']['width'];
+        $height = $parameters['resizeFormat']['height'];
+        // Create a image resource
+        $newImageToCreateResource = imagecreatetruecolor($width, $height);
+        // Preserve transparency:
+        // Concern transparent "gif" resource
+        if ('gif' === $imageType && imagecolortransparent($imageResource) >= 0) {
+            $transparentIndex = imagecolortransparent($imageResource);
+            imagepalettecopy($imageResource, $newImageToCreateResource);
+            imagefill($newImageToCreateResource, 0, 0, $transparentIndex);
+            imagecolortransparent($newImageToCreateResource, $transparentIndex);
+            imagetruecolortopalette($newImageToCreateResource, true, 256);
+        // Concern transparent "png" resource
+        }
+        if ('png' === $imageType && imagecolortransparent($imageResource) >= 0) {
+            imagealphablending($newImageToCreateResource, false);
+            imagesavealpha($newImageToCreateResource,true);
+            $transparent = imagecolorallocatealpha($newImageToCreateResource, 255, 255, 255, 127);
+            imagefilledrectangle($newImageToCreateResource, 0, 0, $width, $height, $transparent);
+        }
+        // Concerns all cases including "jp(e)g" resource!:
+        // Get scaled (resized) resource with the same ratio to create future image with expected media type dimension
+        $isSuccess = imagecopyresampled($newImageToCreateResource, $imageResource, 0, 0, 0, 0, $width, $height, imagesx($imageResource), imagesy($imageResource));
+        // Resource handling is a failure!
+        if (!$isSuccess) {
+            return null;
+        }
+        return $newImageToCreateResource;
+    }
+
+    /**
      * Resize a user cropped image as regards its media type dimensions definition.
      *
-     * @param       $croppedImageResource
+     * @param       $croppedImageResource the "gd" image resource to handle
      * @param array $parameters
      * @param array $uploadedFileInfos
      *
@@ -234,33 +285,23 @@ class ImageUploader
         if (!\is_resource($croppedImageResource)) {
             throw new \InvalidArgumentException('A valid cropped resource is expected to be able to resize uploaded image!');
         }
-        $imageType = $parameters['extension'];
-        // Get expected final format (dimensions)
-        $width = $parameters['resizeFormat']['width'];
-        $height = $parameters['resizeFormat']['height'];
-        // Create a image resource
-        $newImageToCreateResource = imagecreatetruecolor($width, $height);
-        // Preserve transparency
-        if ('gif' === $imageType || 'png' === $imageType) {
-            imagecolortransparent($newImageToCreateResource, imagecolorallocatealpha($newImageToCreateResource, 0, 0, 0, 127));
-            imagealphablending($newImageToCreateResource, false);
-            imagesavealpha($newImageToCreateResource, true);
+        // Resize image as expected by keeping transparency
+        $newImageToCreateResource = $this->resizeImageResourceAndPreserveTransparency($croppedImageResource, $parameters);
+        if (!\is_null($newImageToCreateResource)) {
+            // Replace dimensions format in new resized image name as expected in media type definition
+            $newImageName = $this->renameImageAsExpectedInMediaType($parameters, $uploadedFileInfos['uploadedFileName']);
+            $newImageNamePath = $uploadedFileInfos['baseUploadDirectory'] . '/' . $newImageName;
+            // Generate final image file by calling the appropriate function as regards image extension
+            $imageType = $parameters['extension'];
+            $isImageGenerated = $this->generateImage($newImageToCreateResource, $imageType, $newImageNamePath);
+            // Free up memory by destroying final image resource
+            imagedestroy($newImageToCreateResource);
+            if (!$isImageGenerated) {
+                return null;
+            }
+            return new File($newImageNamePath, true);
         }
-        // Get scaled (resized) resource with ratio to create future image with expected media type dimensions
-        $scaledImageResource = imagescale($croppedImageResource , $width, $height);
-        imagecopyresampled($newImageToCreateResource, $scaledImageResource, 0, 0, 0, 0, $width, $height, $width, $height);
-        // Replace dimensions format in new resized image name as expected in media type definition
-        $newImageName = $this->renameImageAsExpectedInMediaType($parameters, $uploadedFileInfos['uploadedFileName']);
-        $newImageNamePath = $uploadedFileInfos['baseUploadDirectory'] . '/' . $newImageName;
-        // Generate final image file by calling the appropriate function as regards image extension
-        $isImageGenerated = $this->generateImage($newImageToCreateResource, $imageType, $newImageNamePath);
-        if (!$isImageGenerated) {
-            return null;
-        }
-        // Free up memory by destroying scaled (resized) and final image resources
-        imagedestroy($scaledImageResource);
-        imagedestroy($newImageToCreateResource);
-        return new File($newImageNamePath, true);
+        return null;
     }
 
     /**

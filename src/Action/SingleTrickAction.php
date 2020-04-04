@@ -55,7 +55,9 @@ class SingleTrickAction
     /**
      * Show homepage with starting list of tricks.
      *
-     * @Route("/{_locale}/trick/{slug}-{encodedUuid}", name="show_single_trick", requirements={"slug":"[\w-]+", "encodedUuid":"\w+"})
+     * @Route({
+     *     "en": "/{_locale<en>}/trick/{slug<[\w-]+>}-{encodedUuid<\w+>}"
+     * }, name="show_single_trick")
      *
      * @param SingleTrickResponder $responder
      * @param Request              $request
