@@ -4,12 +4,17 @@ declare(strict_types = 1);
 
 namespace App\Form\Handler;
 
+use App\Domain\DTOToEmbed\ImageToCropDTO;
+use App\Domain\Entity\User;
+use App\Domain\ServiceLayer\ImageManager;
 use App\Domain\ServiceLayer\TrickManager;
 use App\Form\Type\Admin\CreateTrickType;
 use App\Utils\Traits\CSRFTokenHelperTrait;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 /**
@@ -28,22 +33,30 @@ final class CreateTrickHandler extends AbstractUploadFormHandler
     private $csrfTokenManager;
 
     /**
+     * @var Security
+     */
+    private $security;
+
+    /**
      * RegisterHandler constructor.
      *
      * @param CsrfTokenManagerInterface   $csrfTokenManager
      * @param FlashBagInterface           $flashBag
      * @param FormFactoryInterface        $formFactory
      * @param RequestStack                $requestStack
+     * @param Security                    $security
      */
     public function __construct(
         csrfTokenManagerInterface $csrfTokenManager,
         FlashBagInterface $flashBag,
         FormFactoryInterface $formFactory,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        Security $security
     ) {
         parent::__construct($flashBag, $formFactory, CreateTrickType::class, $requestStack);
         $this->csrfTokenManager = $csrfTokenManager;
         $this->customError = null;
+        $this->security = $security;
     }
 
     /**
@@ -71,7 +84,7 @@ final class CreateTrickHandler extends AbstractUploadFormHandler
         // DTO is in valid state but filled in trick name (title) already exist in database: it must be unique!
         $isTrickNameUnique = \is_null($trickService->findSingleByName($this->form->getData()->getName())) ? true : false; // or $this->form->get('name')->getData()
         if (!$isTrickNameUnique) {
-            $trickNameError = 'Please check chosen title!<br>A trick with the same name already exists!';
+            $trickNameError = 'Please check chosen title!<br>A trick with the same name already exists.';
             $this->customError = $trickNameError;
             $this->flashBag->add('danger', 'Trick creation failed!<br>Try to request again by checking the form fields.');
             return false;
@@ -94,12 +107,26 @@ final class CreateTrickHandler extends AbstractUploadFormHandler
     {
         // Check UserManager instance in passed data
         $this->checkNecessaryData($actionData);
+        /** @var ImageManager $imageService */
+        $imageService = $actionData['imageService'];
         /** @var TrickManager $trickService */
         $trickService = $actionData['trickService'];
         // TODO: do stuff for trick creation (add TrickManager method)!
         // Create a new trick in database with the validated DTO
         //$newTrick = $trickService->createTrick($this->form->getData());
+
         // 1. Retrieve image Media entities thanks to images saved names with loop
+        /** @var User|UserInterface $authenticatedUser */
+        $authenticatedUser = $this->security->getUser();
+        $imagesDTOCollection = $this->form->getData()->getImages();
+        foreach ($imagesDTOCollection as $imageData) {
+            /** @var ImageToCropDTO $imageToCropDTO */
+            $imageToCropDTO = $imageData;
+            // Get big image entity which was already uploaded on server during form validation thanks to corresponding DTO with its "savedImageName" property.
+            $bigImageEntity = $imageService->createTrickImage($imageToCropDTO, 'trickBig', $authenticatedUser, false);
+            // Create physically small and medium images with corresponding Image and Media entities
+        }
+
         // 2. Create the two other images (medium and thumb) physically on server
         // 3. Update "isMain" and "description" data in Media entities
         // 4. Create videos Media and Video entities, and then retrieve Medias entities to provide with loop

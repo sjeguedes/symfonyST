@@ -4,14 +4,9 @@ declare(strict_types = 1);
 
 namespace App\Form\Handler;
 
-use App\Domain\DTO\AbstractReadableDTO;
-use App\Domain\Entity\User;
-use App\Domain\ServiceLayer\ImageManager;
-use App\Domain\ServiceLayer\UserManager;
+use App\Service\Medias\Upload\ImageUploader;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 

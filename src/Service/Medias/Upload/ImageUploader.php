@@ -13,7 +13,11 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 /**
  * Class ImageUploader.
  *
- * This class manages image upload provided by a form.
+ * This class manages image upload provided by a form and handles it (crop, resize...) if necessary.
+ *
+ * Please note this package would be better for image handling (resize, crop...):
+ * @see https://packagist.org/packages/intervention/image
+ * @see http://image.intervention.io/use/basics
  */
 class ImageUploader
 {
@@ -64,7 +68,7 @@ class ImageUploader
     }
 
     /**
-     * Check if a file was uploaded on server;
+     * Check if a file was uploaded on server.
      *
      * @param string $fileName
      * @param string $uploadDirectoryKey
@@ -95,11 +99,11 @@ class ImageUploader
             return $isFileFound;
         }
         // Check directly file path name
-        return is_file($this->getUploadDirectory($uploadDirectoryKey) . '/' . $fileName);
+        return \is_file($this->getUploadDirectory($uploadDirectoryKey) . '/' . $fileName);
     }
 
     /**
-     * Crop an image, resize it and rename it with expected media type format.
+     * Crop an image based on an uploaded file, resize it and rename it with expected media type format.
      *
      * @param string $uploadDirectory the destination folder
      * @param File   $uploadedImage
@@ -107,18 +111,22 @@ class ImageUploader
      *
      * @return File|null an image file
      *
-     * @throws \Exception
-     *
+     * Use variables in curly braces instead of call_user_function() or call_user_function_array() functions:
      * @see https://stackoverflow.com/questions/9257505/using-braces-with-dynamic-variable-names-in-php
-     * to possibly use variables in curly braces instead of call_user_function() or call_user_function_array() functions
+     *
+     * @throws \Exception
      */
     private function createCroppedAndResizedImage(string $uploadDirectory, File $uploadedImage, array $parameters) : ?File
     {
+        if (!extension_loaded('gd')) {
+            throw new \RuntimeException('Image can not be handled: "gd" extension is not installed on server!');
+        }
         // Decode crop data to get a stdClass instance
         $cropDataObject = json_decode($parameters['cropJSONData'])[0];
         // Get a resource based on uploaded image extension with particular "jpg" case
         $imageType = 'jpg' === $parameters['extension'] ? 'jpeg' : $parameters['extension'];
-        $uploadedImageResource = \call_user_func('imagecreatefrom' . $imageType, $uploadedImage->getPathname());
+        $function = "imagecreatefrom{$imageType}";
+        $uploadedImageResource = \call_user_func($function, $uploadedImage->getPathname());
         // Get cropped resource
         $croppedImageResource = imagecrop(
             $uploadedImageResource,
@@ -127,8 +135,8 @@ class ImageUploader
         if (!$croppedImageResource) {
             throw new \UnexpectedValueException('Crop operation failed due to unexpected value(s) in parameters!');
         }
-        $uploadedFileInfos = ['baseUploadDirectory' => $uploadDirectory, 'uploadedFileName' => $uploadedImage->getFilename()];
-        $finalImageFile = $this->resizeCroppedResourceAsExpected($croppedImageResource, $parameters, $uploadedFileInfos);
+        $uploadedFileInfos = ['imageDirectory' => $uploadDirectory, 'imageFileName' => $uploadedImage->getFilename()];
+        $finalImageFile = $this->resizeImageResourceAsExpected($croppedImageResource, $parameters, $uploadedFileInfos);
         if (\is_null($finalImageFile)) {
             return null;
         }
@@ -139,11 +147,42 @@ class ImageUploader
     }
 
     /**
+     * Resize an image based on image source file, and rename it with expected media type format.
+     *
+     * @param string $imageDirectory
+     * @param File   $imageSourceFile
+     * @param array  $parameters
+     *
+     * @return File|null
+     *
+     * @throws \Exception
+     */
+    private function createResizedImage(string $imageDirectory, File $imageSourceFile, array $parameters) : ?File
+    {
+        // Get a resource based on uploaded image extension with particular "jpg" case
+        $imageType = 'jpg' === $parameters['extension'] ? 'jpeg' : $parameters['extension'];
+        $function = "imagecreatefrom{$imageType}";
+        $imageResource = \call_user_func($function, $imageSourceFile->getPathname());
+
+        $fileInfos = ['imageDirectory' => $imageDirectory, 'imageFileName' => $imageSourceFile->getFilename()];
+        $finalImageFile = $this->resizeImageResourceAsExpected($imageResource, $parameters, $fileInfos);
+        if (\is_null($finalImageFile)) {
+            return null;
+        }
+        // Free up memory by destroying resources
+        imagedestroy($imageResource);
+        return $finalImageFile;
+    }
+
+    /**
      * Generate the final image file after resource operation(s).
      *
-     * @param        $newImageToCreateResource
-     * @param string $imageType
-     * @param string $newImageNamePath
+     * @param resource $newImageToCreateResource a "gd" resource to handle
+     * @param string   $imageType
+     * @param string   $newImageNamePath
+     *
+     * Change gif quality with php:
+     * @see https://stackoverflow.com/questions/3708947/compress-gif-images-quality-in-php
      *
      * @return bool
      */
@@ -152,12 +191,13 @@ class ImageUploader
         // Define the compression quality
         // png: -1 default compiled in zlib library, 0 no compression, 1-9 where 9 is the maximum compression
         //jp(e)g: 80% (0-100)
-        // gif: no change is used here (https://stackoverflow.com/questions/3708947/compress-gif-images-quality-in-php)
+        // gif: no change is used here.
         $qualityParameters = ['png' => 2, 'jpeg' => 80, 'jpg' => 80];
         $arguments = [$newImageToCreateResource, $newImageNamePath];
         if (isset($qualityParameters[$imageType])) array_push($arguments, $qualityParameters[$imageType]);
         // Call the adapted function which depends on image type (imagepng(), imagegif(), imagejpeg())
-        $result = \call_user_func_array('image' . $imageType, $arguments);
+        $function = "image{$imageType}";
+        $result = \call_user_func_array($function, $arguments);
         if (!$result) {
             return false;
         }
@@ -206,11 +246,15 @@ class ImageUploader
      */
     private function renameImageAsExpectedInMediaType(array $parameters, string $fileName) : string
     {
-        // WARNING: Change identifier with hash to avoid identical name between uploaded file name and final image name
-        // when they have the same dimensions!
-        $newHash = hash('crc32', uniqid());
-        preg_match('/^.*-([a-z0-9]*)-\d{2,}x\d{2,}\.[a-z]{3,4}$/', $fileName, $matches, PREG_UNMATCHED_AS_NULL);
-        $newImageName = preg_replace('/' . $matches[1] . '/',  $newHash, $fileName);
+        $newImageName = $fileName;
+        $isImageNameHashChanged = $parameters['isImageNameHashChanged'];
+        // WARNING: Change file name hash to avoid identical names
+        // between uploaded file name and immediately created final image name when they have the same dimensions!
+        if ($isImageNameHashChanged) {
+            $newHash = hash('crc32', uniqid());
+            preg_match('/^.*-([a-z0-9]*)-\d{2,}x\d{2,}\.[a-z]{3,4}$/', $fileName, $matches, PREG_UNMATCHED_AS_NULL);
+            $newImageName = preg_replace('/' . $matches[1] . '/', $newHash, $fileName);
+        }
         // Change included format in name (Initial format is replaced with expected resize format!)
         $width = $parameters['resizeFormat']['width'];
         $height = $parameters['resizeFormat']['height'];
@@ -225,17 +269,19 @@ class ImageUploader
      * Please take into account ratio is not checked and considered correct due to crop process!
      * Sadly, there is no type hint for a "gd" image resource!
      *
-     * @param       $imageResource
-     * @param array $parameters
+     * @param resource $imageResource a "gd" image resource to handle
+     * @param array    $parameters
      *
      * @see https://www.php.net/manual/en/function.imagecolortransparent.php
      * 2 very old but useful posts:
      * @see https://stackoverflow.com/questions/6819822/how-to-allow-upload-transparent-gif-or-png-with-php
      * @see http://www.akemapa.com/2008/07/10/php-gd-resize-transparent-image-png-gif/comment-page-2/
+     * Check png transparency:
+     * @see https://stackoverflow.com/questions/5495275/how-to-check-if-an-image-has-transparency-using-gd
      *
      * @return resource|null a "gd" image resource
      */
-    private function resizeImageResourceAndPreserveTransparency($imageResource, array $parameters) // No available return type hint for resource
+    private function resizeImageResourceWithTransparency($imageResource, array $parameters) // No available return type hint for resource
     {
         $imageType = $parameters['extension'];
         // Get expected final format (dimensions)
@@ -250,10 +296,10 @@ class ImageUploader
             imagepalettecopy($imageResource, $newImageToCreateResource);
             imagefill($newImageToCreateResource, 0, 0, $transparentIndex);
             imagecolortransparent($newImageToCreateResource, $transparentIndex);
-            imagetruecolortopalette($newImageToCreateResource, true, 256);
+            imagetruecolortopalette($newImageToCreateResource, true, 256); // Maximum quality
         // Concern transparent "png" resource
         }
-        if ('png' === $imageType && imagecolortransparent($imageResource) >= 0) {
+        if ('png' === $imageType) {
             imagealphablending($newImageToCreateResource, false);
             imagesavealpha($newImageToCreateResource,true);
             $transparent = imagecolorallocatealpha($newImageToCreateResource, 255, 255, 255, 127);
@@ -270,27 +316,27 @@ class ImageUploader
     }
 
     /**
-     * Resize a user cropped image as regards its media type dimensions definition.
+     * Resize an image as regards its media type dimensions definition.
      *
-     * @param       $croppedImageResource the "gd" image resource to handle
-     * @param array $parameters
-     * @param array $uploadedFileInfos
+     * @param resource $imageResource a "gd" image resource to handle
+     * @param array    $parameters
+     * @param array    $fileInfos
      *
      * @return File|null an image file
      *
      * @throws \Exception
      */
-    private function resizeCroppedResourceAsExpected($croppedImageResource, array $parameters, array $uploadedFileInfos) : ?File
+    private function resizeImageResourceAsExpected($imageResource, array $parameters, array $fileInfos) : ?File
     {
-        if (!\is_resource($croppedImageResource)) {
-            throw new \InvalidArgumentException('A valid cropped resource is expected to be able to resize uploaded image!');
+        if (!\is_resource($imageResource)) {
+            throw new \InvalidArgumentException('A valid image resource is expected to be able to resize uploaded image!');
         }
         // Resize image as expected by keeping transparency
-        $newImageToCreateResource = $this->resizeImageResourceAndPreserveTransparency($croppedImageResource, $parameters);
+        $newImageToCreateResource = $this->resizeImageResourceWithTransparency($imageResource, $parameters);
         if (!\is_null($newImageToCreateResource)) {
             // Replace dimensions format in new resized image name as expected in media type definition
-            $newImageName = $this->renameImageAsExpectedInMediaType($parameters, $uploadedFileInfos['uploadedFileName']);
-            $newImageNamePath = $uploadedFileInfos['baseUploadDirectory'] . '/' . $newImageName;
+            $newImageName = $this->renameImageAsExpectedInMediaType($parameters, $fileInfos['imageFileName']);
+            $newImageNamePath = $fileInfos['imageDirectory'] . '/' . $newImageName;
             // Generate final image file by calling the appropriate function as regards image extension
             $imageType = $parameters['extension'];
             $isImageGenerated = $this->generateImage($newImageToCreateResource, $imageType, $newImageNamePath);
@@ -305,18 +351,51 @@ class ImageUploader
     }
 
     /**
-     * Upload a file.
+     * Resize a new image with expected parameters based on a source image Image data parameters.
      *
-     * @param UploadedFile $file
-     * @param string       $key a key which indicates a chosen upload directory
-     * @param array        $parameters an array of uploaded file parameters
-     * @param bool         $isCropped
+     * @param string $key
+     * @param array  $parameters
      *
-     * @return string|null
+     * @return \SplFileInfo|null a resized image SplFileInfo instance
      *
      * @throws \Exception
      */
-    public function upload(UploadedFile $file, string $key, array $parameters, bool $isCropped = false) : ?string
+    public function resizeNewImage(string $key, array $parameters) : ?\SplFileInfo
+    {
+        if (!isset($this->uploadDirectory[$key])) {
+            throw new \InvalidArgumentException('Chosen upload directory is unknown!');
+        }
+        $sourceImageName = $parameters['identifierName'];
+        $sourceImageExtension = $parameters['extension'];
+        // Get a image File instance based on image source Image entity
+        $imageDirectory = $this->uploadDirectory[$key];
+        $imageName = $sourceImageName . '.' . $sourceImageExtension;
+        $imagePath = $imageDirectory . '/' . $imageName;
+        $sourceImageFile = new File($imagePath,true);
+        // Get a new resized image \SplFileInfo|File instance
+        $finalImage = $this->createResizedImage($imageDirectory, $sourceImageFile, $parameters);
+        if (\is_null($finalImage)) {
+            return null;
+        }
+        // Final image data will be stored in database
+        return $finalImage;
+    }
+
+    /**
+     * Upload a file and call crop/resize action if needed.
+     *
+     * Please note first uploaded image is not kept if crop/resize operations are used after.
+     *
+     * @param UploadedFile $file
+     * @param string       $key        a key which indicates a chosen upload directory
+     * @param array        $parameters an array of uploaded file parameters
+     * @param bool         $isCropped
+     *
+     * @return \SplFileInfo|null a SplFileInfo instance based on uploaded file which can be handled to be cropped
+     *
+     * @throws \Exception
+     */
+    public function upload(UploadedFile $file, string $key, array $parameters, bool $isCropped = false) : ?\SplFileInfo
     {
         if (!isset($this->uploadDirectory[$key])) {
             throw new \InvalidArgumentException('Chosen upload directory is unknown!');
@@ -341,15 +420,14 @@ class ImageUploader
                 if (\is_null($finalImage)) {
                     return null;
                 }
-                $finalImageNameWithoutExtension = str_replace('.' . $finalImage->getExtension(), '', $finalImage->getFilename());
                 // Remove physically uploaded image to keep only resized final image after crop
                 @unlink($uploadedFile->getPathname());
             // No crop
             } else {
-                $finalImageNameWithoutExtension = str_replace('.' . $uploadedFile->getExtension(), '', $uploadedFile->getFilename());
+                $finalImage = $uploadedFile;
             }
-            // Result will be stored in database
-            return $finalImageNameWithoutExtension;
+            // Final image data will be stored in database
+            return $finalImage;
         } catch (FileException $e) {
             return null;
         }

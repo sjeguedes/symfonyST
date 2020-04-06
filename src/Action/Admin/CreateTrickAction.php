@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Action\Admin;
 
+use App\Domain\ServiceLayer\ImageManager;
 use App\Domain\ServiceLayer\TrickManager;
 use App\Form\Handler\FormHandlerInterface;
 use App\Responder\Admin\CreateTrickResponder;
@@ -20,6 +21,11 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class CreateTrickAction
 {
+    /**
+     * @var ImageManager $imageService
+     */
+    private $imageService;
+
     /**
      * @var TrickManager $trickService
      */
@@ -38,11 +44,18 @@ class CreateTrickAction
     /**
      * CreateTrickAction constructor.
      *
+     * @param ImageManager         $imageService,
      * @param TrickManager         $trickService
      * @param FlashBagInterface    $flashBag
      * @param FormHandlerInterface $formHandler
      */
-    public function __construct(TrickManager $trickService, FlashBagInterface $flashBag, FormHandlerInterface $formHandler) {
+    public function __construct(
+        ImageManager $imageService,
+        TrickManager $trickService,
+        FlashBagInterface $flashBag,
+        FormHandlerInterface $formHandler
+    ) {
+        $this->imageService = $imageService;
         $this->trickService = $trickService;
         $this->flashBag = $flashBag;
         $this->formHandler = $formHandler;
@@ -71,7 +84,7 @@ class CreateTrickAction
         // Process only on submit
         if ($createTrickForm->isSubmitted()) {
             // Constraints and custom validation: call actions to perform if necessary on success
-            $isFormRequestValid = $this->formHandler->processFormRequest(['trickService' => $this->trickService]);
+            $isFormRequestValid = $this->formHandler->processFormRequest(['imageService' => $this->imageService, 'trickService' => $this->trickService]);
             if ($isFormRequestValid) {
                 return $redirectionResponder('home');
             }

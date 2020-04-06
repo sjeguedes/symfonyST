@@ -91,7 +91,7 @@ trait UserHandlingHelperTrait
     }
 
     /**
-     * Slugify a user nickname.
+     * Make a slug with a user nickname.
      *
      * @param string $nickname
      *
@@ -99,7 +99,7 @@ trait UserHandlingHelperTrait
      *
      * @throws \Exception
      */
-    public function cleanAvatarNickNameForSlug(string $nickname) : string
+    public function makeSlugWithNickName(string $nickname) : string
     {
         if (!extension_loaded('iconv')) {
             throw new \Exception('Sorry, iconv module is not loaded!');

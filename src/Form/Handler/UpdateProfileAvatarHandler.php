@@ -7,7 +7,6 @@ namespace App\Form\Handler;
 use App\Domain\DTO\UpdateProfileAvatarDTO;
 use App\Domain\ServiceLayer\UserManager;
 use App\Form\Type\Admin\UpdateProfileAvatarType;
-use App\Service\Medias\Upload\ImageUploader;
 use App\Utils\Traits\CSRFTokenHelperTrait;
 use App\Utils\Traits\UserHandlingHelperTrait;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -32,30 +31,22 @@ final class UpdateProfileAvatarHandler extends AbstractUploadFormHandler
     private $csrfTokenManager;
 
     /**
-     * @var ImageUploader
-     */
-    private $imageUploader;
-
-    /**
      * UpdateProfileAvatarHandler constructor.
      *
      * @param CsrfTokenManagerInterface   $csrfTokenManager
      * @param FlashBagInterface           $flashBag
      * @param FormFactoryInterface        $formFactory
-     * @param ImageUploader               $imageUploader
      * @param RequestStack                $requestStack
      */
     public function __construct(
         csrfTokenManagerInterface $csrfTokenManager,
         FlashBagInterface $flashBag,
         FormFactoryInterface $formFactory,
-        ImageUploader $imageUploader,
         RequestStack $requestStack
     ) {
         parent::__construct($flashBag, $formFactory, UpdateProfileAvatarType::class, $requestStack);
         $this->csrfTokenManager = $csrfTokenManager;
         $this->customError = null;
-        $this->imageUploader = $imageUploader;
     }
 
     /**

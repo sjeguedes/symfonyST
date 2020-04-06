@@ -108,8 +108,6 @@ services:
 
     # add update profile avatar handler
     App\Form\Handler\UpdateProfileAvatarHandler:
-        arguments:
-            $imageUploader: '@App\Service\Medias\Upload\ImageUploader'
 
     # add update profile infos handler
     App\Form\Handler\UpdateProfileInfosHandler:
