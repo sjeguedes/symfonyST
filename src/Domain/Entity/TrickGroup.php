@@ -63,7 +63,7 @@ class TrickGroup
     /**
      * @var Collection (inverse side of entity relation)
      *
-     * @ORM\OneToMany(targetEntity=Trick::class, mappedBy="trickGroup")
+     * @ORM\OneToMany(targetEntity=Trick::class, cascade={"remove"}, orphanRemoval=true, mappedBy="trickGroup")
      */
     private $tricks;
 

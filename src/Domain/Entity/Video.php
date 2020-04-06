@@ -60,11 +60,11 @@ class Video
     private $updateDate;
 
     /**
-     * @var Collection (inverse side of entity relation)
+     * @var Media (inverse side of entity relation)
      *
-     * @ORM\OneToMany(targetEntity=Media::class, cascade={"persist", "remove"}, orphanRemoval=true, mappedBy="video")
+     * @ORM\OneToOne(targetEntity=Media::class, orphanRemoval=true, mappedBy="video")
      */
-    private $medias;
+    private $media;
 
     /**
      * Image constructor.
@@ -89,7 +89,6 @@ class Video
         $this->description = $description;
         $this->creationDate = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
         $this->updateDate = $this->creationDate;
-        $this->medias = new ArrayCollection();
     }
 
     /**
@@ -147,37 +146,6 @@ class Video
     }
 
     /**
-     * Add Media entity to collection.
-     *
-     * @param Media $media
-     *
-     * @return Video
-     */
-    public function addMedia(Media $media) : self
-    {
-        if (!$this->medias->contains($media)) {
-            $this->medias->add($media);
-            $media->modifyVideo($this);
-        }
-        return $this;
-    }
-
-    /**
-     * Remove Media entity from collection.
-     *
-     * @param Media $media
-     *
-     * @return Video
-     */
-    public function removeMedia(Media $media) : self
-    {
-        if ($this->medias->contains($media)) {
-            $this->medias->removeElement($media);
-        }
-        return $this;
-    }
-
-    /**
      * @return UuidInterface
      */
     public function getUuid() : UuidInterface
@@ -218,10 +186,10 @@ class Video
     }
 
     /**
-     * @return Collection|Media[]
+     * @return Media
      */
-    public function getMedias() : Collection
+    public function getMedia() : Media
     {
-        return $this->medias;
+        return $this->media;
     }
 }

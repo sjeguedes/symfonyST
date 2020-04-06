@@ -150,14 +150,14 @@ class User implements UserInterface, \Serializable
     /**
      * @var Collection (inverse side of entity relation)
      *
-     * @ORM\OneToMany(targetEntity=Media::class, cascade={"persist"}, mappedBy="user")
+     * @ORM\OneToMany(targetEntity=Media::class, cascade={"persist", "remove"}, orphanRemoval=true, mappedBy="user")
      */
     private $medias;
 
     /**
      * @var Collection (inverse side of entity relation)
      *
-     * @ORM\OneToMany(targetEntity=Trick::class, cascade={"persist"}, mappedBy="user")
+     * @ORM\OneToMany(targetEntity=Trick::class, cascade={"persist", "remove"}, orphanRemoval=true, mappedBy="user")
      */
     private $tricks;
 

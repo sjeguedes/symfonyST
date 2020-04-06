@@ -75,11 +75,11 @@ class Image
     private $updateDate;
 
     /**
-     * @var Collection (inverse side of entity relation)
+     * @var Media (inverse side of entity relation)
      *
-     * @ORM\OneToMany(targetEntity=Media::class, cascade={"persist", "remove"}, orphanRemoval=true, mappedBy="image")
+     * @ORM\OneToOne(targetEntity=Media::class, orphanRemoval=true, mappedBy="image")
      */
-    private $medias;
+    private $media;
 
     /**
      * Image constructor.
@@ -112,7 +112,6 @@ class Image
         $this->size = $size;
         $this->creationDate = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
         $this->updateDate = $this->creationDate;
-        $this->medias = new ArrayCollection();
     }
 
     /**
@@ -166,37 +165,6 @@ class Image
             throw new \RuntimeException('Update date is not logical: Image can not be created after modified update date!');
         }
         $this->updateDate = $updateDate;
-        return $this;
-    }
-
-    /**
-     * Add Media entity to collection.
-     *
-     * @param Media $media
-     *
-     * @return Image
-     */
-    public function addMedia(Media $media) : self
-    {
-        if (!$this->medias->contains($media)) {
-            $this->medias->add($media);
-            $media->modifyImage($this);
-        }
-        return $this;
-    }
-
-    /**
-     * Remove Media entity from collection.
-     *
-     * @param Media $media
-     *
-     * @return Image
-     */
-    public function removeMedia(Media $media) : self
-    {
-        if ($this->medias->contains($media)) {
-            $this->medias->removeElement($media);
-        }
         return $this;
     }
 
@@ -257,10 +225,10 @@ class Image
     }
 
     /**
-     * @return Collection|Media[]
+     * @return Media
      */
-    public function getMedias() : Collection
+    public function getMedia() : Media
     {
-        return $this->medias;
+        return $this->media;
     }
 }

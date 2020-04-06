@@ -111,33 +111,50 @@ final class CreateTrickHandler extends AbstractUploadFormHandler
         $imageService = $actionData['imageService'];
         /** @var TrickManager $trickService */
         $trickService = $actionData['trickService'];
-        // TODO: do stuff for trick creation (add TrickManager method)!
-        // Create a new trick in database with the validated DTO
-        //$newTrick = $trickService->createTrick($this->form->getData());
+        // Create a new trick in database with the validated DTO(s)
 
-        // 1. Retrieve image Media entities thanks to images saved names with loop
+        // Loop on existing form images collection
         /** @var User|UserInterface $authenticatedUser */
         $authenticatedUser = $this->security->getUser();
         $imagesDTOCollection = $this->form->getData()->getImages();
-        foreach ($imagesDTOCollection as $imageData) {
-            /** @var ImageToCropDTO $imageToCropDTO */
-            $imageToCropDTO = $imageData;
+        foreach ($imagesDTOCollection as $imageToCropDTO) {
+            // 1. Retrieve big image Image and Media entities thanks to saved image name with loop
             // Get big image entity which was already uploaded on server during form validation thanks to corresponding DTO with its "savedImageName" property.
-            $bigImageEntity = $imageService->createTrickImage($imageToCropDTO, 'trickBig', $authenticatedUser, false);
-            // Create physically small and medium images with corresponding Image and Media entities
+            /** @var ImageToCropDTO $imageToCropDTO */
+            $bigImageEntity = $imageService->findSingleByName($imageToCropDTO->getSavedImageName());
+            // Update big image Image entity (image name corresponds to "saveImageName" ImageToCropDTO property) which was already uploaded without form validation
+            // TODO: update image name by making a slug with Trick name (method to create with Regex!)
+            $bigImageEntity->modifyDescription($imageToCropDTO->getDescription());
+            $bigImageEntity->modifyUpdateDate(new \DateTime('now'));
+            // TODO: get corresponding image Media entity and update it with $imageToCropDTO data (isMain and showListRank)
+
+            // 2. Create physically small and medium images with corresponding Image and Media entities
+            // Here is made image physical creation, Image and Media entities generation with form data with createTrickImage(...)!
+            $normalImageEntity = $imageService->createTrickImage($imageToCropDTO, 'trickNormal', $authenticatedUser, false);
+            $thumbImageEntity = $imageService->createTrickImage($imageToCropDTO, 'trickThumbnail', $authenticatedUser, false);
+            // TODO: update only image name by making a slug with Trick name (method to create with Regex!)
         }
 
-        // 2. Create the two other images (medium and thumb) physically on server
-        // 3. Update "isMain" and "description" data in Media entities
-        // 4. Create videos Media and Video entities, and then retrieve Medias entities to provide with loop
-        // 5. Create trick by merging authenticated user, images et videos entities
-        // TODO: do stuff for trick creation success flashbag!
-        // Creation success notification
+        // Loop on existing form videos collection
+        $videosDTOCollection = $this->form->getData()->getVideos();
+        foreach ($videosDTOCollection as $videoInfosDTO) {
+            // 3. Create videos with corresponding Video and Media entities
+            // TODO: do stuff for video creation (add VideoManager method)!
+            //$videoEntity = $videoService->createTrickVideo(...);
+        }
+
+        // 4. Create Trick entity by merging root form data ($this->form->getData()), authenticated user, images et videos entities
+        // TODO: do stuff for trick creation (add TrickManager method)!
+        //$newTrick = $trickService->createTrick(...);
+
+        // 5. Creation success/failure notification
+        // TODO: do stuff for trick creation success/failure flashbag!
         /*if ($isTrickCreated) {
             $this->flashBag->add(
                 'success',
                 'The trick was created successfully!<br>Please check trick list on website to look at content.');
-        }*/
+        } else {...}*/
+        // 6. TODO: do stuff for this form handler methods refactoring!
     }
 
     /**

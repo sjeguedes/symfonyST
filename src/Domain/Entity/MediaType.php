@@ -99,7 +99,7 @@ class MediaType
     /**
      * @var Collection (inverse side of entity relation)
      *
-     * @ORM\OneToMany(targetEntity=Media::class, mappedBy="mediaType")
+     * @ORM\OneToMany(targetEntity=Media::class, cascade={"remove"}, mappedBy="mediaType")
      */
     private $medias;
 
