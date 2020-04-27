@@ -36,7 +36,7 @@ trait StringHelperTrait
           $clean = str_replace((array) $replace, ' ', $clean);
         }
         // Delete all characters which are not in this list (delimiter is excluded.)
-        $clean = preg_replace("/[^a-z0-9\/_|+-]/i", '', $clean);
+        $clean = preg_replace("/[^a-z0-9\/_|+\s-]/i", '', $clean);
         // Format string with lowercase letters
         $clean = strtolower($clean);
         // Replace this characters list with delimiter

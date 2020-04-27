@@ -91,7 +91,7 @@ trait UserHandlingHelperTrait
     }
 
     /**
-     * Make a slug with a user nickname.
+     * Make a particular slug with a user nickname.
      *
      * @param string $nickname
      *
@@ -109,8 +109,10 @@ trait UserHandlingHelperTrait
         setlocale(LC_ALL, 'en_US.UTF-8');
         $clean = iconv('UTF-8', 'ASCII//TRANSLIT', $nickname);
         $clean = strtolower($clean);
-        // Optional for actual nickname format!
-        $clean = preg_replace('/\s/', '', $clean);
+        // Optional for actual nickname format, this is already cleaned by form!
+        $clean = trim($clean); // delete space before and after
+        // Optional for actual nickname format, indeed space character is not allowed!
+        $clean = preg_replace('/\s/', '-', $clean);
         // Revert back to the old locale
         setlocale(LC_ALL, $oldLocale);
         return $clean;

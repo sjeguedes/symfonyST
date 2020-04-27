@@ -77,11 +77,13 @@
                     {{ form_widget(updateProfileAvatarForm.avatar, {
                         'attr': {
                             'class': 'uk-input st-file-input',
-                            'data-error': 'Please select first<br>an image file which is allowed!',
-                            'data-error-2': 'Please select another file!<br>This one will be refused due to invalid dimensions!',
-                            'data-error-3': 'Please select another file!<br>This one will be refused due to invalid size!',
-                            'data-error-4': 'Crop aborted!<br>Please select another image to crop<br>to validate the form!',
-                            'data-error-5': 'File type, size and dimensions must be checked!'
+
+                            'data-error': 'Please select first\nan image file which is allowed!',
+                            'data-error-2': 'Please select another file!\nThis one will be refused due to invalid dimensions!',
+                            'data-error-3': 'Please select another file!\nThis one will be refused due to invalid size!',
+                            'data-error-4': 'Crop aborted!\nPlease select another image to crop\nto validate the form!',
+                            'data-error-5': 'Crop minimum size is reached!\nPlease be aware of allowed dimensions!',
+                            'data-error-6': 'File type, size and dimensions must be checked!',
                         },
                         'value': updateProfileAvatarForm.avatar.vars.value})
                     }}
@@ -106,7 +108,7 @@
                         <p class="uk-flex uk-flex-center uk-flex-column">
                         <ul class="uk-list uk-text-small">
                             <li><span class="uk-icon st-color-blue" uk-icon="icon: move"></span> Allowed format: <strong>squared selection</strong></li>
-                            <li><span class="uk-icon st-color-blue" uk-icon="icon: image"></span> Exported dimensions: <strong>width: 80px</strong> X <strong>height: 80px</strong> or <strong>higher</strong></li>
+                            <li><span class="uk-icon st-color-blue" uk-icon="icon: image"></span> Exported minimum size: <strong>width: 80px</strong> X <strong>height: 80px</strong> or <strong>higher</strong></li>
                         </ul>
                         </p>
                         <div id="st-cropper-container" class="uk-flex uk-flex-center uk-border-rounded uk-margin-auto st-cropper-container st-box-shadow-full-small">

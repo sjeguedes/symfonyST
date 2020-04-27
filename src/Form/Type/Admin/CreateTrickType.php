@@ -96,7 +96,7 @@ class CreateTrickType extends AbstractTrickType
                 'allow_add'      => true,
                 'prototype_name' => '__imageIndex__',
                 // Used here to access fields in templates and customize a particular prototype
-                'prototype'      => true,
+                'prototype'      => true, // This is he default value but more explicit due to customization
                 // Custom root form options passed to entry type form
                 'entry_options'  => [
                     'rootFormHandler' =>  $options['formHandler']
@@ -109,13 +109,10 @@ class CreateTrickType extends AbstractTrickType
                 'allow_add'      => true,
                 'prototype_name' => '__videoIndex__',
                 // Used here to access fields in templates and customize a particular prototype
-                'prototype'      => true,
+                'prototype'      => true, // This is he default value but more explicit due to customization
                 // Maintain validation state at the collection form level, to be able to show errors near field
                 'error_bubbling' => false
             ]);
-
-        // Add data transformer to "group" data.
-        $this->addSingleEntityToArrayCustomDataTransformer($builder, 'group');
     }
 
     /**

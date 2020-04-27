@@ -108,12 +108,14 @@ final class UpdateProfileAvatarHandler extends AbstractUploadFormHandler
         $userService = $actionData['userService'];
         $identifiedUser = $actionData['userToUpdate'];
         $imageService = $actionData['imageService'];
+        $mediaService = $actionData['mediaService'];
         // Update (including removal action) a user in database with the validated DTO
         /** @var UserManager $userService */
         $isAvatarUpdated = $userService->updateUserProfileAvatar(
             $this->form->getData(),
             $identifiedUser,
-            $imageService
+            $imageService,
+            $mediaService
         );
         if (!$isAvatarUpdated) {
             $updateError = 'Your image was not uploaded!<br>Try again later or use another file.';

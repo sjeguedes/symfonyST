@@ -42,9 +42,9 @@ class AjaxTrickListAction
     /**
      * Load tricks from AJAX request.
      *
-     * Please not url is always the same even if language changed. This is a simple AJAX request and not a public indexed URL.
+     * Please not url is always the same even if language changed. This is a simple AJAX request and locale parameter is null.
      *
-     * @Route("/home-load-tricks/{offset?<\d+>}/{limit?<\d+>}", name="home_load_tricks_offset_limit")
+     * @Route("/home-load-tricks/{offset?<\d+>}/{limit?<\d+>?}", name="home_load_tricks_offset_limit")
      *
      * @param AjaxTrickListResponder $responder
      * @param Request                $request
@@ -61,7 +61,7 @@ class AjaxTrickListAction
         // Total count has changed during trick list ajax loading!
         if ($this->trickService->isCountAllOutdated($trickCount)) {
             $this->trickService->storeInSession('trickCount', $trickCount);
-            $parameters = $this->trickService->getDefaultTrickList();
+            $parameters = $this->trickService->getTrickListParameters();
             $this->logger->error("[trace app snowTricks] AjaxTrickListAction/__invoke => trickCount: $trickCount");
             $listError = 'Trick list was reinitialized!<br>Wrong total count is used<br>due to outdated or unexpected value.';
         } else {
@@ -79,7 +79,7 @@ class AjaxTrickListAction
             'ajaxMode'         => true,
             'listError'        => $listError ?? null,
             'trickCount'       => $trickCount,
-            'trickLoadingMode' => $this->trickService->getListDefaultParameters()['loadingMode'],
+            'trickLoadingMode' => $this->trickService->getTrickListConfigParameters()['loadingMode'],
             'tricks'           => $this->trickService->getFilteredList($parameters['offset'], $parameters['limit'])
         ];
         return $responder($data);

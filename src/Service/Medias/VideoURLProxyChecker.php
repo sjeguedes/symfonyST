@@ -14,10 +14,12 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class VideoURLProxyChecker
 {
+    // CAUTION: these iframe URL patterns should certainly be improved and are very important for a quite "secure" use!
+    // Even more, they can evolve, so it is preferable to use providers APIs!
     const ALLOWED_URL_PATTERNS = [
-        '/^https?:\/\/www\.youtube\.com\/embed\/.+$/',
-        '/^https?:\/\/player\.vimeo\.com\/video\/.+$/',
-        '/^https?:\/\/www\.dailymotion\.com\/embed\/video\/.+$/'
+        '/^https?:\/\/www\.youtube\.com\/embed\/[a-zA-Z0-9_]+$/', // more explicit but video ID can be "simplified" to [\w-]+
+        '/^https?:\/\/player\.vimeo\.com\/video\/[0-9]+$/',
+        '/^https?:\/\/www\.dailymotion\.com\/embed\/video\/[a-zA-Z0-9]+$/'
     ];
 
     /**
@@ -30,12 +32,9 @@ class VideoURLProxyChecker
     public function filterURLAttribute(Request $request) : ?string
     {
         // Get URL to check
-        if ($request->attributes->has('url')) {
+        $url = null;
+        if (!\is_null($request->attributes->get('url'))) {
             $url = $request->attributes->get('url');
-        } elseif ($request->query->has('url')) {
-            $url = $request->query->get('url');
-        } else {
-            $url = null;
         }
         return $url;
     }
@@ -53,6 +52,7 @@ class VideoURLProxyChecker
             return false;
         }
         $patterns = self::ALLOWED_URL_PATTERNS;
+        // Use of "array_filter" would be more appropriate here!
         for ($i = 0; $i < count($patterns); $i ++) {
             if (preg_match( $patterns[$i], $url)) {
                 return true;
@@ -62,7 +62,10 @@ class VideoURLProxyChecker
     }
 
     /**
-     * Request URL to check if a content can be loaded.
+     * Request URL to check if a content can be loaded. Choice is made to use cURL here.
+     *
+     * CAUTION: do not use this method alone because of potential "SSRF" attacks! At least use isAllowed() before...
+     * @link https://www.vaadata.com/blog/understanding-web-vulnerability-server-side-request-forgery-1/
      *
      * @param string|null $url
      *
@@ -112,5 +115,4 @@ class VideoURLProxyChecker
         }
         return $this->isAllowed($url) && $this->isContent($url) ? ['status' => 1] : ['status' => 0];
     }
-
 }

@@ -6,6 +6,7 @@ namespace App\Domain\ServiceLayer;
 
 use App\Domain\Entity\MediaType;
 use App\Domain\Repository\MediaTypeRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 
@@ -19,6 +20,11 @@ class MediaTypeManager
     use LoggerAwareTrait;
 
     /**
+     * @var EntityManagerInterface
+     */
+    private $entityManager;
+
+    /**
      * @var MediaTypeRepository
      */
     private $repository;
@@ -26,28 +32,17 @@ class MediaTypeManager
     /**
      * MediaTypeManager constructor.
      *
-     * @param MediaTypeRepository $repository
-     * @param LoggerInterface     $logger
+     * @param EntityManagerInterface $entityManager
+     * @param MediaTypeRepository    $repository
+     * @param LoggerInterface        $logger
      *
      * @return void
      */
-    public function __construct(MediaTypeRepository $repository, LoggerInterface $logger)
+    public function __construct(EntityManagerInterface $entityManager, MediaTypeRepository $repository, LoggerInterface $logger)
     {
+        $this->entityManager = $entityManager;
         $this->repository = $repository;
         $this->setLogger($logger);
-    }
-
-    /**
-     * get a particular media type based on its key.
-     *
-     * @param string $mediaTypeKey
-     *
-     * @return string|null
-     */
-    public function getType(string $mediaTypeKey) : ?string
-    {
-        $type = $this->getMandatoryDefaultTypes()[$mediaTypeKey] ?? null;
-        return $type;
     }
 
     /**
@@ -63,6 +58,16 @@ class MediaTypeManager
     }
 
     /**
+     * Get entity manager.
+     *
+     * @return EntityManagerInterface
+     */
+    public function getEntityManager() : EntityManagerInterface
+    {
+        return $this->entityManager;
+    }
+
+    /**
      * Get mandatory default types.
      *
      * @return array
@@ -70,5 +75,28 @@ class MediaTypeManager
     public function getMandatoryDefaultTypes() : array
     {
         return MediaType::TYPE_CHOICES;
+    }
+
+    /**
+     * Get MediaType entity repository.
+     *
+     * @return MediaTypeRepository
+     */
+    public function getRepository() : MediaTypeRepository
+    {
+        return $this->repository;
+    }
+
+    /**
+     * Get a particular media type based on its key.
+     *
+     * @param string $mediaTypeKey
+     *
+     * @return string|null
+     */
+    public function getType(string $mediaTypeKey) : ?string
+    {
+        $type = $this->getMandatoryDefaultTypes()[$mediaTypeKey] ?? null;
+        return $type;
     }
 }

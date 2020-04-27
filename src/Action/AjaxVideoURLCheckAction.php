@@ -44,24 +44,32 @@ class AjaxVideoURLCheckAction
     /**
      * Check if single trick video URL can be loaded from AJAX request.
      *
-     * Please not url is always the same even if language changed. This is a simple AJAX request and not a public indexed URL.
+     * Please not url is always the same even if language changed. This is a simple AJAX request and locale parameter is null.
+     * Particular "url" attribute value can be empty in some cases! Its declared placeholder requirement can be: {url<(.+)?>},
+     * but choice is made to check if "url" attribute is null (optional placeholder) instead of checking its value with this placeholder requirement: {url<(.+)>?}
      *
-     * @Route("/load-trick-video/{url<(.+)?>}", name="load_trick_video_url_check")
+     * @Route("/load-trick-video/url/{url<(.+)>?}", name="load_trick_video_url_check")
      *
      * @param AjaxVideoURLCheckResponder $responder
      * @param Request                    $request
      *
      * @return Response
      *
+     * "url" attribute value is checked with a filter:
+     * @see VideoURLProxyChecker::filterURLAttribute()
+     * About trailing slash:
      * @see https://symfony.com/doc/current/routing/slash_in_parameter.html
      */
     public function __invoke(AjaxVideoURLCheckResponder $responder, Request $request) : Response
     {
-        // Check if URL value is null!
+        // Check video URL value
         $url = $this->trickVideoChecker->filterURLAttribute($request);
         if (\is_null($url)) {
-            $this->logger->error("[trace app snowTricks] AjaxVideoURLCheckAction/__invoke => url: null");
+            $this->logger->error(
+                "[trace app snowTricks] AjaxVideoURLCheckAction/__invoke => Technical error due to video url set to null: check loading process for both client and server side!"
+            );
         }
+        // Check if URL is formatted as expected (validation) and accessible
         $data = $this->trickVideoChecker->verify($url);
         return $responder($data);
     }

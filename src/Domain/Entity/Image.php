@@ -5,8 +5,6 @@ declare(strict_types = 1);
 namespace App\Domain\Entity;
 
 use App\Domain\Repository\ImageRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
@@ -77,7 +75,7 @@ class Image
     /**
      * @var Media (inverse side of entity relation)
      *
-     * @ORM\OneToOne(targetEntity=Media::class, orphanRemoval=true, mappedBy="image")
+     * @ORM\OneToOne(targetEntity=Media::class, cascade={"persist", "remove"}, orphanRemoval=true, mappedBy="image")
      */
     private $media;
 
@@ -169,6 +167,19 @@ class Image
     }
 
     /**
+     * Set an associated Media to manage persistence from Image entity.
+     *
+     * @param Media $media
+     *
+     * @return Image
+     */
+    public function setMedia(Media $media) : self
+    {
+        $this->media = $media;
+        return $this;
+    }
+
+    /**
      * @return UuidInterface
      */
     public function getUuid() : UuidInterface
@@ -225,9 +236,9 @@ class Image
     }
 
     /**
-     * @return Media
+     * @return Media|null
      */
-    public function getMedia() : Media
+    public function getMedia() : ?Media
     {
         return $this->media;
     }

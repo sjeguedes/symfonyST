@@ -45,7 +45,7 @@ class PaginatedTrickListAction
      * Show complete list directly on dedicated page "tricks".
      *
      * @Route({
-     *     "en": "/{_locale<en>}/trick-list/{page?<\d+>}"
+     *     "en": "/{_locale<en>}/trick-list/page/{page<\d+>?}"
      * }, name="list_tricks")
      *
      * @param PaginatedTrickListResponder $responder
@@ -59,13 +59,14 @@ class PaginatedTrickListAction
      */
     public function __invoke(PaginatedTrickListResponder $responder, RedirectionResponder $redirectionResponder, Request $request) : Response
     {
-        // Particular redirection (optional) to indicate page 1 by default in URL
-        if (!preg_match('/^\d+/', $request->get('page'))) {
+        // Make a redirection to page index "1" by default, if page attribute is empty (allowed in route)
+        // CAUTION: be aware of defining route "page" attribute requirements and default value carefully!
+        if (\is_null($request->attributes->get('page'))) {
             return $redirectionResponder('list_tricks', ['page' => 1]);
         }
         // Get necessary data to create pagination filtering wrong parameters if necessary
-        $pageIndex = $this->trickService->filterPaginationRequestAttribute($request, 'list_tricks');
-        $paginationParameters = $this->trickService->getPaginationParameters($pageIndex);
+        $pageIndex = $this->trickService->filterPaginationRequestAttribute($request);
+        $paginationParameters = $this->trickService->getTrickListPaginationParameters($pageIndex);
         if (\is_null($paginationParameters)) {
             $this->logger->error("[trace app snowTricks] PaginatedTrickListAction/__invoke => pagination parameters: null");
             throw new NotFoundHttpException('Trick list page can not be reached! Wrong parameter is used.');

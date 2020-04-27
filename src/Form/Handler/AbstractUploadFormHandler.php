@@ -4,7 +4,6 @@ declare(strict_types = 1);
 
 namespace App\Form\Handler;
 
-use App\Service\Medias\Upload\ImageUploader;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -55,10 +54,10 @@ class AbstractUploadFormHandler extends AbstractFormHandler
         $cropData = json_decode($cropJSONData);
         // Optional with Symfony 4.3 JSON validation constraint
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \InvalidArgumentException('Crop data is an invalid json string!');
+            throw new \InvalidArgumentException('Crop data is an invalid JSON string!');
         }
-        // Use str_replace() function to remove added "\" (by Javascript) to make a correct comparison
-        $isFileMatched = urldecode($image->getClientOriginalName()) === str_replace('\\', '', $cropData[0]->imageName);
+        // Use urldecode function (filename in formatted JSON is also "URI" encoded by Javascript) to make a correct comparison
+        $isFileMatched = urldecode($image->getClientOriginalName()) === urldecode($cropData[0]->imageName);
         $areCropAreaDataWithIntegerType = \is_int($cropData[0]->x) && \is_int($cropData[0]->y) && \is_int($cropData[0]->width) && \is_int($cropData[0]->height);
         if (!$isFileMatched || !$areCropAreaDataWithIntegerType) {
             throw new \InvalidArgumentException('Retrieved image crop data are invalid due to possible technical error, or user input tampered data!');

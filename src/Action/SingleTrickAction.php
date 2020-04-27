@@ -81,7 +81,7 @@ class SingleTrickAction
             'mediaError'           => 'Media loading error',
             'mediaTypesValues'     => $this->mediaTypeService->getMandatoryDefaultTypes(),
             'normalImageMediaType' => $normalImageMediaType,
-            'videoURLProxyPath'    => $this->trickService->generateURLFromRoute('load_trick_video_url_check', ['url' => '']),
+            'videoURLProxyPath'    => $this->trickService->generateURLFromRoute('load_trick_video_url_check', ['url' => '']), // Empty declared url is more explicit!
             'trick'                => $trick
         ];
         return $responder($data);

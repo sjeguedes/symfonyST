@@ -22,7 +22,17 @@ use Ramsey\Uuid\UuidInterface;
 class MediaType
 {
     /**
-     * Immutable types used to filter medias.
+     * Define allowed videos providers.
+     */
+    const ALLOWED_VIDEO_TYPES = ['youtube', 'vimeo', 'dailymotion'];
+
+    /**
+     * Define media type prefixes.
+     */
+    const TYPE_PREFIXES = ['trick' => 't_', 'user' => 'u_'];
+
+    /**
+     * Define immutable types used to filter medias.
      */
     const TYPE_CHOICES = [
         'trickThumbnail'   => 't_thumbnail',

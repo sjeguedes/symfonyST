@@ -6,6 +6,7 @@ namespace App\Action\Admin;
 
 use App\Domain\Entity\User;
 use App\Domain\ServiceLayer\ImageManager;
+use App\Domain\ServiceLayer\MediaManager;
 use App\Domain\ServiceLayer\UserManager;
 use App\Form\Handler\FormHandlerInterface;
 use App\Form\Type\Admin\UpdateProfileAvatarType;
@@ -35,6 +36,11 @@ class UpdateProfileAction
     private $imageService;
 
     /**
+     * @var MediaManager
+     */
+    private $mediaService;
+
+    /**
      * @var UserManager $userService
      */
     private $userService;
@@ -58,6 +64,7 @@ class UpdateProfileAction
      * UpdateProfileAction constructor.
      *
      * @param ImageManager                 $imageService
+     * @param MediaManager                 $mediaService
      * @param UserManager                  $userService
      * @param array|FormHandlerInterface[] $formHandlers
      * @param RouterInterface              $router
@@ -65,12 +72,14 @@ class UpdateProfileAction
      */
     public function __construct(
         ImageManager $imageService,
+        MediaManager $mediaService,
         UserManager $userService,
         array $formHandlers,
         RouterInterface $router,
         Security $security
     ) {
         $this->imageService = $imageService;
+        $this->mediaService = $mediaService;
         $this->userService = $userService;
         $this->formHandlers = $formHandlers;
         $this->setRouter($router);
@@ -80,8 +89,11 @@ class UpdateProfileAction
     /**
      *  Show profile update forms (user avatar, account) and validation errors.
      *
+     * Please not this action is used for both non AJAX/AJAX mode!
+     * If this action is a simple AJAX request, this url is always the same even if language changed: "locale" parameter can be null.
+     *
      * @Route({
-     *     "en": "/{_locale<en>}/{mainRoleLabel<admin|member>}/update-profile"
+     *     "en": "/{_locale?<en>}/{mainRoleLabel<admin|member>}/update-profile"
      * }, name="update_profile")
      *
      * @param RedirectionResponder   $redirectionResponder
@@ -108,6 +120,7 @@ class UpdateProfileAction
             switch ($submittedRequest = $request->request) {
                 case $submittedRequest->has($updateProfileAvatarForm->getName()): // 'update_profile_avatar'
                     $actionData['imageService'] = $this->imageService;
+                    $actionData['mediaService'] = $this->mediaService;
                     // Constraints and custom validation: call actions to perform if necessary on success
                     $isFormRequestValid = $this->formHandlers[0]->processFormRequest($actionData);
                     // Adapt the response depending on ajax mode de/activation

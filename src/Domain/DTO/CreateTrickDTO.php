@@ -23,7 +23,7 @@ use App\Form\Collection\DTOCollection;
 final class CreateTrickDTO
 {
     /**
-     * @var array|null
+     * @var TrickGroup|null
      */
     private $group;
 
@@ -50,7 +50,7 @@ final class CreateTrickDTO
     /**
      * CreateTrickDTO constructor.
      *
-     * @param array|TrickGroup[]|null     $group       a trick group which is a kind of category
+     * @param TrickGroup|null             $group       a trick group which is a kind of category
      * @param string|null                 $name        a unique trick title
      * @param string|null                 $description a text which describes the trick
      * @param array|ImageToCropDTO[]|null $images      a collection of image data (crop JSON data, preview data URI, identifier reference...)
@@ -59,7 +59,7 @@ final class CreateTrickDTO
      * @throws \Exception
      */
     public function __construct(
-        ?array $group,
+        ?TrickGroup $group,
         ?string $name,
         ?string $description,
         ?array $images,
@@ -73,9 +73,9 @@ final class CreateTrickDTO
     }
 
     /**
-     * @return array|null
+     * @return TrickGroup|null
      */
-    public function getGroup() : ?array
+    public function getGroup() : ?TrickGroup
     {
         return $this->group;
     }
@@ -112,30 +112,7 @@ final class CreateTrickDTO
         return $this->videos;
     }
 
-    // TODO: probably delete these methods below!
-    /**
-     * ImageToCropDTO adder to add a new DTO.
-     *
-     * @param ImageToCropDTO $image
-     */
-    /*public function addImage(ImageToCropDTO $image) : void
-    {
-        if (!$this->images->contains($image)) {
-            $this->images[] = $image;
-        }
-    }*/
-
-    /**
-     * ImageToCropDTO remover to delete an existing DTO.
-     *
-     * @param ImageToCropDTO $image
-     */
-    /*public function removeImage(ImageToCropDTO $image) : void
-    {
-        if ($this->images->contains($image)) {
-            $this->images->removeElement($image);
-        }
-    }*/
+    // TODO: complete setters for Trick update
 
     /**
      * @param array|null $images

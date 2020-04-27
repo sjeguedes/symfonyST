@@ -7,8 +7,8 @@ namespace App\Form\TypeToEmbed;
 use App\Domain\DTO\AbstractReadableDTO;
 use App\Domain\DTOToEmbed\ImageToCropDTO;
 use App\Domain\Entity\Image;
-use App\Domain\Entity\User;
 use App\Domain\ServiceLayer\ImageManager;
+use App\Domain\ServiceLayer\MediaManager;
 use App\Form\Type\Admin\CreateTrickType;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -21,8 +21,6 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Security\Core\Security;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -43,9 +41,9 @@ class ImageToCropType extends AbstractTrickCollectionEntryType
     private $imageService;
 
     /**
-     * @var Security
+     * @var MediaManager
      */
-    private $security;
+    private $mediaManager;
 
     /**
      * @var ValidatorInterface
@@ -57,18 +55,18 @@ class ImageToCropType extends AbstractTrickCollectionEntryType
      *
      * @param DataMapperInterface $dataMapper
      * @param ImageManager        $imageService
-     * @param Security            $security
+     * @param MediaManager        $mediaManager
      * @param ValidatorInterface  $validator
      */
     public function __construct(
         DataMapperInterface $dataMapper,
         ImageManager $imageService,
-        Security $security,
+        MediaManager $mediaManager,
         ValidatorInterface $validator
     ) {
         $this->dataMapper = $dataMapper;
         $this->imageService = $imageService;
-        $this->security = $security;
+        $this->mediaManager = $mediaManager;
         $this->validator = $validator;
     }
 
@@ -108,54 +106,12 @@ class ImageToCropType extends AbstractTrickCollectionEntryType
                 // Maintain validation state at the child form level, to be able to show errors near field
                 'error_bubbling' => false
             ]);
-
         // Add data transformer to "showListRank" data.
         $this->addStringToIntegerCustomDataTransformer($builder, 'showListRank');
-
         // Retrieve root form handler passed in parent form entry_options parameter
         $rootFormHandler = $options['rootFormHandler'];
-
         // Use submit form event for image to crop type to save each uploaded image on server without global validation!
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use ($builder, $rootFormHandler) {
-            // User must be authenticated to upload a standalone file in application "gallery"!
-            /** @var User|UserInterface $authenticatedUser */
-            $authenticatedUser = $this->security->getUser();
-            if (\is_null($authenticatedUser)) {
-                return;
-            }
-            // Get current "image to crop" form
-            $currentImageToCropForm = $event->getForm();
-
-            // Get current image form data
-            $formData = $event->getData();
-
-            // Get the data model based on form data
-            $imageToCropDataModel = $this->prepareAndCheckDataModelForDirectUpload($currentImageToCropForm, $formData, $rootFormHandler);
-            // Image or/and cropJSON Data are not valid, so direct upload must no be enabled!
-            if (\is_null($imageToCropDataModel)) {
-                return;
-            }
-            // if no expected violation is found, save directly the uploaded file as a standalone media without complete root form validation
-            $rootFormType = $currentImageToCropForm->getRoot()->getConfig()->getType()->getInnerType();
-            switch ($rootFormType) {
-                // Create a Trick image with the highest expected format
-                case $rootFormType instanceof CreateTrickType:
-                    // At this level, Trick slug can't be used due to not validated Trick name,
-                    // so we used a image basic identifier name to replace it later on Trick creation or update actions.
-                    $imageIdentifierName = 'unnamed-trick-image';
-                    $createdImageOnServer = $this->imageService->createTrickImage($imageToCropDataModel, 'trickBig', $authenticatedUser, true, $imageIdentifierName);
-                    break;
-                // Stop process for other root form types
-                default:
-                    return;
-            }
-            // Upload is a success: update mandatory form data associated to image to make a persistence until complete form validation
-            if (!\is_null($createdImageOnServer)) {
-                $formData = $this->updateMandatoryPersistentImageData($createdImageOnServer, $formData);
-                // Update global current "image to crop" form data
-                $event->setData($formData);
-            }
-        });
+        $this->uploadValidatedImage($builder, $rootFormHandler);
     }
 
     /**
@@ -276,5 +232,56 @@ class ImageToCropType extends AbstractTrickCollectionEntryType
         $cropData = json_encode([$cropData[0]]);
         $formData['cropJSONData'] = $cropData;
         return $formData;
+    }
+
+    /**
+     * Upload directly current sub form validated image on server, without complete root form validation.
+     *
+     * @param FormBuilderInterface $builder
+     * @param object               $rootFormHandler
+     *
+     * @return void
+     */
+    private function uploadValidatedImage(FormBuilderInterface $builder , object $rootFormHandler) : void
+    {
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use ($rootFormHandler) {
+            // Get current "image to crop" form
+            $currentImageToCropForm = $event->getForm();
+            // Get current image form data
+            $formData = $event->getData();
+            // Get the data model based on form data
+            $imageToCropDataModel = $this->prepareAndCheckDataModelForDirectUpload($currentImageToCropForm, $formData, $rootFormHandler);
+            // Image or/and cropJSON Data are not valid, so direct upload must no be enabled!
+            if (\is_null($imageToCropDataModel)) {
+                return;
+            }
+            // if no expected violation is found, save directly the uploaded file as a standalone media without complete root form validation
+            $rootFormType = $currentImageToCropForm->getRoot()->getConfig()->getType()->getInnerType();
+            switch ($rootFormType) {
+                // Create a Trick image with the highest expected format
+                case $rootFormType instanceof CreateTrickType:
+                    // At this level, Trick slug can't be used due to not validated Trick name,
+                    // so we used a image basic identifier name to replace it later on Trick creation or update actions.
+                    $imageIdentifierName = ImageManager::DEFAULT_IMAGE_IDENTIFIER_NAME;
+                    // Generate a physical image and returns a image file instance
+                    $imageFile = $this->imageService->generateTrickImageFile($imageToCropDataModel, 'trickBig', true, $imageIdentifierName);
+                    $createdImageOnServer = $this->imageService->createTrickImage($imageToCropDataModel, $imageFile);
+                    break;
+                // TODO: here, declare also the same case for future trick update form
+                // Stop process for other root form types
+                default:
+                    return;
+            }
+            // Upload is a success: update mandatory form data associated to image to make a persistence until complete form validation
+            if (!\is_null($createdImageOnServer)) {
+                // Create mandatory Media entity which references corresponding Image entity
+                $createdMedia = $this->mediaManager->createTrickMedia($createdImageOnServer, $imageToCropDataModel, 'trickBig');
+                // Persist and flush big image Image and Media entities
+                $newBigImage = $this->imageService->addAndSaveImage($createdImageOnServer, $createdMedia, true, true);
+                $formData = $this->updateMandatoryPersistentImageData($newBigImage, $formData);
+                // Update global current "image to crop" form data
+                $event->setData($formData);
+            }
+        });
     }
 }

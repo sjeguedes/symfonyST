@@ -6,8 +6,10 @@ namespace App\Form\Handler;
 
 use App\Domain\Entity\User;
 use App\Domain\ServiceLayer\ImageManager;
+use App\Domain\ServiceLayer\MediaManager;
 use App\Domain\ServiceLayer\TrickManager;
 use App\Domain\ServiceLayer\UserManager;
+use App\Domain\ServiceLayer\VideoManager;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,11 +27,13 @@ class AbstractFormHandler implements FormHandlerInterface
      * Define data keys and types to check which are used in form request process.
      */
     const DATA_CONFIG_TO_CHECK = [
-        'userToUpdate' => User::class,
-        'imageService' => ImageManager::class,
         'request'      => Request::class,
+        'userToUpdate' => User::class,
         'userService'  => UserManager::class,
-        'trickService' => TrickManager::class
+        'trickService' => TrickManager::class,
+        'imageService' => ImageManager::class,
+        'videoService' => VideoManager::class,
+        'mediaService' => MediaManager::class,
     ];
 
     /**

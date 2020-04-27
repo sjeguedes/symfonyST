@@ -18,39 +18,6 @@ use Symfony\Component\Form\FormView;
 abstract class AbstractTrickType extends AbstractType
 {
     /**
-     * Add single entity to array model transformer to a form data.
-     *
-     * This transformer aims at using the same DTO if "multiple" form option changes.
-     *
-     * @param FormBuilderInterface $formBuilder
-     * @param string               $formName    a Form instance name
-     *
-     * @return void
-     */
-    protected function addSingleEntityToArrayCustomDataTransformer(FormBuilderInterface $formBuilder, string $formName) : void
-    {
-        /** @var FormBuilderInterface $form */
-        $form = $formBuilder->get($formName);
-        $form->addModelTransformer(
-            new CallbackTransformer(
-                // Normalized data (transform)
-                function ($uuidStrings) {
-                    // Do not transform the (encoded) uuid string(s): (encoded) uuid strings can be a single or several (encoded) uuid strings in array
-                    return !\is_null($uuidStrings) ? $uuidStrings : null;
-                },
-                // Model data (reverse transform)
-                function ($entities) use ($form) {
-                    if (\is_null($entities)) {
-                        return null;
-                    }
-                    // Transform a single entity into an array: $entities can be a single entity or an array (collection) of several entities
-                    return !$form->getOption('multiple') ? [$entities] : $entities;
-                }
-            )
-        );
-    }
-
-    /**
      * Use finished view to redefine show list rank for images/videos collections.
      *
      * Please note hidden inputs values can be redefined and collections order may be changed

@@ -6,7 +6,6 @@ namespace App\Domain\ServiceLayer;
 use App\Domain\DTO\RegisterUserDTO;
 use App\Domain\DTO\UpdateProfileAvatarDTO;
 use App\Domain\DTO\UpdateProfileInfosDTO;
-use App\Domain\Entity\Image;
 use App\Domain\Entity\User;
 use App\Domain\Repository\UserRepository;
 use App\Event\CustomEventFactory;
@@ -87,9 +86,9 @@ class UserManager
      * @param CustomEventFactoryInterface  $customEventFactory
      * @param EncoderFactoryInterface      $encoderFactory
      * @param EntityManagerInterface       $entityManager
+     * @param UserRepository               $repository
      * @param RequestStack                 $requestStack
      * @param SessionInterface             $session
-     * @param UserRepository               $repository
      * @param Security                     $security
      * @param LoggerInterface              $logger
      *
@@ -99,17 +98,16 @@ class UserManager
         CustomEventFactoryInterface $customEventFactory,
         EncoderFactoryInterface $encoderFactory,
         EntityManagerInterface $entityManager,
+        UserRepository $repository,
         LoggerInterface $logger,
         RequestStack $requestStack,
         SessionInterface $session,
-        UserRepository $repository,
         Security $security
     ) {
         $this->customEventFactory = $customEventFactory;
         $this->entityManager = $entityManager;
         $this->repository = $repository;
         $this->request = $requestStack->getCurrentRequest();
-        $this->requestStack = $requestStack;
         $this->session = $session; //$this->request->getSession();
         $this->userPasswordEncoder = $encoderFactory->getEncoder(User::class);
         $this->security = $security;
@@ -122,6 +120,10 @@ class UserManager
      * @param RegisterUserDTO $dataModel a DTO
      *
      * @return User
+     *
+     * @see Bcrypt storage:
+     * https://stackoverflow.com/questions/5881169/what-column-type-length-should-i-use-for-storing-a-bcrypt-hashed-password-in-a-d
+     * https://stackoverflow.com/questions/247304/what-data-type-to-use-for-hashed-password-field-and-what-length
      *
      * @throws \Exception
      */
@@ -136,8 +138,8 @@ class UserManager
             $this->userPasswordEncoder->encodePassword($dataModel->getPasswords(), null)
         );
         // Save data
-        $this->getEntityManager()->persist($newUser);
-        $this->getEntityManager()->flush();
+        $this->entityManager->persist($newUser);
+        $this->entityManager->flush();
         return $newUser;
     }
 
@@ -159,7 +161,7 @@ class UserManager
         }
         // Update account status
         $userToValidate->modifyIsActivated(true);
-        $this->getEntityManager()->flush();
+        $this->entityManager->flush();
         return true;
     }
 
@@ -291,7 +293,7 @@ class UserManager
         if (\is_null($renewalRequestDate)) {
             return true;
         }
-        $now = new \DateTime();
+        $now = new \DateTime('now');
         $interval = $now->getTimestamp() - $renewalRequestDate->getTimestamp();
         return $interval > self::PASSWORD_RENEWAL_TIME_LIMIT ? true : false;
     }
@@ -356,55 +358,63 @@ class UserManager
         // Generate encrypted password with BCrypt
         $newPassword = $this->userPasswordEncoder->encodePassword($plainPassword, null);
         $user->modifyPassword($newPassword, 'BCrypt');
-        $user->modifyUpdateDate(new \DateTime());
+        $user->modifyUpdateDate(new \DateTime('now'));
         // Reset renewal token request data
         $user->updateRenewalRequestDate(null);
         $user->updateRenewalToken(null);
-        $this->getEntityManager()->flush();
+        $this->entityManager->flush();
         // Return an updated user
         $updatedUser = $user;
         return $updatedUser;
     }
 
     /**
-     * Set user avatar image.
-     *
-     * @param UpdateProfileAvatarDTO $dataModel
-     * @param User                   $user
-     * @param ImageManager           $imageService
-     *
-     * @return Image|null
-     *
-     * @throws \Exception
-     */
-    private function setAvatarImage(UpdateProfileAvatarDTO $dataModel, User $user, ImageManager $imageService) : ?Image
-    {
-        return $imageService->createUserAvatar($dataModel, $user);
-    }
-
-    /**
      * Update a user profile avatar.
      *
-     * @param ImageManager           $imageService
      * @param UpdateProfileAvatarDTO $dataModel
-     * @param User                   $user
+     * @param User $user
+     * @param ImageManager $imageService
+     * @param MediaManager $mediaService
      *
      * @return bool
      *
      * @throws \Exception
      */
-    public function updateUserProfileAvatar(UpdateProfileAvatarDTO $dataModel, User $user, ImageManager $imageService) : bool
+    public function updateUserProfileAvatar(
+        UpdateProfileAvatarDTO $dataModel,
+        User $user,
+        ImageManager $imageService,
+        MediaManager $mediaService
+    ) : bool
     {
         // Data are saved thanks to image service which calls entity manager in both cases, no need to flush change here!
         // Update avatar image media attached to user
         if (!\is_null($dataModel->getAvatar())) {
             // Remove previous avatar image if it exists
             $this->removeAvatarImage($user, $imageService);
-            // Save image and corresponding media instances (persistence is used in image service layer.)
-            $isAvatarSet = $this->setAvatarImage($dataModel, $user, $imageService);
-            if (\is_null($isAvatarSet)) {
+            // Generate Avatar physical image and return a file instance
+            $avatarImageFile = $imageService->generateUserAvatarFile($dataModel, $user);
+            if (\is_null($avatarImageFile)) {
                 return false;
             }
+            // Save image and corresponding media instances (persistence is used in image service layer.)
+            $newAvatarImage = $imageService->createUserAvatar($avatarImageFile, $user);
+            if (\is_null($newAvatarImage)) {
+                return false;
+            }
+            // Create mandatory Media entity which references corresponding Image entity
+            $newAvatarMedia = $mediaService->createUserAvatarMedia(
+                $newAvatarImage,
+                $dataModel,
+                'userAvatar'
+            );
+            // Save data (image, user, media and media type instances):
+            // There is no need to persist media and media type associated instances thanks to cascade option in mapping!
+            $newAvatarImage = $imageService->addAndSaveImage($newAvatarImage, $newAvatarMedia, true, true);
+            if (\is_null($newAvatarImage)) {
+                return false;
+            }
+            return true;
         }
         // User does not want to keep his avatar (value is set with JavaScript thanks to image remove button): default avatar will be shown!
         if (\is_null($dataModel->getAvatar()) && (true === $dataModel->getRemoveAvatar())) {
@@ -431,7 +441,7 @@ class UserManager
             ->modifyFirstName($dataModel->getFirstName())
             ->modifyNickName($dataModel->getUserName())
             ->modifyEmail($dataModel->getEmail())
-            ->modifyUpdateDate(new \DateTime());
+            ->modifyUpdateDate(new \DateTime('now'));
         // Update password only if it's not null
         if (!\is_null($dataModel->getPasswords())) {
             // Don't forget to update user salt if not set to null bellow with $user->modifySalt($salt);
@@ -439,7 +449,7 @@ class UserManager
             $user->modifyPassword($updatedPassword, 'BCrypt');
         }
         // Save all user updated data
-        $this->getEntityManager()->flush();
+        $this->entityManager->flush();
     }
 
     /**
@@ -453,9 +463,9 @@ class UserManager
      */
     public function generatePasswordRenewalToken(User $user) : User
     {
-        $user->updateRenewalRequestDate(new \Datetime());
+        $user->updateRenewalRequestDate(new \DateTime('now'));
         $user->updateRenewalToken($this->generateCustomToken($user->getNickName()));
-        $this->getEntityManager()->flush();
+        $this->entityManager->flush();
         // Return an updated user
         $updatedUser = $user;
         return $updatedUser;

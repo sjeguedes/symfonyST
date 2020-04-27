@@ -37,7 +37,7 @@
                 </h2>
             </div>
             <div class="uk-flex-center uk-grid uk-grid-collapse">
-                <div class="uk-width-5-6 uk-width-3-5@s uk-width-2-5@m uk-width-2-5@l uk-width-1-3@xl uk-card uk-card-primary uk-box-shadow-medium st-border-white-small">
+                <div class="uk-width-5-6 uk-width-2-3@s uk-width-3-5@m uk-width-1-2@l uk-width-2-5@xl uk-card uk-card-primary uk-box-shadow-medium st-border-white-small">
                     {% if trickCreationError %}
                     <div class="uk-card-header uk-padding-small uk-text-center">
                         {# Trick creation errors #}
@@ -213,7 +213,7 @@
                                                 </small>
                                                 <small>
                                                     Trick images are present on its dedicated page.
-                                                    No maximum length is defined.<br>
+                                                    No maximum length is defined. <strong>At least 1 image is expected!</strong><br>
                                                     Each image is expected to be a file with one of these extensions:<br><span class="uk-text-bold">.jpg, .jpeg, .png, .gif</span><br>
                                                     Its minimum format must be:<br><span class="uk-text-bold">1600px (width) x 900px (height)</span><br>
                                                     and its maximum size must be:<br><span class="uk-text-bold">2MB (MegaByte / Mo)</span>.<br>
@@ -282,9 +282,9 @@
                                                 </small>
                                                 <small>
                                                     Trick videos are present on its dedicated page thanks to iframe.
-                                                    No maximum length is defined.<br>
+                                                    No maximum length is defined. <strong>At least 1 video is expected!</strong><br>
                                                     Each video is expected to come from <span class="uk-text-bold">Youtube, Vimeo, or Dailymotion</span> providers.<br>
-                                                    Iframe Integration source URL must be used one of these:<br>
+                                                    Iframe Integration source URL must use one of these:<br>
                                                     <span class="uk-text-bold uk-text-break">
                                                         https://www.youtube.com/embed/<em><span class="st-color-blue">videoId</span></em>
                                                     </span><br>

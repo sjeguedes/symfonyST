@@ -5,8 +5,6 @@ declare(strict_types = 1);
 namespace App\Domain\Entity;
 
 use App\Domain\Repository\VideoRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
@@ -62,7 +60,7 @@ class Video
     /**
      * @var Media (inverse side of entity relation)
      *
-     * @ORM\OneToOne(targetEntity=Media::class, orphanRemoval=true, mappedBy="video")
+     * @ORM\OneToOne(targetEntity=Media::class, cascade={"persist", "remove"}, orphanRemoval=true, mappedBy="video")
      */
     private $media;
 
@@ -146,6 +144,19 @@ class Video
     }
 
     /**
+     * Set an associated Media to manage persistence from Video entity.
+     *
+     * @param Media $media
+     *
+     * @return Video
+     */
+    public function setMedia(Media $media) : self
+    {
+        $this->media = $media;
+        return $this;
+    }
+
+    /**
      * @return UuidInterface
      */
     public function getUuid() : UuidInterface
@@ -186,9 +197,9 @@ class Video
     }
 
     /**
-     * @return Media
+     * @return Media|null
      */
-    public function getMedia() : Media
+    public function getMedia() : ?Media
     {
         return $this->media;
     }

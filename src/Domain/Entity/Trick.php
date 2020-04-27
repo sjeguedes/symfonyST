@@ -306,7 +306,6 @@ class Trick
     {
         if ($rank < 0) {
             throw new \InvalidArgumentException('Trick rank value can not be negative!');
-
         }
         $this->rank = $rank;
         return $this;

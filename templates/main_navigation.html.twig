@@ -1,5 +1,5 @@
 {# Main navigation #}
-<ul class="uk-navbar-nav uk-flex-center">
+<ul class="uk-navbar-nav uk-flex-center {{ navClass }}">
     <li{{ app.request.get('_route') == 'home' ? ' class="uk-active uk-disabled"' }}>
         <a href="{{ path('home') }}" title="Home">
             <div>
@@ -9,7 +9,7 @@
         </a>
     </li>
     <li{{ app.request.get('_route') == 'list_tricks' ? ' class="uk-active uk-disabled"' }}>
-        <a href="{{ path('list_tricks') }}" title="Tricks">
+        <a href="{{ path('list_tricks', {'page': 1}) }}" title="Tricks">
             <div>
                 <span class="uk-text-uppercase"><span uk-icon="thumbnails"></span><br class="uk-hidden@m">&nbsp;Tricks</span>
                 <div class="uk-navbar-subtitle uk-visible@m"><small><span class="uk-visible@l">Look at </span>complete list</small></div>
@@ -24,7 +24,7 @@
             </div>
         </a>
     </li>
-    {% if is_granted('IS_AUTHENTICATED_FULLY') == false %}
+    {% if is_granted('ROLE_USER') == false %}
     <li{{ app.request.get('_route') == 'connect' ? ' class="uk-active uk-disabled"' }}>
         <a href="{{ path('connect') }}" title="Login">
             <div>
@@ -49,7 +49,8 @@
         <a class="uk-position-relative" href="{{ path('update_profile', {'mainRoleLabel': app.user.mainRoleLabel|lower}) }}" title="{{ app.user.nickName|e('html_attr') }}'s Profile">
             <div>
                 <span class="uk-text-break uk-text-uppercase">
-                     <small>{{ app.user.firstName~' '~app.user.familyName }} <br class="uk-hidden@m"><span uk-icon="user"></span></small>
+                    {# This HTML content is safely escaped due to default html strategy #}
+                    <small>{{ app.user.firstName~' '~app.user.familyName }} <br class="uk-hidden@m"><span uk-icon="user"></span></small>
                 </span>
                 <div class="uk-navbar-subtitle uk-text-right uk-visible@m">
                     <small>{{ app.user.mainRoleLabel }}</small>

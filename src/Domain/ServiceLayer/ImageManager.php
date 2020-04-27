@@ -7,7 +7,9 @@ namespace App\Domain\ServiceLayer;
 use App\Domain\DTO\UpdateProfileAvatarDTO;
 use App\Domain\DTOToEmbed\ImageToCropDTO;
 use App\Domain\Entity\Image;
+use App\Domain\Entity\Media;
 use App\Domain\Entity\MediaType;
+use App\Domain\Entity\Trick;
 use App\Domain\Entity\User;
 use App\Domain\Repository\ImageRepository;
 use App\Service\Medias\Upload\ImageUploader;
@@ -17,17 +19,28 @@ use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Class ImageManager.
  *
  * Manage images to handle, and retrieve as a "service layer".
  */
-class ImageManager
+class ImageManager extends AbstractServiceLayer
 {
     use LoggerAwareTrait;
     use StringHelperTrait;
     use UserHandlingHelperTrait;
+
+    /**
+     * Define a avatar image type key.
+     */
+    const AVATAR_IMAGE_TYPE_KEY = 'avatar';
+
+    /**
+     * Define a trick image type key.
+     */
+    const TRICK_IMAGE_TYPE_KEY = 'trick';
 
     /**
      * Define a default alternative text for image which is directly uploaded (e.g. not attached to trick entity) on server.
@@ -35,9 +48,14 @@ class ImageManager
     const DEFAULT_IMAGE_DESCRIPTION_TEXT = 'No image description is available.';
 
     /**
+     * Define a default identifier name for image which is directly uploaded (e.g. not attached to trick entity) on server.
+     */
+    const DEFAULT_IMAGE_IDENTIFIER_NAME = 'unnamed-trick-image';
+
+    /**
      * @var EntityManagerInterface
      */
-    private $entityManager;
+    protected $entityManager;
 
     /**
      * @var ImageUploader
@@ -77,6 +95,7 @@ class ImageManager
         MediaTypeManager $mediaTypeManager,
         LoggerInterface $logger
     ) {
+        parent::__construct($entityManager, $logger);
         $this->entityManager = $entityManager;
         $this->imageUploader = $imageUploader;
         $this->mediaManager = $mediaManager;
@@ -87,100 +106,134 @@ class ImageManager
 
 
     /**
-     * Add and save (persist) image in database.
+     * Add (persist) and save Image and Media entities in database.
      *
-     * @param Image $image
+     * Please note combinations:
+     * - $isPersisted = false, $isFlushed = false means Image and Media entities must be instantiated only.
+     * - $isPersisted = true, $isFlushed = true means Image and Media entities are added to unit of work and saved in database.
+     * - $isPersisted = true, $isFlushed = false means Image and Media entities are added to unit of work only.
+     * - $isPersisted = false, $isFlushed = true means Image and Media entities are saved in database only with possible change(s) in unit of work.
      *
-     * @return Image
+     * There is no need to persist media and media type associated instances if to cascade option is set in mapping!
+     *
+     * @param Image      $newImage
+     * @param Media|null $newMedia
+     * @param bool       $isPersisted
+     * @param bool       $isFlushed
+     *
+     * @return Image|null
      */
-    private function addAndSaveImage(Image $image) : Image
+    public function addAndSaveImage(
+        Image $newImage,
+        ?Media $newMedia,
+        bool $isPersisted = false,
+        bool $isFlushed = false
+    ) : ?Image
     {
-        $this->getEntityManager()->persist($image);
-        $this->getEntityManager()->flush();
-        return $image;
+        // Bind associated Media entity if it is expected.
+        if (!\is_null($newMedia)) {
+            $newImage->setMedia($newMedia);
+        }
+        // The logic would be also more functional and easier by persisting Media entity directly,
+        // without the need to set e Media entity.
+        $object = $this->addAndSaveEntity($newImage, $isPersisted, $isFlushed);
+        return \is_null($object) ? null : $newImage;
     }
 
     /**
-     * Create trick image file with its parameters with two different ways:
+     * Create trick image Image and Media entities, and file with its parameters with two different ways:
      * - by uploading it directly on server without complete form validation,
      * - by using an existing image (e.g. big format or a particular image) to create other formats based on it
      *
-     * Please note image is published by default, without administrator control in actual app configuration!
+     * Please note image is published by default, without administrator control in application at this time!
      *
      * @param ImageToCropDTO $dataModel
-     * @param string         $mediaTypeKey
-     * @param User           $user
+     * @param \SplFileInfo   $newTrickImageFile
      * @param bool           $isDirectUpload
-     * @param string|null    $identifierName a partial name to use for uploaded image (slug, custom string...) for direct upload on mode
-     *                                       or an existing image name with extension which will be resized to create a new image for direct upload off mode
+     * @param bool           $isPersisted
+     * @param bool           $isFlushed
      *
      * @return Image|null
+     *
+     * @see addAndSaveImage() method to save data (image, media and media type instances)
      *
      * @throws \Exception
      */
     public function createTrickImage(
         ImageToCropDTO $dataModel,
-        string $mediaTypeKey,
-        User $user,
+        ?\SplFileInfo $newTrickImageFile,
         bool $isDirectUpload = false,
-        string $identifierName = null
+        bool $isPersisted = false,
+        bool $isFlushed = false
     ) : ?Image
     {
-        // Direct upload mode can not be used if no image was uploaded!
-        // Direct upload off mode can not be used if data model "savedImageName" property is null and identifier is set to null
-        $isDirectUploadOnModeRequirementSet = $isDirectUpload && \is_null($dataModel->getImage());
-        $isDirectUploadOffModeRequirementSet = !$isDirectUpload && \is_null($dataModel->getSavedImageName()) && \is_null($identifierName);
-        if (!$isDirectUploadOnModeRequirementSet || !$isDirectUploadOffModeRequirementSet) {
-            // Avoid to block process with an exception (e.g. direct upload used in ImageToCropType form event)
-            return null;
+        // Image file was not generated! So, this avoids to block running process.
+        if (\is_null($newTrickImageFile)) {
+           return null;
         }
-        // Get image source necessary parameters (will be uploaded or a source for another image to create: e.g. another format)
-        $sourceImageParameters = $this->getTrickImageParameters($dataModel, $mediaTypeKey, $isDirectUpload, $identifierName);
-        // Create new trick image without complete form validation with direct upload on mode
-        // or create new trick image based on existing image source (e.g. use this method in form handler to create Trick instance) with direct upload off mode
-        $trickImageFile = $this->generateImageFile($dataModel, $mediaTypeKey, $sourceImageParameters, $isDirectUpload);
-        // Create new trick image without complete form validation
-        $entitiesParameters = $this->prepareTrickImageAndMediaData($dataModel, $isDirectUpload);
         // Create trick image entity
-        $trickImageFileNameWithoutExtension = str_replace('.' . $trickImageFile->getExtension(), '', $trickImageFile->getFilename());
-        $trickImageFileFormat = $trickImageFile->getExtension();
-        $trickImageFileSize = $trickImageFile->getSize();
+        $trickImageFileNameWithoutExtension = str_replace('.' . $newTrickImageFile->getExtension(), '', $newTrickImageFile->getFilename());
+        $trickImageDescription = $isDirectUpload ? self::DEFAULT_IMAGE_DESCRIPTION_TEXT : $dataModel->getDescription();
+        $trickImageFileFormat = $newTrickImageFile->getExtension();
+        $trickImageFileSize = $newTrickImageFile->getSize();
         // Get new trick Image entity
-        $trickImage = new Image(
+        $newTrickImage = new Image(
             $trickImageFileNameWithoutExtension,
-            $entitiesParameters['imageDescription'],
+            $trickImageDescription,
             $trickImageFileFormat,
             $trickImageFileSize
         );
-        // Create mandatory Media entity which references corresponding Image entity
-        $this->mediaManager->createTrickMedia(
-            $trickImage,
-            $mediaTypeKey,
-            $user,
-            $entitiesParameters['isMainOption'],
-            $entitiesParameters['isPublished'],
-            $entitiesParameters['showListRank']
-        );
-        // Save data (image, media and media type instances):
-        // There is no need to persist media and media type associated instances thanks to cascade option in mapping!
-        $newTrickImage = $this->addAndSaveImage($trickImage);
-        // Return Image entity
-        return $newTrickImage;
+        // Save data in database
+        return $this->addAndSaveImage($newTrickImage, null, $isPersisted, $isFlushed); // null or the entity
     }
 
     /**
      * Create avatar image file with its parameters by uploading it on server.
      *
-     * * Please note image is published by default, without administrator control in actual app configuration!
+     * Please note image is published by default, without administrator control in application at this time!
      *
-     * @param UpdateProfileAvatarDTO $dataModel
-     * @param User                   $user
+     * @param \SplFileInfo|null  $newAvatarImageFile
+     * @param User|UserInterface $user
      *
      * @return Image|null
      *
      * @throws \Exception
      */
-    public function createUserAvatar(UpdateProfileAvatarDTO $dataModel, User $user) : ?Image
+    public function createUserAvatar(?\SplFileInfo $newAvatarImageFile, UserInterface $user) : ?Image
+    {
+        // Image file was not generated! So, this avoids to block running process.
+        if (\is_null($newAvatarImageFile)) {
+            return null;
+        }
+        $avatarFileNameWithoutExtension = str_replace('.' . $newAvatarImageFile->getExtension(), '', $newAvatarImageFile->getFilename());
+        $avatarFileFormat = $newAvatarImageFile->getExtension();
+        $avatarFileSize = $newAvatarImageFile->getSize();
+        // Create avatar Image entity
+        $avatarImage = new Image(
+            $avatarFileNameWithoutExtension,
+            $user->getNickName() . '\'s avatar',
+            $avatarFileFormat,
+            $avatarFileSize
+        );
+        return $avatarImage;
+    }
+
+    /**
+     * Generate a physical image file which will correspond to a User avatar image.
+     *
+     * Please note this method returns a \SplFileInfo instance in case of success.
+     *
+     * @param UpdateProfileAvatarDTO $dataModel
+     * @param User|UserInterface     $user
+     *
+     * @return \SplFileInfo|null
+     *
+     * @throws \Exception
+     */
+    public function generateUserAvatarFile(
+        UpdateProfileAvatarDTO $dataModel,
+        UserInterface $user
+    ) : ?\SplFileInfo
     {
         // Get avatar necessary parameters
         $parameters = $this->getUserAvatarParameters($dataModel, $user);
@@ -190,16 +243,58 @@ class ImageManager
         if (\is_null($avatarFile)) {
             return null;
         }
-        $avatarFileNameWithoutExtension = str_replace('.' . $avatarFile->getExtension(), '', $avatarFile->getFilename());
-        $avatarFileFormat = $avatarFile->getExtension();
-        $avatarFileSize = $avatarFile->getSize();
-        // Create avatar Image entity
-        $image = new Image($avatarFileNameWithoutExtension, $user->getNickName() . '\'s avatar', $avatarFileFormat, $avatarFileSize);
-        // Create mandatory Media entity which references corresponding Image entity
-        $this->mediaManager->createUserAvatarMedia($image, $user, true, true);
-        // Save data (image, media and media type instances):
-        // There is no need to loop and persist media and media type associated instances thanks to cascade option in mapping!
-        return $this->addAndSaveImage($image);
+        return $avatarFile;
+     }
+
+    /**
+     * Delete physically all images already associated to a Trick entity.
+     *
+     * Please note, Image and Media entities corresponding to deleted image still exist after!
+     * Thanks to possibly defined cascade operations, Trick entity removal will also remove corresponding Image and Media entities for each image.
+     *
+     * @param Trick $newTrick
+     *
+     * @return void
+     *
+     * @see TrickManager::removeTrick()
+     *
+     * @throws \Exception
+     */
+    public function deleteAllTrickImagesFiles(Trick $newTrick) : void
+    {
+        $uploadDirectory = $this->imageUploader->getUploadDirectory(ImageUploader::TRICK_IMAGE_DIRECTORY_KEY);
+        foreach ($newTrick->getMedias() as $media) {
+            /** @var Image|null $imageEntity */
+            $imageEntity = $media->getImage();
+            // Media must reference a Image entity!
+            if (\is_null($imageEntity)) {
+                continue;
+            }
+            // Remove image physically
+            $this->deleteOneTrickImageFile($imageEntity, $uploadDirectory);
+        }
+    }
+
+    /**
+     * Delete physically a particular image already associated to a Trick entity.
+     *
+     * @param Image  $image
+     * @param string $uploadDirectory
+     *
+     * @return void
+     *
+     * @see TrickManager::removeTrick()
+     *
+     * @throws \Exception
+     */
+    public function deleteOneTrickImageFile(Image $image, ?string $uploadDirectory) : void
+    {
+        if (is_null($uploadDirectory)) {
+            $uploadDirectory = $this->imageUploader->getUploadDirectory(ImageUploader::TRICK_IMAGE_DIRECTORY_KEY);
+        }
+        $imageNameWithExtension = $image->getName() . '.' . $image->getFormat();
+        // Remove image physically
+        unlink($uploadDirectory . '/' . $imageNameWithExtension);
     }
 
     /**
@@ -214,7 +309,12 @@ class ImageManager
      *
      * @throws \Exception
      */
-    private function generateImageFile(ImageToCropDTO $dataModel, string $key, array $sourceImageParameters, bool $isDirectUpload) : ?\SplFileInfo
+    private function generateImageFile(
+        ImageToCropDTO $dataModel,
+        string $key,
+        array $sourceImageParameters,
+        bool $isDirectUpload
+    ) : ?\SplFileInfo
     {
         if ($isDirectUpload) {
             // Upload file on server and get created file name with possible crop option
@@ -228,6 +328,44 @@ class ImageManager
         if (\is_null($trickImageFile)) {
             return null;
         }
+        return $trickImageFile;
+    }
+
+    /**
+     * Generate a physical image file which will correspond to a Trick entity.
+     *
+     * Please note this method returns a \SplFileInfo instance in case of success.
+     *
+     * @param ImageToCropDTO $dataModel
+     * @param string         $mediaTypeKey
+     * @param bool           $isDirectUpload
+     * @param string|null    $identifierName a partial name to use for uploaded image (slug, custom string...) for direct upload on mode
+     *                                       or an existing image name with extension which will be resized to create a new image for direct upload off mode
+     *
+     * @return \SplFileInfo|null
+     *
+     * @throws \Exception
+     */
+    public function generateTrickImageFile(
+        ImageToCropDTO $dataModel,
+        string $mediaTypeKey,
+        bool $isDirectUpload = false,
+        string $identifierName = null
+    ) : ?\SplFileInfo
+    {
+        // Direct upload mode can not be used if no image was uploaded!
+        // Direct upload off mode can not be used if data model "savedImageName" property is null and identifier is set to null!
+        $isDirectUploadOnModeRequirementSet = $isDirectUpload && !\is_null($dataModel->getImage());
+        $isDirectUploadOffModeRequirementSet = !$isDirectUpload && (!\is_null($dataModel->getSavedImageName()) || !\is_null($identifierName));
+        if (!$isDirectUploadOnModeRequirementSet && !$isDirectUploadOffModeRequirementSet) {
+            // Avoid to block process with an exception (e.g. direct upload used in ImageToCropType form event)
+            return null;
+        }
+        // Get image source necessary parameters (will be uploaded or a source for another image to create: e.g. another format)
+        $sourceImageParameters = $this->getTrickImageParameters($dataModel, $mediaTypeKey, $isDirectUpload, $identifierName);
+        // Create new trick image without complete form validation with direct upload on mode
+        // or create new trick image based on existing image source (e.g. use this method in form handler to create Trick instance) with direct upload off mode
+        $trickImageFile = $this->generateImageFile($dataModel, $mediaTypeKey, $sourceImageParameters, $isDirectUpload);
         return $trickImageFile;
     }
 
@@ -282,11 +420,11 @@ class ImageManager
                 $imageEntity = $this->findSingleByName($dataModel->getSavedImageName());
                 $fileName = $imageEntity->getName() . '.' . $imageEntity->getFormat();
                 // Get File instance based on "savedImageName" property
-                $trickSourceImage = new File($this->getImageUploader()->getUploadDirectory(ImageUploader::TRICK_IMAGE_DIRECTORY_KEY) . '/' . $fileName, true);
+                $trickSourceImage = new File($this->imageUploader->getUploadDirectory(ImageUploader::TRICK_IMAGE_DIRECTORY_KEY) . '/' . $fileName, true);
                 $trickImageIdentifierName = $imageEntity->getName();
             } else {
                 // Get File instance based on identifier name parameter (used here as image name with its extension)
-                $trickSourceImage = new File($this->getImageUploader()->getUploadDirectory(ImageUploader::TRICK_IMAGE_DIRECTORY_KEY) . '/' . $identifierName, true);
+                $trickSourceImage = new File($this->imageUploader->getUploadDirectory(ImageUploader::TRICK_IMAGE_DIRECTORY_KEY) . '/' . $identifierName, true);
                 $trickImageIdentifierName = str_replace('.' . $trickSourceImage->getExtension(), '', $trickSourceImage->getFileName());
             }
             $cropJSONData = null;
@@ -336,13 +474,13 @@ class ImageManager
      * Get user avatar parameters.
      *
      * @param UpdateProfileAvatarDTO $dataModel
-     * @param User                   $user
+     * @param User|UserInterface user
      *
      * @return array
      *
      * @throws \Exception
      */
-    private function getUserAvatarParameters(UpdateProfileAvatarDTO $dataModel, User $user) : array
+    private function getUserAvatarParameters(UpdateProfileAvatarDTO $dataModel, UserInterface $user) : array
     {
         $avatar = $dataModel->getAvatar();
         $cropJSONData = $dataModel->getCropJSONData();
@@ -375,17 +513,39 @@ class ImageManager
     }
 
     /**
-     * Find Image by its name.
+     * Find Image by its name without extension.
      *
-     * @param string $fullNameWithoutExtension
+     * @param string $fileNameWithoutExtension
      *
      * @return Image|null
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function findSingleByName(string $fullNameWithoutExtension) : ?Image
+    public function findSingleByName(string $fileNameWithoutExtension) : ?Image
     {
-        return $this->getRepository()->findOneByName($fullNameWithoutExtension);
+        return $this->getRepository()->findOneByName($fileNameWithoutExtension);
+    }
+
+    /**
+     * Get a particular image directory key constant value depending on image type key.
+     *
+     * Please not this method is a bit tricky but useful for refactoring!
+     *
+     * @param string $imageTypeKey
+     *
+     * @return string
+     *
+     * @throws \Exception
+     */
+    public function getImageDirectoryConstantValue(string $imageTypeKey) : string
+    {
+        $constantName = strtoupper($imageTypeKey) . '_IMAGE_DIRECTORY_KEY';
+        $className = ImageUploader::class;
+        $constant = constant("{$className}::{$constantName}");
+        if (\is_null($constant)) {
+            throw new \InvalidArgumentException("Image type key $imageTypeKey is unknown!");
+        }
+        return $constant;
     }
 
     /**
@@ -401,13 +561,13 @@ class ImageManager
     /**
      * Get unique user avatar image entity.
      *
-     * @param User $user
+     * @param User|UserInterface $user
      *
      * @return Image|null
      *
      * @throws \Exception
      */
-    public function getUserAvatarImage(User $user) : ?Image
+    public function getUserAvatarImage(UserInterface $user) : ?Image
     {
         $image = null;
         $medias = $user->getMedias();
@@ -454,61 +614,57 @@ class ImageManager
     }
 
     /**
-     * Prepare essential image data to set corresponding Image and Media entities.
+     * Prepare a new image name depending on image type key.
      *
-     * @param ImageToCropDTO $dataModel
-     * @param bool $isDirectUpload
+     * @param string $currentImageName
+     * @param string $newSlug           a partial name used to replace image name slug part
+     * @param string $imageTypeKey      a key which identifies image type
      *
-     * @return array
+     * @return string
+     *
+     * @throws \Exception
      */
-    private function prepareTrickImageAndMediaData(ImageToCropDTO $dataModel, bool $isDirectUpload) : array
+    public function prepareImageName(string $currentImageName, string $newSlug, string $imageTypeKey) : ?string
     {
-        // Create new trick image without complete form validation
-        if ($isDirectUpload) {
-            return [
-                // Image description is set with default text at this level without possible complete form validation!
-                'imageDescription' => self::DEFAULT_IMAGE_DESCRIPTION_TEXT,
-                // Image main option is set to default value at this level without possible complete form validation like description!
-                'isMainOption'     => false,
-                // Corresponding Media entity will be published by default without administration (this management should be added in application!).
-                'isPublished'      => true,
-                // No show list rank can be defined without complete form validation!
-                '$showListRank'    => null
-            ];
-         // Create new trick image based on existing image source
-        } else {
-            return [
-                // Get image description from data model
-                'imageDescription' => $dataModel->getDescription(),
-                // Get image main option from data model
-                'isMainOption'     => $dataModel->getIsMain(),
-                // Corresponding Media entity will be published by default without administration (this management should be added in application!).
-                'isPublished'      => true,
-                // Get show list rank from data model
-                '$showListRank'    => $dataModel->getShowListRank()
-            ];
+        // Get dynamically a image directory key constant value depending on image type
+        $constant = $this->getImageDirectoryConstantValue($imageTypeKey);
+        switch ($imageTypeKey) {
+            case self::AVATAR_IMAGE_TYPE_KEY:
+                preg_match('/^(.*)-[a-z0-9]*(\.[a-z]{3,4})?$/', $currentImageName, $matches, PREG_UNMATCHED_AS_NULL);
+                // Replace group 1 in front of string by slug
+                $newImageName = preg_replace('/' . $matches[1] . '/', $newSlug, $currentImageName);
+                break;
+            case self::TRICK_IMAGE_TYPE_KEY:
+                preg_match('/^(.*)-[a-z0-9]*-\d{2,}x\d{2,}(\.[a-z]{3,4})?$/', $currentImageName, $matches, PREG_UNMATCHED_AS_NULL);
+                // Replace group 1 in front of string by slug
+                $newImageName = preg_replace('/' . $matches[1] . '/', $newSlug, $currentImageName);
+                break;
+            default:
+                // No change
+                $newImageName = $currentImageName;
         }
+        return $newImageName;
     }
 
     /**
      * Remove user avatar image.
      *
-     * @param User $user
+     * @param User|UserInterface $user
      *
      * @return void
      *
      * @throws \Exception
      */
-    public function removeUserAvatar(User $user) : void
+    public function removeUserAvatar(UserInterface $user) : void
     {
         // Image is both removed physically and in database (no user avatar gallery is used on website).
         $medias = $user->getMedias();
         foreach ($medias as $media) {
             if ($this->mediaTypeManager->getType('userAvatar') === $media->getMediaType()->getType()) {
-                $pathToImage = $this->imageUploader->getUploadDirectory(ImageUploader::AVATAR_IMAGE_DIRECTORY_KEY);
+                $uploadDirectory = $this->imageUploader->getUploadDirectory(ImageUploader::AVATAR_IMAGE_DIRECTORY_KEY);
                 $image = $media->getImage();
                 $imageFileName = $image->getName() . '.' . $image->getFormat();
-                @unlink($pathToImage . '/' . $imageFileName);
+                unlink($uploadDirectory . '/' . $imageFileName);
                 // Remove image entity (and corresponding media entity thanks to delete cascade option on relation)
                 $this->entityManager->remove($image);
                 // Save (update) data
@@ -517,5 +673,74 @@ class ImageManager
                 break;
             }
         }
+    }
+
+    /**
+     * Rename a file which exists physically in a particular directory.
+     *
+     * @param string $currentImageName a base image name with extension
+     * @param string $newImageName     a base image name with extension
+     * @param string $imageTypeKey     a key which identifies image type
+     *
+     * @return bool
+     *
+     * @see https://www.php.net/manual/fr/function.constant.php
+     * @see https://electrictoolbox.com/php-constant-value-dynamically/
+     *
+     * @throws \Exception
+     */
+    public function renameImage(string $currentImageName, string $newImageName, string $imageTypeKey) : bool
+    {
+        // Get dynamically a image directory key constant value depending on image type
+        $constant = $this->getImageDirectoryConstantValue($imageTypeKey);
+        // Get image directory thanks to image type key passed as argument
+        $uploadDirectory = $this->imageUploader->getUploadDirectory($constant);
+        // Rename image
+        $isImageRenamed = rename($uploadDirectory . '/' . $currentImageName, $uploadDirectory . '/' . $newImageName);
+        return $isImageRenamed;
+    }
+
+    /**
+     * Update big image corresponding Image and Media entities when a trick is created.
+     *
+     * Please not this valid image was created without complete form validation.
+     *
+     * @param Image          $bigImageEntity
+     * @param ImageToCropDTO $imageToCropDTO
+     * @param string         $newImageName
+     * @param bool           $isFlushed
+     *
+     * @return bool
+     *
+     * @throws \Exception
+     */
+    public function updateTrickBigImage(
+        Image $bigImageEntity,
+        ImageToCropDTO $imageToCropDTO,
+        string $newImageName,
+        bool $isFlushed = true
+    ) : bool
+    {
+        // Get corresponding image Media entity
+        $bigImagMediaEntity = $bigImageEntity->getMedia();
+        if (is_null($bigImagMediaEntity)) {
+            return false;
+        }
+        // Update name (with new name), description and update date in corresponding Image entity
+        $bigImageEntity->modifyName($newImageName);
+        $bigImageEntity->modifyDescription($imageToCropDTO->getDescription());
+        $bigImageEntity->modifyUpdateDate(new \DateTime('now'));
+        // Update update date and data with corresponding ImageToCropDTO data ("isMain" and "showListRank" properties) in corresponding Media entity
+        $bigImagMediaEntity->modifyIsMain($imageToCropDTO->getIsMain());
+        $bigImagMediaEntity->modifyShowListRank($imageToCropDTO->getShowListRank());
+        $bigImagMediaEntity->modifyUpdateDate(new \DateTime('now'));
+        // To be sure to update data in database
+        if ($isFlushed) {
+            $updatedBigImagMediaEntity = $this->addAndSaveEntity($bigImagMediaEntity, false, true);
+            if (\is_null($updatedBigImagMediaEntity)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

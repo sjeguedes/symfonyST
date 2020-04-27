@@ -5,7 +5,9 @@ declare(strict_types = 1);
 namespace App\Action\Admin;
 
 use App\Domain\ServiceLayer\ImageManager;
+use App\Domain\ServiceLayer\MediaManager;
 use App\Domain\ServiceLayer\TrickManager;
+use App\Domain\ServiceLayer\VideoManager;
 use App\Form\Handler\FormHandlerInterface;
 use App\Responder\Admin\CreateTrickResponder;
 use App\Responder\Redirection\RedirectionResponder;
@@ -22,14 +24,24 @@ use Symfony\Component\Routing\Annotation\Route;
 class CreateTrickAction
 {
     /**
-     * @var ImageManager $imageService
+     * @var TrickManager
+     */
+    private $trickService;
+
+    /**
+     * @var ImageManager
      */
     private $imageService;
 
     /**
-     * @var TrickManager $trickService
+     * @var VideoManager
      */
-    private $trickService;
+    private $videoService;
+
+    /**
+     * @var MediaManager
+     */
+    private $mediaService;
 
     /**
      * @var FlashBagInterface
@@ -41,22 +53,29 @@ class CreateTrickAction
      */
     private $formHandler;
 
+
     /**
      * CreateTrickAction constructor.
      *
-     * @param ImageManager         $imageService,
      * @param TrickManager         $trickService
+     * @param ImageManager         $imageService
+     * @param VideoManager         $videoService
+     * @param MediaManager         $mediaService
      * @param FlashBagInterface    $flashBag
      * @param FormHandlerInterface $formHandler
      */
     public function __construct(
-        ImageManager $imageService,
         TrickManager $trickService,
+        ImageManager $imageService,
+        VideoManager $videoService,
+        MediaManager $mediaService,
         FlashBagInterface $flashBag,
         FormHandlerInterface $formHandler
     ) {
-        $this->imageService = $imageService;
         $this->trickService = $trickService;
+        $this->imageService = $imageService;
+        $this->videoService = $videoService;
+        $this->mediaService = $mediaService;
         $this->flashBag = $flashBag;
         $this->formHandler = $formHandler;
     }
@@ -84,7 +103,12 @@ class CreateTrickAction
         // Process only on submit
         if ($createTrickForm->isSubmitted()) {
             // Constraints and custom validation: call actions to perform if necessary on success
-            $isFormRequestValid = $this->formHandler->processFormRequest(['imageService' => $this->imageService, 'trickService' => $this->trickService]);
+            $isFormRequestValid = $this->formHandler->processFormRequest([
+                'trickService' => $this->trickService,
+                'imageService' => $this->imageService,
+                'videoService' => $this->videoService,
+                'mediaService' => $this->mediaService
+            ]);
             if ($isFormRequestValid) {
                 return $redirectionResponder('home');
             }

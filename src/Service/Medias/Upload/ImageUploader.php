@@ -159,6 +159,9 @@ class ImageUploader
      */
     private function createResizedImage(string $imageDirectory, File $imageSourceFile, array $parameters) : ?File
     {
+        if (!extension_loaded('gd')) {
+            throw new \RuntimeException('Image can not be handled: "gd" extension is not installed on server!');
+        }
         // Get a resource based on uploaded image extension with particular "jpg" case
         $imageType = 'jpg' === $parameters['extension'] ? 'jpeg' : $parameters['extension'];
         $function = "imagecreatefrom{$imageType}";
@@ -252,13 +255,15 @@ class ImageUploader
         // between uploaded file name and immediately created final image name when they have the same dimensions!
         if ($isImageNameHashChanged) {
             $newHash = hash('crc32', uniqid());
-            preg_match('/^.*-([a-z0-9]*)-\d{2,}x\d{2,}\.[a-z]{3,4}$/', $fileName, $matches, PREG_UNMATCHED_AS_NULL);
+            preg_match('/^.*-([a-z0-9]*)-\d{2,}x\d{2,}(\.[a-z]{3,4})?$/', $fileName, $matches, PREG_UNMATCHED_AS_NULL);
+            // Replace previous hash in group 1 by new hash
             $newImageName = preg_replace('/' . $matches[1] . '/', $newHash, $fileName);
         }
         // Change included format in name (Initial format is replaced with expected resize format!)
         $width = $parameters['resizeFormat']['width'];
         $height = $parameters['resizeFormat']['height'];
-        preg_match('/^.*-(\d{2,}x\d{2,})\.[a-z]{3,4}$/', $newImageName, $matches, PREG_UNMATCHED_AS_NULL);
+        preg_match('/^.*-(\d{2,}x\d{2,})(\.[a-z]{3,4})?$/', $newImageName, $matches, PREG_UNMATCHED_AS_NULL);
+        // Replace previous dimensions ("with"x"height") in group 1 by new corresponding dimensions
         $newImageName = preg_replace('/' . $matches[1] . '/',  $width . 'x' . $height, $newImageName);
         return $newImageName;
     }
@@ -421,7 +426,7 @@ class ImageUploader
                     return null;
                 }
                 // Remove physically uploaded image to keep only resized final image after crop
-                @unlink($uploadedFile->getPathname());
+                unlink($uploadedFile->getPathname());
             // No crop
             } else {
                 $finalImage = $uploadedFile;

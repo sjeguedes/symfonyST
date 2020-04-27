@@ -30,3 +30,10 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Domain/Entity'
                 prefix: 'App\Domain\Entity'
                 alias: App
+        # https://www.doctrine-project.org/projects/doctrine-bundle/en/latest/configuration.html
+        dql:
+            # declare custom string functions to parse in dql
+            string_functions:
+                # IMPORTANT! Array key "FIELD" must exactly be declared as it is used in query (can be a custom function name like "my_string_function")!
+                # FIELD() MySQL function
+                FIELD: App\Utils\Database\DoctrineExtensions\Query\MySQL\FieldStringFunction
