@@ -50,7 +50,7 @@ class ImageManager extends AbstractServiceLayer
     /**
      * Define a default identifier name for image which is directly uploaded (e.g. not attached to trick entity) on server.
      */
-    const DEFAULT_IMAGE_IDENTIFIER_NAME = 'unnamed-trick-image';
+    const DEFAULT_IMAGE_IDENTIFIER_NAME = '-unnamed-image'; // A image category will be added before!
 
     /**
      * @var EntityManagerInterface
@@ -136,7 +136,7 @@ class ImageManager extends AbstractServiceLayer
         }
         // The logic would be also more functional and easier by persisting Media entity directly,
         // without the need to set e Media entity.
-        $object = $this->addAndSaveEntity($newImage, $isPersisted, $isFlushed);
+        $object = $this->addAndSaveNewEntity($newImage, $isPersisted, $isFlushed);
         return \is_null($object) ? null : $newImage;
     }
 
@@ -320,15 +320,16 @@ class ImageManager extends AbstractServiceLayer
             // Upload file on server and get created file name with possible crop option
             $isCropped = property_exists(\get_class($dataModel), 'cropJSONData') ? true : false;
             // Particular case for trick: upload image file on server without complete form validation and get new File instance
-            $trickImageFile = $this->imageUploader->upload($dataModel->getImage(), ImageUploader::TRICK_IMAGE_DIRECTORY_KEY, $sourceImageParameters, $isCropped);
+            $imageFile = $this->imageUploader->upload($dataModel->getImage(), $key, $sourceImageParameters, $isCropped, true);
         } else {
             // Get new File instance based on source image (defined by data model "savedImageName" property or directly by identifier name parameter)
-            $trickImageFile = $this->imageUploader->resizeNewImage(ImageUploader::TRICK_IMAGE_DIRECTORY_KEY, $sourceImageParameters);
+            $isTemporaryImageSource = $isDirectUpload;
+            $imageFile = $this->imageUploader->resizeNewImage($key, $sourceImageParameters, $isTemporaryImageSource);
         }
-        if (\is_null($trickImageFile)) {
+        if (\is_null($imageFile)) {
             return null;
         }
-        return $trickImageFile;
+        return $imageFile;
     }
 
     /**
@@ -365,7 +366,8 @@ class ImageManager extends AbstractServiceLayer
         $sourceImageParameters = $this->getTrickImageParameters($dataModel, $mediaTypeKey, $isDirectUpload, $identifierName);
         // Create new trick image without complete form validation with direct upload on mode
         // or create new trick image based on existing image source (e.g. use this method in form handler to create Trick instance) with direct upload off mode
-        $trickImageFile = $this->generateImageFile($dataModel, $mediaTypeKey, $sourceImageParameters, $isDirectUpload);
+        $imageDirectoryKey = ImageUploader::TRICK_IMAGE_DIRECTORY_KEY;
+        $trickImageFile = $this->generateImageFile($dataModel, $imageDirectoryKey, $sourceImageParameters, $isDirectUpload);
         return $trickImageFile;
     }
 
@@ -412,7 +414,6 @@ class ImageManager extends AbstractServiceLayer
             $cropJSONData = $dataModel->getCropJSONData();
             // Sanitize identifier name (if null, a fallback with image original name is used!)
             $trickImageIdentifierName = $this->getTrickImageSanitizedIdentifierName($identifierName, $trickSourceImage);
-            $isImageNameHashChanged = true;
         // CAUTION: this case is used to create other image files based on big image or particular image, with different formats and the same ratio!
         } else {
             if (\is_null($identifierName)) {
@@ -428,7 +429,6 @@ class ImageManager extends AbstractServiceLayer
                 $trickImageIdentifierName = str_replace('.' . $trickSourceImage->getExtension(), '', $trickSourceImage->getFileName());
             }
             $cropJSONData = null;
-            $isImageNameHashChanged = false;
         }
         // Get image file data
         $trickImageData = $this->prepareImageFileData($trickSourceImage);
@@ -436,7 +436,7 @@ class ImageManager extends AbstractServiceLayer
             'cropJSONData'           => $cropJSONData,
             'resizeFormat'           => ['width' => $trickImageMediaType->getWidth(), 'height' => $trickImageMediaType->getHeight()],
             'identifierName'         => $trickImageIdentifierName,
-            'isImageNameHashChanged' => $isImageNameHashChanged,
+            'isImageNameHashChanged' => $isDirectUpload,
             'width'                  => $trickImageData['imageWidth'],
             'height'                 => $trickImageData['imageHeight'],
             'dimensionsFormat'       => $trickImageData['imageDimensionsFormat'],
@@ -736,11 +736,24 @@ class ImageManager extends AbstractServiceLayer
         $bigImagMediaEntity->modifyUpdateDate(new \DateTime('now'));
         // To be sure to update data in database
         if ($isFlushed) {
-            $updatedBigImagMediaEntity = $this->addAndSaveEntity($bigImagMediaEntity, false, true);
+            $updatedBigImagMediaEntity = $this->addAndSaveNewEntity($bigImagMediaEntity, false, true);
             if (\is_null($updatedBigImagMediaEntity)) {
                 return false;
             }
         }
         return true;
+    }
+
+    /**
+     * Remove an image and all associated entities depending on cascade operations.
+     *
+     * @param Image $image
+     *
+     * @return bool
+     */
+    public function removeImage(Image $image) : bool
+    {
+        // Proceed to removal in database
+        return $this->removeAndSaveNoMoreEntity($image);
     }
 }

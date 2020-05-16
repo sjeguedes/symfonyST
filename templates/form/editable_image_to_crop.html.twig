@@ -29,7 +29,7 @@
             <span class="st-color-blue st-background-yellow st-svg-icon-padding">Main image</span>
         </span>
         {# Image fields #}
-        <div class="uk-grid uk-grid-collapse">
+        <div class="uk-grid uk-grid-collapse uk-margin-medium-bottom">
             {# Image file #}
             <div class="uk-width-1-1 uk-margin-small-bottom">
                 {% if (imageToCropForm.image.vars.valid == 0) %}
@@ -124,15 +124,12 @@
                     <div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical">
                         <button class="uk-modal-close-outside" type="button" uk-close></button>
                         <h3 class="uk-modal-title uk-text-lead uk-text-center uk-text-bold uk-text-uppercase st-color-black">Resize your image</h3>
-                        <p class="uk-flex uk-flex-center uk-flex-column">
-                        <ul class="uk-list uk-text-small">
+                        <ul class="uk-list uk-flex uk-flex-center uk-flex-column uk-text-small">
                             <li><span class="uk-icon st-color-blue" uk-icon="icon: move"></span> Allowed format: <strong>16/9 selection</strong></li>
                             <li><span class="uk-icon st-color-blue" uk-icon="icon: image"></span> Exported minimum size: <strong>width: 1600px</strong> X <strong>height: 900px</strong> or <strong>higher</strong></li>
                         </ul>
-                        </p>
                         <div id="st-cropper-container-{{ imageIndex }}" class="uk-border-rounded uk-padding-small st-cropper-container st-box-shadow-full-small">
-                        {#<div id="st-cropper-container-{{ imageIndex }}" class="uk-flex uk-flex-center uk-border-rounded uk-margin-auto st-cropper-container st-box-shadow-full-small">#}
-                            <div id="st-cropper-container-content-{{ imageIndex }}" class="st-cropper-container-content">
+                            <div id="st-cropper-container-content-{{ imageIndex }}" class="st-cropper-container-content uk-responsive">
                                 <img id="st-cropper-preview-{{ imageIndex }}" class="uk-responsive st-cropper-preview" src="" alt="Crop preview">
                             </div>
                         </div>
@@ -167,7 +164,7 @@
                 </div>
                 {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
                 {# Show as main image? #}
-                <div id="st-is-main-image-{{ imageIndex }}" class="uk-width-1-1 uk-margin-small-top uk-margin-small-bottom">
+                <div id="st-is-main-image-{{ imageIndex }}" class="uk-width-1-1 uk-margin-small-top">
                     <div class="uk-inline">
                         {% if imageToCropForm.isMain.vars.valid == 0 %}
                             {{ form_errors(imageToCropForm.isMain) }}

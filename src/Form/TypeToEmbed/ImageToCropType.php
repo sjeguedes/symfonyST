@@ -262,10 +262,10 @@ class ImageToCropType extends AbstractTrickCollectionEntryType
                 case $rootFormType instanceof CreateTrickType:
                     // At this level, Trick slug can't be used due to not validated Trick name,
                     // so we used a image basic identifier name to replace it later on Trick creation or update actions.
-                    $imageIdentifierName = ImageManager::DEFAULT_IMAGE_IDENTIFIER_NAME;
+                    $imageIdentifierName = ImageManager::TRICK_IMAGE_TYPE_KEY . ImageManager::DEFAULT_IMAGE_IDENTIFIER_NAME;
                     // Generate a physical image and returns a image file instance
                     $imageFile = $this->imageService->generateTrickImageFile($imageToCropDataModel, 'trickBig', true, $imageIdentifierName);
-                    $createdImageOnServer = $this->imageService->createTrickImage($imageToCropDataModel, $imageFile);
+                    $createdImageOnServer = $this->imageService->createTrickImage($imageToCropDataModel, $imageFile, true);
                     break;
                 // TODO: here, declare also the same case for future trick update form
                 // Stop process for other root form types

@@ -34,7 +34,7 @@ services:
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/*'
-        exclude: '../src/{DependencyInjection,Domain/Entity,Kernel.php,Service,Tests,Utils/Traits,Utils/Database/Migrations}'
+        exclude: '../src/{DependencyInjection,Domain/Entity,Kernel.php,Service,Tests,Utils/Command,Utils/Traits,Utils/Database/Migrations}'
 
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
@@ -152,10 +152,14 @@ services:
     # add login form guard authenticator
     App\Service\Security\LoginFormAuthenticationManager:
 
-    # add template engine renderer default service when calling interface: Twig
+    # add Twig template engine renderer default service when calling interface:
     App\Service\Templating\TwigTemplateRenderer: ~
     App\Service\Templating\TemplateRendererInterface: '@App\Service\Templating\TwigTemplateRenderer'
     App\Service\Templating\TemplateBlockRendererInterface: '@App\Service\Templating\TwigTemplateRenderer'
+
+    App\Utils\Command\DeleteUnusedImageCommand:
+        public: false
+        tags: ['console.command']
 
     # add "preg_replace" function
     App\Utils\Templating\StringReplaceTwigExtension:
@@ -172,6 +176,7 @@ services:
 
     # add PSR3 logger as default logger for actions (controllers)
     Symfony\Component\HttpKernel\Log\Logger:
+        arguments: ['info','%kernel.project_dir%/var/log/dev.log']
 
     # add options resolver
     Symfony\Component\OptionsResolver\OptionsResolver:

@@ -659,7 +659,7 @@ class User implements UserInterface, \Serializable
      */
     public function getUsername() : string
     {
-        // nickname equals username in App.
+        // Nickname equals username in App.
         return $this->nickName;
     }
 

@@ -14,16 +14,16 @@ App\Domain\DTO\UpdateProfileAvatarDTO:
                 mimeTypesMessage: This file is not a valid image.
                 # Max size is inherited from File constraint
                 maxSize: 2M
-                maxSizeMessage: The file is too large ({{ size }} {{ suffix }}).<br>Allowed maximum size is {{ limit }} {{ suffix }}.
+                maxSizeMessage: "The file is too large ({{ size }} {{ suffix }}).\nAllowed maximum size is {{ limit }} {{ suffix }}."
                 minWidth: 80
-                minWidthMessage: The image width is too small ({{ width }} px).<br>Minimum width expected is {{ min_width }} px.
+                minWidthMessage: "The image width is too small ({{ width }} px).\nMinimum width expected is {{ min_width }} px."
                 minHeight: 80
-                minHeightMessage: The image height is too small ({{ height }} px).<br>Minimum height expected is {{ min_height }} px.
+                minHeightMessage: "The image height is too small ({{ height }} px).\nMinimum height expected is {{ min_height }} px."
 
         removeAvatar:
             - Type:
                 type: bool
-                message: A technical error happened! Existing image can not be removed.
+                message: "A technical error happened!\nExisting image can not be removed."
 
         cropJSONData:
             # Data can be null or field can be blank because image is not mandatory!

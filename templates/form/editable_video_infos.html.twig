@@ -24,7 +24,7 @@
             }
         }) }}
         {# Video fields #}
-        <div class="uk-grid uk-grid-collapse">
+        <div class="uk-grid uk-grid-collapse uk-margin-medium-bottom">
             <div class="uk-width-1-1 uk-margin-small-bottom">
                 {% if (videoInfosForm.url.vars.valid == 0) %}
                     {{ form_errors(videoInfosForm.url) }}
@@ -50,7 +50,7 @@
             </div>
             {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
             {# Video description #}
-            <div class="uk-width-1-1 uk-margin-small-top uk-margin-large-bottom">
+            <div class="uk-width-1-1 uk-margin-small-top uk-margin-small-bottom">
                 {% if videoInfosForm.description.vars.valid == 0 %}
                     {{ form_errors(videoInfosForm.description) }}
                 {% endif %}

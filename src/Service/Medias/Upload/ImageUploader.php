@@ -4,11 +4,12 @@ declare(strict_types = 1);
 
 namespace App\Service\Medias\Upload;
 
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 
 /**
  * Class ImageUploader.
@@ -21,6 +22,8 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
  */
 class ImageUploader
 {
+    use LoggerAwareTrait;
+
     /**
      * Define expected image formats.
      */
@@ -32,14 +35,24 @@ class ImageUploader
     const AVATAR_IMAGE_DIRECTORY_KEY = 'avatarImages';
 
     /**
+     * Define a key to retrieve avatar temporary images upload directory.
+     */
+    const AVATAR_TEMP_IMAGE_DIRECTORY_KEY = 'avatarTempImages';
+
+    /**
+     * Define a name to retrieve temporary directory.
+     */
+    const TEMPORARY_DIRECTORY_NAME = 'temporary';
+
+    /**
      * Define a key to retrieve trick images upload directory.
      */
     const TRICK_IMAGE_DIRECTORY_KEY = 'trickImages';
 
     /**
-     * @var FlashBagInterface
+     * Define a key to retrieve trick temporary images upload directory.
      */
-    private $flashBag;
+    const TRICK_TEMP_IMAGE_DIRECTORY_KEY = 'trickTempImages';
 
     /*
      * @var ParameterBagInterface
@@ -49,57 +62,98 @@ class ImageUploader
     /*
      * @var array
      */
-    private $uploadDirectory;
+    private $uploadDirectories;
 
     /**
      * ImageUploader constructor.
      *
      * @param ParameterBagInterface $parameterBag
-     * @param FlashBagInterface     $flashBag
+     * @param LoggerInterface       $logger
      */
-    public function __construct(ParameterBagInterface $parameterBag, FlashBagInterface $flashBag)
+    public function __construct(ParameterBagInterface $parameterBag, LoggerInterface $logger)
     {
         $this->parameterBag = $parameterBag;
-        $this->uploadDirectory = [
-            self::AVATAR_IMAGE_DIRECTORY_KEY => $this->parameterBag->get('app_avatar_image_upload_directory'),
-            self::TRICK_IMAGE_DIRECTORY_KEY  => $this->parameterBag->get('app_trick_image_upload_directory')
+        $this->uploadDirectories = [
+            self::AVATAR_IMAGE_DIRECTORY_KEY      => $this->parameterBag->get('app_avatar_image_upload_directory'),
+            self::AVATAR_TEMP_IMAGE_DIRECTORY_KEY => $this->parameterBag->get('app_avatar_image_upload_directory') . '/' . self::TEMPORARY_DIRECTORY_NAME,
+            self::TRICK_IMAGE_DIRECTORY_KEY       => $this->parameterBag->get('app_trick_image_upload_directory'),
+            self::TRICK_TEMP_IMAGE_DIRECTORY_KEY  => $this->parameterBag->get('app_trick_image_upload_directory') . '/' . self::TEMPORARY_DIRECTORY_NAME
         ];
-        $this->flashBag = $flashBag;
+        // Use a PSR3 logger
+        $this->setLogger($logger);
     }
 
     /**
      * Check if a file was uploaded on server.
      *
-     * @param string $fileName
+     * @param string $fileName           a base filename or regex pattern
      * @param string $uploadDirectoryKey
+     * @param bool   $isTemporary        a file to find in temporary sub directory
+     * @param bool   $isRegExMode        a regex pattern is used as filename
      *
-     * @return bool
+     * @return array|\SplFileInfo[]|null
      *
      * @throws \Exception
      */
-    public function checkFileUploadOnServer(string $fileName, string $uploadDirectoryKey = null) : bool
+    public function checkFileUploadOnServer(
+        string $fileName,
+        string $uploadDirectoryKey = null,
+        bool $isTemporary = false,
+        bool $isRegExMode = false
+    ) : ?array
     {
+        $isDirectory = !\is_null($uploadDirectoryKey) ? true : false;
+        $directories = $this->getUploadDirectories();
+        // Upload directory is set!
+        if ($isDirectory) {
+            $temporarySubDirectory = $isTemporary ? '/' . ImageUploader::TEMPORARY_DIRECTORY_NAME : '';
+            $uploadDirectory = $this->getUploadDirectory($uploadDirectoryKey);
+            // Adjust more precisely upload directories
+            $directories = [$uploadDirectory . $temporarySubDirectory];
+            // Regex mode is also off, so return directly check result!
+            if (!$isRegExMode) {
+                // Check directly file path name
+                $filePathName = $uploadDirectory . $temporarySubDirectory . '/' . $fileName;
+                return \is_file($filePathName) ? [new \SplFileInfo($filePathName)] : null;
+            }
+        }
+        // Prepare an array to store 0, 1 or more results if regex mode is on!
+        $filesArray = [];
+        // Escape filename for regex use
+        $expression = preg_quote($fileName, '/');
+        // Use filename as pattern
+        $pattern = "/{$expression}/";
         // Loop on upload directories
-        if (\is_null($uploadDirectoryKey)) {
-            $isFileFound = false;
-            // Escape filename for regex use
-            $fileName = preg_quote($fileName, '/');
-            foreach ($this->getUploadDirectories() as $directory) {
-                if ($handle = opendir($directory)) {
+        foreach ($directories as $directory) {
+            // Avoid warning error (and use of "@" to silent it which is a bad practice!) by using try catch
+            // if a directory does not exist (e.g. a temporary deleted directory, wrong directory due to misconfiguration...)!
+            try {
+                if (is_dir($directory)) {
+                    $handle = opendir($directory);
                     while (false !== ($file = readdir($handle))) {
                         // Check file existence
-                        if (preg_match("/{$fileName}/", $file)) {
-                            $isFileFound = true;
-                            break;
+                        if (preg_match($pattern, $file)) {
+                            $filePathName = $directory . '/' . $file;
+                            if ($isRegExMode) {
+                                $filesArray[] = new \SplFileInfo($filePathName);
+                                continue;
+                            }
+                            // Pattern is a complete filename without extension, so only 1 result is expected!
+                            return [new \SplFileInfo($filePathName)];
                         }
                     }
                     closedir($handle);
                 }
+            } catch (\Throwable $exception) {
+                // Store process error
+                $this->logger->error(
+                    sprintf("[trace app snowTricks] ImageUploader/checkFileUploadOnServer => exception: %s", $exception->getMessage())
+                );
+                continue;
             }
-            return $isFileFound;
         }
-        // Check directly file path name
-        return \is_file($this->getUploadDirectory($uploadDirectoryKey) . '/' . $fileName);
+        // Pattern is a part of filename, so 1 or more results can match!
+        return !empty($filesArray) ? $filesArray : null;
     }
 
     /**
@@ -218,10 +272,10 @@ class ImageUploader
      */
     public function getUploadDirectory(string $key) : string
     {
-        if (!isset($this->uploadDirectory[$key])) {
+        if (!isset($this->uploadDirectories[$key])) {
             throw new \InvalidArgumentException('Upload directory key is unknown!');
         }
-        return $this->uploadDirectory[$key];
+        return $this->uploadDirectories[$key];
     }
 
     /**
@@ -233,10 +287,7 @@ class ImageUploader
      */
     public function getUploadDirectories() : array
     {
-        return [
-            self::AVATAR_IMAGE_DIRECTORY_KEY => $this->getUploadDirectory(self::AVATAR_IMAGE_DIRECTORY_KEY),
-            self::TRICK_IMAGE_DIRECTORY_KEY  => $this->getUploadDirectory(self::TRICK_IMAGE_DIRECTORY_KEY)
-        ];
+        return $this->uploadDirectories;
     }
 
     /**
@@ -360,22 +411,26 @@ class ImageUploader
      *
      * @param string $key
      * @param array  $parameters
+     * @param bool   $isTemporaryImageSource
      *
      * @return \SplFileInfo|null a resized image SplFileInfo instance
      *
      * @throws \Exception
      */
-    public function resizeNewImage(string $key, array $parameters) : ?\SplFileInfo
+    public function resizeNewImage(string $key, array $parameters, bool $isTemporaryImageSource = false) : ?\SplFileInfo
     {
-        if (!isset($this->uploadDirectory[$key])) {
+        if (!isset($this->uploadDirectories[$key])) {
             throw new \InvalidArgumentException('Chosen upload directory is unknown!');
         }
         $sourceImageName = $parameters['identifierName'];
         $sourceImageExtension = $parameters['extension'];
         // Get a image File instance based on image source Image entity
-        $imageDirectory = $this->uploadDirectory[$key];
+        $imageDirectory = $this->uploadDirectories[$key];
+        // Get a possible used temporary upload sub directory
+        $imageTempSubDirectory = $isTemporaryImageSource ? '/' . self::TEMPORARY_DIRECTORY_NAME : '';
+        // Get image name and path
         $imageName = $sourceImageName . '.' . $sourceImageExtension;
-        $imagePath = $imageDirectory . '/' . $imageName;
+        $imagePath = $imageDirectory . $imageTempSubDirectory . '/' . $imageName;
         $sourceImageFile = new File($imagePath,true);
         // Get a new resized image \SplFileInfo|File instance
         $finalImage = $this->createResizedImage($imageDirectory, $sourceImageFile, $parameters);
@@ -395,19 +450,26 @@ class ImageUploader
      * @param string       $key        a key which indicates a chosen upload directory
      * @param array        $parameters an array of uploaded file parameters
      * @param bool         $isCropped
+     * @param bool         $isTemporary
      *
      * @return \SplFileInfo|null a SplFileInfo instance based on uploaded file which can be handled to be cropped
      *
      * @throws \Exception
      */
-    public function upload(UploadedFile $file, string $key, array $parameters, bool $isCropped = false) : ?\SplFileInfo
+    public function upload(
+        UploadedFile $file,
+        string $key,
+        array $parameters,
+        bool $isCropped = false,
+        bool $isTemporary = false
+    ) : ?\SplFileInfo
     {
-        if (!isset($this->uploadDirectory[$key])) {
+        if (!isset($this->uploadDirectories[$key])) {
             throw new \InvalidArgumentException('Chosen upload directory is unknown!');
         }
         // Create a directory if it does not exist and add full permissions
-        if (!is_dir($this->uploadDirectory[$key])) {
-            mkdir($this->uploadDirectory[$key], 0777);
+        if (!is_dir($this->uploadDirectories[$key])) {
+            mkdir($this->uploadDirectories[$key], 0755); // default permissions
         }
         // Get the label (original name turned into lower-cased slug) to concatenate with definitive file name
         $label = $parameters['identifierName'];
@@ -415,7 +477,10 @@ class ImageUploader
         $format = $parameters['dimensionsFormat'];
         $definedFileName = $label . '-' . hash('crc32', uniqid()) . '-' . $format;
         $fileName = $definedFileName . '.' . $file->guessExtension();
-        $uploadDirectory = $this->uploadDirectory[$key];
+        $uploadDirectory = $this->uploadDirectories[$key];
+        // Get a possible used temporary upload sub directory
+        $imageTempSubDirectory = $isTemporary ? '/' . self::TEMPORARY_DIRECTORY_NAME : '';
+        $uploadDirectory = $uploadDirectory . $imageTempSubDirectory;
         try {
             // Upload file on server
             $uploadedFile = $file->move($uploadDirectory, $fileName);

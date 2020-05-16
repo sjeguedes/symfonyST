@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace App\Form\Validator;
 
@@ -144,7 +144,9 @@ final class ImageToCropConstraintValidator extends AbstractTrickCollectionConstr
         // "image" field can not be null (no uploaded image) when "savedImageName" field is also null.
         // This equals "NotNull" constraint.
         if (\is_null($object->getImage()) && \is_null($object->getSavedImageName())) {
-            $addedText = !\is_null($object->getCropJSONData()) ? 'a new file to validate.' : 'an image as expected.';
+            $addedText = !\is_null($object->getCropJSONData())
+                            ? 'a new file to validate.' . "\n" . 'Caution: this may be due to technical error!' . "\n" . 'Contact us if necessary.'
+                            : 'an image as expected.';
             $context->buildViolation('Please select ' . $addedText)
                 ->atPath('image')
                 ->addViolation();
@@ -174,11 +176,11 @@ final class ImageToCropConstraintValidator extends AbstractTrickCollectionConstr
                 // Check if a real image is present in base 64 encoded string.
                 $this->dataUriDeNormalizer->denormalize($object->getImagePreviewDataURI(), 'SplFileObject');
             } catch (\Exception $exception) {
-                // This condition is useful in case of Trick update when the image used in preview is not a base 64 encoded image!
+                // CAUTION: this condition is useful in case of Trick update when the image used in preview is not a base 64 encoded image!
                 // If a normal image present on server is found here, that means the field data was feed by initial injected model data to update
-                $isImageFileFound = $this->imageService->getImageUploader()->checkFileUploadOnServer($object->getImagePreviewDataURI());
+                $imageFiles[0] = $this->imageService->getImageUploader()->checkFileUploadOnServer($object->getImagePreviewDataURI(), null, true);
                 // Data was tampered by malicious user: image source is not a base 64 encoded string and image does not exist on server!
-                if (false === $isImageFileFound) {
+                if (null === $imageFiles[0]) {
                     $context->buildViolation('You are not allowed to tamper image preview data URI!')
                         ->atPath('imagePreviewDataURI')
                         ->addViolation();
@@ -264,20 +266,20 @@ final class ImageToCropConstraintValidator extends AbstractTrickCollectionConstr
         $object = $context->getObject();
         // Saved image name (which is a kind of identifier) is automatically feed each time a image is uploaded in corresponding "image to crop" box.
         if (!\is_null($object->getSavedImageName())) {
+            $isImageFileValid = false;
             // Check if a real image which corresponds to saved image name is present on server.
-            $isImageFileFound = $this->imageService->getImageUploader()->checkFileUploadOnServer($object->getSavedImageName());
+            $imageFiles[0] = $this->imageService->getImageUploader()->checkFileUploadOnServer($object->getSavedImageName(), null, true);
             // Image file may not have been created physically yet, so we check if "cropJSONData" identifier is the same as "savedImageName" value!
-            if (!$isImageFileFound && !\is_null($object->getCropJSONData())) {
+            if (!\is_null($imageFiles[0]) && !\is_null($object->getCropJSONData())) {
                 $dataObjectFromJSONData = json_decode($object->getCropJSONData());
-                if (json_last_error() !== JSON_ERROR_NONE && property_exists(\get_class($dataObjectFromJSONData[0]),'identifier')) {
+                if (json_last_error() === JSON_ERROR_NONE && property_exists($dataObjectFromJSONData[0],'identifier')) {
                     $imageJSONIdentifier = $dataObjectFromJSONData[0]->identifier;
                     // We presume image file will be created on server as a result of direct upload action!
-                    $isImageFileFound = $imageJSONIdentifier === $object->getSavedImageName();
-                } else {
-                    $isImageFileFound = false;
+                    $isImageFileValid = $imageJSONIdentifier === $object->getSavedImageName();
                 }
             }
-            if (false === $isImageFileFound) {
+            // No matching image was found
+            if (false === $isImageFileValid) {
                 // Data was tampered by malicious user!
                 $context->buildViolation('You are not allowed to tamper saved image name!')
                     ->atPath('savedImageName')
@@ -331,7 +333,7 @@ final class ImageToCropConstraintValidator extends AbstractTrickCollectionConstr
                 }
                 // Data was tampered by malicious user! At least two images (two checkboxes) are defined as main.
                 if (false === $isMainImageNotSet && true === $form->getData()->getIsMain() && true === $object->getIsMain()) {
-                    $context->buildViolation('You are not allowed to tamper the main image!<br>Only one must be set.')
+                    $context->buildViolation('You are not allowed to tamper the main image!' . "\n" . 'Only one must be set.')
                         ->atPath('isMain')
                         ->addViolation();
                     break;
@@ -344,7 +346,7 @@ final class ImageToCropConstraintValidator extends AbstractTrickCollectionConstr
         }
         // One unique image or all image boxes is (are) not defined as main image!
         if (true === $isMainImageNotSet) {
-            $context->buildViolation('Please define the main image.')
+            $context->buildViolation('Please define a main image.')
                 ->atPath('isMain')
                 ->addViolation();
         }

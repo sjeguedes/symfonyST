@@ -97,7 +97,7 @@ class MediaManager extends AbstractServiceLayer
         bool $isFlushed
     ) : Media
     {
-        $object = $this->addAndSaveEntity($newMedia, $isPersisted, $isFlushed);
+        $object = $this->addAndSaveNewEntity($newMedia, $isPersisted, $isFlushed);
         return \is_null($object) ? null : $newMedia;
     }
 
@@ -218,5 +218,18 @@ class MediaManager extends AbstractServiceLayer
     public function getRepository() : MediaRepository
     {
         return $this->repository;
+    }
+
+    /**
+     * Remove a media and all associated entities depending on cascade operations.
+     *
+     * @param Media $media
+     *
+     * @return bool
+     */
+    public function removeMedia(Media $media) : bool
+    {
+        // Proceed to removal in database
+        return $this->removeAndSaveNoMoreEntity($media);
     }
 }

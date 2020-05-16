@@ -4,7 +4,6 @@ App\Domain\DTOToEmbed\ImageToCropDTO:
     properties:
         image:
             - Image:
-                groups: [Default, directUpload]
                 mimeTypes:
                     - image/pjpeg
                     - image/jpeg
@@ -15,11 +14,11 @@ App\Domain\DTOToEmbed\ImageToCropDTO:
                 mimeTypesMessage: This file is not a valid image.
                 # Max size is inherited from File constraint
                 maxSize: 2M
-                maxSizeMessage: The file is too large ({{ size }} {{ suffix }}).<br>Allowed maximum size is {{ limit }} {{ suffix }}.
+                maxSizeMessage: "The file is too large ({{ size }} {{ suffix }}).\nAllowed maximum size is {{ limit }} {{ suffix }}."
                 minWidth: 1600
-                minWidthMessage: The image width is too small ({{ width }} px).<br>Minimum width expected is {{ min_width }} px.
+                minWidthMessage: "The image width is too small ({{ width }} px).\nMinimum width expected is {{ min_width }} px."
                 minHeight: 900
-                minHeightMessage: The image height is too small ({{ height }} px).<br>Minimum height expected is {{ min_height }} px.
+                minHeightMessage: "The image height is too small ({{ height }} px).\nMinimum height expected is {{ min_height }} px."
 
         description:
             - NotBlank:

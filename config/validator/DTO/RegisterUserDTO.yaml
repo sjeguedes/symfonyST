@@ -47,4 +47,4 @@ App\Domain\DTO\RegisterUserDTO:
 
         agreement:
             - IsTrue:
-                message: You have to accept the terms of use<br>to confirm registration.
+                message: "You have to accept the terms of use\nto confirm registration."

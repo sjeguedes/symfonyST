@@ -55,7 +55,7 @@ abstract  class AbstractServiceLayer
      *
      * @return object|null
      */
-    public function addAndSaveEntity(object $entity, bool $isPersisted = false, bool $isFlushed = false) : ?object
+    public function addAndSaveNewEntity(object $entity, bool $isPersisted = false, bool $isFlushed = false) : ?object
     {
         // Create a new entity manager instance, if previous has detach managed entities with close() method!
         if (!$this->entityManager->isOpen()) {

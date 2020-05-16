@@ -21,7 +21,7 @@
         }
     }) }}
     {# Video fields #}
-    <div class="uk-grid uk-grid-collapse">
+    <div class="uk-grid uk-grid-collapse uk-margin-small-top uk-margin-medium-bottom">
         {# Video URL #}
         <div class="uk-width-1-1 uk-margin-small-bottom">
             {{ form_label(rootForm.videos.vars.prototype.url, 'Video URL (iframe "src" attribute)', {'label_attr': {'class': 'uk-form-label'}}) }}
@@ -35,7 +35,7 @@
         </div>
         {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
         {# Video description #}
-        <div class="uk-width-1-1 uk-margin-small-top uk-margin-large-bottom">
+        <div class="uk-width-1-1 uk-margin-small-top uk-margin-small-bottom">
             {{ form_label(rootForm.videos.vars.prototype.description, 'Video description (a kind of short title)', {'label_attr': {'class': 'uk-form-label'}}) }}
             <div class="uk-inline uk-flex">
                 <span class="uk-form-icon" uk-icon="icon: bookmark"></span>

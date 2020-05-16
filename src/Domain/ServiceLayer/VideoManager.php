@@ -89,7 +89,7 @@ class VideoManager extends AbstractServiceLayer
         }
         // The logic would be also more functional and easier by persisting Media entity directly,
         // without the need to set e Media entity.
-        $object = $this->addAndSaveEntity($newVideo, $isPersisted, $isFlushed);
+        $object = $this->addAndSaveNewEntity($newVideo, $isPersisted, $isFlushed);
         return \is_null($object) ? null : $newVideo;
     }
 

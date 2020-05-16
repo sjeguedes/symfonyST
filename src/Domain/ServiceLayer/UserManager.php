@@ -38,7 +38,7 @@ class UserManager
      * Define time limit to renew a password
      * when requesting renewal permission by email (forgotten password).
      */
-    public const PASSWORD_RENEWAL_TIME_LIMIT = 60 * 30; // 30 min. in seconds to use with timestamps
+    public const PASSWORD_RENEWAL_TIME_LIMIT = 60 * 30; // 30 min expressed in seconds to use with timestamps
 
     /**
      * @var CustomEventFactoryInterface

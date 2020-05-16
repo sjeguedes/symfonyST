@@ -3,14 +3,14 @@
 {# Errors #}
 {%- block form_errors -%}
     {%- if errors|length > 0 -%}
-        <ul class="uk-list">
+        {# CAUTION: this defines a global way to display all forms errors! #}
+        <ul class="uk-list uk-flex">
             {%- for error in errors -%}
-                <li>
-                    <div class="uk-label uk-display-inline-block uk-form-danger uk-box-shadow-large uk-text-bold uk-text">
-                        <p class="uk-display-inline-block uk-margin-remove uk-text-center">
-                            <span uk-icon="icon: arrow-down"></span> {{ error.message|raw }}
-                        </p>
-                    </div>
+                <li class="uk-label uk-flex uk-flex-middle uk-form-danger uk-box-shadow-large uk-text-bold uk-text">
+                    <span uk-icon="icon: arrow-down"></span>
+                    <span class="uk-display-inline-block">
+                         {{ error.message|nl2br }}
+                    </span>
                 </li>
             {%- endfor -%}
         </ul>

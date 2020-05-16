@@ -22,11 +22,11 @@ App\Domain\DTO\CreateTrickDTO:
             # Image collection must contain at least one item.
             - Count:
                 min: 1
-                minMessage: The new trick must contain at least one image.
+                minMessage: A new trick must contain at least one image.
 
         videos:
             - Valid: ~
             # Video collection must contain at least one item.
             - Count:
                 min: 1
-                minMessage: The new trick must contain at least one video.
+                minMessage: A new trick must contain at least one video.

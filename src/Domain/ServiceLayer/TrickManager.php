@@ -139,7 +139,7 @@ class TrickManager extends AbstractServiceLayer
      */
     public function addAndSaveTrick(Trick $newTrick, bool $isPersisted = false, bool $isFlushed = false) : ?Trick
     {
-        $object = $this->addAndSaveEntity($newTrick, $isPersisted, $isFlushed);
+        $object = $this->addAndSaveNewEntity($newTrick, $isPersisted, $isFlushed);
         return \is_null($object) ? null : $newTrick;
     }
 
@@ -507,12 +507,12 @@ class TrickManager extends AbstractServiceLayer
     }
 
     /**
-     * Remove a trick and all associated entities depending on cascade operations.
-     *
-     * @param Trick $trick
-     *
-     * @return bool
-     */
+ * Remove a trick and all associated entities depending on cascade operations.
+ *
+ * @param Trick $trick
+ *
+ * @return bool
+ */
     public function removeTrick(Trick $trick) : bool
     {
         // Proceed to removal in database
