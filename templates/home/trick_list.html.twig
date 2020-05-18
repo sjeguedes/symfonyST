@@ -94,7 +94,7 @@
         {# Display trick list #}
         <div class="uk-child-width-1-2@s uk-child-width-1-3@m uk-child-width-1-4@l uk-child-width-1-5@xl uk-grid-match uk-padding"
              uk-grid data-loading-mode="{{ trickLoadingMode|e('html_attr') }}" data-count="{{ trickCount|e('html_attr') }}"
-             data-limit="{{ trickNumberPerLoading|e('html_attr') }}" data-path="{{ trickAjaxLoadingPath }}"
+             data-limit="{{ trickNumberPerLoading|e('html_attr') }}" data-path="{{ trickAjaxLoadingPath|e('html_attr') }}"
              data-technical-error="{{ technicalError|e('html_attr') }}" data-ended="{{ listEnded|e('html_attr') }}">
         {# This block is also used for ajax loading! #}
         {% block trick_cards %}

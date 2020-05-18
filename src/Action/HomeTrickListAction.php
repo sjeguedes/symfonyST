@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Class HomeTrickListAction.
@@ -68,7 +69,7 @@ class HomeTrickListAction
             'listEnded'             => 'No more trick to load!',
             'noList'                => 'Sorry, no trick was found!',
             'technicalError'        => 'Sorry, something wrong happened<br>during trick list loading!<br>Please contact us or try again later.<br>',
-            'trickAjaxLoadingPath'  => $this->trickService->generateURLFromRoute('home_load_tricks_offset_limit', []),
+            'trickAjaxLoadingPath'  => $this->trickService->generateURLFromRoute('home_load_tricks_offset_limit', [], UrlGeneratorInterface::ABSOLUTE_URL),
             'trickCount'            => $this->trickService->countAll(),
             'trickLoadingMode'      => $this->trickService->getTrickListConfigParameters()['loadingMode'],
             'trickNumberPerLoading' => $parameters['limit'],

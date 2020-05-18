@@ -17,26 +17,27 @@ class VideoURLProxyChecker
     // CAUTION: these iframe URL patterns should certainly be improved and are very important for a quite "secure" use!
     // Even more, they can evolve, so it is preferable to use providers APIs!
     const ALLOWED_URL_PATTERNS = [
-        '/^https?:\/\/www\.youtube\.com\/embed\/[a-zA-Z0-9_]+$/', // more explicit but video ID can be "simplified" to [\w-]+
-        '/^https?:\/\/player\.vimeo\.com\/video\/[0-9]+$/',
-        '/^https?:\/\/www\.dailymotion\.com\/embed\/video\/[a-zA-Z0-9]+$/'
+        '/^https?:\/\/www\.youtube\.com\/embed\/.+$/', // Video ID can also be [a-zA-Z0-9_]+ or [\w-]+, but it is more risky!
+        '/^https?:\/\/player\.vimeo\.com\/video\/.+$/', // Video ID can also be [0-9]+, but it is more risky!
+        '/^https?:\/\/www\.dailymotion\.com\/embed\/video\/.+$/' // Video ID can also be [a-zA-Z0-9]+, but it is more risky!
     ];
 
     /**
      * Filter provided URL.
      *
      * @param Request $request
+     * @param bool    $isDecoded
      *
      * @return null|string
      */
-    public function filterURLAttribute(Request $request) : ?string
+    public function filterURLAttribute(Request $request, bool $isDecoded = false) : ?string
     {
         // Get URL to check
         $url = null;
         if (!\is_null($request->attributes->get('url'))) {
             $url = $request->attributes->get('url');
         }
-        return $url;
+        return $isDecoded ? $url : urldecode($url);
     }
 
     /**
@@ -54,7 +55,7 @@ class VideoURLProxyChecker
         $patterns = self::ALLOWED_URL_PATTERNS;
         // Use of "array_filter" would be more appropriate here!
         for ($i = 0; $i < count($patterns); $i ++) {
-            if (preg_match( $patterns[$i], $url)) {
+            if (preg_match( $patterns[$i], urldecode($url))) {
                 return true;
             }
         }
@@ -82,8 +83,8 @@ class VideoURLProxyChecker
         if (\is_null($url)) {
             return false;
         }
-        // Use cURL
-        $handle = curl_init($url);
+          // Use cURL
+        $handle = curl_init(urldecode($url));
         curl_setopt($handle, CURLOPT_RETURNTRANSFER, 1);
         // Avoid content loading by getting the headers only
         curl_setopt($handle, CURLOPT_NOBODY, 1);
@@ -113,6 +114,7 @@ class VideoURLProxyChecker
         if (\is_null($url)) {
             return ['status' => 0];
         }
+        $url = urldecode($url);
         return $this->isAllowed($url) && $this->isContent($url) ? ['status' => 1] : ['status' => 0];
     }
 }

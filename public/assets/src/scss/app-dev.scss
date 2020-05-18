@@ -1,0 +1,779 @@
+// **** App styles which concern UIkit **** \\
+// 1. Custom variables and variable overwrites per components.
+//@import "uikit-themes/symfonyST-theme/variables.scss";
+//@import "uikit-themes/symfonyST-theme/variables-theme.scss";
+
+//@import "uikit-themes/symfonyST-theme/accordion.scss";
+//@import "uikit-themes/symfonyST-theme/alert.scss";
+//@import "uikit-themes/symfonyST-theme/align.scss";
+
+
+
+// Layout
+//@import "uikit-themes/symfonyST-theme/card.scss";
+// Common
+//@import "uikit-themes/symfonyST-theme/label.scss";
+//@import "uikit-themes/symfonyST-theme/spinner.scss";
+// Navs
+//@import "uikit-themes/symfonyST-theme/navbar.scss";
+// Utilities
+//@import "uikit-themes/symfonyST-theme/text.scss";
+//@import "uikit-themes/symfonyST-theme/background.scss";
+// ... import all
+//@import "uikit-themes/symfonyST-theme/notification.scss";
+
+// 2. Import UIkit default variables and available mixins.
+//@import "../../uikit/src/scss/variables.scss";
+//@import "../../uikit/src/scss/mixins.scss";
+
+// 3. Custom mixin overwrites per components.
+//@import "uikit-themes/symfonyST-theme/accordion-mixins.scss";
+//@import "uikit-themes/symfonyST-theme/alert-mixins.scss";
+//@import "uikit-themes/symfonyST-theme/align-mixins.scss";
+// ... import all
+
+// 4. Import UIkit
+//@import "../../uikit/src/scss/uikit.scss";
+
+// Styles for cropper js
+@import '../../node_modules/cropperjs/dist/cropper.css';
+
+// 1. Your custom variables and variable overwrites.
+// Typography
+$global-font-family: 'Montserrat', Arial, sans-serif;
+$site-2xsmall-font-size: 0.625rem; // 10px
+$site-xsmall-font-size: 0.75rem; // 12px
+$global-small-font-size: 0.875rem !default; // 14px
+// Colors
+$site-white-color: rgba(255, 255, 255, 1); //#FFF
+$site-black-color: rgba(51, 51, 51, 1); //#333
+$site-yellow-color: rgba(236, 221, 19, 1); //#ECDD13
+$site-red-color: rgba(159, 6, 2, 1); //9F0602
+$site-red-color1: rgba(239, 43, 43, 1); //#EF2B2B
+$site-red-color2: rgba(172, 15, 15, 1); //#AC0F0F
+$site-blue-color: rgba(74, 134, 232, 1); //#4A86E8
+$site-green-color: rgba(13, 152, 37, 1); //#0D9825
+$site-green-color1: rgba(7, 251, 36, 1); //#07FB24
+$site-green-color2: rgba(26, 201, 29, 1); //#1AC91D
+// --- Elements ---
+// Form
+$form-radio-checked-icon-color: rgba(0, 0, 0, 1);
+// --- Layout ---
+// Background
+$background-image-header-background: rgba(0, 0, 0, 0.2); // Header
+// Navbar
+$navbar-nav-item-color: rgba(255, 255, 255, 1);
+$navbar-background: rgba(172, 15, 15, 1); //#AC0F0F
+
+// 2. Import default variables and available mixins.
+@import "../../uikit/src/scss/variables-theme.scss";
+@import "../../uikit/src/scss/mixins-theme.scss";
+
+// 3. Your custom mixin overwrites.
+// --- Elements ---
+// Link
+@mixin hook-link-misc() {
+    a.uk-link-text {
+        text-decoration: none;
+    }
+}
+
+// Buttons
+@mixin hook-button-misc() {
+    .uk-card.uk-card-primary .uk-card-footer a.uk-button {
+        span.uk-icon {
+            border-color: transparent;
+            border-radius: 5px;
+            @extend .uk-box-shadow-small;
+            &:hover {
+                border-color: rgba(255, 255, 255, 0.3);
+            }
+        }
+    }
+    .uk-button {
+        margin-right: 1px; // Tricky tip to avoid disappearing border for Chrome on window resize!
+        &.uk-button-secondary {
+            border-color: transparent;
+            background-color: $site-black-color;
+            color: $site-white-color;
+            @extend .uk-box-shadow-small;
+            @extend .uk-text-bold;
+            transition: background-color ease-in-out 0.5s;
+            &:hover {
+                border-color: rgba(255, 255, 255, 0.3);
+                background-color: $site-blue-color;
+                color: $site-white-color;
+            }
+        }
+    }
+    .uk-card {
+        &.uk-card-primary {
+            .uk-card-body {
+                .uk-button {
+                    &.uk-button-secondary {
+                        background-color: $site-black-color;
+                        color: $site-white-color;
+                        transition: background-color ease-in-out 0.5s;
+                        &:hover {
+                            background-color: $site-blue-color;
+                            color: $site-white-color;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Form
+@mixin hook-form-misc() {
+    .uk-form-error {
+        border-color: $site-red-color2 !important;
+    }
+    .uk-form-icon-flip {
+        right: 0;
+    }
+    .uk-form-custom {
+        width: 100%;
+        /*.st-fake-file-input {
+            width: 75%;
+            & + .uk-form-icon-flip {
+                right: 25%;
+            }
+        }
+        .st-fake-file-input-button {
+            width: 25%;
+        }*/
+    }
+    .uk-input {
+        &[type="file"] {
+            &:hover {
+                & + .st-fake-file-input-button {
+                    border-color: rgba(255, 255, 255, 1);
+                }
+            }
+        }
+    }
+    .st-update-profile-form {
+        .st-file-remove-button, .st-file-remove-button {
+            padding-left: 10px;
+            .uk-icon {
+                color: rgba(255, 255, 255, 0.5);
+            }
+        }
+        .st-file-remove-button {
+            box-sizing: border-box;
+            padding-right: 26px;
+        }
+    }
+    .uk-card {
+        &.uk-card-primary {
+            .uk-card-body {
+                .uk-checkbox {
+                    width: 24px;
+                    height: 24px;
+                    & + .uk-form-label {
+                        margin-left: 5px;
+                    }
+                }
+                .uk-form-label {
+                    @extend .uk-display-inline-block;
+                    margin-bottom: 5px;
+                    + .uk-inline {
+                        & > .uk-button-link {
+                            @extend .uk-display-inline-block;
+                            margin-left: 5px;
+                            @extend .uk-position-relative;
+                            @extend .uk-box-shadow-medium;
+                            top: -2px;
+                            .uk-icon {
+                                background-color: rgba(255, 255, 255, 0.2);
+                                @extend .uk-border-circle;
+                                transition: color ease-in-out 0.3s;
+                                &:hover {
+                                    color: rgba(255, 255, 255, 1);
+                                }
+                            }
+                        }
+                    }
+                }
+                .uk-input,
+                .uk-select,
+                .uk-textarea {
+                    border-color: rgba(255, 255, 255, 0.3);
+                }
+                .uk-input,
+                .uk-select,
+                .uk-textarea {
+                    padding: 0 40px;
+                    color: rgba(51, 51, 51, 1);
+                    &:focus {
+                        color: rgba(51, 51, 51, 1);
+                    }
+                }
+                .uk-select {
+                    padding: 0 45px 0 40px;
+                    &.st-select-error,
+                    &.st-select-success {
+                        background-position: 92% 50%;
+                    }
+                }
+                .uk-textarea {
+                    padding: 10px 40px;
+                }
+                .uk-form-icon.st-textarea-icon {
+                    top: 10px !important;
+                    bottom: auto;
+                }
+                .uk-disabled,
+                .uk-input:disabled,
+                .uk-select:disabled,
+                .uk-textarea:disabled {
+                    background-color: rgba(76, 139, 239, 0.7); //#4C8BEF
+                    // Safari hack for rgba issue with opacity / rgba background color
+                    // Look at https://github.com/jgthms/bulma/issues/2355
+                    -webkit-text-fill-color: rgba(255, 255, 255, 0.5);
+                }
+                // form error messages arrow icon
+                .uk-list .uk-label.uk-form-danger {
+                    color: $site-white-color;
+                    span.uk-display-inline-block {
+                        color: $site-red-color;
+                    }
+                    svg {
+                        width: 18px;
+                        height: 18px;
+                        margin: 2px;
+                    }
+                }
+                .uk-form-danger, .uk-form-success {
+                    box-shadow: none !important;
+                    color: $site-white-color;
+                    svg {
+                        @extend .st-box-shadow-full-small;
+                        border-radius: 20px;
+                    }
+                }
+                .uk-form-danger, .uk-form-danger:focus {
+                    //color: $site-red-color;
+                    //border-color: $site-red-color;
+                    @extend .st-box-shadow-full-small;
+                    svg {
+                        width: 20px;
+                        height: 20px;
+                        //padding: 2px;
+                        background-color: $site-red-color;
+                        //border: 1px solid transparent;
+                    }
+                }
+                .uk-form-success, .uk-form-success:focus {
+                    //color: $site-green-color;
+                    border-color: $site-green-color;
+                    svg {
+                        width: 14px;
+                        height: 14px;
+                        padding: 2px;
+                        background-color: $site-green-color;
+                        border: 1px solid $site-white-color;
+                    }
+                }
+                // Chrome autofill settings
+                // https://webagility.com/posts/the-ultimate-list-of-hacks-for-chromes-forced-yellow-background-on-autocompleted-inputs
+                input:-webkit-autofill,
+                input:-webkit-autofill:hover,
+                input:-webkit-autofill:focus,
+                input:-webkit-autofill:active {
+                    // Transition delay 99999s is mandatory.
+                    transition: background-color 99999s ease-in-out 0s, color 99999s ease-in-out 0s;
+                    border-color: rgba(255, 255, 255, 0.3);
+                    background-color: rgba(255, 255, 255, 0.1);
+                }
+            }
+        }
+    }
+}
+
+// --- Common ---
+// Alert
+@mixin hook-alert-misc() {
+    .uk-alert {
+        font-weight: normal;
+        .uk-alert-close {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            opacity: 0.4 !important;
+            color: $site-black-color !important;
+        }
+        .st-custom-close {
+            top: 5px !important;
+            right: 5px !important;
+            color: $site-black-color !important;
+        }
+    }
+}
+// Label
+@mixin hook-label-misc() {
+    .uk-card-primary .uk-card-header .uk-label, .uk-card-primary.uk-card-body .uk-label, .uk-label {
+        background-color: transparent;
+        font-size: .6875rem; // 11px
+        white-space: normal;
+        &.uk-form-danger {
+            background-color: $site-white-color;
+            color: $site-red-color2;
+        }
+    }
+}
+
+// --- Javascript ---
+// Drop
+@mixin hook-drop-misc() {
+    .uk-drop {
+        .uk-drop-close {
+            position: absolute;
+            top: -10px;
+            right: -5px;
+            color: $site-blue-color;
+            &:hover {
+                opacity: 0.7;
+            }
+        }
+    }
+}
+
+// --- Layout ---
+// Card
+@mixin hook-card-misc() {
+    .uk-card {
+        &.uk-card-primary {
+            background-color: $site-blue-color;
+            .uk-card-footer {
+                @extend .uk-padding-small;
+            }
+        }
+        a {
+            transition: color .3s ease-in-out;
+        }
+    }
+    .st-card-container {
+        img {
+            width: 100%;
+        }
+        .st-card-image, .st-card-iframe {
+            min-height: 150px;
+        }
+        .uk-card-badge { // Home
+            width: 100%;
+            min-height: 30px;
+            box-sizing: border-box;
+            position: relative;
+            top: 0;
+            right: 0;
+            background-color: $site-yellow-color;
+            border-radius: 0;
+            @extend .uk-text-bold;
+        }
+        .uk-card-primary .uk-card-badge {
+            color: $site-blue-color;
+        }
+        .uk-card-footer {
+            div.uk-flex:first-child {
+                @extend .uk-flex-middle;
+            }
+        }
+    }
+}
+
+// --- Navs ---
+// Navbar
+@mixin hook-navbar-misc() {
+    .uk-navbar {
+        border-bottom: 4px solid $site-yellow-color;
+        position: relative;
+        z-index: 1;
+        .st-slogan {
+            @extend .uk-text-bold;
+            color: $site-black-color;
+            em {
+                color: $site-yellow-color;
+            }
+        }
+    }
+    ul.uk-navbar-nav {
+        @extend .uk-text-bold;
+        li.uk-active {
+            a {
+                color: rgba(236, 221, 19, 1) !important;
+            }
+        }
+        li:not(.uk-active) {
+            a {
+                &:hover {
+                    color: rgba(0, 0, 0, 0.8);
+                    span.uk-text-uppercase, .uk-navbar-subtitle {
+                        color: rgba(0, 0, 0, 0.8);
+                    }
+                }
+                span.uk-text-uppercase {
+                    color: rgba(255, 255, 255, 1);
+                    transition: color .3s ease-in-out;
+                }
+                .uk-navbar-subtitle {
+                    color: rgba(185, 185, 185, 1); //#b9b9b9
+                    transition: color .3s ease-in-out;
+                }
+            }
+        }
+    }
+    .uk-navbar-toggle {
+        height: auto;
+        color: rgba(255, 255, 255, 1);
+        &:focus {
+            color: rgba(255, 255, 255, 1);
+        }
+        &:hover {
+            color: rgba(0, 0, 0, 0.8);
+        }
+    }
+}
+
+// --- Components ---
+// Notification
+@mixin hook-notification-misc() {
+    .uk-notification {
+        @media (max-width: 639px) {
+            max-width: 350px;
+            margin: auto;
+        }
+        .uk-notification-message {
+            font-size: $global-small-font-size;
+            font-weight: 500;
+            box-shadow: 0 2px 5px 2px rgba(0, 0, 0, 0.4);
+            border-radius: 5px;
+            .uk-notification-close {
+                top: 10px;
+                right: 10px;
+                display: block;
+                &.uk-close {
+                    color: $site-yellow-color;
+                    &:hover {
+                        opacity: 0.7;
+                    }
+                }
+            }
+            &.uk-notification-message-info {
+                background-color: $site-black-color;
+                color: $site-white-color;
+            }
+            &.uk-notification-message-success {
+                background-color: $site-green-color;
+                color: $site-white-color;
+            }
+            &.uk-notification-message-error {
+                background-color: $site-red-color;
+                color: $site-white-color;
+            }
+        }
+    }
+}
+
+// 4. Import UIkit.
+@import "../../uikit/src/scss/uikit-theme.scss";
+
+/***************************************************************************/
+
+// **** App styles which do not concern UIkit **** \\
+
+// Hacks - fixes
+#target:hover { display:block; }
+
+// Sticky footer
+html, body {
+    height: 100%;
+}
+main {
+    height: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+.st-header {
+    flex: none;
+}
+.st-content {
+    flex: 1 0 auto;
+}
+.st-footer {
+    flex: none;
+}
+
+// Background colors
+.st-background-white {
+    background-color: rgba(255, 255, 255, 1);
+}
+.st-background-black {
+    background-color: rgba(51, 51, 51, 1); //#333
+}
+.st-background-yellow {
+    background-color: $site-yellow-color;
+}
+.st-background-red {
+    background-color: $site-red-color;
+}
+.st-background-blue {
+    background-color: $site-blue-color;
+}
+
+// Box shadow
+.st-box-shadow-full-small {
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
+}
+
+// Containers
+.st-overlay-image-header-container {
+    width: 80%;
+}
+.st-overlay-main-image-header-container {
+    width: 95%;
+    height: 85%;
+    max-width: 900px;
+}
+
+// Texts
+.st-line-height-normal {
+    line-height: 1.2
+}
+
+// Colors
+.st-color-white {
+    color: rgba(255, 255, 255, 1);
+}
+.st-color-black {
+    color: rgba(51, 51, 51, 1); //#333
+}
+.st-color-yellow {
+    color: $site-yellow-color;
+}
+.st-color-red {
+    color: $site-red-color;
+}
+.st-color-blue {
+    color: $site-blue-color;
+}
+
+// Borders
+.st-border-white-small {
+    border: 15px solid $site-white-color;
+    box-sizing: border-box;
+}
+
+// Icons
+.st-svg-icon-button {
+    padding: 10px;
+    border: 1px solid $site-white-color;
+    transition: background-color .3s ease-in-out;
+    &.st-svg-icon-update:hover {
+        background-color: rgba(226, 210, 29, 1); //#e2d21d //$site-yellow-color;
+    }
+    &.st-svg-icon-delete:hover {
+        background-color: $site-red-color;
+    }
+    &.st-svg-icon-other:hover {
+        background-color: $site-blue-color;
+    }
+    &.st-svg-icon-actions {
+        border-color: transparent;
+        border-radius: 5px;
+    }
+}
+
+// Shadows
+.st-text-shadow-dark {
+    color: rgba(255, 255, 255, 1);
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 1);
+}
+.st-text-shadow-light {
+    color: rgba(255, 255, 255, 1);
+    text-shadow: 0 2px 5px rgba(250, 250, 250, 0.1);
+}
+
+// Paddings
+.st-svg-icon-padding {
+    padding: 0 2px;
+}
+
+// Responsive SVG
+.svg-container {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%;
+    vertical-align: middle;
+    overflow: hidden;
+}
+.svg-content {
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+
+// Header
+header.st-header {
+    border-bottom: 4px solid $site-yellow-color;
+    .st-background-image-header {
+        background-color: $background-image-header-background;
+    }
+    .st-header-spinner {
+        display: block;
+        width: 80%;
+        @extend .uk-text-center;
+    }
+    // Clickable svg
+    // https://stackoverflow.com/questions/11374059/make-an-html-svg-object-also-a-clickable-link
+    .uk-logo {
+        width: 150px;
+        z-index: 1;
+        .svg-container {
+            top: 1.1rem;
+            z-index: -1;
+        }
+    }
+    ul.uk-navbar-nav {
+        &.st-header-navbar {
+            @extend .uk-flex-right;
+            & > li {
+                a {
+                    padding: 20px 12px;
+                    height: auto;
+                }
+            }
+        }
+    }
+}
+
+// content
+section.st-content {
+    .st-media-spinner {
+        display: block;
+        width: 80%;
+        @extend .uk-text-center;
+    }
+}
+
+// Footer
+footer.st-footer {
+    border-top: 4px solid $site-yellow-color;
+    .st-footer-nav-container {
+        position: fixed;
+        width: 100%;
+        left: 0;
+        bottom: 0;
+        z-index: 10;
+        ul.uk-navbar-nav {
+            &.st-footer-navbar {
+                @extend .uk-flex-between;
+                & > li {
+                    a {
+                        padding: 20px 8px;
+                        height: auto;
+                    }
+                }
+            }
+        }
+    }
+    .st-footer-nav-none {
+        //display: none;
+    }
+    .st-footer-logo {
+        width: 200px;
+        .svg-container {
+            padding-bottom: 50%;
+        }
+    }
+}
+
+// Layout
+.uk-section.st-section {
+    padding-top: 0
+}
+
+/************************** Home **************************/
+
+/************************** Tricks **************************/
+
+/************************** Single trick **************************/
+// Fix bug on safari for slider controls "prev" and "next"
+.st-single-slider-container {
+    overflow: hidden;
+    padding: 0 50px;
+    @media (max-width: 479px) {
+        padding: 0 40px;
+    }
+    @media (min-width: 480px) and (max-width: $breakpoint-xsmall-max) { //639px
+        padding: 0 60px;
+    }
+    @media (min-width: $breakpoint-large) and (max-width: $breakpoint-large-max) { //1200px - 1599px
+        padding: 0 40px;
+    }
+    .uk-slider-items {
+        box-sizing: border-box;
+        padding: 0 1px;
+        // To be able to see box-shadow around card in slider
+        li > .uk-card {
+            box-sizing: border-box;
+            margin: 10px 10px 20px;
+        }
+    }
+}
+/************************** Update profile **************************/
+.st-avatar-default {
+    width: 80px;
+    .svg-container {
+        background-color: $site-white-color;
+        padding-bottom: 100%;
+        border: 4px solid $site-blue-color;
+    }
+}
+// Avatar upload progress
+.st-avatar-upload-progress {
+    width: 3em;
+    height: 3em;
+    line-height: 3em;
+    opacity: 0;
+    transition: opacity 2s ease-in-out;
+    &.st-aup-fade-in {
+        opacity: 1;
+    }
+}
+// Avatar image preview
+.st-avatar-preview {
+    opacity: 1;
+    transition: opacity 0.75s ease-in-out;
+    &.st-ap-fade-out {
+        opacity: 0;
+        transition: opacity 0.25s ease-in-out;
+    }
+}
+// Avatar update or remove text info
+.st-avatar-text-info {
+    opacity: 0;
+    transition: opacity 0.25s ease-in-out;
+    &.st-ati-fade-in {
+        opacity: 1;
+        transition: opacity 0.75s ease-in-out;
+    }
+}
+// Avatar Cropper image preview
+.st-cropper-preview {
+    width: 100%;
+}
+/************************** Create/Update trick **************************/
+// image crop box label
+.st-image-to-crop-label {
+    margin-bottom: 20px !important;
+}
+
+
+

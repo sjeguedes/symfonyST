@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Class SingleTrickAction.
@@ -81,7 +82,7 @@ class SingleTrickAction
             'mediaError'           => 'Media loading error',
             'mediaTypesValues'     => $this->mediaTypeService->getMandatoryDefaultTypes(),
             'normalImageMediaType' => $normalImageMediaType,
-            'videoURLProxyPath'    => $this->trickService->generateURLFromRoute('load_trick_video_url_check', ['url' => '']), // Empty declared url is more explicit!
+            'videoURLProxyPath'    => $this->trickService->generateURLFromRoute('load_trick_video_url_check', ['url' => ''], UrlGeneratorInterface::ABSOLUTE_URL), // Empty declared url is more explicit!
             'trick'                => $trick
         ];
         return $responder($data);

@@ -83,170 +83,357 @@ images:
             description: "One-footed - Tricks performed with one foot removed from the binding (typically the rear foot) are referred to as one-footed tricks."
             format: "jpg"
             size: 293000
+
+    ###########################################################################################
+    # Several images for 1 trick
     -
         #13
+        fields:
+            name: "mctwist-03a98ff0-1600x900"
+            description: "McTwist - PARK LIFE - DC AREA 43 in Méribel - Mottaret"
+            format: "jpeg"
+            size: 183503
+    -
+        #14
+        fields:
+            name: "mctwist-d49bccf0-1600x900"
+            description: "McTwist - A forward-flipping backside 540, performed in a halfpipe, quarterpipe, or similar obstacle."
+            format: "jpeg"
+            size: 242274
+    -
+        #15
+        fields:
+            name: "tuck-knee-9e00f443-1600x900"
+            description: "Tuck Knee - Straight Airs - Snowboard Basics"
+            format: "jpeg"
+            size: 138646
+    -
+        #16
+        fields:
+            name: "tuck-knee-d51fb799-1600x900"
+            description: "Tuck Knee - Frontside 360° - Snowboarding Basics"
+            format: "jpeg"
+            size: 205492
+    -
+        #17
+        fields:
+            name: "stalefish-2a3c95f5-1600x900"
+            description: "Stalefish - Nordkette (Austria)"
+            format: "jpeg"
+            size: 96156
+    -
+        #18
+        fields:
+            name: "stalefish-21391b8d-1600x900"
+            description: "Stalefish - Laax Open 2017: Chase Josey & Chloe Kim"
+            format: "jpeg"
+            size: 143679
+    -
+        #19
+        fields:
+            name: "stalefish-a8a2a371-1600x900"
+            description: "Stalefish - Zoi Sadowski Synnott & Dusty Henricksen"
+            format: "jpeg"
+            size: 151869
+
+    ###########################################################################################
+    -
+        #20
         fields:
             name: "ollie-2d4b002c-880x495"
             description: "Ollie - A trick in which the snowboarder springs off the tail of the board and into the air."
             format: "jpg"
             size: 234000
     -
-        #14
+        #21
         fields:
             name: "nollie-654fd080-880x495"
             description: "Nollie - A trick in which the snowboarder springs off the nose of the board and into the air."
             format: "jpg"
             size: 289000
-    -   #15
+    -   #22
         fields:
             name: "one-two-0edd47a6-880x495"
             description: "One-Two - A trick in which the rider's front hand grabs the heel edge behind their back foot."
             format: "jpg"
             size: 322000
     -
-        #16
+        #23
         fields:
             name: "back-flip-055e6c78-880x495"
             description: "Back flip - Flipping backwards (like a standing backflip) off of a jump."
             format: "jpg"
             size: 355000
     -
-        #17
+        #24
         fields:
             name: "front-flip-8d3dbb8d-880x495"
             description: "Front flip - Flipping forward (like a standing frontflip) off of a jump."
             format: "jpg"
             size: 323000
     -
-        #18
+        #25
         fields:
             name: "invert-d8061ac8-880x495"
             description: "Invert - Overlaying term for handstands on the edge of a halfpipe."
             format: "jpg"
             size: 242000
     -
-        #19
+        #26
         fields:
             name: "handplant-606a6e96-880x495"
             description: "Handplant - A 180° degree handplant in which the rear hand is planted on the lip of the wall and the rotation is frontside."
             format: "jpg"
             size: 156000
     -
-        #20
+        #27
         fields:
             name: "50-50-3e9ad1c0-880x495"
             description: "50-50 - A slide in which a snowboarder rides straight along a rail or other obstacle."
             format: "jpg"
             size: 384000
     -
-        #21
+        #28
         fields:
             name: "boardslide-5bdd9e7a-880x495"
             description: "boardslide - A slide performed where the riders leading foot passes over the rail on approach, with their snowboard traveling perpendicular along the rail or other obstacle."
             format: "jpg"
             size: 240000
     -
-        #22
+        #29
         fields:
             name: "nose-pick-8a3a46aa-880x495"
             description: "Nose-pick - Stalling on an object with the nose of the snowboard, while grabbing frontside, and then jumping back off the object into the jump you came off."
             format: "jpg"
             size: 325000
     -
-        #23
+        #30
         fields:
             name: "board-stall-6008595a-880x495"
             description: "Board-stall and Disaster variation - A trick performed when a rider stalls on an object with their snowboard, with the point of contact between both bindings."
             format: "jpg"
             size: 419000
     -
-        #24
+        #31
         fields:
             name: "one-footed-1e29bd6d-880x495"
             description: "One-footed - Tricks performed with one foot removed from the binding (typically the rear foot) are referred to as one-footed tricks."
             format: "jpg"
             size: 140000
+
+    ###########################################################################################
+    # Several images for 1 trick
     -
-        #25
+        #32
+        fields:
+            name: "mctwist-03a98ff0-880x495"
+            description: "McTwist - PARK LIFE - DC AREA 43 in Méribel - Mottaret"
+            format: "jpeg"
+            size: 57929
+    -
+        #33
+        fields:
+            name: "mctwist-d49bccf0-880x495"
+            description: "McTwist - A forward-flipping backside 540, performed in a halfpipe, quarterpipe, or similar obstacle."
+            format: "jpeg"
+            size: 75869
+    -
+        #34
+        fields:
+            name: "tuck-knee-9e00f443-880x495"
+            description: "Tuck Knee - Straight Airs - Snowboard Basics"
+            format: "jpeg"
+            size: 52160
+    -
+        #35
+        fields:
+            name: "tuck-knee-d51fb799-880x495"
+            description: "Tuck Knee - Frontside 360° - Snowboarding Basics"
+            format: "jpeg"
+            size: 69205
+    -
+        #36
+        fields:
+            name: "stalefish-2a3c95f5-880x495"
+            description: "Stalefish - Nordkette (Austria)"
+            format: "jpeg"
+            size: 32747
+    -
+        #37
+        fields:
+            name: "stalefish-21391b8d-880x495"
+            description: "Stalefish - Laax Open 2017: Chase Josey & Chloe Kim"
+            format: "jpeg"
+            size: 48007
+    -
+        #38
+        fields:
+            name: "stalefish-a8a2a371-880x495"
+            description: "Stalefish - Zoi Sadowski Synnott & Dusty Henricksen"
+            format: "jpeg"
+            size: 52640
+
+    ###########################################################################################
+    -
+        #39
         fields:
             name: "ollie-2d4b002c-400x225"
             description: "Ollie - A trick in which the snowboarder springs off the tail of the board and into the air."
             format: "jpg"
             size: 61000
     -
-        #26
+        #40
         fields:
             name: "nollie-654fd080-400x225"
             description: "Nollie - A trick in which the snowboarder springs off the nose of the board and into the air."
             format: "jpg"
             size: 71000
     -
-        #27
+        #41
         fields:
             name: "one-two-0edd47a6-400x225"
             description: "One-Two - A trick in which the rider's front hand grabs the heel edge behind their back foot."
             format: "jpg"
             size: 84000
     -
-        #28
+        #42
         fields:
             name: "back-flip-055e6c78-400x225"
             description: "Back flip - Flipping backwards (like a standing backflip) off of a jump."
             format: "jpg"
             size: 87000
     -
-        #29
+        #43
         fields:
             name: "front-flip-8d3dbb8d-400x225"
             description: "Front flip - Flipping forward (like a standing frontflip) off of a jump."
             format: "jpg"
             size: 84000
     -
-        #30
+        #44
         fields:
             name: "invert-d8061ac8-400x225"
             description: "Invert - Overlaying term for handstands on the edge of a halfpipe."
             format: "jpg"
             size: 61000
     -
-        #31
+        #45
         fields:
             name: "handplant-606a6e96-400x225"
             description: "Handplant - A 180° degree handplant in which the rear hand is planted on the lip of the wall and the rotation is frontside."
             format: "jpg"
             size: 43000
     -
-        #32
+        #46
         fields:
             name: "50-50-3e9ad1c0-400x225"
             description: "50-50 - A slide in which a snowboarder rides straight along a rail or other obstacle."
             format: "jpg"
             size: 91000
     -
-        #33
+        #47
         fields:
             name: "boardslide-5bdd9e7a-400x225"
             description: "boardslide - A slide performed where the riders leading foot passes over the rail on approach, with their snowboard traveling perpendicular along the rail or other obstacle."
             format: "jpg"
             size: 66000
     -
-        #34
+        #48
         fields:
             name: "nose-pick-8a3a46aa-400x225"
             description: "Nose-pick - Stalling on an object with the nose of the snowboard, while grabbing frontside, and then jumping back off the object into the jump you came off."
             format: "jpg"
             size: 82000
     -
-        #35
+        #49
         fields:
             name: "board-stall-6008595a-400x225"
             description: "Board-stall and Disaster variation - A trick performed when a rider stalls on an object with their snowboard, with the point of contact between both bindings."
             format: "jpg"
             size: 93000
     -
-        #36
+        #50
         fields:
             name: "one-footed-1e29bd6d-400x225"
             description: "One-footed - Tricks performed with one foot removed from the binding (typically the rear foot) are referred to as one-footed tricks."
             format: "jpg"
             size: 42000
+
+    ###########################################################################################
+    # Several images for 1 trick
+    -
+        #51
+        fields:
+            name: "mctwist-03a98ff0-400x225"
+            description: "McTwist - PARK LIFE - DC AREA 43 in Méribel - Mottaret"
+            format: "jpeg"
+            size: 15769
+    -
+        #52
+        fields:
+            name: "mctwist-d49bccf0-400x225"
+            description: "McTwist - A forward-flipping backside 540, performed in a halfpipe, quarterpipe, or similar obstacle."
+            format: "jpeg"
+            size: 18906
+    -
+        #53
+        fields:
+            name: "tuck-knee-9e00f443-400x225"
+            description: "Tuck Knee - Straight Airs - Snowboard Basics"
+            format: "jpeg"
+            size: 15335
+    -
+        #54
+        fields:
+            name: "tuck-knee-d51fb799-400x225"
+            description: "Tuck Knee - Frontside 360° - Snowboarding Basics"
+            format: "jpeg"
+            size: 17981
+    -
+        #55
+        fields:
+            name: "stalefish-2a3c95f5-400x225"
+            description: "Stalefish - Nordkette (Austria)"
+            format: "jpeg"
+            size: 9482
+    -
+        #56
+        fields:
+            name: "stalefish-21391b8d-400x225"
+            description: "Stalefish - Laax Open 2017: Chase Josey & Chloe Kim"
+            format: "jpeg"
+            size: 12618
+    -
+        #57
+        fields:
+            name: "stalefish-a8a2a371-400x225"
+            description: "Stalefish - Zoi Sadowski Synnott & Dusty Henricksen"
+            format: "jpeg"
+            size: 14735
+
+    ###########################################################################################
+    ## Avatars
+    -
+        #58
+        fields:
+            name: "arny-avatar-10ed1b41-80x80"
+            description: "Arny's avatar"
+            format: "jpeg"
+            size: 2116
+    -
+        #59
+        fields:
+            name: "miky-avatar-253ad5be-80x80"
+            description: "Miky's avatar"
+            format: "jpeg"
+            size: 2189
+    -
+        #60
+        fields:
+            name: "rooky-avatar-462e1861-80x80"
+            description: "Rooky's avatar"
+            format: "jpeg"
+            size: 1628
+
+    ###########################################################################################
+

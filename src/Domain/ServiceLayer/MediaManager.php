@@ -116,8 +116,8 @@ class MediaManager extends AbstractServiceLayer
      *
      * TODO: review this method if database "medias" table schema is improved:
      * TODO: delete image and video foreign keys, keep reference to media in Image or Video tables by modifying relationships)
-     * TODO: create a public constructor with Image or Video entity reference (delete named constrcutors)
-     * TODO: delete trick foreign key, because a media source is not necessarily to trick , that's the casr for avatar or media document source
+     * TODO: create a public constructor with Image or Video entity reference (delete named constructors)
+     * TODO: delete trick foreign key, because a media source is not necessarily linked to trick , that's the case for avatar or media document source
      */
     public function createUserAvatarMedia(
         Image $image,
@@ -156,6 +156,11 @@ class MediaManager extends AbstractServiceLayer
      * @return Media|null
      *
      * @throws \Exception
+     *
+     * TODO: review this method if database "medias" table schema is improved:
+     * TODO: delete image and video foreign keys, keep reference to media in Image or Video tables by modifying relationships)
+     * TODO: create a public constructor with Image or Video entity reference (delete named constructors)
+     * TODO: delete trick foreign key, because a media source is not necessarily linked to trick , that's the case for avatar or media document source
      */
     public function createTrickMedia(
         object $entityType,
