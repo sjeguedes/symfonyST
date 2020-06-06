@@ -67,13 +67,30 @@ class MediaOwner
     private $user;
 
     /**
+     *
+     * @var \DateTimeInterface
+     *
+     * @ORM\Column(type="datetime")
+     */
+    private $creationDate;
+
+    /**
+     *
+     * @var \DateTimeInterface
+     *
+     * @ORM\Column(type="datetime")
+     */
+    private $updateDate;
+
+    /**
      * MediaOwner constructor.
      *
-     * @param object $owner
+     * @param object                  $owner
+     * @param \DateTimeInterface|null $creationDate
      *
      * @throws \Exception
      */
-    public function __construct(object $owner)
+    public function __construct(object $owner, \DateTimeInterface $creationDate = null)
     {
         // Check parent class to make also fixture proxy work!
         \assert(
@@ -87,6 +104,8 @@ class MediaOwner
         $this->medias = new ArrayCollection();
         $this->trick = $owner instanceof Trick ? $owner : null;
         $this->user = $owner instanceof User ? $owner : null;
+        $this->creationDate = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
+        $this->updateDate = $this->creationDate;
     }
 
     /**
@@ -119,6 +138,22 @@ class MediaOwner
     public function getUser() : ?User
     {
         return $this->user;
+    }
+
+    /**
+     * @return \DateTimeInterface
+     */
+    public function getCreationDate() : \DateTimeInterface
+    {
+        return $this->creationDate;
+    }
+
+    /**
+     * @return \DateTimeInterface
+     */
+    public function getUpdateDate() : \DateTimeInterface
+    {
+        return $this->updateDate;
     }
 
     /**

@@ -17,14 +17,6 @@ use Ramsey\Uuid\UuidInterface;
  *
  * @ORM\Entity(repositoryClass=TrickRepository::class)
  * @ORM\Table(name="tricks")
- * @ORM\SqlResultSetMappings(
- *      @ORM\SqlResultSetMapping(
- *          name    = "mappingTrickListSortOrder",
- *          columns = {
- *              @ORM\ColumnResult("rank")
- *          }
- *     )
- * )
  */
 class Trick
 {

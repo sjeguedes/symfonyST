@@ -63,13 +63,30 @@ class MediaSource
     private $media;
 
     /**
+     *
+     * @var \DateTimeInterface
+     *
+     * @ORM\Column(type="datetime")
+     */
+    private $creationDate;
+
+    /**
+     *
+     * @var \DateTimeInterface
+     *
+     * @ORM\Column(type="datetime")
+     */
+    private $updateDate;
+
+    /**
      * MediaSource constructor.
      *
-     * @param object $source
+     * @param object                  $source
+     * @param \DateTimeInterface|null $creationDate
      *
      * @throws \Exception
      */
-    public function __construct(object $source)
+    public function __construct(object $source, \DateTimeInterface $creationDate = null)
     {
         // Check parent class to make also fixture proxy work!
         \assert(
@@ -82,6 +99,8 @@ class MediaSource
         $this->uuid = Uuid::uuid4();
         $this->image = $source instanceof Image ? $source : null;
         $this->video = $source instanceof Video ? $source : null;
+        $this->creationDate = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
+        $this->updateDate = $this->creationDate;
     }
 
     /**
@@ -127,5 +146,21 @@ class MediaSource
     public function getVideo() : ?Video
     {
         return $this->video;
+    }
+
+    /**
+     * @return \DateTimeInterface
+     */
+    public function getCreationDate() : \DateTimeInterface
+    {
+        return $this->creationDate;
+    }
+
+    /**
+     * @return \DateTimeInterface
+     */
+    public function getUpdateDate() : \DateTimeInterface
+    {
+        return $this->updateDate;
     }
 }

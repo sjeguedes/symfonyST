@@ -40,6 +40,8 @@ class Media
     /**
      * @var MediaOwner|null (owning side of entity relation)
      *
+     * It can be null in case of direct upload!
+     *
      * @ORM\ManyToOne(targetEntity=MediaOwner::class, inversedBy="medias")
      * @ORM\JoinColumn(name="media_owner_uuid", referencedColumnName="uuid", nullable=true)
      */
@@ -55,6 +57,8 @@ class Media
 
     /**
      * @var User (owning side of entity relation)
+     *
+     * It can be changed in case user creator account removal!
      *
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="medias")
      * @ORM\JoinColumn(name="user_uuid", referencedColumnName="uuid", nullable=false)
@@ -107,7 +111,7 @@ class Media
      * @param MediaOwner|null         $mediaOwner  a media attachment which can be in case of direct upload
      * @param MediaSource             $mediaSource
      * @param MediaType               $mediaType
-     * @param User|null               $user        a media creator can be null (an anonymous one when creator is deleted!)
+     * @param User                    $user        a media creator ("author")
      * @param bool                    $isMain
      * @param bool                    $isPublished
      * @param int                     $showListRank
@@ -119,7 +123,7 @@ class Media
         ?MediaOwner $mediaOwner,
         MediaSource $mediaSource,
         MediaType $mediaType,
-        ?User $user,
+        User $user,
         bool $isMain = false,
         bool $isPublished = false,
         int $showListRank = null,
@@ -146,6 +150,8 @@ class Media
      * Change assigned media owner after creation.
      *
      * @param MediaOwner $mediaOwner
+     *
+     * After creation a media owner cannot be null!
      *
      * @return Media
      */
@@ -185,6 +191,9 @@ class Media
      * Change assigned user after creation.
      *
      * @param User $user
+     *
+     * After creation a user "creator" can be changed due to user account removal!
+     * For instance an anonymous user or administrator can be affected to replace the creator.
      *
      * @return Media
      */
@@ -300,6 +309,14 @@ class Media
     public function getMediaType() : MediaType
     {
         return $this->mediaType;
+    }
+
+    /**
+     * @return User
+     */
+    public function getUser() : User
+    {
+        return $this->user;
     }
 
     /**
