@@ -130,12 +130,15 @@ class ImageManager extends AbstractServiceLayer
         bool $isFlushed = false
     ) : ?Image
     {
-        // Bind associated Media entity if it is expected.
+        // Bind associated Media entity if it is expected to ensure correct persistence!
+        // This is needed without individual persistence by using cascade option.
         if (!\is_null($newMedia)) {
-            $newImage->setMedia($newMedia);
+            $mediaSource = $newMedia->getMediaSource();
+            $newImage->assignMediaSource($mediaSource);
+            $mediaSource->assignMedia($newMedia);
         }
         // The logic would be also more functional and easier by persisting Media entity directly,
-        // without the need to set e Media entity.
+        // without the need to assign e Media entity.
         $object = $this->addAndSaveNewEntity($newImage, $isPersisted, $isFlushed);
         return \is_null($object) ? null : $newImage;
     }
@@ -183,7 +186,8 @@ class ImageManager extends AbstractServiceLayer
             $trickImageFileFormat,
             $trickImageFileSize
         );
-        // Save data in database
+        // Return Image entity
+        // Maybe persist and possibly save data in database
         return $this->addAndSaveImage($newTrickImage, null, $isPersisted, $isFlushed); // null or the entity
     }
 
@@ -256,44 +260,49 @@ class ImageManager extends AbstractServiceLayer
      *
      * @return void
      *
+     * @throws \Exception
      * @see TrickManager::removeTrick()
      *
-     * @throws \Exception
      */
     public function deleteAllTrickImagesFiles(Trick $newTrick) : void
     {
-        $uploadDirectory = $this->imageUploader->getUploadDirectory(ImageUploader::TRICK_IMAGE_DIRECTORY_KEY);
-        foreach ($newTrick->getMedias() as $media) {
+        foreach ($newTrick->getMediaOwner()->getMedias() as $media) {
             /** @var Image|null $imageEntity */
-            $imageEntity = $media->getImage();
+            $imageEntity = $media->getMediaSource()->getImage();
             // Media must reference a Image entity!
             if (\is_null($imageEntity)) {
                 continue;
             }
             // Remove image physically
-            $this->deleteOneTrickImageFile($imageEntity, $uploadDirectory);
+            $this->removeOneImageFile($imageEntity, ImageUploader::TRICK_IMAGE_DIRECTORY_KEY);
         }
     }
 
     /**
-     * Delete physically a particular image already associated to a Trick entity.
+     * Remove physically a particular image.
      *
-     * @param Image  $image
-     * @param string $uploadDirectory
+     * @param Image|null  $imageEntity
+     * @param string|null $uploadDirectoryKey
+     * @param string|null $imageFullName      a full image name (not a path) with extension
      *
      * @return void
      *
-     * @see TrickManager::removeTrick()
-     *
      * @throws \Exception
+     *
+     * @see TrickManager::removeTrick()
      */
-    public function deleteOneTrickImageFile(Image $image, ?string $uploadDirectory) : void
+    public function removeOneImageFile(?Image $imageEntity, string $uploadDirectoryKey, string $imageFullName = null) : void
     {
-        if (is_null($uploadDirectory)) {
-            $uploadDirectory = $this->imageUploader->getUploadDirectory(ImageUploader::TRICK_IMAGE_DIRECTORY_KEY);
+        if (\is_null($imageEntity) && \is_null($imageFullName)) {
+            throw new \RuntimeException('A instance of Image, or a full image name must be defined!');
         }
-        $imageNameWithExtension = $image->getName() . '.' . $image->getFormat();
-        // Remove image physically
+        $imageNameWithExtension = !\is_null($imageEntity)
+                                  ? $imageEntity->getName() . '.' . $imageEntity->getFormat() : $imageFullName;
+        // Remove image physically (check also temporary image)
+        $uploadDirectory = $this->imageUploader->getUploadDirectory($uploadDirectoryKey);
+        if (preg_match('/' . ImageManager::DEFAULT_IMAGE_IDENTIFIER_NAME . '/', $imageNameWithExtension)) {
+            $uploadDirectory = $uploadDirectory . '/' .ImageUploader::TEMPORARY_DIRECTORY_NAME;
+        }
         unlink($uploadDirectory . '/' . $imageNameWithExtension);
     }
 
@@ -570,10 +579,10 @@ class ImageManager extends AbstractServiceLayer
     public function getUserAvatarImage(UserInterface $user) : ?Image
     {
         $image = null;
-        $medias = $user->getMedias();
+        $medias = $user->getMediaOwner()->getMedias();
         foreach ($medias as $media) {
             if ($this->mediaTypeManager->getType('userAvatar') === $media->getMediaType()->getType()) {
-                $image = $media->getImage();
+                $image = $media->getMediaSource()->getImage();
                 // Avatar image is unique.
                 break;
             }
@@ -658,11 +667,11 @@ class ImageManager extends AbstractServiceLayer
     public function removeUserAvatar(UserInterface $user) : void
     {
         // Image is both removed physically and in database (no user avatar gallery is used on website).
-        $medias = $user->getMedias();
+        $medias = $user->getMediaOwner()->getMedias();
         foreach ($medias as $media) {
             if ($this->mediaTypeManager->getType('userAvatar') === $media->getMediaType()->getType()) {
                 $uploadDirectory = $this->imageUploader->getUploadDirectory(ImageUploader::AVATAR_IMAGE_DIRECTORY_KEY);
-                $image = $media->getImage();
+                $image = $media->getMediaSource()->getImage();
                 $imageFileName = $image->getName() . '.' . $image->getFormat();
                 unlink($uploadDirectory . '/' . $imageFileName);
                 // Remove image entity (and corresponding media entity thanks to delete cascade option on relation)
@@ -681,6 +690,7 @@ class ImageManager extends AbstractServiceLayer
      * @param string $currentImageName a base image name with extension
      * @param string $newImageName     a base image name with extension
      * @param string $imageTypeKey     a key which identifies image type
+     * @param bool   $isTemporary      the file can be uploaded in a temporary directory
      *
      * @return bool
      *
@@ -689,14 +699,24 @@ class ImageManager extends AbstractServiceLayer
      *
      * @throws \Exception
      */
-    public function renameImage(string $currentImageName, string $newImageName, string $imageTypeKey) : bool
+    public function renameImage(
+        string $currentImageName,
+        string $newImageName,
+        string $imageTypeKey,
+        bool $isTemporary = false
+    ) : bool
     {
         // Get dynamically a image directory key constant value depending on image type
         $constant = $this->getImageDirectoryConstantValue($imageTypeKey);
         // Get image directory thanks to image type key passed as argument
         $uploadDirectory = $this->imageUploader->getUploadDirectory($constant);
+        // Update base path with temporary directory if needed
+        $baseDirectory = $isTemporary ? $uploadDirectory . '/' . ImageUploader::TEMPORARY_DIRECTORY_NAME : $uploadDirectory;
         // Rename image
-        $isImageRenamed = rename($uploadDirectory . '/' . $currentImageName, $uploadDirectory . '/' . $newImageName);
+        $isImageRenamed = rename(
+            $baseDirectory . '/' . $currentImageName,
+            $uploadDirectory . '/' . $newImageName
+        );
         return $isImageRenamed;
     }
 
@@ -722,7 +742,7 @@ class ImageManager extends AbstractServiceLayer
     ) : bool
     {
         // Get corresponding image Media entity
-        $bigImagMediaEntity = $bigImageEntity->getMedia();
+        $bigImagMediaEntity = $bigImageEntity->getMediaSource()->getMedia();
         if (is_null($bigImagMediaEntity)) {
             return false;
         }
@@ -748,12 +768,13 @@ class ImageManager extends AbstractServiceLayer
      * Remove an image and all associated entities depending on cascade operations.
      *
      * @param Image $image
+     * @param bool  $isFlushed
      *
      * @return bool
      */
-    public function removeImage(Image $image) : bool
+    public function removeImage(Image $image, bool $isFlushed = true) : bool
     {
         // Proceed to removal in database
-        return $this->removeAndSaveNoMoreEntity($image);
+        return $this->removeAndSaveNoMoreEntity($image, $isFlushed);
     }
 }

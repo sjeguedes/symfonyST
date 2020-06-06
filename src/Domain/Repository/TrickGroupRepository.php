@@ -20,8 +20,6 @@ class TrickGroupRepository extends ServiceEntityRepository
      * TrickGroupRepository constructor.
      *
      * @param RegistryInterface $registry
-     *
-     * @return void
      */
     public function __construct(RegistryInterface $registry)
     {

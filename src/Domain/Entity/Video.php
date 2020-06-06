@@ -27,12 +27,12 @@ class Video
      * @ORM\Id()
      * @ORM\Column(type="uuid_binary", unique=true)
      */
-    private $uuid;
+    protected $uuid;
 
     /**
      * @var string
      *
-     * @ORM\Column(type="string", unique=true)
+     * @ORM\Column(type="string")
      */
     private $url;
 
@@ -58,11 +58,11 @@ class Video
     private $updateDate;
 
     /**
-     * @var Media (inverse side of entity relation)
+     * @var MediaSource (inverse side of relation)
      *
-     * @ORM\OneToOne(targetEntity=Media::class, cascade={"persist", "remove"}, orphanRemoval=true, mappedBy="video")
+     * @ORM\OneToOne(targetEntity=MediaSource::class, mappedBy="video", cascade={"persist", "remove"}, orphanRemoval=true)
      */
-    private $media;
+    private $mediaSource;
 
     /**
      * Image constructor.
@@ -70,8 +70,6 @@ class Video
      * @param string                  $url
      * @param string                  $description
      * @param \DateTimeInterface|null $creationDate
-     *
-     * @return void
      *
      * @throws \Exception
      */
@@ -87,6 +85,19 @@ class Video
         $this->description = $description;
         $this->creationDate = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
         $this->updateDate = $this->creationDate;
+    }
+
+    /**
+     * Assign a media source.
+     *
+     * @param MediaSource $mediaSource
+     *
+     * @return $this
+     */
+    public function assignMediaSource(MediaSource $mediaSource) : self
+    {
+        $this->mediaSource = $mediaSource;
+        return $this;
     }
 
     /**
@@ -144,19 +155,6 @@ class Video
     }
 
     /**
-     * Set an associated Media to manage persistence from Video entity.
-     *
-     * @param Media $media
-     *
-     * @return Video
-     */
-    public function setMedia(Media $media) : self
-    {
-        $this->media = $media;
-        return $this;
-    }
-
-    /**
      * @return UuidInterface
      */
     public function getUuid() : UuidInterface
@@ -197,10 +195,10 @@ class Video
     }
 
     /**
-     * @return Media|null
+     * @return MediaSource|null
      */
-    public function getMedia() : ?Media
+    public function getMediaSource() : ?MediaSource
     {
-        return $this->media;
+        return $this->mediaSource;
     }
 }

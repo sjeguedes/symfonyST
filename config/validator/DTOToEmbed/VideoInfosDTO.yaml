@@ -9,6 +9,9 @@ App\Domain\DTOToEmbed\VideoInfosDTO:
         description:
             - NotBlank:
                 message: Please fill in a short description.
+            - Length:
+                max: 255
+                maxMessage: "This description should contain\na maximum of {{ limit }} characters or less."
 
     constraints:
         # Custom validator for:

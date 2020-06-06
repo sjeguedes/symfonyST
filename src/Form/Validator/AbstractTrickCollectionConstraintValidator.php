@@ -54,7 +54,7 @@ abstract class AbstractTrickCollectionConstraintValidator extends ConstraintVali
             }
         }
         if (true === $isRankTampered) {
-            $context->buildViolation('You are not allowed to tamper show list rank!<br>' . ucfirst($collectionName) . ' list was reordered by default.')
+            $context->buildViolation('You are not allowed to tamper show list rank!' . "\n" . ucfirst($collectionName) . ' list was reordered by default.')
                 ->atPath('showListRank')
                 ->addViolation();
         }

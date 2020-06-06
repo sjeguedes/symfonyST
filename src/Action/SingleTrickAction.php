@@ -64,6 +64,8 @@ class SingleTrickAction
      * @param Request              $request
      *
      * @return Response
+     *
+     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function __invoke(SingleTrickResponder $responder, Request $request) : Response
     {

@@ -1,0 +1,111 @@
+media_owners:
+    -
+        #1
+        #trick: "Ollie"
+        type: "trick"
+        references:
+            trick: 1
+    -
+        #2
+        #trick: "Nollie"
+        type: "trick"
+        references:
+            trick: 2
+    -
+        #3
+        #trick: "One-Two"
+        type: "trick"
+        references:
+            trick: 3
+    -
+        #4
+        #trick: "Back flip"
+        type: "trick"
+        references:
+            trick: 4
+    -
+        #5
+        #trick: "Front flip"
+        type: "trick"
+        references:
+            trick: 5
+    -
+        #6
+        #trick: "Invert"
+        type: "trick"
+        references:
+            trick: 6
+    -
+        #7
+        #trick: "Handplant"
+        type: "trick"
+        references:
+            trick: 7
+    -
+        #8
+        #trick: "50-50"
+        type: "trick"
+        references:
+            trick: 8
+    -
+        #9
+        #trick: "Boardslide"
+        type: "trick"
+        references:
+            trick: 9
+    -
+        #10
+        #trick: "Nose-pick"
+        type: "trick"
+        references:
+            trick: 10
+    -
+        #11
+        #trick: "Board-stall"
+        type: "trick"
+        references:
+            trick: 11
+    -
+        #12
+        #trick: "One-footed"
+        type: "trick"
+        references:
+            trick: 12
+    -
+        #13
+        #trick: "McTwist"
+        type: "trick"
+        references:
+            trick: 13
+    -
+        #14
+        #trick: "McTwist"
+        type: "trick"
+        references:
+            trick: 14
+    -
+        #15
+        #trick: "Stalefish"
+        type: "trick"
+        references:
+            trick: 15
+    ###########################################################################################
+    ## Avatars
+    -
+        #16
+        #user Miky
+        type: "user"
+        references:
+            user: 1
+    -
+        #17
+        #user Rooky
+        type: "user"
+        references:
+            user: 2
+    -
+        #18
+        #user Arny
+        type: "user"
+        references:
+            user: 3

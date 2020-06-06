@@ -83,9 +83,12 @@ class VideoManager extends AbstractServiceLayer
         bool $isFlushed = false
     ) : ?Video
     {
-        // Bind associated Media entity if it is expected.
+        // Bind associated Media entity if it is expected to ensure correct persistence!
+        // This is needed without individual persistence by using cascade option.
         if (!\is_null($newMedia)) {
-            $newVideo->setMedia($newMedia);
+            $mediaSource = $newMedia->getMediaSource();
+            $newVideo->assignMediaSource($mediaSource);
+            $mediaSource->assignMedia($newMedia);
         }
         // The logic would be also more functional and easier by persisting Media entity directly,
         // without the need to set e Media entity.
@@ -97,17 +100,24 @@ class VideoManager extends AbstractServiceLayer
      * Create trick video Video entity.
      *
      * @param VideoInfosDTO $dataModel
+     * @param bool          $isPersisted
+     * @param bool          $isFlushed
      *
      * @return Video|null
      *
      * @throws \Exception
      */
-    public function createTrickVideo(VideoInfosDTO $dataModel) : ?Video
+    public function createTrickVideo(
+        VideoInfosDTO $dataModel,
+        bool $isPersisted = false,
+        bool $isFlushed = false
+    ) : ?Video
     {
         // Get new trick Video entity
-        $trickVideo = new Video($dataModel->getUrl(), $dataModel->getDescription());
+        $newTrickVideo = new Video($dataModel->getUrl(), $dataModel->getDescription());
         // Return Video entity
-        return $trickVideo;
+        // Maybe persist and possibly save data in database
+        return $this->addAndSaveVideo($newTrickVideo, null, $isPersisted, $isFlushed); // null or the entity
     }
 
     /**

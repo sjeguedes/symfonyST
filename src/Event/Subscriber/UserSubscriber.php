@@ -11,7 +11,6 @@ use App\Domain\ServiceLayer\UserManager;
 use App\Event\CustomEventFactory;
 use App\Event\FormUnchangedEvent;
 use App\Event\UserRetrievedEvent;
-use App\Form\Type\Admin\UpdateProfileInfosType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;

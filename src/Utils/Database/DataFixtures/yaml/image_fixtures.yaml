@@ -6,6 +6,8 @@ images:
             description: "Ollie - A trick in which the snowboarder springs off the tail of the board and into the air."
             format: "jpg"
             size: 501000
+        references:
+            #media_source: 1
     -
         #2
         fields:
@@ -13,6 +15,8 @@ images:
             description: "Nollie - A trick in which the snowboarder springs off the nose of the board and into the air."
             format: "jpg"
             size: 641000
+        references:
+            #media_source: 2
     -
         #3
         fields:
@@ -20,6 +24,8 @@ images:
             description: "One-Two - A trick in which the rider's front hand grabs the heel edge behind their back foot."
             format: "jpg"
             size: 660000
+        references:
+            #media_source: 3
     -
         #4
         fields:
@@ -27,6 +33,8 @@ images:
             description: "Back flip - Flipping backwards (like a standing backflip) off of a jump."
             format: "jpg"
             size: 776000
+        references:
+            #media_source: 4
     -
         #5
         fields:
@@ -34,6 +42,8 @@ images:
             description: "Front flip - Flipping forward (like a standing frontflip) off of a jump."
             format: "jpg"
             size: 229000
+        references:
+            #media_source: 5
     -
         #6
         fields:
@@ -41,6 +51,8 @@ images:
             description: "Invert - Overlaying term for handstands on the edge of a halfpipe."
             format: "jpg"
             size: 532000
+        references:
+            #media_source: 6
     -
         #7
         fields:
@@ -48,6 +60,8 @@ images:
             description: "Handplant - A 180° degree handplant in which the rear hand is planted on the lip of the wall and the rotation is frontside."
             format: "jpg"
             size: 306000
+        references:
+            #media_source: 7
     -
         #8
         fields:
@@ -55,6 +69,8 @@ images:
             description: "50-50 - A slide in which a snowboarder rides straight along a rail or other obstacle."
             format: "jpg"
             size: 855000
+        references:
+            #media_source: 8
     -
         #9
         fields:
@@ -62,6 +78,8 @@ images:
             description: "Boardslide - A slide performed where the riders leading foot passes over the rail on approach, with their snowboard traveling perpendicular along the rail or other obstacle."
             format: "jpg"
             size: 471000
+        references:
+            #media_source: 9
     -
         #10
         fields:
@@ -69,6 +87,8 @@ images:
             description: "Nose-pick - Stalling on an object with the nose of the snowboard, while grabbing frontside, and then jumping back off the object into the jump you came off."
             format: "jpg"
             size: 706000
+        references:
+            #media_source: 10
     -
         #11
         fields:
@@ -76,6 +96,8 @@ images:
             description: "Board-stall (and Disaster variation) - A trick performed when a rider stalls on an object with their snowboard, with the point of contact between both bindings."
             format: "jpg"
             size: 976000
+        references:
+            #media_source: 11
     -
         #12
         fields:
@@ -83,6 +105,8 @@ images:
             description: "One-footed - Tricks performed with one foot removed from the binding (typically the rear foot) are referred to as one-footed tricks."
             format: "jpg"
             size: 293000
+        references:
+            #media_source: 12
 
     ###########################################################################################
     # Several images for 1 trick
@@ -93,6 +117,8 @@ images:
             description: "McTwist - PARK LIFE - DC AREA 43 in Méribel - Mottaret"
             format: "jpeg"
             size: 183503
+        references:
+            #media_source: 13
     -
         #14
         fields:
@@ -100,6 +126,8 @@ images:
             description: "McTwist - A forward-flipping backside 540, performed in a halfpipe, quarterpipe, or similar obstacle."
             format: "jpeg"
             size: 242274
+        references:
+            #media_source: 14
     -
         #15
         fields:
@@ -107,6 +135,8 @@ images:
             description: "Tuck Knee - Straight Airs - Snowboard Basics"
             format: "jpeg"
             size: 138646
+        references:
+            #media_source: 15
     -
         #16
         fields:
@@ -114,6 +144,8 @@ images:
             description: "Tuck Knee - Frontside 360° - Snowboarding Basics"
             format: "jpeg"
             size: 205492
+        references:
+            #media_source: 16
     -
         #17
         fields:
@@ -121,6 +153,8 @@ images:
             description: "Stalefish - Nordkette (Austria)"
             format: "jpeg"
             size: 96156
+        references:
+            #media_source: 17
     -
         #18
         fields:
@@ -128,6 +162,8 @@ images:
             description: "Stalefish - Laax Open 2017: Chase Josey & Chloe Kim"
             format: "jpeg"
             size: 143679
+        references:
+            #media_source: 18
     -
         #19
         fields:
@@ -135,6 +171,8 @@ images:
             description: "Stalefish - Zoi Sadowski Synnott & Dusty Henricksen"
             format: "jpeg"
             size: 151869
+        references:
+            #media_source: 19
 
     ###########################################################################################
     -
@@ -144,6 +182,8 @@ images:
             description: "Ollie - A trick in which the snowboarder springs off the tail of the board and into the air."
             format: "jpg"
             size: 234000
+        references:
+            #media_source: 20
     -
         #21
         fields:
@@ -151,12 +191,16 @@ images:
             description: "Nollie - A trick in which the snowboarder springs off the nose of the board and into the air."
             format: "jpg"
             size: 289000
+        references:
+            #media_source: 21
     -   #22
         fields:
             name: "one-two-0edd47a6-880x495"
             description: "One-Two - A trick in which the rider's front hand grabs the heel edge behind their back foot."
             format: "jpg"
             size: 322000
+        references:
+            #media_source: 22
     -
         #23
         fields:
@@ -164,6 +208,8 @@ images:
             description: "Back flip - Flipping backwards (like a standing backflip) off of a jump."
             format: "jpg"
             size: 355000
+        references:
+            #media_source: 23
     -
         #24
         fields:
@@ -171,6 +217,8 @@ images:
             description: "Front flip - Flipping forward (like a standing frontflip) off of a jump."
             format: "jpg"
             size: 323000
+        references:
+            #media_source: 24
     -
         #25
         fields:
@@ -178,6 +226,8 @@ images:
             description: "Invert - Overlaying term for handstands on the edge of a halfpipe."
             format: "jpg"
             size: 242000
+        references:
+            #media_source: 25
     -
         #26
         fields:
@@ -185,6 +235,8 @@ images:
             description: "Handplant - A 180° degree handplant in which the rear hand is planted on the lip of the wall and the rotation is frontside."
             format: "jpg"
             size: 156000
+        references:
+            #media_source: 26
     -
         #27
         fields:
@@ -192,6 +244,8 @@ images:
             description: "50-50 - A slide in which a snowboarder rides straight along a rail or other obstacle."
             format: "jpg"
             size: 384000
+        references:
+            #media_source: 27
     -
         #28
         fields:
@@ -199,6 +253,8 @@ images:
             description: "boardslide - A slide performed where the riders leading foot passes over the rail on approach, with their snowboard traveling perpendicular along the rail or other obstacle."
             format: "jpg"
             size: 240000
+        references:
+            #media_source: 28
     -
         #29
         fields:
@@ -206,6 +262,8 @@ images:
             description: "Nose-pick - Stalling on an object with the nose of the snowboard, while grabbing frontside, and then jumping back off the object into the jump you came off."
             format: "jpg"
             size: 325000
+        references:
+            #media_source: 29
     -
         #30
         fields:
@@ -213,6 +271,8 @@ images:
             description: "Board-stall and Disaster variation - A trick performed when a rider stalls on an object with their snowboard, with the point of contact between both bindings."
             format: "jpg"
             size: 419000
+        references:
+            #media_source: 30
     -
         #31
         fields:
@@ -220,6 +280,8 @@ images:
             description: "One-footed - Tricks performed with one foot removed from the binding (typically the rear foot) are referred to as one-footed tricks."
             format: "jpg"
             size: 140000
+        references:
+            #media_source: 31
 
     ###########################################################################################
     # Several images for 1 trick
@@ -230,6 +292,8 @@ images:
             description: "McTwist - PARK LIFE - DC AREA 43 in Méribel - Mottaret"
             format: "jpeg"
             size: 57929
+        references:
+            #media_source: 32
     -
         #33
         fields:
@@ -237,6 +301,8 @@ images:
             description: "McTwist - A forward-flipping backside 540, performed in a halfpipe, quarterpipe, or similar obstacle."
             format: "jpeg"
             size: 75869
+        references:
+            #media_source: 33
     -
         #34
         fields:
@@ -244,6 +310,8 @@ images:
             description: "Tuck Knee - Straight Airs - Snowboard Basics"
             format: "jpeg"
             size: 52160
+        references:
+            #media_source: 34
     -
         #35
         fields:
@@ -251,6 +319,8 @@ images:
             description: "Tuck Knee - Frontside 360° - Snowboarding Basics"
             format: "jpeg"
             size: 69205
+        references:
+            #media_source: 35
     -
         #36
         fields:
@@ -258,6 +328,8 @@ images:
             description: "Stalefish - Nordkette (Austria)"
             format: "jpeg"
             size: 32747
+        references:
+            #media_source: 36
     -
         #37
         fields:
@@ -265,6 +337,8 @@ images:
             description: "Stalefish - Laax Open 2017: Chase Josey & Chloe Kim"
             format: "jpeg"
             size: 48007
+        references:
+            #media_source: 37
     -
         #38
         fields:
@@ -272,6 +346,8 @@ images:
             description: "Stalefish - Zoi Sadowski Synnott & Dusty Henricksen"
             format: "jpeg"
             size: 52640
+        references:
+            #media_source: 38
 
     ###########################################################################################
     -
@@ -281,6 +357,8 @@ images:
             description: "Ollie - A trick in which the snowboarder springs off the tail of the board and into the air."
             format: "jpg"
             size: 61000
+        references:
+            #media_source: 39
     -
         #40
         fields:
@@ -288,6 +366,8 @@ images:
             description: "Nollie - A trick in which the snowboarder springs off the nose of the board and into the air."
             format: "jpg"
             size: 71000
+        references:
+            #media_source: 40
     -
         #41
         fields:
@@ -295,6 +375,8 @@ images:
             description: "One-Two - A trick in which the rider's front hand grabs the heel edge behind their back foot."
             format: "jpg"
             size: 84000
+        references:
+            #media_source: 41
     -
         #42
         fields:
@@ -302,6 +384,8 @@ images:
             description: "Back flip - Flipping backwards (like a standing backflip) off of a jump."
             format: "jpg"
             size: 87000
+        references:
+            #media_source: 42
     -
         #43
         fields:
@@ -309,6 +393,8 @@ images:
             description: "Front flip - Flipping forward (like a standing frontflip) off of a jump."
             format: "jpg"
             size: 84000
+        references:
+            #media_source: 43
     -
         #44
         fields:
@@ -316,6 +402,8 @@ images:
             description: "Invert - Overlaying term for handstands on the edge of a halfpipe."
             format: "jpg"
             size: 61000
+        references:
+            #media_source: 44
     -
         #45
         fields:
@@ -323,6 +411,8 @@ images:
             description: "Handplant - A 180° degree handplant in which the rear hand is planted on the lip of the wall and the rotation is frontside."
             format: "jpg"
             size: 43000
+        references:
+            #media_source: 45
     -
         #46
         fields:
@@ -330,6 +420,8 @@ images:
             description: "50-50 - A slide in which a snowboarder rides straight along a rail or other obstacle."
             format: "jpg"
             size: 91000
+        references:
+            #media_source: 46
     -
         #47
         fields:
@@ -337,6 +429,8 @@ images:
             description: "boardslide - A slide performed where the riders leading foot passes over the rail on approach, with their snowboard traveling perpendicular along the rail or other obstacle."
             format: "jpg"
             size: 66000
+        references:
+            #media_source: 47
     -
         #48
         fields:
@@ -344,6 +438,8 @@ images:
             description: "Nose-pick - Stalling on an object with the nose of the snowboard, while grabbing frontside, and then jumping back off the object into the jump you came off."
             format: "jpg"
             size: 82000
+        references:
+            #media_source: 48
     -
         #49
         fields:
@@ -351,6 +447,8 @@ images:
             description: "Board-stall and Disaster variation - A trick performed when a rider stalls on an object with their snowboard, with the point of contact between both bindings."
             format: "jpg"
             size: 93000
+        references:
+            #media_source: 49
     -
         #50
         fields:
@@ -358,6 +456,8 @@ images:
             description: "One-footed - Tricks performed with one foot removed from the binding (typically the rear foot) are referred to as one-footed tricks."
             format: "jpg"
             size: 42000
+        references:
+            #media_source: 50
 
     ###########################################################################################
     # Several images for 1 trick
@@ -368,6 +468,8 @@ images:
             description: "McTwist - PARK LIFE - DC AREA 43 in Méribel - Mottaret"
             format: "jpeg"
             size: 15769
+        references:
+            #media_source: 51
     -
         #52
         fields:
@@ -375,6 +477,8 @@ images:
             description: "McTwist - A forward-flipping backside 540, performed in a halfpipe, quarterpipe, or similar obstacle."
             format: "jpeg"
             size: 18906
+        references:
+            #media_source: 52
     -
         #53
         fields:
@@ -382,6 +486,8 @@ images:
             description: "Tuck Knee - Straight Airs - Snowboard Basics"
             format: "jpeg"
             size: 15335
+        references:
+            #media_source: 53
     -
         #54
         fields:
@@ -389,6 +495,8 @@ images:
             description: "Tuck Knee - Frontside 360° - Snowboarding Basics"
             format: "jpeg"
             size: 17981
+        references:
+            #media_source: 54
     -
         #55
         fields:
@@ -396,6 +504,8 @@ images:
             description: "Stalefish - Nordkette (Austria)"
             format: "jpeg"
             size: 9482
+        references:
+            #media_source: 55
     -
         #56
         fields:
@@ -403,6 +513,8 @@ images:
             description: "Stalefish - Laax Open 2017: Chase Josey & Chloe Kim"
             format: "jpeg"
             size: 12618
+        references:
+            #media_source: 56
     -
         #57
         fields:
@@ -410,6 +522,8 @@ images:
             description: "Stalefish - Zoi Sadowski Synnott & Dusty Henricksen"
             format: "jpeg"
             size: 14735
+        references:
+            #media_source: 57
 
     ###########################################################################################
     ## Avatars
@@ -420,6 +534,8 @@ images:
             description: "Arny's avatar"
             format: "jpeg"
             size: 2116
+        references:
+            #media_source: 58
     -
         #59
         fields:
@@ -427,6 +543,8 @@ images:
             description: "Miky's avatar"
             format: "jpeg"
             size: 2189
+        references:
+            #media_source: 59
     -
         #60
         fields:
@@ -434,6 +552,8 @@ images:
             description: "Rooky's avatar"
             format: "jpeg"
             size: 1628
+        references:
+            #media_source: 60
 
     ###########################################################################################
 

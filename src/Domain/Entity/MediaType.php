@@ -22,17 +22,34 @@ use Ramsey\Uuid\UuidInterface;
 class MediaType
 {
     /**
-     * Define allowed videos providers.
+     * Define allowed images types.
+     *
+     * Please note this kind of data should be in a configuration file
+     * which have to be updated each time media types evolve in database!
+     */
+    const ALLOWED_IMAGE_TYPES = ['thumbnail', 'normal', 'big', 'avatar'];
+
+    /**
+     * Define allowed videos types (providers).
+     *
+     * Please note this kind of data should be in a configuration file
+     * which have to be updated each time media types evolve in database!
      */
     const ALLOWED_VIDEO_TYPES = ['youtube', 'vimeo', 'dailymotion'];
 
     /**
      * Define media type prefixes.
+     *
+     * Please note this kind of data should be in a configuration file
+     * which have to be updated each time media types evolve in database!
      */
     const TYPE_PREFIXES = ['trick' => 't_', 'user' => 'u_'];
 
     /**
      * Define immutable types used to filter medias.
+     *
+     * Please note this kind of data should be in a configuration file
+     * which have to be updated each time media types evolve in database!
      */
     const TYPE_CHOICES = [
         'trickThumbnail'   => 't_thumbnail',
@@ -43,6 +60,14 @@ class MediaType
         'trickVimeo'       => 't_vimeo',
         'trickDailymotion' => 't_dailymotion'
     ];
+
+    /**
+     * Define media types source types used to filter medias.
+     *
+     * Please note this kind of data should be in a configuration file
+     * which have to be updated each time media types evolve in database!
+     */
+    const SOURCE_TYPES = ['image', 'video'];
 
     /**
      * The internal primary identity key.
@@ -57,9 +82,17 @@ class MediaType
     /**
      * @var string
      *
-     * @ORM\Column(type="string", unique=true)
+     * @ORM\Column(type="string", length=45, unique=true)
      */
     private $type;
+
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string", length=45)
+     */
+    private $sourceType;
 
     /**
      * @var string
@@ -109,7 +142,7 @@ class MediaType
     /**
      * @var Collection (inverse side of entity relation)
      *
-     * @ORM\OneToMany(targetEntity=Media::class, cascade={"remove"}, mappedBy="mediaType")
+     * @ORM\OneToMany(targetEntity=Media::class, mappedBy="mediaType")
      */
     private $medias;
 
@@ -117,18 +150,18 @@ class MediaType
      * MediaType constructor.
      *
      * @param string                  $type
+     * @param string                  $sourceType
      * @param string                  $name
      * @param string                  $description
      * @param int                     $width
      * @param int                     $height
      * @param \DateTimeInterface|null $creationDate
      *
-     * @return void
-     *
      * @throws \Exception
      */
     public function __construct(
         string $type,
+        string $sourceType,
         string $name,
         string $description,
         int $width,
@@ -136,12 +169,14 @@ class MediaType
         \DateTimeInterface $creationDate = null
     ) {
         \assert(\in_array($type, self::TYPE_CHOICES), 'MediaType type does not exist!');
+        \assert(\in_array($sourceType, self::SOURCE_TYPES), 'MediaType source type does not exist!');
         \assert(!empty($name), 'MediaType name can not be empty!');
         \assert(!empty($description), 'MediaType description can not be empty!');
         \assert($width > 0, 'MediaType width must be greater than 0!');
         \assert($height > 0, 'MediaType height must be greater than 0!');
         $this->uuid = Uuid::uuid4();
         $this->type = $type;
+        $this->sourceType = $sourceType;
         $this->name = $name;
         $this->description = $description;
         $this->width = $width;
@@ -149,6 +184,24 @@ class MediaType
         $this->creationDate = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
         $this->updateDate = $this->creationDate;
         $this->medias = new ArrayCollection();
+    }
+
+    /**
+     * Change source type after creation.
+     *
+     * @param string $sourceType
+     *
+     * @return MediaType
+     *
+     * @throws \Exception
+     */
+    public function modifySourceType(string $sourceType) : self
+    {
+        if (!\in_array($sourceType, self::SOURCE_TYPES)) {
+            throw new \InvalidArgumentException('MediaType source type is unknown!');
+        }
+        $this->sourceType = $sourceType;
+        return $this;
     }
 
     /**
@@ -250,6 +303,14 @@ class MediaType
     public function getType() : string
     {
         return $this->type;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSourceType() : string
+    {
+        return $this->sourceType;
     }
 
     /**

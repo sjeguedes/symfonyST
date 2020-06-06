@@ -27,8 +27,8 @@ class ImageFixtures extends BaseFixture
     {
         $array = $this->parseYamlFile('image_fixtures.yaml');
         $data = $array['images'];
-        // Create trick images
-        $this->createFixtures(Image::class, \count($data), function($i) use($data) {
+        // Create trick images or avatar images
+        $this->createFixtures(Image::class, \count($data), function ($i) use ($data) {
             return new Image(
                 $data[$i]['fields']['name'],
                 $data[$i]['fields']['description'],

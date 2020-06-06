@@ -181,10 +181,10 @@ class TrickManager extends AbstractServiceLayer
     ) : ?Trick
     {
         $newTrick = new Trick(
-            $createTrickDTO->getName(),
-            $createTrickDTO->getDescription(),
             $createTrickDTO->getGroup(), // At this time an array of TrickGroup is returned to possibly manage several "categories".
             $authenticatedUser,
+            $createTrickDTO->getName(),
+            $createTrickDTO->getDescription(),
             $this->makeSlug($createTrickDTO->getName()) // At this time slug is not defined in form, so create it with trick name.
         );
         // Save data in database
@@ -197,6 +197,8 @@ class TrickManager extends AbstractServiceLayer
      * @param string $name
      *
      * @return Trick|null
+     *
+     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function findSingleByName(string $name) : ?Trick
     {
@@ -209,6 +211,8 @@ class TrickManager extends AbstractServiceLayer
      * @param string $encodedUuid
      *
      * @return Trick|null
+     *
+     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function findSingleByEncodedUuid(string $encodedUuid) : ?Trick
     {
@@ -429,7 +433,6 @@ class TrickManager extends AbstractServiceLayer
         $isPageParameterCorrect = \ctype_digit((string) $page) && $page >= 1;
         // Wrong parameters
         // This is an optional check thanks to requirements and default empty parameters on route at this time
-        // TODO: manage "0" value !
         if (!$isPageParameterCorrect && !$isDefaultParameter) {
             $this->logger->error(
                 sprintf("[trace app snowTricks] TrickManager/filterPaginationRequestAttribute => pagination error with parameter: %s", $page)
@@ -507,15 +510,16 @@ class TrickManager extends AbstractServiceLayer
     }
 
     /**
- * Remove a trick and all associated entities depending on cascade operations.
- *
- * @param Trick $trick
- *
- * @return bool
- */
-    public function removeTrick(Trick $trick) : bool
+     * Remove a trick and all associated entities depending on cascade operations.
+     *
+     * @param Trick $trick
+     * @param bool  $isFlushed
+     *
+     * @return bool
+     */
+    public function removeTrick(Trick $trick, bool $isFlushed = true) : bool
     {
         // Proceed to removal in database
-        return $this->removeAndSaveNoMoreEntity($trick);
+        return $this->removeAndSaveNoMoreEntity($trick, $isFlushed);
     }
 }

@@ -40,16 +40,16 @@
         {% endif %}
         {# Display trick list #}
         <div class="uk-child-width-1-2@s uk-child-width-1-3@m uk-child-width-1-4@l uk-child-width-1-5@xl uk-grid-match uk-padding"
-             uk-grid>
+             uk-grid uk-height-match="target: > .st-card-container > .uk-card > .uk-card-body">
             {% for trick in tricks %}
             <div class="st-card-container" data-offset="{{ trick.rank|e('html_attr') }}">
                 <div class="uk-card uk-card-primary uk-box-shadow-medium uk-box-shadow-hover-large st-border-white-small">
-                    <div class="uk-card-badge uk-label uk-text-center"><span class="st-color-red">In</span> {{ trick.trickGroup.name }}<br><span class="st-color-red">Trick #</span> {{ 'DESC' == trickLoadingMode ? trickCount - (- trick.rank - 1 + trickCount) : trickCount + (trick.rank + 1 - trickCount) }}{#  <span class="st-color-red">Rank</span> {{ trick.rank }}#} <span class="st-color-red">Added on</span> {{ trick.creationDate|date('d/m/Y') }}</div>
+                    <div class="uk-card-badge uk-label uk-text-center"><span class="st-color-red">In</span> {{ trick.trickGroup.name }}<br><span class="st-color-red">Trick #</span> {{ 'DESC' == trickLoadingMode ? trickCount - (- trick.rank - 1 + trickCount) : trickCount + (trick.rank + 1 - trickCount) }} <span class="st-color-red">Added on</span> {{ trick.creationDate|date('d/m/Y') }}</div>
                     <div class="uk-card-media-top uk-position-relative st-background-black">
                         {% include 'all/trick_media_loader.html.twig' with {'spinnerRatio': '1.5'} %}
-                        <img id="st-card-image-{{ trick.rank|e('html_attr') }}" class="uk-invisible" src="{{ asset(globalTrickUploadDirectory~trick.medias[0].image.name|e('html_attr')~'.'~trick.medias[0].image.format|e('html_attr')) }}" alt="{{ trick.medias[0].image.description|e('html_attr') }}">
+                        <img id="st-card-image-{{ trick.rank|e('html_attr') }}" class="uk-invisible" src="{{ asset(globalTrickUploadDirectory~trick.mediaOwner.medias[0].mediaSource.image.name|e('html_attr')~'.'~trick.mediaOwner.medias[0].mediaSource.image.format|e('html_attr')) }}" alt="{{ trick.mediaOwner.medias[0].mediaSource.image.description|e('html_attr') }}">
                     </div>
-                    <div class="uk-card-body">
+                    <div class="uk-card-body uk-padding-small">
                         <h2 class="uk-card-title">{{ trick.name }}</h2>
                     </div>
                     <div class="uk-card-footer">

@@ -9,14 +9,14 @@
 {% set mediaToExpandDimensions = '' %}
 {# Loop on trick medias using variables to get main image only ! #}
 {% set break = false %}
-{% for media in trick.medias if not break %}
+{% for media in trick.mediaOwner.medias if not break %}
     {# Media must be published to be shown. #}
     {% if media.isPublished == 1 %}
         {# Extract main image to show #}
         {% if media.isMain == 1 and media.mediaType.type == mediaTypesValues['trickNormal'] %}
-            {% set mainImage = asset(globalTrickUploadDirectory~media.image.name~'.'~media.image.format) %}
+            {% set mainImage = asset(globalTrickUploadDirectory~media.mediasource.image.name~'.'~media.mediasource.image.format) %}
             {% set isMainAvailable = 1 %}
-            {% set mainImageDesc = media.image.description %}
+            {% set mainImageDesc = media.mediasource.image.description %}
             {% set break = true %}
         {% endif %}
     {% endif %}
@@ -73,7 +73,7 @@
         <!-- Trick medias slider (invisible by default on mobile: look at button above!) -->
         <div id="st-single-slider-container" class="uk-visible@s uk-position-relative uk-margin-medium-bottom st-single-slider-container" uk-slider="autoplay: true; autoplay-interval: 6000; pause-on-hover: true">
             {# Create a slider only if it is necessary #}
-            {% if trick.medias|length != 0 %}
+            {% if trick.mediaOwner.medias|length != 0 %}
             <div id="st-single-slider" class="uk-slider-container uk-position-relative st-card-container" data-current-path="{{ path(app.request.attributes.get('_route'),
                     app.request.attributes.get('_route_params'))|e('html_attr') }}" data-video-proxy="{{ videoURLProxyPath|e('html_attr') }}" data-media-error="{{ mediaError|e('html_attr') }}">
                 {# ---------------------------------------------------------------------------- #}
@@ -81,7 +81,7 @@
                 {% set mediaQueryLabels = ['@s', '@m', '@l', '@xl'] %}
                 {% set itemCounter = 0 %}
                 {% set sliderDynamicCenterClass = '' %}
-                {% for media in trick.medias %}
+                {% for media in trick.mediaOwner.medias %}
                     {% if (media.mediaType.type == mediaTypesValues['trickThumbnail']) or
                           (media.mediaType.type matches '/'~mediaTypesValues['trickYoutube']~'|'~mediaTypesValues['trickVimeo']~'|'~mediaTypesValues['trickDailymotion']~'/') %}
                         {% set itemCounter = itemCounter + 1 %}
@@ -96,12 +96,12 @@
                 <ul class="{{ sliderDynamicCenterClass }}uk-slider-items uk-child-width-1-1 uk-child-width-1-2@s uk-child-width-1-3@m uk-child-width-1-4@l uk-child-width-1-5@xl uk-grid uk-grid-small">
                 {# ---------------------------------------------------------------------------- #}
                 {# Loop on trick medias to feed the slider #}
-                {% for media in trick.medias %}
+                {% for media in trick.mediaOwner.medias %}
                     {# ---------------------------------------------------------------------------- #}
                     {# List trick medias images #}
                     {% if media.mediaType.type == mediaTypesValues['trickThumbnail'] %}
                     {# Image to show in slide #}
-                    {% set mediaForSlide = media.image.name~'.'~media.image.format %}
+                    {% set mediaForSlide = media.mediasource.image.name~'.'~media.mediasource.image.format %}
                     {% set mediaToExpandDimensions = normalImageMediaType.width~'x'~normalImageMediaType.height %}
                     {# Image to show in modal: switch to normal image dimensions #}
                     {% set mediaToExpand = preg_replace('/\\d{3,4}x\\d{3,4}/', mediaToExpandDimensions, mediaForSlide) %}
@@ -113,8 +113,8 @@
                         {% include 'single-trick/media_card.html.twig' with {
                             'mediaTypesValues': mediaTypesValues,
                             'mediaType': media.mediaType,
-                            'mediaCreationDate': media.image.creationDate,
-                            'mediaDescription': media.image.description,
+                            'mediaCreationDate': media.mediasource.image.creationDate,
+                            'mediaDescription': media.mediasource.image.description,
                             'mediaRank': media.showListRank,
                             'mediaForSlide': mediaForSlide,
                             'mediaToExpand': mediaToExpand,
@@ -128,18 +128,18 @@
                     {# List trick medias videos #}
                     {% if media.mediaType.type matches '/'~mediaTypesValues['trickYoutube']~'|'~mediaTypesValues['trickVimeo']~'|'~mediaTypesValues['trickDailymotion']~'/' %}
                     {# Video to show both in slide and modal #}
-                    {% set mediaForSlide = media.video.url %}
+                    {% set mediaForSlide = media.mediaSource.video.url %}
                     {% set showListRank = media.showListRank %}
                     <li id="st-single-trick-video-slide-{{ showListRank }}">
                         {# html attribute escaping is used inside when necessary! #}
                         {# CAUTION: stragely 'html' autoescape strategy does not work in included template,
-                        so combined |e|e('html_attr') are used to apply only 'html_attr' filter! #}
+                        so for instance, combined |e|e('html_attr') are used to apply only 'html_attr' filter! #}
                         {% include 'single-trick/media_card.html.twig' with {
                             'mediaTypesValues': mediaTypesValues,
                             'mediaType': media.mediaType,
                             'mediaTypesValues': mediaTypesValues,
-                            'mediaCreationDate': media.video.creationDate,
-                            'mediaDescription': media.video.description,
+                            'mediaCreationDate': media.mediaSource.video.creationDate,
+                            'mediaDescription': media.mediaSource.video.description,
                             'mediaRank': media.showListRank,
                             'mediaForSlide': mediaForSlide,
                             'mediaToExpand': mediaForSlide,

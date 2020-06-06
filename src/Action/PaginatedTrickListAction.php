@@ -73,6 +73,7 @@ class PaginatedTrickListAction
         }
         $data = [
             'currentPage'      => $paginationParameters['currentPage'],
+            'noList'           => 'Sorry, no trick was found!',
             'pageCount'        => $paginationParameters['pageCount'],
             'trickCount'       => $paginationParameters['trickCount'],
             'trickLoadingMode' => $paginationParameters['loadingMode'],

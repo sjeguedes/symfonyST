@@ -145,7 +145,7 @@ final class ImageToCropConstraintValidator extends AbstractTrickCollectionConstr
         // This equals "NotNull" constraint.
         if (\is_null($object->getImage()) && \is_null($object->getSavedImageName())) {
             $addedText = !\is_null($object->getCropJSONData())
-                            ? 'a new file to validate.' . "\n" . 'Caution: this may be due to technical error!' . "\n" . 'Contact us if necessary.'
+                            ? "a new file to validate.\nCaution: this may be due to technical error!\nContact us if necessary."
                             : 'an image as expected.';
             $context->buildViolation('Please select ' . $addedText)
                 ->atPath('image')
@@ -333,7 +333,7 @@ final class ImageToCropConstraintValidator extends AbstractTrickCollectionConstr
                 }
                 // Data was tampered by malicious user! At least two images (two checkboxes) are defined as main.
                 if (false === $isMainImageNotSet && true === $form->getData()->getIsMain() && true === $object->getIsMain()) {
-                    $context->buildViolation('You are not allowed to tamper the main image!' . "\n" . 'Only one must be set.')
+                    $context->buildViolation("You are not allowed to tamper the main image!\nOnly one must be set.")
                         ->atPath('isMain')
                         ->addViolation();
                     break;

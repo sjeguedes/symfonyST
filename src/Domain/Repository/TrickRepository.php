@@ -6,9 +6,12 @@ namespace App\Domain\Repository;
 
 use App\Domain\Entity\Image;
 use App\Domain\Entity\Media;
+use App\Domain\Entity\MediaOwner;
+use App\Domain\Entity\MediaSource;
 use App\Domain\Entity\MediaType;
 use App\Domain\Entity\Trick;
 use App\Domain\Entity\TrickGroup;
+use App\Domain\Entity\TrickMedia;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NativeQuery;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
@@ -32,13 +35,11 @@ class TrickRepository extends ServiceEntityRepository
      *
      * @param RegistryInterface       $registry
      * @param ResultSetMappingBuilder $resultSetMapping
-     *
-     * @return void
      */
     public function __construct(RegistryInterface $registry, ResultSetMappingBuilder $resultSetMapping)
     {
         parent::__construct($registry, Trick::class);
-        // ResultSetMappingBuilder extends ResultSetMapping
+        // ResultSetMappingBuilder extends ResultSetMapping.
         $this->resultSetMapping = $resultSetMapping;
     }
 
@@ -123,19 +124,21 @@ class TrickRepository extends ServiceEntityRepository
      */
     public function findOneByName(string $name) : ?Trick
     {
-        // TODO: complete query later with users messages or use Message Repository to limit result!
+        // TODO: complete query later with users messages or use Message (Comment) Repository to limit result!
         $queryBuilder = $this->createQueryBuilder('t');
         // No need to join media types and trick group due to no particular filter on data
         // trick group and media type data are added automatically thanks to lazy loading!
         // Specifying joins reduces query numbers!
         $result = $queryBuilder
             // IMPORTANT! This feeds all objects properties correctly!
-            ->select(['t', 'tg', 'm', 'i', 'v'])
+            ->select(['t', 'tg','mo', 'm', 'mt', 'ms', 'i', 'v'])
             ->leftJoin('t.trickGroup', 'tg', 'WITH', 't.trickGroup = tg.uuid')
-            ->leftJoin('t.medias', 'm', 'WITH', 'm.trick = t.uuid')
+            ->leftJoin('t.mediaOwner', 'mo', 'WITH', 'mo.trick = t.uuid')
+            ->leftJoin('mo.medias', 'm', 'WITH', 'm.mediaOwner = mo.uuid')
             ->leftJoin('m.mediaType', 'mt', 'WITH', 'm.mediaType = mt.uuid')
-            ->leftJoin('m.image', 'i', 'WITH', 'm.image = i.uuid')
-            ->leftJoin('m.video', 'v', 'WITH', 'm.video = v.uuid')
+            ->leftJoin('m.mediaSource', 'ms', 'WITH', 'm.mediaSource = ms.uuid')
+            ->leftJoin('ms.image', 'i', 'WITH', 'ms.image = i.uuid')
+            ->leftJoin('ms.video', 'v', 'WITH', 'ms.video = v.uuid')
             ->where('t.name = ?1')
             ->orderBy('i.creationDate', 'DESC')
             ->addOrderBy('v.creationDate', 'DESC')
@@ -170,26 +173,25 @@ class TrickRepository extends ServiceEntityRepository
      */
     public function findOneByUuid(UuidInterface $uuid) : ?Trick
     {
-        // TODO: complete query later with users messages or use Message Repository to limit result!
+        // TODO: complete query later with users messages or use Message (Comment) Repository to limit result!
         $queryBuilder = $this->createQueryBuilder('t');
         // No need to join media types and trick group due to no particular filter on data
         // trick group and media type data are added automatically thanks to lazy loading!
         // Specifying joins reduces query numbers!
         $result = $queryBuilder
             // IMPORTANT! This feeds all objects properties correctly!
-            // Column declaration 't, tg, m, i, v' is equivalent to ['t', 'tg', 'm', 'mt', 'i', 'v'] syntax.
-            ->select('t, tg, m, i, v')
+            ->select(['t', 'tg','mo', 'm', 'mt', 'ms', 'i', 'v']) // same as ['t', 'tg', 'tm', 'm', 'mt', 'i', 'v']
             // CAUTION! 'HIDDEN' is a DQL keyword and
             // uses 'INVISIBLE' (or limited query result "tips") equivalence for MariaDB/MySQL up to date server version,
             // not to keep this column in final result.
-            ->addSelect('FIELD(mt.type, ?2, ?5, ?6, ?7) AS HIDDEN ordered_media_type')
+            ->addSelect('FIELD(mt.sourceType, ?8, ?9) AS HIDDEN ordered_media_source_type')
             ->leftJoin('t.trickGroup', 'tg', 'WITH', 't.trickGroup = tg.uuid')
-            ->leftJoin('t.medias', 'm', 'WITH', 'm.trick = t.uuid')
+            ->leftJoin('t.mediaOwner', 'mo', 'WITH', 'mo.trick = t.uuid')
+            ->leftJoin('mo.medias', 'm', 'WITH', 'm.mediaOwner = mo.uuid')
             ->leftJoin('m.mediaType', 'mt', 'WITH', 'm.mediaType = mt.uuid')
-            // "m.image" should be replaced by "ms.uuid" with ms as a new "media_sources" table!
-            ->leftJoin('m.image', 'i', 'WITH', 'm.image = i.uuid')
-            // "m.video" should be replaced by "ms.uuid" with ms as a new "media_sources" table!
-            ->leftJoin('m.video', 'v', 'WITH', 'm.video = v.uuid')
+            ->leftJoin('m.mediaSource', 'ms', 'WITH', 'm.mediaSource = ms.uuid')
+            ->leftJoin('ms.image', 'i', 'WITH', 'ms.image = i.uuid')
+            ->leftJoin('ms.video', 'v', 'WITH', 'ms.video = v.uuid')
             // Get big image format only for main image
             ->where('mt.type = ?4')
             ->andWhere('m.isMain = ' . $queryBuilder->expr()->literal('1'))
@@ -202,7 +204,7 @@ class TrickRepository extends ServiceEntityRepository
             // Expression is equivalent to 't.uuid= ?1' in WHERE clause.
             ->andWhere($queryBuilder->expr()->eq('t.uuid', '?1'))
             // List is ordered by these particular media types. FIELD() function can be directly used here to simplify query!
-            ->orderBy('ordered_media_type')
+            ->orderBy('ordered_media_source_type')
             // Each group of medias sorted earlier by types are sorted by show list rank data.
             ->addOrderBy('m.showListRank', 'ASC')
             ->setParameter(1, $uuid->getBytes())
@@ -212,6 +214,8 @@ class TrickRepository extends ServiceEntityRepository
             ->setParameter(5, MediaType::TYPE_CHOICES['trickYoutube'])
             ->setParameter(6, MediaType::TYPE_CHOICES['trickVimeo'])
             ->setParameter(7, MediaType::TYPE_CHOICES['trickDailymotion'])
+            ->setParameter(8, MediaType::SOURCE_TYPES[0]) // image
+            ->setParameter(9, MediaType::SOURCE_TYPES[1]) // video
             ->getQuery()
             ->getOneOrNullResult();
         return $result;
@@ -227,7 +231,6 @@ class TrickRepository extends ServiceEntityRepository
         // SQL query
         return $customSQL = "
             SELECT r.*
-            -- SELECT r.*, g.name AS trick_group_name, m.*, mt.*
             FROM
             (
                 -- Sub query to get trick ordered with descending/ascending order
@@ -236,10 +239,12 @@ class TrickRepository extends ServiceEntityRepository
                 (
                     -- Sub query to order tricks by date with sort direction 
                     -- and retrieve associated entities with necessary data for trick list
-                    SELECT t.uuid, t.name, t.slug, t.creation_date, 
-                           tg.uuid AS tg_uuid, tg.name AS tg_name, 
-                           m.uuid AS m_uuid, m.image_uuid, m.media_type_uuid, m.trick_uuid,
+                    SELECT t.uuid, t.name AS t_name, t.slug, t.creation_date, 
+                           tg.uuid AS tg_uuid, tg.name AS tg_name,
+                           mo.uuid AS mo_uuid,
+                           m.uuid AS m_uuid,
                            mt.uuid AS mt_uuid, mt.type,
+                           ms.uuid AS ms_uuid,
                            i.uuid AS i_uuid, i.name AS i_name, i.description, i.format
                     FROM
                     (
@@ -249,9 +254,11 @@ class TrickRepository extends ServiceEntityRepository
                     ) AS s, 
                     tricks t
                     INNER JOIN trick_groups tg ON t.trick_group_uuid = tg.uuid
-                    INNER JOIN medias m ON m.trick_uuid = t.uuid
+                    INNER JOIN media_owners mo ON mo.trick_uuid = t.uuid 
+                    INNER JOIN medias m ON m.media_owner_uuid = mo.uuid    
                     INNER JOIN media_types mt ON m.media_type_uuid = mt.uuid
-                    INNER JOIN images i ON m.image_uuid = i.uuid
+                    INNER JOIN media_sources ms ON m.media_source_uuid = ms.uuid
+                    INNER JOIN images i ON ms.image_uuid = i.uuid
                     -- Filter with media type
                     WHERE mt.type = :mediaType
                     -- Filter with image main status 
@@ -259,7 +266,7 @@ class TrickRepository extends ServiceEntityRepository
                     AND m.is_main = 1
                     ORDER BY
                     CASE WHEN @sortDirection = 'DESC' THEN t.creation_date END DESC,
-                    CASE WHEN @sortDirection = 'ASC' THEN t.creation_date END ASC
+                    CASE WHEN @sortDirection = 'ASC' THEN t.creation_date END
                 ) AS o
             ) AS r
             -- Filter with parameters to define expected rank interval instead of using LIMIT and OFFSET definition
@@ -279,19 +286,23 @@ class TrickRepository extends ServiceEntityRepository
     {
         $resultSetMapping->addEntityResult(Trick::class, 't')
             ->addFieldResult('t', 'uuid', 'uuid')
-            ->addFieldResult('t', 'name', 'name')
+            ->addFieldResult('t', 't_name', 'name')
             ->addFieldResult('t', 'slug', 'slug')
             ->addFieldResult('t', 'creation_date', 'creationDate')
             ->addScalarResult('rank', 'rank', 'integer');
         $resultSetMapping->addJoinedEntityResult(TrickGroup::class , 'tg', 't', 'trickGroup')
             ->addFieldResult('tg', 'tg_uuid', 'uuid')
             ->addFieldResult('tg', 'tg_name', 'name');
-        $resultSetMapping->addJoinedEntityResult(Media::class , 'm', 't', 'medias')
+       $resultSetMapping->addJoinedEntityResult(MediaOwner::class , 'mo', 't', 'mediaOwner')
+            ->addFieldResult('mo', 'mo_uuid', 'uuid');
+        $resultSetMapping->addJoinedEntityResult(Media::class , 'm', 'mo', 'medias')
             ->addFieldResult('m', 'm_uuid', 'uuid');
         $resultSetMapping->addJoinedEntityResult(MediaType::class , 'mt', 'm', 'mediaType')
             ->addFieldResult('mt', 'mt_uuid', 'uuid')
-            ->addFieldResult('mt', 'type', 'type');
-        $resultSetMapping->addJoinedEntityResult(Image::class , 'i', 'm', 'image')
+            ->addFieldResult('mt', 'mt_type', 'type');
+        $resultSetMapping->addJoinedEntityResult(MediaSource::class , 'ms', 'm', 'mediaSource')
+            ->addFieldResult('ms', 'ms_uuid', 'uuid');
+        $resultSetMapping->addJoinedEntityResult(Image::class , 'i', 'ms', 'image')
             ->addFieldResult('i', 'i_uuid', 'uuid')
             ->addFieldResult('i', 'i_name', 'name')
             ->addFieldResult('i', 'description', 'description')

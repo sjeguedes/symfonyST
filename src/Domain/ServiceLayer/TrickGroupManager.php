@@ -34,7 +34,6 @@ class TrickGroupManager
      * @param EntityManagerInterface $entityManager
      * @param TrickGroupRepository   $repository
      * @param LoggerInterface        $logger
-     *
      */
     public function __construct(EntityManagerInterface $entityManager, TrickGroupRepository $repository, LoggerInterface $logger)
     {

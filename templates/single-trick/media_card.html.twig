@@ -1,5 +1,5 @@
-{# CAUTION! This is important to avoid XSS attack! Double escaping is used here!
-Indeed, escaping is partially functional on variables (with the same name) from external context
+{# CAUTION! This is important to avoid XSS attack! Correct escaping must be monitored here!
+escaping is maybe not functional on variables (with the same name) from external context
 inside included template when a loop is used! #}
 {# https://github.com/twigphp/Twig/issues/2623 #}
 {# https://security.stackexchange.com/questions/155789/is-the-src-of-an-iframe-safe-for-user-input #}
@@ -20,7 +20,7 @@ inside included template when a loop is used! #}
         {% if mediaType.type == mediaTypesValues['trickThumbnail'] %}
             <!-- Trick image -->
             {# Thumb image #}
-            {% set thumbImageName = mediaForSlide|e|e('html_attr') %}
+            {% set thumbImageName = mediaForSlide|e('html_attr') %}
             <div id="st-card-image-{{ index }}" class="uk-position-relative uk-background-cover uk-background-blend-darken uk-invisible st-card-image st-background-image-header" data-src="{{ asset(globalTrickUploadDirectory~thumbImageName) }}" style="background-position: 50% 50%; width: 100%; height: 150px" uk-img></div>
             {# Modal for image #}
             <div id="st-modal-media-image-{{ index }}" class="uk-flex-top st-modal" uk-modal>
@@ -29,12 +29,12 @@ inside included template when a loop is used! #}
                     <div class="uk-position-relative uk-modal-body uk-padding-remove st-background-black">
                         {# Image loading spinner #}
                         {% include 'all/trick_media_loader.html.twig' with {'spinnerRatio': '2'} %}
-                        {% set normalImageName = mediaToExpand|e|e('html_attr') %}
-                        {% set normalImageDesc = mediaDescription|e|e('html_attr') %}
+                        {% set normalImageName = mediaToExpand|e('html_attr') %}
+                        {% set normalImageDesc = mediaDescription|e('html_attr') %}
                         <img id="st-modal-image-{{ index }}" class="st-modal-image" width="{{ normalImageMediaType.width }}" height="{{ normalImageMediaType.height }}" src="" data-src="{{ asset(globalTrickUploadDirectory~normalImageName) }}" alt="{{ normalImageDesc }}">
                     </div>
                     <div class="uk-modal-footer uk-padding-remove">
-                        {% set normalImageText = mediaDescription|e|e('html') %}
+                        {% set normalImageText = mediaDescription %}
                         <p class="uk-margin-small-top uk-text-muted">{{ normalImageText }}</p>
                     </div>
                 </div>
@@ -44,8 +44,8 @@ inside included template when a loop is used! #}
         {% elseif mediaType.type == mediaTypesValues['trickYoutube'] %}
             <!-- Trick Youtube video -->
             {# Iframe for video #}
-            {% set youtubeVideoURL = mediaForSlide|e|e('html_attr') %}
-            {% set youtubeVideoDesc = mediaDescription|e|e('html_attr') %}
+            {% set youtubeVideoURL = mediaForSlide|e('html_attr') %}
+            {% set youtubeVideoDesc = mediaDescription|e('html_attr') %}
             <iframe id="st-card-iframe-{{ index }}" class="uk-invisible st-card-iframe st-yt-iframe" width="100%" height="100%" src="{{ youtubeVideoURL }}?enablejsapi=1&amp;origin={{ app.request.getSchemeAndHttpHost() }}" title="{{ youtubeVideoDesc }}"
                     allowfullscreen allow="autoplay; encrypted-media" uk-responsive></iframe>
             {# Modal for video #}
@@ -55,12 +55,12 @@ inside included template when a loop is used! #}
                     <div class="uk-position-relative uk-modal-body uk-padding-remove st-background-black">
                         {# Video loading spinner #}
                         {% include 'all/trick_media_loader.html.twig' with {'spinnerRatio': '2'} %}
-                        {% set youtubeVideoURL = mediaToExpand|e|e('html_attr') %}
+                        {% set youtubeVideoURL = mediaToExpand|e('html_attr') %}
                         <iframe id="st-modal-iframe-{{ index }}" class="uk-invisible st-modal-iframe st-yt-iframe" width="{{ mediaType.width }}" height="{{ mediaType.height }}" data-src="{{ youtubeVideoURL }}?enablejsapi=1&amp;origin={{ app.request.getSchemeAndHttpHost() }}&amp;autoplay=0" title="{{ youtubeVideoDesc }}"
                                 allowfullscreen allow="autoplay; encrypted-media" uk-responsive></iframe>
                     </div>
                     <div class="uk-modal-footer uk-padding-remove">
-                        {% set youtubeVideoText = mediaDescription|e|e('html') %}
+                        {% set youtubeVideoText = mediaDescription %}
                         <p class="uk-margin-small-top uk-text-muted">{{ youtubeVideoText }}</p>
                     </div>
                 </div>
@@ -68,8 +68,8 @@ inside included template when a loop is used! #}
         {% elseif mediaType.type == mediaTypesValues['trickVimeo'] %}
             <!-- Trick Vimeo video -->
             {# Iframe for video #}
-            {% set vimeoVideoURL = mediaForSlide|e|e('html_attr') %}
-            {% set vimeoVideoDesc = mediaDescription|e|e('html_attr') %}
+            {% set vimeoVideoURL = mediaForSlide|e('html_attr') %}
+            {% set vimeoVideoDesc = mediaDescription|e('html_attr') %}
             <iframe id="st-card-iframe-{{ index }}" class="uk-invisible st-card-iframe st-vm-iframe" width="100%" height="100%" src="{{ vimeoVideoURL }}?api=1&amp;origin={{ app.request.getSchemeAndHttpHost() }}" title="{{ vimeoVideoDesc }}"
                     allowfullscreen allow="autoplay" uk-responsive></iframe>
             {# Modal for video #}
@@ -79,12 +79,12 @@ inside included template when a loop is used! #}
                     <div class="uk-position-relative uk-modal-body uk-padding-remove st-background-black">
                         {# Video loading spinner #}
                         {% include 'all/trick_media_loader.html.twig' with {'spinnerRatio': '2'} %}
-                        {% set vimeoVideoURL = mediaToExpand|e|e('html_attr') %}
+                        {% set vimeoVideoURL = mediaToExpand|e('html_attr') %}
                         <iframe id="st-modal-iframe-{{ index }}" class="uk-invisible st-modal-iframe st-vm-iframe" width="{{ mediaType.width }}" height="{{ mediaType.height }}" data-src="{{ vimeoVideoURL }}?api=1&amp;origin={{ app.request.getSchemeAndHttpHost() }}&amp;autoplay=0" title="{{ vimeoVideoDesc }}"
                                 allowfullscreen allow="autoplay" uk-responsive></iframe>
                     </div>
                     <div class="uk-modal-footer uk-padding-remove">
-                        {% set vimeoVideoText = mediaDescription|e|e('html') %}
+                        {% set vimeoVideoText = mediaDescription %}
                         <p class="uk-margin-small-top uk-text-muted">{{ vimeoVideoText }}</p>
                     </div>
                 </div>
@@ -92,8 +92,8 @@ inside included template when a loop is used! #}
         {% elseif mediaType.type == mediaTypesValues['trickDailymotion'] %}
             <!-- Trick Dailymotion video -->
             {# Iframe for video #}
-            {% set dailymotionVideoURL = mediaForSlide|e|e('html_attr') %}
-            {% set dailymotionVideoDesc = mediaDescription|e|e('html_attr') %}
+            {% set dailymotionVideoURL = mediaForSlide|e('html_attr') %}
+            {% set dailymotionVideoDesc = mediaDescription|e('html_attr') %}
             <iframe id="st-card-iframe-{{ index }}" class="uk-invisible st-card-iframe st-dm-iframe" width="100%" height="100%" src="{{ dailymotionVideoURL }}?api=1&amp;origin={{ app.request.getSchemeAndHttpHost() }}" title="{{ dailymotionVideoDesc }}"
                     allowfullscreen allow="autoplay" uk-responsive></iframe>
             {# Modal for video #}
@@ -103,12 +103,12 @@ inside included template when a loop is used! #}
                     <div class="uk-position-relative uk-modal-body uk-padding-remove st-background-black">
                         {# Video loading spinner #}
                         {% include 'all/trick_media_loader.html.twig' with {'spinnerRatio': '2'} %}
-                        {% set dailymotionVideoURL = mediaToExpand|e|e('html_attr') %}
+                        {% set dailymotionVideoURL = mediaToExpand|e('html_attr') %}
                         <iframe id="st-modal-iframe-{{ index }}" class="uk-invisible st-modal-iframe st-dm-iframe" width="{{ mediaType.width }}" height="{{ mediaType.height }}" data-src="{{ dailymotionVideoURL }}?api=1&amp;origin={{ app.request.getSchemeAndHttpHost() }}&amp;autoplay=0" title="{{ dailymotionVideoDesc }}"
                                 allowfullscreen allow="autoplay" uk-responsive></iframe>
                     </div>
                     <div class="uk-modal-footer uk-padding-remove">
-                        {% set dailymotionVideoText = mediaDescription|e|e('html') %}
+                        {% set dailymotionVideoText = mediaDescription %}
                         <p class="uk-margin-small-top uk-text-muted">{{ dailymotionVideoText }}</p>
                     </div>
                 </div>
@@ -123,8 +123,8 @@ inside included template when a loop is used! #}
                     <span class="st-single-button-spinner" uk-spinner="ratio: 0.4"></span>
                     <small>&nbsp;Loading</small>
                 </span>
-                <a id="st-modal-button-{{ index }}" href="#st-modal-media-{{ custom.icon matches '/^image/' ? 'image' : 'video' }}-{{ index }}" class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-invisible uk-disabled" title="{{ custom.title|e|e('html_attr') }}" uk-toggle>
-                    <span uk-icon="icon: expand; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-other"><span uk-icon="icon: {{ custom.icon|e|e('html_attr') }}; ratio: 1" class="uk-icon"></span>&nbsp;</span>&nbsp;
+                <a id="st-modal-button-{{ index }}" href="#st-modal-media-{{ custom.icon matches '/^image/' ? 'image' : 'video' }}-{{ index }}" class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-invisible uk-disabled" title="{{ custom.title|e('html_attr') }}" uk-toggle>
+                    <span uk-icon="icon: expand; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-other"><span uk-icon="icon: {{ custom.icon|e('html_attr') }}; ratio: 1" class="uk-icon"></span>&nbsp;</span>&nbsp;
                 </a>
             </div>
             {% if is_granted('ROLE_USER') %}

@@ -74,8 +74,6 @@ class TrickGroup
      * @param string                  $description
      * @param \DateTimeInterface|null $creationDate
      *
-     * @return void
-     *
      * @throws \Exception
      */
     public function __construct(

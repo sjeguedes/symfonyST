@@ -7,6 +7,9 @@ namespace App\Form\TypeToEmbed;
 use App\Domain\DTO\AbstractReadableDTO;
 use App\Domain\DTOToEmbed\ImageToCropDTO;
 use App\Domain\Entity\Image;
+use App\Domain\Entity\Media;
+use App\Domain\Entity\MediaOwner;
+use App\Domain\Entity\MediaSource;
 use App\Domain\ServiceLayer\ImageManager;
 use App\Domain\ServiceLayer\MediaManager;
 use App\Form\Type\Admin\CreateTrickType;
@@ -19,6 +22,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -169,6 +173,67 @@ class ImageToCropType extends AbstractTrickCollectionEntryType
     }
 
     /**
+     * Generate image with direct upload when it is expected.
+     *
+     * @param FormtypeInterface $rootFormType
+     * @param ImageToCropDTO    $imageToCropDataModel
+     *
+     * @return Image|null
+     *
+     * @throws \Exception
+     */
+    private function generateImageWithDirectUpload(FormtypeInterface $rootFormType, ImageToCropDTO $imageToCropDataModel) : ?Image
+    {
+        switch ($rootFormType) {
+            // Create a Trick image with the highest expected format
+            case $rootFormType instanceof CreateTrickType:
+                // At this level, Trick slug can't be used due to not validated Trick name,
+                // so we used a image basic identifier name to replace it later on Trick creation or update actions.
+                $imageIdentifierName = ImageManager::TRICK_IMAGE_TYPE_KEY . ImageManager::DEFAULT_IMAGE_IDENTIFIER_NAME;
+                // Generate a physical image and returns a image file instance
+                $imageFile = $this->imageService->generateTrickImageFile($imageToCropDataModel, 'trickBig', true, $imageIdentifierName);
+                $newTemporaryImage = $this->imageService->createTrickImage($imageToCropDataModel, $imageFile, true);
+                break;
+            // TODO: here, declare also the same case for future trick update form
+            // Stop process for other root form types
+            default:
+                $newTemporaryImage = null;
+        }
+        return $newTemporaryImage;
+    }
+
+    /**
+     * Generate a trick image media after direct upload.
+     *
+     * @param Image          $createdImageOnServer
+     * @param ImageToCropDTO $imageToCropDataModel
+     *
+     * @return Media|null
+     *
+     * @throws \Exception
+     */
+    private function generateTrickImageMediaAfterDirectUpload(Image $createdImageOnServer, ImageToCropDTO $imageToCropDataModel) : ?Media
+    {
+        // Create mandatory Media entity which references corresponding entities:
+        // MediaOwner is the attachment (none is defined here, since no trick is set yet), MediaSource is an image.
+        /** @var MediaOwner|null $newMediaOwner */
+        $newMediaOwner = null;
+        /** @var MediaSource|null $newMediaSource */
+        $newMediaSource = $this->mediaManager->getMediaSourceManager()->createMediaSource($createdImageOnServer);
+        if (\is_null($newMediaSource)) {
+            return null;
+        }
+        // Create temporary Media instance
+        $createdMedia = $this->mediaManager->createTrickMedia(
+            null,
+            $newMediaSource,
+            $imageToCropDataModel,
+            'trickBig'
+        );
+        return $createdMedia;
+    }
+
+    /**
      * Prepare and check data model for a direct upload without complete form validation.
      *
      * Please note image and crop JSON data are controlled only to upload a selected image.
@@ -253,35 +318,28 @@ class ImageToCropType extends AbstractTrickCollectionEntryType
             $imageToCropDataModel = $this->prepareAndCheckDataModelForDirectUpload($currentImageToCropForm, $formData, $rootFormHandler);
             // Image or/and cropJSON Data are not valid, so direct upload must no be enabled!
             if (\is_null($imageToCropDataModel)) {
-                return;
+                return null;
             }
             // if no expected violation is found, save directly the uploaded file as a standalone media without complete root form validation
             $rootFormType = $currentImageToCropForm->getRoot()->getConfig()->getType()->getInnerType();
-            switch ($rootFormType) {
-                // Create a Trick image with the highest expected format
-                case $rootFormType instanceof CreateTrickType:
-                    // At this level, Trick slug can't be used due to not validated Trick name,
-                    // so we used a image basic identifier name to replace it later on Trick creation or update actions.
-                    $imageIdentifierName = ImageManager::TRICK_IMAGE_TYPE_KEY . ImageManager::DEFAULT_IMAGE_IDENTIFIER_NAME;
-                    // Generate a physical image and returns a image file instance
-                    $imageFile = $this->imageService->generateTrickImageFile($imageToCropDataModel, 'trickBig', true, $imageIdentifierName);
-                    $createdImageOnServer = $this->imageService->createTrickImage($imageToCropDataModel, $imageFile, true);
-                    break;
-                // TODO: here, declare also the same case for future trick update form
-                // Stop process for other root form types
-                default:
-                    return;
-            }
+            // Perform directUpload
+            /** @var Image|null $createdImageOnServer */
+            $createdImageOnServer =$this->generateImageWithDirectUpload($rootFormType, $imageToCropDataModel);
             // Upload is a success: update mandatory form data associated to image to make a persistence until complete form validation
-            if (!\is_null($createdImageOnServer)) {
-                // Create mandatory Media entity which references corresponding Image entity
-                $createdMedia = $this->mediaManager->createTrickMedia($createdImageOnServer, $imageToCropDataModel, 'trickBig');
-                // Persist and flush big image Image and Media entities
-                $newBigImage = $this->imageService->addAndSaveImage($createdImageOnServer, $createdMedia, true, true);
-                $formData = $this->updateMandatoryPersistentImageData($newBigImage, $formData);
-                // Update global current "image to crop" form data
-                $event->setData($formData);
+            if (\is_null($createdImageOnServer)) {
+                return null;
             }
+            // Create a trick image media based on direct upload
+            /** @var Media|null $createdMedia */
+            $createdMedia = $this->generateTrickImageMediaAfterDirectUpload($createdImageOnServer, $imageToCropDataModel);
+            // Persist and flush big image Image and Media entities
+            if (\is_null($createdMedia)) {
+                return null;
+            }
+            $newBigImage = $this->imageService->addAndSaveImage($createdImageOnServer, $createdMedia, true, true);
+            $formData = $this->updateMandatoryPersistentImageData($newBigImage, $formData);
+            // Update global current "image to crop" form data
+            $event->setData($formData);
         });
     }
 }

@@ -28,7 +28,7 @@ class TrickGroupFixtures extends BaseFixture
         $array = $this->parseYamlFile('trick_group_fixtures.yaml');
         $data = $array['trick_groups'];
         // Create trick groups
-        $this->createFixtures(TrickGroup::class, \count($data), function($i) use($data) {
+        $this->createFixtures(TrickGroup::class, \count($data), function ($i) use ($data) {
             return new TrickGroup(
                 $data[$i]['fields']['name'],
                 $data[$i]['fields']['description'],

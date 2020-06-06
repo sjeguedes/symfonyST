@@ -9,6 +9,9 @@ App\Domain\DTO\CreateTrickDTO:
         name:
             - NotBlank:
                 message: Please fill in a name which is a title.
+            - Length:
+                max: 255
+                maxMessage: "This name should contain\na maximum of {{ limit }} characters or less."
 
         description:
             - NotBlank:

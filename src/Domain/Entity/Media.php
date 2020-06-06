@@ -30,36 +30,28 @@ class Media
     private $uuid;
 
     /**
+     * @var MediaSource (owning side of entity relation)
+     *
+     * @ORM\OneToOne(targetEntity=MediaSource::class, inversedBy="media")
+     * @ORM\JoinColumn(name="media_source_uuid", referencedColumnName="uuid", nullable=false)
+     */
+    private $mediaSource;
+
+    /**
+     * @var MediaOwner|null (owning side of entity relation)
+     *
+     * @ORM\ManyToOne(targetEntity=MediaOwner::class, inversedBy="medias")
+     * @ORM\JoinColumn(name="media_owner_uuid", referencedColumnName="uuid", nullable=true)
+     */
+    private $mediaOwner;
+
+    /**
      * @var MediaType (owning side of entity relation)
      *
      * @ORM\ManyToOne(targetEntity=MediaType::class, inversedBy="medias")
      * @ORM\JoinColumn(name="media_type_uuid", referencedColumnName="uuid", nullable=false)
      */
     private $mediaType;
-
-    /**
-     * @var Image|null (owning side of entity relation)
-     *
-     * @ORM\OneToOne(targetEntity=Image::class, cascade={"persist", "remove"}, inversedBy="media")
-     * @ORM\JoinColumn(name="image_uuid", referencedColumnName="uuid", nullable=true)
-     */
-    private $image;
-
-    /**
-     * @var Video|null (owning side of entity relation)
-     *
-     * @ORM\OneToOne(targetEntity=Video::class, cascade={"persist", "remove"}, inversedBy="media")
-     * @ORM\JoinColumn(name="video_uuid", referencedColumnName="uuid", nullable=true)
-     */
-    private $video;
-
-    /**
-     * @var Trick|null (owning side of entity relation)
-     *
-     * @ORM\ManyToOne(targetEntity=Trick::class, inversedBy="medias")
-     * @ORM\JoinColumn(name="trick_uuid", referencedColumnName="uuid", nullable=true)
-     */
-    private $trick;
 
     /**
      * @var User (owning side of entity relation)
@@ -112,34 +104,36 @@ class Media
     /**
      * Media constructor.
      *
+     * @param MediaOwner|null         $mediaOwner  a media attachment which can be in case of direct upload
+     * @param MediaSource             $mediaSource
      * @param MediaType               $mediaType
-     * @param Trick|null              $trick
-     * @param User|null               $user
+     * @param User|null               $user        a media creator can be null (an anonymous one when creator is deleted!)
      * @param bool                    $isMain
      * @param bool                    $isPublished
      * @param int                     $showListRank
      * @param \DateTimeInterface|null $creationDate
      *
-     * @return void
-     *
      * @throws \Exception
      */
-    private function __construct(
+    public function __construct(
+        ?MediaOwner $mediaOwner,
+        MediaSource $mediaSource,
         MediaType $mediaType,
-        Trick $trick = null,
-        User $user = null,
+        ?User $user,
         bool $isMain = false,
         bool $isPublished = false,
         int $showListRank = null,
         \DateTimeInterface $creationDate = null
     ) {
-        // Show list rank can be null, when the media entity to create, is based on an Image entity generated during image direct upload
+        // Show list rank can be null, when the media entity to create is based on an Image entity
+        // generated during image direct upload, or if rank makes no sense!
         if (!\is_null($showListRank)) {
             \assert($showListRank > 0, 'Show list rank must be greater than 0!');
         }
         $this->uuid = Uuid::uuid4();
+        $this->mediaOwner = $mediaOwner;
+        $this->mediaSource = $mediaSource;
         $this->mediaType = $mediaType;
-        $this->trick = $trick;
         $this->user = $user;
         $this->isMain = $isMain;
         $this->isPublished = $isPublished;
@@ -149,111 +143,30 @@ class Media
     }
 
     /**
-     * Named constructor used to create instance based on Image instance.
+     * Change assigned media owner after creation.
      *
-     * @param Image                   $image
-     * @param MediaType               $mediaType
-     * @param Trick|null              $trick
-     * @param User|null               $user
-     * @param bool                    $isMain
-     * @param bool                    $isPublished
-     * @param int                     $showListRank
-     * @param \DateTimeInterface|null $creationDate
+     * @param MediaOwner $mediaOwner
      *
      * @return Media
-     *
-     * @throws \Exception
      */
-    public static function createNewInstanceWithImage(
-        Image $image,
-        MediaType $mediaType,
-        Trick $trick = null,
-        User $user = null,
-        bool $isMain = false,
-        bool $isPublished = false,
-        int $showListRank = null,
-        \DateTimeInterface $creationDate = null
-    ) : Media
+    public function modifyMediaOwner(MediaOwner $mediaOwner) : self
     {
-        $self = new self($mediaType, $trick, $user, $isMain, $isPublished, $showListRank, $creationDate);
-        $self->image = $image;
-        $self->video = null;
-        return $self;
-    }
-
-    /**
-     * Named constructor used to create instance based on Video instance.
-     *
-     * @param Video                   $video
-     * @param MediaType               $mediaType
-     * @param Trick|null              $trick
-     * @param User|null               $user
-     * @param bool                    $isMain
-     * @param bool                    $isPublished
-     * @param int                     $showListRank
-     * @param \DateTimeInterface|null $creationDate
-     *
-     * @return Media
-     *
-     * @throws \Exception
-     */
-    public static function createNewInstanceWithVideo(
-        Video $video,
-        MediaType $mediaType,
-        Trick $trick = null,
-        User $user = null,
-        bool $isMain = false,
-        bool $isPublished = false,
-        int $showListRank = null,
-        \DateTimeInterface $creationDate = null
-    ) : Media
-    {
-        $self = new self($mediaType, $trick, $user, $isMain, $isPublished, $showListRank, $creationDate);
-        $self->video = $video;
-        $self->image = null;
-        return $self;
-    }
-
-    /**
-     * Change assigned image resource after creation.
-     *
-     * @param Image $image
-     *
-     * @return Media
-     *
-     * @throws \Exception
-     */
-    public function modifyImage(Image $image) : self
-    {
-        if (!\is_null($this->video)) {
-            throw new \BadMethodCallException(
-                'Entity already references a relationship with a "Video" entity! You are not allowed to call this method.'
-            );
-        }
-        $this->image = $image;
+        $this->mediaOwner = $mediaOwner;
         return $this;
     }
 
     /**
-     * Change assigned video resource after creation.
+     * Change assigned media source after creation.
      *
-     * @param Video $video
+     * @param MediaSource $mediaSource
      *
      * @return Media
-     *
-     * @throws \Exception
      */
-    public function modifyVideo(Video $video) : self
+    public function modifyMediaSource(MediaSource $mediaSource) : self
     {
-        if (!\is_null($this->image)) {
-            throw new \BadMethodCallException(
-                'Entity already references a relationship with a "Image" entity! You are not allowed to call this method.'
-            );
-        }
-        $this->video = $video;
+        $this->mediaSource = $mediaSource;
         return $this;
     }
-
 
     /**
      * Change assigned media type after creation.
@@ -265,19 +178,6 @@ class Media
     public function modifyMediaType(MediaType $mediaType) : self
     {
         $this->mediaType = $mediaType;
-        return $this;
-    }
-
-    /**
-     * Change assigned trick after creation.
-     *
-     * @param Trick $trick
-     *
-     * @return Media
-     */
-    public function modifyTrick(Trick $trick) : self
-    {
-        $this->trick = $trick;
         return $this;
     }
 
@@ -379,19 +279,19 @@ class Media
     }
 
     /**
-     * @return Image|null
+     * @return MediaOwner
      */
-    public function getImage() : ?Image
+    public function getMediaOwner() : MediaOwner
     {
-        return $this->image;
+        return $this->mediaOwner;
     }
 
     /**
-     * @return Video|null
+     * @return MediaSource
      */
-    public function getVideo() : ?Video
+    public function getMediaSource() : MediaSource
     {
-        return $this->video;
+        return $this->mediaSource;
     }
 
     /**
@@ -400,14 +300,6 @@ class Media
     public function getMediaType() : MediaType
     {
         return $this->mediaType;
-    }
-
-    /**
-     * @return Trick
-     */
-    public function getTrick() : Trick
-    {
-        return $this->trick;
     }
 
     /**

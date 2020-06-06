@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *
  * Define User entity schema in database, its initial state and behaviors.
  *
- * Avatar image reference is shared with Image - Media - MediaType entities.
+ * His avatar image reference is defined with Image - Media - MediaType entities.
  *
  * @ORM\Entity(repositoryClass=UserRepository::class)
  * @ORM\Table(name="users")
@@ -39,6 +39,9 @@ class User implements UserInterface, \Serializable
      */
     const HASH_ALGORITHMS = ['BCrypt', 'Argon2i'];
 
+    /**
+     * Define a label for each type of user.
+     */
     const ROLE_LABELS = [
         'ROLE_USER'  => 'Member',
         'ROLE_ADMIN' => 'Admin',
@@ -96,7 +99,8 @@ class User implements UserInterface, \Serializable
     private $password;
 
     /**
-     * @var string|null a custom salt for password hash (e.g. BCrypt but Symfony does not use custom value for that kind of algorithm!)
+     * @var string|null a custom salt for password hash
+     *                  (e.g. BCrypt but Symfony does not use custom value for that kind of algorithm!)
      */
     private $salt;
 
@@ -150,14 +154,21 @@ class User implements UserInterface, \Serializable
     /**
      * @var Collection (inverse side of entity relation)
      *
-     * @ORM\OneToMany(targetEntity=Media::class, cascade={"persist", "remove"}, orphanRemoval=true, mappedBy="user")
+     * @ORM\OneToMany(targetEntity=Media::class, orphanRemoval=true, mappedBy="user")
      */
     private $medias;
 
     /**
+     * @var MediaOwner (inverse side of entity relation)
+     *
+     * @ORM\OneToOne(targetEntity=MediaOwner::class, mappedBy="user")
+     */
+    private $mediaOwner;
+
+    /**
      * @var Collection (inverse side of entity relation)
      *
-     * @ORM\OneToMany(targetEntity=Trick::class, cascade={"persist", "remove"}, orphanRemoval=true, mappedBy="user")
+     * @ORM\OneToMany(targetEntity=Trick::class, orphanRemoval=true, mappedBy="user")
      */
     private $tricks;
 
@@ -168,12 +179,10 @@ class User implements UserInterface, \Serializable
      * @param string                  $firstName
      * @param string                  $nickName
      * @param string                  $email
-     * @param string                  $password     an encoded password
-     * @param string                  $algorithm    a hash algorithm type for password
+     * @param string                  $password   an encoded password
+     * @param string                  $algorithm  a hash algorithm type for password
      * @param array                   $roles
      * @param \DateTimeInterface|null $creationDate
-     *
-     * @return void
      *
      * @throws \Exception
      */
@@ -205,6 +214,20 @@ class User implements UserInterface, \Serializable
         $this->creationDate = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
         $this->updateDate = $this->creationDate;
         $this->medias = new ArrayCollection();
+        $this->tricks = new ArrayCollection();
+    }
+
+    /**
+     * Assign a media owner.
+     *
+     * @param MediaOwner $mediaOwner
+     *
+     * @return $this
+     */
+    public function assignMediaOwner(MediaOwner $mediaOwner) : self
+    {
+        $this->mediaOwner = $mediaOwner;
+        return $this;
     }
 
     /**
@@ -701,6 +724,14 @@ class User implements UserInterface, \Serializable
     public function getRenewalRequestDate() : ?\DateTimeInterface
     {
         return $this->renewalRequestDate;
+    }
+
+    /**
+     * @return MediaOwner
+     */
+    public function getMediaOwner() : MediaOwner
+    {
+        return $this->mediaOwner;
     }
 
     /**

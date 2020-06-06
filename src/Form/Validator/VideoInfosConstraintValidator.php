@@ -77,13 +77,13 @@ final class VideoInfosConstraintValidator extends AbstractTrickCollectionConstra
         if (!\is_null($url)) {
             // Video URL is not allowed! Please note video URL format could also have been checked thanks to basic "Regex" validation constraint!
             if (false === $this->videoURLProxyChecker->isAllowed($url)) {
-                $context->buildViolation('Video url is not allowed!<br>Please check source URL.')
+                $context->buildViolation("Video url is not allowed!\nPlease check source URL.")
                     ->atPath('url')
                     ->addViolation();
             } else {
                 // Video content can not be retrieved or does not exist!
                 if (false === $this->videoURLProxyChecker->isContent($url)) {
-                    $context->buildViolation('Video content is not available!<br>Please check source URL.')
+                    $context->buildViolation("Video content is not available!\nPlease check source URL.")
                         ->atPath('url')
                         ->addViolation();
                 }

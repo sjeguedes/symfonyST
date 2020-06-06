@@ -6,6 +6,8 @@ namespace App\Domain\ServiceLayer;
 use App\Domain\DTO\RegisterUserDTO;
 use App\Domain\DTO\UpdateProfileAvatarDTO;
 use App\Domain\DTO\UpdateProfileInfosDTO;
+use App\Domain\Entity\MediaOwner;
+use App\Domain\Entity\MediaSource;
 use App\Domain\Entity\User;
 use App\Domain\Repository\UserRepository;
 use App\Event\CustomEventFactory;
@@ -402,9 +404,19 @@ class UserManager
             if (\is_null($newAvatarImage)) {
                 return false;
             }
-            // Create mandatory Media entity which references corresponding Image entity
+            // Create mandatory Media entity which references corresponding entities:
+            // MediaOwner is the attachment (here a User), MediaSource is a image, User is the creator.
+            /** @var MediaOwner|null $newAvatarMediaOwner */
+            $newAvatarMediaOwner = $mediaService->getMediaOwnerManager()->createMediaOwner($user);
+            /** @var MediaSource|null $newAvatarMediaSource */
+            $newAvatarMediaSource = $mediaService->getMediaSourceManager()->createMediaSource($newAvatarImage);
+            if (\is_null($newAvatarMediaOwner) || \is_null($newAvatarMediaSource)) {
+                return false;
+            }
+            // Create avatar Media
             $newAvatarMedia = $mediaService->createUserAvatarMedia(
-                $newAvatarImage,
+                $newAvatarMediaOwner,
+                $newAvatarMediaSource,
                 $dataModel,
                 'userAvatar'
             );
@@ -416,7 +428,8 @@ class UserManager
             }
             return true;
         }
-        // User does not want to keep his avatar (value is set with JavaScript thanks to image remove button): default avatar will be shown!
+        // User does not want to keep his avatar
+        // Value is set with JavaScript thanks to image remove button: default avatar will be shown!
         if (\is_null($dataModel->getAvatar()) && (true === $dataModel->getRemoveAvatar())) {
             // Remove previous avatar image.
             $this->removeAvatarImage($user, $imageService);

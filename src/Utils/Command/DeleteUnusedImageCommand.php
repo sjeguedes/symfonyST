@@ -125,7 +125,8 @@ class DeleteUnusedImageCommand extends Command
             null,
             InputOption::VALUE_REQUIRED,
             'Which is the way to call Command?',
-            array_search(0, self::COMMAND_CALL_MODE) // "manual" mode
+            // "manual" mode
+            array_search(0, self::COMMAND_CALL_MODE)
         );
         // Option to select unused image category
         $this->addOption(
@@ -133,7 +134,8 @@ class DeleteUnusedImageCommand extends Command
             null,
             InputOption::VALUE_REQUIRED,
             'Which category(ies) must be used to delete unused image(s)?',
-            $this->unusedImageCategories[0] // All categories ("all") are selected: e.g. --category=all, --category=trick, ...
+            // All categories ("all") are selected: e.g. --category=all, --category=trick, ...
+            $this->unusedImageCategories[0]
         );
         // Option to set search in temporary file(s) or not
         $this->addOption(
@@ -206,13 +208,12 @@ class DeleteUnusedImageCommand extends Command
             $imageName = preg_replace("/\.{$file->getExtension()}/" , '', $file->getFilename());
             // Query to remove entities (Doctrine flush is integrated!)
             $imageEntity = $this->imageService->findSingleByName($imageName);
-            // Image and Media entities must exist, but this avoid issue!
+            // Image and Media (also Media Source) entities must exist, but this avoid issue!
             if (!\is_null($imageEntity)) {
                 $isFileOutdated = $this->isUnusedFileOutdated($imageEntity->getCreationDate(), $input);
                 if ($isFileOutdated) {
-                    $this->mediaService->removeMedia($imageEntity->getMedia());
-                    // Normally this is not necessary with cascade option on relationship!
-                    $this->imageService->removeImage($imageEntity);
+                    // Prepare entities removal before global flush with cascade option on relationships!
+                    $this->imageService->removeImage($imageEntity, false);
                 }
             } else {
                 $isFileNotCorrectlySaved = true;
@@ -236,7 +237,8 @@ class DeleteUnusedImageCommand extends Command
                         $path = $pathArray[$i];
                         $pattern = preg_quote(ImageUploader::TEMPORARY_DIRECTORY_NAME, '/');
                         $isTemporaryPath = preg_match("/{$pattern}$/", $path);
-                        if ($isTemporaryPath && !$files = glob($path . "/*")) {
+                        // Remove each found temporary directory if it (still) exists and is empty.
+                        if ($isTemporaryPath && is_dir($path) && !$files = glob($path . "/*")) {
                             rmdir($path);
                         }
                     }
@@ -249,6 +251,10 @@ class DeleteUnusedImageCommand extends Command
                 );
                 $isProcessOK = false;
             }
+        }
+        // Flush global removal to make it effective outside the loop
+        if ($isProcessOK) {
+            $this->imageService->getEntityManager()->flush();
         }
         return $isProcessOK;
     }
@@ -357,6 +363,7 @@ class DeleteUnusedImageCommand extends Command
                 $isProcessOK = $this->deleteFiles($imageFiles, $input, $answers['isTemporary']);
                 if ($isProcessOK) {
                     $ioConsoleStyle->success(['Good job, process is a success!', 'No more file must be deleted!']);
+                    return 0;
                 } else {
                     $ioConsoleStyle->warning(['Error, something wrong happened during process!', 'Please check errors log file.']);
                     return 1;

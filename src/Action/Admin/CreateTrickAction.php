@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Action\Admin;
 
+use App\Domain\Entity\Trick;
 use App\Domain\ServiceLayer\ImageManager;
 use App\Domain\ServiceLayer\MediaManager;
 use App\Domain\ServiceLayer\TrickManager;
@@ -11,10 +12,12 @@ use App\Domain\ServiceLayer\VideoManager;
 use App\Form\Handler\FormHandlerInterface;
 use App\Responder\Admin\CreateTrickResponder;
 use App\Responder\Redirection\RedirectionResponder;
+use App\Utils\Traits\UuidHelperTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Security;
 
 /**
  * Class CreateTrickAction.
@@ -23,6 +26,8 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class CreateTrickAction
 {
+    use UuidHelperTrait;
+
     /**
      * @var TrickManager
      */
@@ -53,6 +58,11 @@ class CreateTrickAction
      */
     private $formHandler;
 
+    /**
+     * @var Security
+     */
+    private $security;
+
 
     /**
      * CreateTrickAction constructor.
@@ -63,6 +73,7 @@ class CreateTrickAction
      * @param MediaManager         $mediaService
      * @param FlashBagInterface    $flashBag
      * @param FormHandlerInterface $formHandler
+     * @param Security             $security
      */
     public function __construct(
         TrickManager $trickService,
@@ -70,7 +81,8 @@ class CreateTrickAction
         VideoManager $videoService,
         MediaManager $mediaService,
         FlashBagInterface $flashBag,
-        FormHandlerInterface $formHandler
+        FormHandlerInterface $formHandler,
+        Security $security
     ) {
         $this->trickService = $trickService;
         $this->imageService = $imageService;
@@ -78,6 +90,7 @@ class CreateTrickAction
         $this->mediaService = $mediaService;
         $this->flashBag = $flashBag;
         $this->formHandler = $formHandler;
+        $this->security = $security;
     }
 
     /**
@@ -99,7 +112,8 @@ class CreateTrickAction
     {
         // Set form without initial model data and set the request by binding it
         // Use form handler as form type option
-        $createTrickForm = $this->formHandler->initForm(null, null, ['formHandler' => $this->formHandler])->bindRequest($request);
+        $options = ['formHandler' => $this->formHandler];
+        $createTrickForm = $this->formHandler->initForm(null, null, $options)->bindRequest($request);
         // Process only on submit
         if ($createTrickForm->isSubmitted()) {
             // Constraints and custom validation: call actions to perform if necessary on success
@@ -110,7 +124,20 @@ class CreateTrickAction
                 'mediaService' => $this->mediaService
             ]);
             if ($isFormRequestValid) {
-                return $redirectionResponder('home');
+                /** @var Trick $newTrick */
+                $newTrick = $this->formHandler->getNewTrick();
+                // Success
+                if (!\is_null($newTrick)) {
+                    return $redirectionResponder(
+                        'show_single_trick', ['slug' => $newTrick->getSlug(), 'encodedUuid' => $this->encode($newTrick->getUuid())]
+                    );
+                // Failure
+                } else {
+                    $label = lcfirst($this->security->getUser()->getMainRoleLabel());
+                    return $redirectionResponder(
+                        'create_trick', ['mainRoleLabel' => $label]
+                    );
+                }
             }
         }
         $data = [

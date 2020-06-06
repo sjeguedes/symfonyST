@@ -6,8 +6,6 @@ namespace App\Domain\Entity;
 
 use App\Domain\Repository\TrickRepository;
 use App\Utils\Traits\StringHelperTrait;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
@@ -98,6 +96,13 @@ class Trick
     private $updateDate;
 
     /**
+     * @var MediaOwner (inverse side of entity relation)
+     *
+     * @ORM\OneToOne(targetEntity=MediaOwner::class, mappedBy="trick")
+     */
+    private $mediaOwner;
+
+    /**
      * @var TrickGroup (owning side of entity relation)
      *
      * @ORM\ManyToOne(targetEntity=TrickGroup::class, inversedBy="tricks")
@@ -114,13 +119,6 @@ class Trick
     private $user;
 
     /**
-     * @var Collection (inverse side of entity relation)
-     *
-     * @ORM\OneToMany(targetEntity=Media::class, cascade={"persist", "remove"}, orphanRemoval=true, mappedBy="trick")
-     */
-    private $medias;
-
-    /**
      * @var integer|null a rank value used in lists
      *
      */
@@ -129,37 +127,47 @@ class Trick
     /**
      * Trick constructor.
      *
-     * @param string                  $name
-     * @param string                  $description
      * @param TrickGroup              $trickGroup
      * @param User                    $user
+     * @param string                  $name
+     * @param string                  $description
      * @param string|null             $slug
      * @param \DateTimeInterface|null $creationDate
-     *
-     * @return void
      *
      * @throws \Exception
      */
     public function __construct(
-        string $name,
-        string $description,
         TrickGroup $trickGroup,
         User $user,
+        string $name,
+        string $description,
         string $slug = null,
         \DateTimeInterface $creationDate = null
     ) {
         \assert(!empty($name), 'Trick name can not be empty!');
         \assert(!empty($description), 'Trick description can not be empty!');
         $this->uuid = Uuid::uuid4();
-        $this->name = $name;
-        $this->description = $description;
         $this->trickGroup = $trickGroup;
         $this->user = $user;
+        $this->name = $name;
+        $this->description = $description;
         $this->slug = !\is_null($slug) && !empty($slug) ? $this->makeSlug($slug) : $this->makeSlug($name);
         $this->creationDate = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
         $this->updateDate = $this->creationDate;
         $this->rank = null;
-        $this->medias = new ArrayCollection();
+    }
+
+    /**
+     * Assign a media owner.
+     *
+     * @param MediaOwner $mediaOwner
+     *
+     * @return $this
+     */
+    public function assignMediaOwner(MediaOwner $mediaOwner) : self
+    {
+        $this->mediaOwner = $mediaOwner;
+        return $this;
     }
 
     /**
@@ -235,7 +243,7 @@ class Trick
     }
 
     /**
-     * Change assigned trickGroup after creation.
+     * Change assigned trick group after creation.
      *
      * @param TrickGroup $trickGroup
      *
@@ -257,37 +265,6 @@ class Trick
     public function modifyUser(User $user) : self
     {
         $this->user = $user;
-        return $this;
-    }
-
-    /**
-     * Add Media entity to collection.
-     *
-     * @param Media $media
-     *
-     * @return Trick
-     */
-    public function addMedia(Media $media) : self
-    {
-        if (!$this->medias->contains($media)) {
-            $this->medias->add($media);
-            $media->modifyTrick($this);
-        }
-        return $this;
-    }
-
-    /**
-     * Remove Media entity from collection.
-     *
-     * @param Media $media
-     *
-     * @return Trick
-     */
-    public function removeMedia(Media $media) : self
-    {
-        if ($this->medias->contains($media)) {
-            $this->medias->removeElement($media);
-        }
         return $this;
     }
 
@@ -360,19 +337,19 @@ class Trick
     }
 
     /**
+     * @return MediaOwner
+     */
+    public function getMediaOwner() : MediaOwner
+    {
+        return $this->mediaOwner;
+    }
+
+    /**
      * @return TrickGroup
      */
     public function getTrickGroup() : TrickGroup
     {
         return $this->trickGroup;
-    }
-
-    /**
-     * @return Collection|Media[]
-     */
-    public function getMedias() : Collection
-    {
-        return $this->medias;
     }
 
     /**

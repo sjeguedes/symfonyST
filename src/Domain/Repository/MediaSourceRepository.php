@@ -4,24 +4,24 @@ declare(strict_types = 1);
 
 namespace App\Domain\Repository;
 
-use App\Domain\Entity\Media;
+use App\Domain\Entity\MediaSource;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
- * Class MediaRepository.
+ * Class MediaSourceRepository.
  *
- * Manage Media entity data in database.
+ * Manage MediaSource entity data in database.
  */
-class MediaRepository extends ServiceEntityRepository
+class MediaSourceRepository extends ServiceEntityRepository
 {
     /**
-     * MediaRepository constructor.
+     * MediaSourceRepository constructor.
      *
      * @param RegistryInterface $registry
      */
     public function __construct(RegistryInterface $registry)
     {
-        parent::__construct($registry, Media::class);
+        parent::__construct($registry, MediaSource::class);
     }
 }

@@ -19,8 +19,6 @@ class ImageRepository extends ServiceEntityRepository
      * ImageRepository constructor.
      *
      * @param RegistryInterface $registry
-     *
-     * @return void
      */
     public function __construct(RegistryInterface $registry)
     {

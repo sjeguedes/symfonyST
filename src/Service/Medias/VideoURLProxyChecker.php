@@ -73,9 +73,11 @@ class VideoURLProxyChecker
      * @return bool
      *
      * @see https://stackoverflow.com/questions/408405/easy-way-to-test-a-url-for-404-in-php
+     * @see https://css-tricks.com/snippets/php/check-if-website-is-available/
      * @see https://aboutssl.org/fix-ssl-certificate-problem-unable-to-get-local-issuer-certificate/
      * @see https://blog.petehouston.com/fix-ssl-certificate-problem-with-php-curl/
      * @see https://stackoverflow.com/questions/50948387/curl-error-ssl-certificate-error-self-signed-certificate-in-certificate-chain
+     * @see https://flaviocopes.com/http-curl/
      * @see https://www.php.net/manual/en/function.curl-error.php
      */
     public function isContent(?string $url) : bool
@@ -83,7 +85,12 @@ class VideoURLProxyChecker
         if (\is_null($url)) {
             return false;
         }
-          // Use cURL
+        // Youtube particular case to check availability correctly
+        // otherwise HTTP code is always 200!
+        if (preg_match( '/youtube/', $url)) {
+            $url = $this->prepareAccessToYoutubeVideoContent($url);
+        }
+        // Use cURL
         $handle = curl_init(urldecode($url));
         curl_setopt($handle, CURLOPT_RETURNTRANSFER, 1);
         // Avoid content loading by getting the headers only
@@ -92,9 +99,30 @@ class VideoURLProxyChecker
         curl_exec($handle);
         $httpCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
         // Check resource availability with HTTP response status code which is not a 404 value and also an empty error string returned
-        $isContentFound = 404 !== $httpCode && 0 === strlen(curl_error($handle)) ? true : false;
+        // $isContentFound = 404 !== $httpCode && 0 === strlen(curl_error($handle)) ? true : false;
+        // Checking only HTTP code 200 is better!
+        $isContentFound = 200 === $httpCode ? true : false;
         curl_close($handle);
         return $isContentFound;
+    }
+
+    /**
+     * Check particular youtube video availability.
+     *
+     * @param $url
+     *
+     * @return string the correct url to use to check availability
+     *
+     * @see Particular case for youtube video:
+     * https://stackoverflow.com/questions/29166402/verify-if-video-exist-with-youtube-api-v3
+     */
+    private function prepareAccessToYoutubeVideoContent($url) : string
+    {
+        // Extract video id and use correct URL
+        preg_match( '/embed\/(.+)/', urldecode($url), $matches);
+        $videoID = $matches[1];
+        $url ='https://www.youtube.com/oembed?url=http://www.youtube.com/watch?v=' . $videoID;
+        return $url;
     }
 
     /**
