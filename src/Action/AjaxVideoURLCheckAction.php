@@ -66,7 +66,8 @@ class AjaxVideoURLCheckAction
         $url = $this->trickVideoChecker->filterURLAttribute($request);
         if (\is_null($url)) {
             $this->logger->error(
-                "[trace app snowTricks] AjaxVideoURLCheckAction/__invoke => Technical error due to video url set to null: check loading process for both client and server side!"
+                "[trace app snowTricks] AjaxVideoURLCheckAction/__invoke => " .
+                "Technical error due to video url set to null: check loading process for both client and server side!"
             );
         }
         // Check if URL is formatted as expected (validation) and accessible

@@ -84,6 +84,7 @@ abstract class AbstractServiceLayer
                 $this->entityManager->flush();
             }
         } catch (\Exception $exception) {
+            dd($exception->getMessage());
             return null;
         }
         return $entity;

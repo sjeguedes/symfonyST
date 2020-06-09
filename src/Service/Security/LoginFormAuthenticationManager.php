@@ -109,7 +109,9 @@ class LoginFormAuthenticationManager extends AbstractFormLoginAuthenticator
         $user = $this->userService->getRepository()->loadUserByUsername($credentials['username']);
         // Authentication failed. User value is null.
         if (!$user) {
-            throw new CustomUserMessageAuthenticationException('Please check your credentials!<br>User can not be found.');
+            throw new CustomUserMessageAuthenticationException(
+                nl2br('Please check your credentials!' . "\n" . 'User can not be found.')
+            );
         }
         return $user;
     }
@@ -124,7 +126,9 @@ class LoginFormAuthenticationManager extends AbstractFormLoginAuthenticator
         $isPasswordMatching = $this->passwordEncoder->isPasswordValid($user, $credentials['password']);
         // Authentication failed. Password value does not match user.
         if (!$isPasswordMatching) {
-            throw new CustomUserMessageAuthenticationException('Please check your credentials!<br>User and password do not match.');
+            throw new CustomUserMessageAuthenticationException(
+                nl2br('Please check your credentials!' . "\n" . 'User and password do not match.')
+            );
         }
         return $isPasswordMatching;
     }

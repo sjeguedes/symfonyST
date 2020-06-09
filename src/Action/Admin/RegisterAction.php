@@ -101,9 +101,19 @@ class RegisterAction
         $userId = $request->attributes->get('userId');
         $isActivated = $this->userService->activateAccount($userId);
         if (!$isActivated) {
-            $this->flashBag->add('danger', 'You are not allowed to access<br>account activation process!<br>Please contact us if necessary.');
+            $this->flashBag->add(
+                'danger',
+                nl2br('You are not allowed to access' . "\n" .
+                'account activation process!' . "\n" .
+                'Please contact us if necessary.')
+            );
         } else {
-            $this->flashBag->add('success', 'Good job!<br>Your account was successfully activated.<br>Please login to access member area.');
+            $this->flashBag->add(
+                'success',
+                'Good job!' . "\n" .
+                nl2br('Your account was successfully activated.' . "\n" .
+                'Please login to access member area.')
+            );
         }
         return $redirectionResponder('home');
     }

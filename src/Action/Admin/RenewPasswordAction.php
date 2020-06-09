@@ -56,9 +56,9 @@ class RenewPasswordAction
      *     "en": "/{_locale<en>}/renew-password/{userId}/{renewalToken}"
      * }, name="renew_password_with_personal_link")
      *
-     * @param RedirectionResponder     $redirectionResponder
-     * @param RenewPasswordResponder   $responder
-     * @param Request                  $request
+     * @param RedirectionResponder   $redirectionResponder
+     * @param RenewPasswordResponder $responder
+     * @param Request                $request
      *
      * @return Response
      *
@@ -71,7 +71,13 @@ class RenewPasswordAction
         // User can not be retrieved or
         // personal requested token does not match user token or renewal request date (forgotten password process) is outdated.
         if (\is_null($identifiedUser) || !$this->userService->isPasswordRenewalRequestTokenAllowed($identifiedUser)) {
-            $this->flashBag->add('danger', 'You are not allowed to access<br>password renewal process!<br>Please ask for a new request.');
+            $this->flashBag->add(
+                'danger',
+                nl2br('You are not allowed to access' . "\n" .
+                    'password renewal process!' . "\n" .
+                    'Please ask for a new request.'
+                )
+            );
             // Redirect to new password request page
             return $redirectionResponder('request_new_password');
         }

@@ -660,28 +660,41 @@ class ImageManager extends AbstractServiceLayer
      *
      * @param User|UserInterface $user
      *
-     * @return void
+     * @return bool
      *
      * @throws \Exception
      */
-    public function removeUserAvatar(UserInterface $user) : void
+    public function removeUserAvatar(UserInterface $user) : bool
     {
         // Image is both removed physically and in database (no user avatar gallery is used on website).
-        $medias = $user->getMediaOwner()->getMedias();
+        $isImageRemoved = false;
+        // Avoid issue: no need to remove if no media owner is set (no attached media)!
+        if (\is_null($mediaOwner = $user->getMediaOwner())) {
+            return true;
+        }
+        $medias = $mediaOwner->getMedias();
         foreach ($medias as $media) {
             if ($this->mediaTypeManager->getType('userAvatar') === $media->getMediaType()->getType()) {
                 $uploadDirectory = $this->imageUploader->getUploadDirectory(ImageUploader::AVATAR_IMAGE_DIRECTORY_KEY);
                 $image = $media->getMediaSource()->getImage();
                 $imageFileName = $image->getName() . '.' . $image->getFormat();
-                unlink($uploadDirectory . '/' . $imageFileName);
+                // Try to delete physical image
+                try {
+                    unlink($uploadDirectory . '/' . $imageFileName);
+                    $isImageRemoved = true;
+                } catch (\Exception $exception) {
+                    $isImageRemoved = false;
+                }
                 // Remove image entity (and corresponding media entity thanks to delete cascade option on relation)
-                $this->entityManager->remove($image);
-                // Save (update) data
-                $this->entityManager->flush();
-                // Avatar image is unique.
+                // and save change (update) data.
+                if ($isImageRemoved) {
+                    $isImageRemoved = $this->removeAndSaveNoMoreEntity($image, true);
+                }
+                // Avatar assigned image is unique.
                 break;
             }
         }
+        return $isImageRemoved;
     }
 
     /**

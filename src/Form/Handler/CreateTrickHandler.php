@@ -115,7 +115,8 @@ final class CreateTrickHandler extends AbstractUploadFormHandler
             $this->flashBag->add(
                 'danger',
                 nl2br('Trick creation failed!' . "\n" .
-                'Try to request again by checking the form fields.')
+                'Try to request again by checking the form fields.'
+                )
             );
             return false;
         }
@@ -556,7 +557,8 @@ final class CreateTrickHandler extends AbstractUploadFormHandler
             //Video messages
             case $collectionItemDataModel instanceof VideoInfosDTO:
                 $videoURL = $collectionItemDataModel->getUrl();
-                $errorMessage = nl2br('Sorry, expected trick was not created!' . "\n" .
+                $errorMessage = nl2br(
+                    'Sorry, expected trick was not created!' . "\n" .
                     'An error occurred during' . "\n" . 'video(s) medias management.'
                 );
                 $loggerMessage = sprintf(
@@ -711,7 +713,8 @@ final class CreateTrickHandler extends AbstractUploadFormHandler
         $savedTrick = $trickService->addAndSaveTrick($newTrick, false, true);
         // Create success notification message
         $state = 'success';
-        $message = nl2br(sprintf(
+        $message = nl2br(
+            sprintf(
             'A new trick called' . "\n" . '"%s"' . "\n" . 'was created successfully!' . "\n" .
             'Please check trick detail below to look at content.',
             // Can also be escaped with htmlspecialchars()
@@ -728,8 +731,11 @@ final class CreateTrickHandler extends AbstractUploadFormHandler
                 false
             );
             $state = 'error';
-            $message = nl2br('Sorry, trick creation failed' . "\n" .
-                'due a technical error!' . "\n" . 'Please try again with new data' . "\n" . 'or contact us if necessary.'
+            $message = nl2br(
+                'Sorry, trick creation failed' . "\n" .
+                'due a technical error!' . "\n" .
+                'Please try again with new data' . "\n" .
+                'or contact us if necessary.'
             );
             if (!$isProcessCorrectlyCanceled) {
                 $loggerMessage = sprintf(

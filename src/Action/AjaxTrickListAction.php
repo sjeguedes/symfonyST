@@ -63,7 +63,11 @@ class AjaxTrickListAction
             $this->trickService->storeInSession('trickCount', $trickCount);
             $parameters = $this->trickService->getTrickListParameters();
             $this->logger->error("[trace app snowTricks] AjaxTrickListAction/__invoke => trickCount: $trickCount");
-            $listError = 'Trick list was reinitialized!<br>Wrong total count is used<br>due to outdated or unexpected value.';
+            $listError = nl2br(
+                'Trick list was reinitialized!' . "\n" .
+                'Wrong total count is used' . "\n" .
+                'due to outdated or unexpected value.'
+            );
         } else {
             // Filter request attributes (offset, limit, ...)
             $attributes = $this->trickService->filterListRequestAttributes($request);
@@ -72,7 +76,7 @@ class AjaxTrickListAction
             // Check values which are not allowed!
             if (($parameters['error'])) {
                 $this->logger->error("[trace app snowTricks] AjaxTrickListAction/__invoke => parameters: " . serialize($parameters));
-                $listError = 'Trick list was reinitialized!<br>Wrong parameters are used.';
+                $listError = nl2br('Trick list was reinitialized!' . "\n" . 'Wrong parameters are used.');
             }
         }
         $data = [

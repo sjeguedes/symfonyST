@@ -127,11 +127,18 @@ final class RegisterHandler extends AbstractFormHandler
         if (!$isEmailSent) {
             $this->flashBag->add(
                 'info',
-                'Your account is successfully created!<br>However, confirmation email was not sent<br>due to technical reasons...<br>Please contact us if necessary.');
+                nl2br('Your account is successfully created!' . "\n" .
+                'However, confirmation email was not sent' . "\n" .
+                'due to technical reasons...' . "\n" . 'Please contact us if necessary.')
+            );
         } else {
             $this->flashBag->add(
                 'success',
-                'An email was sent successfully!<br>Please check your box<br>and look at your registration confirmation<br>to <strong>validate your account</strong>.');
+                nl2br('An email was sent successfully!' . "\n" .
+                'Please check your box' . "\n" .
+                'and look at your registration confirmation' . "\n" .
+                'to "validate your account".')
+            );
         }
     }
 

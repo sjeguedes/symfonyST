@@ -88,9 +88,11 @@ class Trick
     private $updateDate;
 
     /**
-     * @var MediaOwner (inverse side of entity relation)
+     * @var MediaOwner|null (inverse side of entity relation)
      *
-     * @ORM\OneToOne(targetEntity=MediaOwner::class, mappedBy="trick")
+     * The media owner can be null if application allows no media at creation/update!
+     *
+     * @ORM\OneToOne(targetEntity=MediaOwner::class, mappedBy="trick", cascade={"persist", "remove"}, orphanRemoval=true)
      */
     private $mediaOwner;
 
@@ -329,9 +331,11 @@ class Trick
     }
 
     /**
-     * @return MediaOwner
+     * @return MediaOwner|null
+     *
+     * * The media owner can be null when no media is set (trick creation/update)!
      */
-    public function getMediaOwner() : MediaOwner
+    public function getMediaOwner() : ?MediaOwner
     {
         return $this->mediaOwner;
     }

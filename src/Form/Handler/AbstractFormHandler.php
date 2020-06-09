@@ -178,7 +178,7 @@ class AbstractFormHandler implements FormHandlerInterface
         // Check constraints validation
         if (!$this->form->isValid()) {
             // Validation failed.
-            $message = 'Validation failed!<br>Try to submit again by checking the form fields.';
+            $message = nl2br('Validation failed!' . "\n" . 'Try to submit again by checking the form fields.');
             // Do not create a flash message in case of ajax form validation
             !$this->request->isXmlHttpRequest()
                 ? $this->flashBag->add('danger', $message)

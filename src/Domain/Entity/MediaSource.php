@@ -104,6 +104,21 @@ class MediaSource
     }
 
     /**
+     * Set an image.
+     *
+     * This is used for Doctrine lazy loading.
+     *
+     * @param Image $image
+     *
+     * @return $this
+     */
+    public function setImage(Image $image) : self
+    {
+        $this->image = $image;
+        return $this;
+    }
+
+    /**
      * Assign a media.
      *
      * @param Media $media
@@ -113,6 +128,21 @@ class MediaSource
     public function assignMedia(Media $media) : self
     {
         $this->media = $media;
+        return $this;
+    }
+
+    /**
+     * Set an video.
+     *
+     * This is used for Doctrine lazy loading.
+     *
+     * @param Video $video
+     *
+     * @return $this
+     */
+    public function setVideo(Video $video) : self
+    {
+        $this->video = $video;
         return $this;
     }
 

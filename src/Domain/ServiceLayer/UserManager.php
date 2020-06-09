@@ -400,30 +400,32 @@ class UserManager
                 return false;
             }
             // Save image and corresponding media instances (persistence is used in image service layer.)
-            $newAvatarImage = $imageService->createUserAvatar($avatarImageFile, $user);
-            if (\is_null($newAvatarImage)) {
+            $newAvatarImageEntity = $imageService->createUserAvatar($avatarImageFile, $user);
+            if (\is_null($newAvatarImageEntity)) {
                 return false;
             }
             // Create mandatory Media entity which references corresponding entities:
             // MediaOwner is the attachment (here a User), MediaSource is a image, User is the creator.
-            /** @var MediaOwner|null $newAvatarMediaOwner */
-            $newAvatarMediaOwner = $mediaService->getMediaOwnerManager()->createMediaOwner($user);
-            /** @var MediaSource|null $newAvatarMediaSource */
-            $newAvatarMediaSource = $mediaService->getMediaSourceManager()->createMediaSource($newAvatarImage);
-            if (\is_null($newAvatarMediaOwner) || \is_null($newAvatarMediaSource)) {
+            /** @var MediaOwner|null $newAvatarMediaOwnerEntity */
+            $newAvatarMediaOwnerEntity = \is_null($user->getMediaOwner()) // No media owner can be set!
+                                         ? $mediaService->getMediaOwnerManager()->createMediaOwner($user)
+                                         : $user->getMediaOwner();
+            /** @var MediaSource|null $newAvatarMediaSourceEntity */
+            $newAvatarMediaSourceEntity = $mediaService->getMediaSourceManager()->createMediaSource($newAvatarImageEntity);
+            if (\is_null($newAvatarMediaOwnerEntity) || \is_null($newAvatarMediaSourceEntity)) {
                 return false;
             }
             // Create avatar Media
-            $newAvatarMedia = $mediaService->createUserAvatarMedia(
-                $newAvatarMediaOwner,
-                $newAvatarMediaSource,
+            $newAvatarMediaEntity = $mediaService->createUserAvatarMedia(
+                $newAvatarMediaOwnerEntity,
+                $newAvatarMediaSourceEntity,
                 $dataModel,
                 'userAvatar'
             );
             // Save data (image, user, media and media type instances):
             // There is no need to persist media and media type associated instances thanks to cascade option in mapping!
-            $newAvatarImage = $imageService->addAndSaveImage($newAvatarImage, $newAvatarMedia, true, true);
-            if (\is_null($newAvatarImage)) {
+            $newAvatarImageEntity = $imageService->addAndSaveImage($newAvatarImageEntity, $newAvatarMediaEntity, true, true);
+            if (\is_null($newAvatarImageEntity)) {
                 return false;
             }
             return true;

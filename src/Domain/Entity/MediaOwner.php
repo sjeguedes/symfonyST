@@ -109,6 +109,36 @@ class MediaOwner
     }
 
     /**
+     * Set a trick.
+     *
+     * This is used for Doctrine lazy loading.
+     *
+     * @param Trick $trick
+     *
+     * @return $this
+     */
+    public function setTrick(Trick $trick) : self
+    {
+        $this->trick = $trick;
+        return $this;
+    }
+
+    /**
+     * Set a user.
+     *
+     * This is used for Doctrine lazy loading.
+     *
+     * @param User $user
+     *
+     * @return $this
+     */
+    public function setUser(User $user) : self
+    {
+        $this->user = $user;
+        return $this;
+    }
+
+    /**
      * @return UuidInterface
      */
     public function getUuid() : UuidInterface

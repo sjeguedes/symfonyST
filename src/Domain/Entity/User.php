@@ -159,9 +159,11 @@ class User implements UserInterface, \Serializable
     private $medias;
 
     /**
-     * @var MediaOwner (inverse side of entity relation)
+     * @var MediaOwner|null (inverse side of entity relation)
      *
-     * @ORM\OneToOne(targetEntity=MediaOwner::class, mappedBy="user")
+     * The media owner can be null when user just created his account!
+     *
+     * @ORM\OneToOne(targetEntity=MediaOwner::class, mappedBy="user", cascade={"persist", "remove"}, orphanRemoval=true)
      */
     private $mediaOwner;
 
@@ -727,9 +729,11 @@ class User implements UserInterface, \Serializable
     }
 
     /**
-     * @return MediaOwner
+     * @return MediaOwner|null
+     *
+     * The media owner can be null when no avatar is set (user registration)!
      */
-    public function getMediaOwner() : MediaOwner
+    public function getMediaOwner() : ?MediaOwner
     {
         return $this->mediaOwner;
     }
