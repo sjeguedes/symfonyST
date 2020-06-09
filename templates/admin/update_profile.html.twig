@@ -272,6 +272,20 @@
                     </div>
                 </div>
             </div>
+            <!-- //------------------------------------------------------------------------------------------------------------------------------------// -->
+            {# User available actions #}
+
+            <!-- Create trick -->
+            <div class="uk-flex uk-flex-center uk-margin-medium-top">
+                <p class="uk-text-center uk-text-uppercase uk-text-bold st-color-red">
+                    Your available actions<br>
+                    <a id="st-create-trick" class="uk-display-inline-block uk-button uk-button-secondary uk-border-rounded uk-box-shadow-hover-medium uk-margin-medium-top"
+                       href="{{ path('create_trick', {'mainRoleLabel': app.user.mainRoleLabel|lower}) }}" title="Create a trick">
+                        Create a trick&nbsp;&nbsp;<span uk-icon="plus-circle"></span>
+                    </a>
+                </p>
+
+            </div>
         </div>
     </div>
 {% endblock %}
