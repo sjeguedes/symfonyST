@@ -1,0 +1,16 @@
+# https://symfony.com/doc/current/validation.html#validation-constraints
+# https://symfony.com/doc/current/validation/groups.html
+App\Domain\DTO\AjaxDeleteImageDTO:
+    properties:
+        uuid:
+            - Uuid:
+                versions: [4]
+
+        name:
+            - Regex:
+                # Adapted pattern for temporary image or not
+                pattern: '/^([a-z0-9-]+)-([a-z0-9]{8,})-(\d{2,})x(\d{2,})$/'
+
+        mediaOwnerType:
+            - Regex:
+                pattern: '/^trick|trick_group|user$/'

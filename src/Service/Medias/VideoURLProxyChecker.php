@@ -98,7 +98,7 @@ class VideoURLProxyChecker
         // Request with cURL
         curl_exec($handle);
         $httpCode = curl_getinfo($handle, CURLINFO_HTTP_CODE);
-        // Check resource availability with HTTP response status code which is not a 404 value and also an empty error string returned
+        // Check resource availability with HTTP code 200
         // $isContentFound = 404 !== $httpCode && 0 === strlen(curl_error($handle)) ? true : false;
         // Checking only HTTP code 200 is better!
         $isContentFound = 200 === $httpCode ? true : false;
@@ -109,12 +109,12 @@ class VideoURLProxyChecker
     /**
      * Check particular youtube video availability.
      *
+     * @link Particular case for youtube video:
+     * https://stackoverflow.com/questions/29166402/verify-if-video-exist-with-youtube-api-v3
+     *
      * @param $url
      *
      * @return string the correct url to use to check availability
-     *
-     * @see Particular case for youtube video:
-     * https://stackoverflow.com/questions/29166402/verify-if-video-exist-with-youtube-api-v3
      */
     private function prepareAccessToYoutubeVideoContent($url) : string
     {

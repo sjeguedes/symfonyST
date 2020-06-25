@@ -263,7 +263,7 @@ class Trick
     }
 
     /**
-     * Assign a rank to sort trick (Used to manage a list to show)
+     * Assign a rank to sort trick (Used to manage a list to show).
      *
      * This data is not persisted but generated during a database query.
      *

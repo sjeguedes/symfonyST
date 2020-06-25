@@ -1,19 +1,33 @@
 {# rootForm var is provided by form template which calls this template #}
 {% set rootFormName = rootForm.vars.name %}
+
+{% set imageOwnerType = mediaOwnerType %}
 {# Get form view for an existing image which exists, or (partially/completely) filled in, furthermore validated or not #}
 {% set imageToCropForm = editableImageToCropForm %}
 {# Get existing index value for editable image box, provided by form template which calls this template #}
 {% set imageIndex = editableImageIndexName %}
 <div id="st-image-to-crop-wrapper-{{ imageIndex }}" class="st-image-to-crop-wrapper">
     <div id="{{ rootFormName }}_images_{{ imageIndex }}" class="uk-position-relative uk-border-rounded uk-padding-small uk-margin-small-bottom st-image-to-crop st-background-blue st-box-shadow-full-small">
-        {# Image block removal #}
-        {# TODO: complete var setting with a test which checks image existence by looping on trick images here, and add removal confirmation modal for update form! #}
-        {% set removalIcon = (rootFormName == 'update_trick') ? 'trash' : 'close' %}
-        <a href="#" class="uk-position-top-right uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-margin-small-top uk-margin-small-right st-image-remove-button" title="Cancel">
+        {# Saved (uploaded) image block removal: look at AbstractTrickType::finishView() #}
+        {# Prepare vars image removal modal by testing a valid and uploaded image #}
+        {% if (imageToCropForm.savedImageName.vars.value != '') and (imageToCropForm.savedImageName.vars.valid == 1) and (imageToCropForm.vars.entityUuid is defined) %}
+            {% set removeImageLink = 'id="st-image-remove-button-'~imageIndex~'" href="#st-modal-delete-image"' %}
+            {% set removalIcon = 'trash' %}
+            {% set imageDataAttributes = 'data-uuid="'~imageToCropForm.vars.entityUuid~'" data-name="'~imageToCropForm.savedImageName.vars.value~'" data-type="'~imageOwnerType~'"' %}
+        {% else %}
+            {% set removeImageLink = 'href="#"' %}
+            {% set removalIcon = 'close' %}
+            {% set imageDataAttributes = '' %}
+        {% endif %}
+        {# These vars are checked to be safe with condition above! #}
+        <a {{ removeImageLink|raw }} title="Cancel" {{ imageDataAttributes|raw }}
+           class="uk-position-top-right uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-margin-small-top uk-margin-small-right st-image-remove-button" uk-toggle>
             <span uk-icon="icon: {{ removalIcon }}; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-delete st-svg-icon-actions"></span>
         </a>
+        {# ----------------------------------------------------------------------------------------------------------------------------------------------------------------#}
         {# Image block sortable #}
-        <a href="#" class="uk-position-bottom-right uk-sortable-handle uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-margin-small-bottom uk-margin-small-right" title="Sort vertically">
+        <a href="#" title="Sort vertically"
+           class="uk-position-bottom-right uk-sortable-handle uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-margin-small-bottom uk-margin-small-right">
             <span uk-icon="icon: list; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-actions"></span>
         </a>
         {# form label for imageToCrop form entry type #}
@@ -80,8 +94,8 @@
                                 {# image change button #}
                                 {% set isDisabled = (imageToCropForm.savedImageName.vars.value != '') and (imageToCropForm.savedImageName.vars.valid == 1) %}
                                 <button class="uk-button uk-button-default{% if isDisabled == 1 %} uk-disabled{% endif %} st-fake-file-input-button" type="button" tabindex="-1"{% if isDisabled == 1 %} disabled{% endif %}>
-                                    <span class="uk-form-icon" uk-icon="icon: upload"></span>
-                                    <span id="st-image-change-button-label-{{ imageIndex }}" class="uk-padding-small st-image-change-button-label">{% if isDisabled == 1 %}Locked{% else %}Select{% endif %}</span>
+                                    <span class="uk-form-icon" uk-icon="icon: {{ isDisabled ? 'lock' : 'upload' }}"></span>
+                                    <span id="st-image-change-button-label-{{ imageIndex }}" class="uk-padding-small st-image-change-button-label">{{ isDisabled ? 'Locked' : 'Select' }}</span>
                                     {# Image file input icon errors #}
                                     {% if imageToCropForm.image.vars.errors.form.submitted == 1 %}
                                         {% set class = (imageToCropForm.image.vars.valid == 0) or (imageToCropForm.imagePreviewDataURI.vars.valid == 0) or
@@ -94,6 +108,15 @@
                                     {% endif %}
                                 </button>
                             </div>
+                            {# Image already uploaded text info #}
+                            {% if isDisabled == 1 %}
+                            <p id="st-temp-upload-text-info" class="uk-margin-small-top">
+                                <small class="uk-text-bold st-color-yellow">
+                                    <span class="uk-icon" uk-icon="icon: info"></span>
+                                    <span class="st-temp-upload-text-info-content">This image is saved on server.</span>
+                                </small>
+                            </p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

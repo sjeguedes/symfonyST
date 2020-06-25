@@ -2,16 +2,16 @@
 
 declare(strict_types = 1);
 
-namespace App\Responder;
+namespace App\Responder\Json;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
- * Class AjaxVideoURLCheckResponder.
+ * Class JsonResponder.
  *
  * Manage a simple JSON response with status from ajax request.
  */
-final class AjaxVideoURLCheckResponder
+final class JsonResponder
 {
     /**
      * Invokable Responder with Magic method.
@@ -23,8 +23,6 @@ final class AjaxVideoURLCheckResponder
     public function __invoke(array $data) : JsonResponse
     {
         // Encode data with JSON string with serializer
-        $response = new JsonResponse($data);
-        $response->headers->set('Content-Type', 'application/json; charset=utf-8');
-        return $response;
+        return new JsonResponse($data);
     }
 }

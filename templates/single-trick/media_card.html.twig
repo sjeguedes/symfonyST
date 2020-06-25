@@ -5,7 +5,7 @@ inside included template when a loop is used! #}
 {# https://security.stackexchange.com/questions/155789/is-the-src-of-an-iframe-safe-for-user-input #}
 {# https://github.com/twigphp/Twig/issues/896 #}
 <div class="uk-card uk-card-primary uk-box-shadow-small uk-box-shadow-hover-medium st-border-white-small">
-    <div class="uk-card-badge uk-label uk-text-center">
+    <div class="uk-card-badge uk-label uk-flex uk-flex-center uk-flex-middle uk-text-center">
         <span class="uk-text-uppercase uk-text-bold">
             <span class="st-color-red">{{ custom.icon matches '/^image/' ? 'Image' : 'Video' }} #</span>  {{ mediaRank }}<br>
             <span class="st-color-red">Added on</span> {{ mediaCreationDate|date('d/m/Y') }}

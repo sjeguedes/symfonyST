@@ -1,4 +1,6 @@
 {
+    "name": "sje-guedes/symfony-st",
+    "description": "Simple Symfony project",
     "type": "project",
     "license": "proprietary",
     "require": {
@@ -84,7 +86,5 @@
             "allow-contrib": false,
             "require": "4.2.*"
         }
-    },
-  "name": "",
-  "description": ""
+    }
 }

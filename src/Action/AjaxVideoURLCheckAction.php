@@ -4,12 +4,12 @@ declare(strict_types = 1);
 
 namespace App\Action;
 
-use App\Responder\AjaxVideoURLCheckResponder;
+use App\Responder\Json\JsonResponder;
 use App\Service\Medias\VideoURLProxyChecker;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -50,17 +50,17 @@ class AjaxVideoURLCheckAction
      *
      * @Route("/load-trick-video/url/{url<(.+)>?}", name="load_trick_video_url_check")
      *
-     * @param AjaxVideoURLCheckResponder $responder
-     * @param Request                    $request
+     * @param JsonResponder $responder
+     * @param Request       $request
      *
-     * @return Response
+     * @return JsonResponse
      *
      * "url" attribute value is checked with a filter:
      * @see VideoURLProxyChecker::filterURLAttribute()
      * About trailing slash:
      * @see https://symfony.com/doc/current/routing/slash_in_parameter.html
      */
-    public function __invoke(AjaxVideoURLCheckResponder $responder, Request $request) : Response
+    public function __invoke(JsonResponder $responder, Request $request) : JsonResponse
     {
         // Check video URL value
         $url = $this->trickVideoChecker->filterURLAttribute($request);

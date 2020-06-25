@@ -4,9 +4,9 @@ declare(strict_types = 1);
 
 namespace App\Form\Type\Admin;
 
+use App\Domain\ServiceLayer\ImageManager;
+use App\Domain\ServiceLayer\VideoManager;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\CallbackTransformer;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
@@ -17,6 +17,28 @@ use Symfony\Component\Form\FormView;
  */
 abstract class AbstractTrickType extends AbstractType
 {
+    /**
+     * @var ImageManager
+     */
+    private $imageService;
+
+    /**
+     * @var VideoManager
+     */
+    private $videoService;
+
+    /**
+     * AbstractTrickType constructor.
+     *
+     * @param ImageManager $imageService
+     * @param VideoManager $videoService
+     */
+    public function __construct(ImageManager $imageService, VideoManager $videoService)
+    {
+        $this->imageService = $imageService;
+        $this->videoService = $videoService;
+    }
+
     /**
      * Use finished view to redefine show list rank for images/videos collections.
      *
@@ -31,39 +53,98 @@ abstract class AbstractTrickType extends AbstractType
      */
     public function finishView(FormView $view, FormInterface $form, array $options) : void
     {
-        // Reorder images and videos collections and redefine ranks if necessary
-        $this->reOrderImagesCollectionDataAndShowListRank($view, $form);
-        $this->reOrderVideosCollectionDataAndShowListRank($view, $form);
+        // Maintain a correct order for images or videos collection form view to be sure to loop correctly on view data
+        // and adapt show list ranks data depending on their validity.
+        $this->manageImagesCollectionData($view, $form);
+        $this->manageVideosCollectionData($view, $form);
     }
 
     /**
-     * Maintain a correct order for images collection form view to be sure to loop correctly on view data
-     * and adapt show list ranks data depending on their validity.
+     * Manage images view data adjustments.
      *
      * @param FormView      $view
      * @param FormInterface $form
      *
      * @return void
      */
-    private function reOrderImagesCollectionDataAndShowListRank(FormView $view, FormInterface $form) : void
+    private function manageImagesCollectionData(FormView $view, FormInterface $form) : void
     {
         // Reorder "image to crop" boxes data in images collection and redefine rank if necessary
         $this->updateCollectionOrderAndRanks('images', $view, $form);
+
+        $this->retrieveEntitiesUuid('images', $view, $form);
     }
 
     /**
-     * Maintain a correct order for videos collection form view to be sure to loop correctly on view data
-     * and adapt show list ranks data depending on their validity.
+     * Manage videos view data adjustments.
      *
      * @param FormView      $view
      * @param FormInterface $form
      *
      * @return void
      */
-    private function reOrderVideosCollectionDataAndShowListRank(FormView $view, FormInterface $form) : void
+    private function manageVideosCollectionData(FormView $view, FormInterface $form) : void
     {
         // Reorder "video infos" boxes data in videos collection and redefine rank if necessary
         $this->updateCollectionOrderAndRanks('videos', $view, $form);
+        // TODO: add logic for video trick update
+        // TODO: make changes in Video, VideoInfosType, VideoInfosDTO, VideoInfosDTO.yaml to add logic for "name" / "savedVideoName"
+        //$this->retrieveEntitiesUuid('videos', $view, $form);
+    }
+
+    /**
+     * Retrieve existing entities uuid identifiers to pass them to collections in order to update/delete items.
+     *
+     * @param string        $collectionName
+     * @param FormView      $view
+     * @param FormInterface $form
+     *
+     * @return void
+     */
+    private function retrieveEntitiesUuid(string $collectionName, FormView $view, FormInterface $form) : void
+    {
+        $config = [
+            'images' => [
+                // This array will store all valid collection entity items "identifier" names.
+                'validSavedNames' => [],
+                'childFormName'   => 'savedImageName',
+                'serviceLayer'    => $this->imageService
+            ],
+            'videos' => [
+                // This array will store all valid collection entity items "identifier" names.
+                'validSavedNames' => [],
+                'childFormName'   => 'savedVideoName',
+                'serviceLayer'    => $this->videoService
+            ]
+        ];
+        $validImagesNames = $config[$collectionName]['validSavedNames'];
+        $childFormName = $config[$collectionName]['childFormName'];
+        // Get an array of valid saved image name to perform a database query later
+        foreach ($form->get($collectionName)->all() as $form) {
+            // Be aware of saved name which can be null even if it is a valid data.
+            if ($form->get($childFormName)->isValid() && !\is_null($form->get($childFormName)->getData())) {
+                $validImagesNames[] = $form->get($childFormName)->getData();
+            }
+        }
+        // Query database to get all uuid values which corresponds to valid saved names (can be considered as "identifier")
+        if (0 !== \count($validImagesNames)) {
+            $serviceLayer = $config[$collectionName]['serviceLayer'];
+            $results = $serviceLayer->getRepository()->findManyUuidByNames($validImagesNames);
+            $collectionFormViews = $view->children[$collectionName]->children;
+            // Pass a new entity uuid variable entity uuid template for each corresponding form view
+            if (0 !== \count($results)) {
+                // Iterate on each
+                foreach ($collectionFormViews as $formView) {
+                    // Retrieve child form view which store entity valid saved name
+                    // For instance, form view name is "savedImageName" or "savedVideoName".
+                    $childFormViewValue = $formView->children[$childFormName]->vars['value'];
+                    // Pass collection item entity uuid to corresponding form view to use it in template
+                    if (isset($results[$childFormViewValue])) {
+                        $formView->vars['entityUuid'] = (string) $results[$childFormViewValue];
+                    }
+                }
+            }
+        }
     }
 
     /**

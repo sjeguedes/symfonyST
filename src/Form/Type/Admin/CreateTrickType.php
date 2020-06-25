@@ -6,13 +6,16 @@ namespace App\Form\Type\Admin;
 
 use App\Domain\DTO\CreateTrickDTO;
 use App\Domain\Entity\TrickGroup;
+use App\Domain\ServiceLayer\ImageManager;
 use App\Domain\ServiceLayer\TrickGroupManager;
+use App\Domain\ServiceLayer\VideoManager;
 use App\Form\Handler\CreateTrickHandler;
 use App\Form\TypeToEmbed\ImageToCropType;
 use App\Form\TypeToEmbed\VideoInfosType;
 use App\Utils\Traits\UuidHelperTrait;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -43,11 +46,19 @@ class CreateTrickType extends AbstractTrickType
     /**
      * CreateTrickType constructor.
      *
+     * @param ImageManager      $imageService
+     * @param VideoManager      $videoService
      * @param RequestStack      $requestStack
      * @param TrickGroupManager $trickGroupService the trick group entity service layer
      */
-    public function __construct(RequestStack $requestStack, TrickGroupManager $trickGroupService)
+    public function __construct(
+        ImageManager $imageService,
+        VideoManager $videoService,
+        RequestStack $requestStack,
+        TrickGroupManager $trickGroupService
+    )
     {
+        parent::__construct($imageService, $videoService);
         $this->request = $requestStack->getCurrentRequest();
         $this->trickGroupService = $trickGroupService;
     }
@@ -112,6 +123,9 @@ class CreateTrickType extends AbstractTrickType
                 'prototype'      => true, // This is he default value but more explicit due to customization
                 // Maintain validation state at the collection form level, to be able to show errors near field
                 'error_bubbling' => false
+            ])
+            ->add('token', HiddenType::class, [
+                'inherit_data' => true
             ]);
     }
 
@@ -136,6 +150,8 @@ class CreateTrickType extends AbstractTrickType
                 );
             },
             'required'        => false,
+            // Disable automatic CSRF validation: this validation/protection is checked/done in form handler manually!
+            'csrf_protection' => false,
             'csrf_field_name' => 'token',
             'csrf_token_id'   => 'create_trick_token'
         ]);

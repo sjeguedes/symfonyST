@@ -117,24 +117,26 @@ final class CreateTrickDTO
     /**
      * @param array|null $images
      *
-     * @return void
+     * @return CreateTrickDTO
      *
      * @throws \Exception
      */
-    public function setImages(?array $images) : void
+    public function setImages(?array $images) : self
     {
         $this->images = new DTOCollection($images);
+        return $this;
     }
 
     /**
      * @param array|null $videos
      *
-     * @return void
+     * @return CreateTrickDTO
      *
      * @throws \Exception
      */
-    public function setVideos(?array $videos) : void
+    public function setVideos(?array $videos) : self
     {
         $this->videos = new DTOCollection($videos);
+        return $this;
     }
 }

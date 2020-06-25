@@ -94,7 +94,7 @@ class UpdateProfileAction
      *
      * @Route({
      *     "en": "/{_locale?<en>}/{mainRoleLabel<admin|member>}/update-profile"
-     * }, name="update_profile")
+     * }, name="update_profile", methods={"GET", "POST"})
      *
      * @param RedirectionResponder   $redirectionResponder
      * @param UpdateProfileResponder $responder
@@ -118,6 +118,7 @@ class UpdateProfileAction
             $actionData = ['userService' => $this->userService, 'userToUpdate' => $identifiedUser];
             // Manage the forms
             switch ($submittedRequest = $request->request) {
+                // Update profile avatar image
                 case $submittedRequest->has($updateProfileAvatarForm->getName()): // 'update_profile_avatar'
                     $actionData['imageService'] = $this->imageService;
                     $actionData['mediaService'] = $this->mediaService;
@@ -126,6 +127,7 @@ class UpdateProfileAction
                     // Adapt the response depending on ajax mode de/activation
                     $response = $this->getAvatarUploadResponse($isFormRequestValid, $redirectionResponder, $request);
                     break;
+                // Update other profile infos
                 case $submittedRequest->has($updateProfileInfosForm->getName()): // 'update_profile_infos'
                     // Constraints and custom validation: call actions to perform if necessary on success
                     $isFormRequestValid =$this->formHandlers[1]->processFormRequest($actionData);

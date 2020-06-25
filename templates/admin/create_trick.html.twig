@@ -235,13 +235,14 @@
                                                 {# Loop on children to retrieve all associated images (with corresponding box) on the way to be possibly created #}
                                                 {% for imageIndex, formView in createTrickForm.images.children %}
                                                     {# index = imageIndex, value = formView  #}
-                                                    {{ include('form/editable_image_to_crop.html.twig', {
+                                                    {% include 'form/editable_image_to_crop.html.twig' with {
                                                             rootForm: createTrickForm,
+                                                            mediaOwnerType: 'trick',
+                                                            deleteImageForm: deleteImageForm,
                                                             rank: loop.index,
                                                             editableImageToCropForm: formView,
                                                             editableImageIndexName: imageIndex
-                                                        })
-                                                    }}
+                                                    } only %}
                                                 {% endfor %}
                                             {% endif %}
                                         </div>
@@ -311,13 +312,13 @@
                                                 {# Loop on children to retrieve all associated videos (with corresponding box) on the way to be possibly created #}
                                                 {% for videoIndex, formView in createTrickForm.videos.children %}
                                                     {# index = videoIndex, value = formView  #}
-                                                    {{ include('form/editable_video_infos.html.twig', {
+                                                    {% include 'form/editable_video_infos.html.twig' with {
                                                         rootForm: createTrickForm,
+                                                        mediaOwnerType: 'trick',
                                                         rank: loop.index,
                                                         editableVideoInfosForm: formView,
                                                         editableVideoIndexName: videoIndex
-                                                    })
-                                                    }}
+                                                    } only %}
                                                 {% endfor %}
                                             {% endif %}
                                         </div>
@@ -340,6 +341,11 @@
                             </div>
                         {{ form_end(createTrickForm) }}
                         <p class="uk-margin-small-top uk-text-center"><small>All fields are mandatory.</small></p>
+                        {# Get image removal ajax form in modal #}
+                        {% include 'form/delete_image.html.twig' with {
+                            removalText: 'This action is required since your image is temporary saved on server.',
+                            deleteImageForm: deleteImageForm
+                        } only %}
                     </div>
                 </div>
             </div>

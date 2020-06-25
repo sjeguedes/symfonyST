@@ -42,12 +42,17 @@
         <div class="uk-child-width-1-2@s uk-child-width-1-3@m uk-child-width-1-4@l uk-child-width-1-5@xl uk-grid-match uk-padding"
              uk-grid uk-height-match="target: > .st-card-container > .uk-card > .uk-card-body">
             {% for trick in tricks %}
-            <div class="st-card-container" data-offset="{{ trick.rank|e('html_attr') }}">
+            <div class="st-card-container" data-offset="{{ trick.rank }}">
                 <div class="uk-card uk-card-primary uk-box-shadow-medium uk-box-shadow-hover-large st-border-white-small">
-                    <div class="uk-card-badge uk-label uk-text-center"><span class="st-color-red">In</span> {{ trick.trickGroup.name }}<br><span class="st-color-red">Trick #</span> {{ 'DESC' == trickLoadingMode ? trickCount - (- trick.rank - 1 + trickCount) : trickCount + (trick.rank + 1 - trickCount) }} <span class="st-color-red">Added on</span> {{ trick.creationDate|date('d/m/Y') }}</div>
+                    <div class="uk-card-badge uk-label uk-flex uk-flex-center uk-flex-middle uk-text-center">
+                        <span>
+                            <span class="st-color-red">In</span> {{ trick.trickGroup.name }}<br>
+                            <span class="st-color-red">Trick #</span> {{ 'DESC' == trickLoadingMode ? trickCount - (- trick.rank - 1 + trickCount) : trickCount + (trick.rank + 1 - trickCount) }} <span class="st-color-red">Added on</span> {{ trick.creationDate|date('d/m/Y') }}
+                        </span>
+                    </div>
                     <div class="uk-card-media-top uk-position-relative st-background-black">
                         {% include 'all/trick_media_loader.html.twig' with {'spinnerRatio': '1.5'} %}
-                        <img id="st-card-image-{{ trick.rank|e('html_attr') }}" class="uk-invisible" src="{{ asset(globalTrickUploadDirectory~trick.mediaOwner.medias[0].mediaSource.image.name|e('html_attr')~'.'~trick.mediaOwner.medias[0].mediaSource.image.format|e('html_attr')) }}" alt="{{ trick.mediaOwner.medias[0].mediaSource.image.description|e('html_attr') }}">
+                        <img id="st-card-image-{{ trick.rank }}" class="uk-invisible" src="{{ asset(globalTrickUploadDirectory~trick.mediaOwner.medias[0].mediaSource.image.name~'.'~trick.mediaOwner.medias[0].mediaSource.image.format) }}" alt="{{ trick.mediaOwner.medias[0].mediaSource.image.description|e('html_attr') }}">
                     </div>
                     <div class="uk-card-body uk-padding-small">
                         <h2 class="uk-card-title">{{ trick.name }}</h2>
@@ -55,8 +60,9 @@
                     <div class="uk-card-footer">
                         <div class="uk-flex{{ is_granted('ROLE_USER') ? ' uk-flex-between' : ' uk-flex-right' }}">
                             <div class="{{ is_granted('ROLE_USER') ? 'uk-text-left' : 'uk-text-right' }}">
-                                <a href="{{ path('show_single_trick', { 'slug': trick.slug|e('html_attr'), 'encodedUuid': trick.uuid|uuid_encode }) }}" class="uk-link-text" title="Read more">
-                                    Read more<span uk-icon="icon: arrow-right; ratio: 1.3" class="uk-icon"></span>
+                                <a href="{{ path('show_single_trick', { 'slug': trick.slug, 'encodedUuid': trick.uuid|uuid_encode }) }}" class="uk-link-text" title="Read more">
+                                    Read <span class="uk-hidden@xl">+</span><span class="uk-visible@xl">more</span>
+                                    <span uk-icon="icon: arrow-right; ratio: 1.3" class="uk-icon"></span>
                                 </a>
                             </div>
                             {% if is_granted('ROLE_USER') %}

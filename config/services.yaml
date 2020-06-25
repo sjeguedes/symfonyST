@@ -52,7 +52,13 @@ services:
     App\Action\Admin\CreateTrickAction:
         tags: ['controller.service_arguments']
         arguments:
-            $formHandler: '@App\Form\Handler\CreateTrickHandler'
+            $formHandlers: ['@App\Form\Handler\CreateTrickHandler', '@App\Form\Handler\AjaxDeleteImageHandler']
+
+    # add form handler when deleting a particular image
+    App\Action\Admin\AjaxDeleteImageAction:
+        tags: ['controller.service_arguments']
+        arguments:
+            $formHandler: '@App\Form\Handler\AjaxDeleteImageHandler'
 
     # add form handler when calling login
     App\Action\Admin\LoginAction:
@@ -95,6 +101,9 @@ services:
 
     # add trick creation handler
     App\Form\Handler\CreateTrickHandler:
+
+    # add image deletion handler
+    App\Form\Handler\AjaxDeleteImageHandler:
 
     # add renew password handler
     App\Form\Handler\RenewPasswordHandler:
@@ -176,7 +185,7 @@ services:
 
     # add PSR3 logger as default logger for actions (controllers)
     Symfony\Component\HttpKernel\Log\Logger:
-        arguments: ['info','%kernel.project_dir%/var/log/dev.log']
+        arguments: ['critical','%kernel.project_dir%/var/log/dev.log']
 
     # add options resolver
     Symfony\Component\OptionsResolver\OptionsResolver:

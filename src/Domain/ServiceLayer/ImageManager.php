@@ -18,6 +18,8 @@ use App\Utils\Traits\UserHandlingHelperTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -285,13 +287,13 @@ class ImageManager extends AbstractServiceLayer
      * @param string|null $uploadDirectoryKey
      * @param string|null $imageFullName      a full image name (not a path) with extension
      *
-     * @return void
+     * @return bool
      *
      * @throws \Exception
      *
      * @see TrickManager::removeTrick()
      */
-    public function removeOneImageFile(?Image $imageEntity, string $uploadDirectoryKey, string $imageFullName = null) : void
+    public function removeOneImageFile(?Image $imageEntity, string $uploadDirectoryKey, string $imageFullName = null) : bool
     {
         if (\is_null($imageEntity) && \is_null($imageFullName)) {
             throw new \RuntimeException('A instance of Image, or a full image name must be defined!');
@@ -303,7 +305,7 @@ class ImageManager extends AbstractServiceLayer
         if (preg_match('/' . ImageManager::DEFAULT_IMAGE_IDENTIFIER_NAME . '/', $imageNameWithExtension)) {
             $uploadDirectory = $uploadDirectory . '/' .ImageUploader::TEMPORARY_DIRECTORY_NAME;
         }
-        unlink($uploadDirectory . '/' . $imageNameWithExtension);
+        return unlink($uploadDirectory . '/' . $imageNameWithExtension);
     }
 
     /**
@@ -522,17 +524,31 @@ class ImageManager extends AbstractServiceLayer
     }
 
     /**
-     * Find Image by its name without extension.
+     * Find an Image entity by its name without extension.
      *
      * @param string $fileNameWithoutExtension
+     *
+     * @return object|Image|null
+     */
+    public function findSingleByName(string $fileNameWithoutExtension) : ?object
+    {
+        return $this->getRepository()->findOneBy(['name' => $fileNameWithoutExtension]);
+    }
+
+    /**
+     * Find an Image entity by its uuid string representation.
+     *
+     * Please note uuid must be converted to binary string to make query!
+     *
+     * @param UuidInterface $uuid
      *
      * @return Image|null
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function findSingleByName(string $fileNameWithoutExtension) : ?Image
+    public function findSingleByUuid(UuidInterface $uuid) : ?Image
     {
-        return $this->getRepository()->findOneByName($fileNameWithoutExtension);
+        return $this->getRepository()->findOneByUuid($uuid);
     }
 
     /**

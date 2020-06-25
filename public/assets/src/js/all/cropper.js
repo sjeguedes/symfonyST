@@ -245,7 +245,7 @@ export default (cropParams) =>  {
                     // Define cropper for image element to use it easily in handlers functions
                     cropParams.modalElement.cropper = newCropper;
                     // Hide crop box when ready for first load to improve appearance effect due to repositioning
-                    cropParams.modalElement.querySelector('.cropper-crop-box').classList.add('uk-hidden');
+                    //cropParams.modalElement.querySelector('.cropper-crop-box').classList.add('uk-hidden');
                     // Get crop box maximum size corresponding to defined ratio as default size
                     currentCropBoxData = renderDefaultCropBoxWithMinMaxsize(newCropper, currentCropBoxData, true);
                     // Set defined crop box with default values (call "crop" event)
@@ -264,7 +264,7 @@ export default (cropParams) =>  {
                             if (state.firstLoad && state.counter === 2) {
                                 renderDefaultCropBoxWithMinMaxsize(newCropper, currentCropBoxData, true);
                                 // Show crop box for first load after repositioning
-                                cropParams.modalElement.querySelector('.cropper-crop-box').classList.remove('uk-hidden');
+                                //cropParams.modalElement.querySelector('.cropper-crop-box').classList.remove('uk-hidden');
                             }
                             // Do not use counter after 2 iterations
                             if (state.counter < 2) state.counter ++;

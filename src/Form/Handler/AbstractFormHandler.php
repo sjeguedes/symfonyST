@@ -27,13 +27,13 @@ class AbstractFormHandler implements FormHandlerInterface
      * Define data keys and types to check which are used in form request process.
      */
     const DATA_CONFIG_TO_CHECK = [
-        'request'      => Request::class,
-        'userToUpdate' => User::class,
-        'userService'  => UserManager::class,
-        'trickService' => TrickManager::class,
-        'imageService' => ImageManager::class,
-        'videoService' => VideoManager::class,
-        'mediaService' => MediaManager::class,
+        'imageService'  => ImageManager::class,
+        'mediaService'  => MediaManager::class,
+        'request'       => Request::class,
+        'trickService'  => TrickManager::class,
+        'userService'   => UserManager::class,
+        'userToUpdate'  => User::class,
+        'videoService'  => VideoManager::class
     ];
 
     /**
@@ -176,7 +176,7 @@ class AbstractFormHandler implements FormHandlerInterface
             throw new \RuntimeException('The form handler must bind the request first!');
         }
         // Check constraints validation
-        if (!$this->form->isValid()) {
+        if ($this->form->isSubmitted() && !$this->form->isValid()) {
             // Validation failed.
             $message = nl2br('Validation failed!' . "\n" . 'Try to submit again by checking the form fields.');
             // Do not create a flash message in case of ajax form validation
