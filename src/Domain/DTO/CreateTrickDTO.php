@@ -48,6 +48,11 @@ final class CreateTrickDTO
     private $videos;
 
     /**
+     * @var bool|null
+     */
+    private $isPublished;
+
+    /**
      * CreateTrickDTO constructor.
      *
      * @param TrickGroup|null             $group       a trick group which is a kind of category
@@ -55,6 +60,7 @@ final class CreateTrickDTO
      * @param string|null                 $description a text which describes the trick
      * @param array|ImageToCropDTO[]|null $images      a collection of image data (crop JSON data, preview data URI, identifier reference...)
      * @param array|VideoInfosDTO[]|null  $videos      a collection of video URL strings to be used in iframe HTML element based on video type (Youtube, DailyMotion, Vimeo...)
+     * @param bool|null                   $isPublished a publication state which an administrator can change
      *
      * @throws \Exception
      */
@@ -63,13 +69,15 @@ final class CreateTrickDTO
         ?string $name,
         ?string $description,
         ?array $images,
-        ?array $videos
+        ?array $videos,
+        ?bool $isPublished = false
     ) {
         $this->group = $group;
         $this->name = $name;
         $this->description = $description;
         $this->images = new DTOCollection($images);
         $this->videos = new DTOCollection($videos);
+        $this->isPublished = $isPublished;
     }
 
     /**
@@ -110,6 +118,14 @@ final class CreateTrickDTO
     public function getVideos() : ?DTOCollection
     {
         return $this->videos;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getIsPublished() : ?bool
+    {
+        return $this->isPublished;
     }
 
     // TODO: complete setters for Trick update

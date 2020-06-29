@@ -84,7 +84,7 @@ abstract class AbstractServiceLayer
                 $this->entityManager->flush();
             }
         } catch (\Exception $exception) {
-            dd($exception->getMessage());
+            // $exception->getMessage() can be used here to debug exception!
             return null;
         }
         return $entity;

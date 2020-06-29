@@ -72,6 +72,13 @@ class Trick
     private $slug;
 
     /**
+     * @var bool
+     *
+     * @ORM\Column(type="boolean")
+     */
+    private $isPublished;
+
+    /**
      *
      * @var \DateTimeInterface
      *
@@ -126,6 +133,7 @@ class Trick
      * @param string                  $name
      * @param string                  $description
      * @param string|null             $slug
+     * @param bool                    $isPublished  a publication state which an administrator can change
      * @param \DateTimeInterface|null $creationDate
      *
      * @throws \Exception
@@ -136,6 +144,7 @@ class Trick
         string $name,
         string $description,
         string $slug = null,
+        bool $isPublished = false,
         \DateTimeInterface $creationDate = null
     ) {
         \assert(!empty($name), 'Trick name can not be empty!');
@@ -146,6 +155,7 @@ class Trick
         $this->name = $name;
         $this->description = $description;
         $this->slug = !\is_null($slug) && !empty($slug) ? $this->makeSlug($slug) : $this->makeSlug($name);
+        $this->isPublished = $isPublished;
         $this->creationDate = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
         $this->updateDate = $this->creationDate;
         $this->rank = null;
@@ -215,6 +225,19 @@ class Trick
             throw new \InvalidArgumentException('Trick slug can not be empty!');
         }
         $this->slug = $this->makeSlug($slug);
+        return $this;
+    }
+
+    /**
+     * Moderate a trick.
+     *
+     * @param bool $isPublished
+     *
+     * @return Trick
+     */
+    public function modifyIsPublished(bool $isPublished) : self
+    {
+        $this->isPublished = $isPublished;
         return $this;
     }
 
@@ -331,6 +354,14 @@ class Trick
     }
 
     /**
+     * @return bool
+     */
+    public function getIsPublished() : bool
+    {
+        return $this->isPublished;
+    }
+
+    /**
      * @return MediaOwner|null
      *
      * * The media owner can be null when no media is set (trick creation/update)!
@@ -346,6 +377,16 @@ class Trick
     public function getTrickGroup() : TrickGroup
     {
         return $this->trickGroup;
+    }
+
+    /**
+     * @return User
+     *
+     * This is the trick author.
+     */
+    public function getUser() : User
+    {
+        return $this->user;
     }
 
     /**

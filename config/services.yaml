@@ -161,6 +161,10 @@ services:
     # add login form guard authenticator
     App\Service\Security\LoginFormAuthenticationManager:
 
+    # add Trick voter
+    App\Service\Security\Voter\TrickVoter:
+        tags: ['security.voter']
+
     # add Twig template engine renderer default service when calling interface:
     App\Service\Templating\TwigTemplateRenderer: ~
     App\Service\Templating\TemplateRendererInterface: '@App\Service\Templating\TwigTemplateRenderer'

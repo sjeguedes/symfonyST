@@ -332,6 +332,56 @@
                                     </div>
                                 </div>
                             </div>
+                            {% if is_granted('ROLE_ADMIN') and (createTrickForm.isPublished is defined) %}
+                            {# isPublished (trick moderation) #}
+                            <div class="uk-width-1-1 uk-margin-small-bottom">
+                                <hr class="uk-margin-small-top uk-padding-small-bottom">
+                                {% if createTrickForm.isPublished.vars.valid == 0 %}
+                                    {{ form_errors(createTrickForm.isPublished) }}
+                                {% endif %}
+                                {{ form_label(createTrickForm.isPublished, 'Moderation', {'label_attr': {'class': 'uk-form-label'}}) }}
+                                {# --- isPublished reminder --- #}
+                                <div class="uk-inline">
+                                    <a href="#" class="uk-button-link">
+                                        <span class="st-color-yellow" uk-icon="icon: question; ratio: 1.25"></span>
+                                    </a>
+                                    <div uk-drop="mode: click; pos: top-center; animation: uk-animation-slide-top-small; duration: 500">
+                                        <div class="uk-inline uk-position-relative uk-padding-small uk-border-rounded uk-box-shadow-medium st-background-yellow st-color-black">
+                                            <a href="#" class="uk-drop-close uk-position-absolute uk-padding-small">
+                                                <span class="st-color-blue" uk-icon="icon: close"></span>
+                                            </a>
+                                            <p class="uk-margin-remove uk-text-center st-line-height-normal">
+                                                <small class="uk-display-block uk-margin-small-top uk-margin-small-bottom uk-text-bold">
+                                                    <span uk-icon="icon: info"></span> Moderation reminder<br>
+                                                </small>
+                                                <small>
+                                                    Trick moderation is proposed to <strong><span class="st-color-red">administrators</span></strong> only!
+                                                    You can decide to publish (post) it immediately or not!
+                                                </small>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                {# --- end isPublished reminder --- #}
+                                <div class="uk-inline uk-flex">
+                                    <span class="uk-form-icon" uk-icon="icon: unlock"></span>
+                                    {% if createTrickForm.isPublished.vars.errors.form.submitted == 1 %}
+                                        {% set onValidationClass = createTrickForm.isPublished.vars.valid == 0 ? ' st-select-error' : ' st-select-success' %}
+                                    {% else %}
+                                        {% set onValidationClass = '' %}
+                                    {% endif %}
+                                    {{ form_widget(createTrickForm.isPublished, {
+                                        'attr': {'class': 'uk-select'~onValidationClass },
+                                        'value': createTrickForm.isPublished.vars.value})
+                                    }}
+                                    {% if createTrickForm.isPublished.vars.errors.form.submitted == 1 %}
+                                        {% set class = createTrickForm.isPublished.vars.valid == 0 ? 'uk-form-danger' : 'uk-form-success' %}
+                                        {% set icon = createTrickForm.isPublished.vars.valid == 0 ? 'warning' : 'check' %}
+                                        <span class="uk-form-icon uk-form-icon-flip {{ class }}" uk-icon="icon: {{ icon }}"></span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endif %}
                             {# CSRF token #}
                             {{ form_row(createTrickForm.token, {'value': csrf_token('create_trick_token')}) }}
                             <div class="uk-width-1-1 uk-flex uk-flex-center">

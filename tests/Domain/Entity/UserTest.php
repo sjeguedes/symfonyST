@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * Class UserTest.
  *
- * Unit testing for User entity
+ * This is unit testing for User entity.
  */
 class UserTest extends TestCase
 {
@@ -22,9 +22,8 @@ class UserTest extends TestCase
     /**
      * Setup one user instance.
      *
-     * @throws \Exception
      */
-    public function setUp()
+    public function setUp() : void
     {
         $this->user = new User(
             'RYAN',
@@ -37,8 +36,10 @@ class UserTest extends TestCase
 
     /**
      * Test if update date is before creation date and throws an exception.
+     *
+     * @throws \Exception
      */
-    public function testModifyUpdateDateCanNotBeSetBeforeCreation()
+    public function testModifyUpdateDateCanNotBeSetBeforeCreation() : void
     {
         $this->expectException(\RuntimeException::class);
         $this->user->modifyUpdateDate(new \DateTime('-1days'));
@@ -48,8 +49,10 @@ class UserTest extends TestCase
      * Test if password update format matches BCrypt hash.
      *
      * @see https://stackoverflow.com/questions/31417387/regular-expression-to-find-bcrypt-hash
+     *
+     * @throws \Exception
      */
-    public function testModifyPasswordHasBCryptFormat()
+    public function testModifyPasswordHasBCryptFormat() : void
     {
         $this->user->modifyPassword('$2y$10$mAN1D4rwZT0wnxRM2er/0OfzgpZelwL6PSTNoqC3p/EmfV3lV5DSe', 'BCrypt');
         $password = $this->user->getPassword();
@@ -59,11 +62,13 @@ class UserTest extends TestCase
     /**
      * Test if renewal token value does not match expected length and throws an exception.
      *
+     * @dataProvider getWrongRenewalTokensDataProvider
+     *
      * @param string $token
      *
-     * @dataProvider getWrongRenewalTokensDataProvider
+     * @throws \Exception
      */
-    public function testGenerateRenewalTokenHasAWrongFormat(string $token)
+    public function testGenerateRenewalTokenHasAWrongFormat(string $token) : void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->user->updateRenewalToken($token);
@@ -73,7 +78,7 @@ class UserTest extends TestCase
     /**
      * @return \Generator
      */
-    public function getWrongRenewalTokensDataProvider()
+    public function getWrongRenewalTokensDataProvider() : \Generator
     {
         yield [substr(hash('sha256', 'test1' . bin2hex(openssl_random_pseudo_bytes(8))), 0, 0)];
         yield [substr(hash('sha256', 'test2' . bin2hex(openssl_random_pseudo_bytes(8))), 0, 13)];
@@ -84,8 +89,10 @@ class UserTest extends TestCase
      * Test if renewal token has a valid format.
      *
      * Look at chosen principle based on hash with 15 characters.
+     *
+     * @throws \Exception
      */
-    public function testUpdateRenewalTokenHasAValidFormat()
+    public function testUpdateRenewalTokenHasAValidFormat() : void
     {
         $this->user->updateRenewalToken(
             // Defined principle to generate a token
@@ -95,10 +102,12 @@ class UserTest extends TestCase
         $this->assertRegExp('/^[a-z0-9]{15}$/', $token);
     }
 
-    /*
+    /**
      * Test if renewal request date is before creation date and throws an exception.
+     *
+     * @throws \Exception
      */
-    public function testUpdateRenewalRequestDateCanNotBeSetBeforeCreation()
+    public function testUpdateRenewalRequestDateCanNotBeSetBeforeCreation() : void
     {
         $this->expectException(\RuntimeException::class);
         $this->user->updateRenewalRequestDate(new \DateTime('-1days'));
@@ -107,7 +116,7 @@ class UserTest extends TestCase
     /**
      * Clear setup to free memory.
      */
-    public function tearDown()
+    public function tearDown() : void
     {
         $this->user = null;
     }

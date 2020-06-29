@@ -115,14 +115,14 @@ class CreateTrickAction
      */
     public function __invoke(RedirectionResponder $redirectionResponder, CreateTrickResponder $responder, Request $request) : Response
     {
-        // Get authenticated user main role label
-        $userMainRoleLabel = lcfirst($this->security->getUser()->getMainRoleLabel());
+        // Get authenticated user
+        $authenticatedUser = $this->security->getUser();
         // Use form handler as form type option
-        $options = ['formHandler' => $this->formHandlers[0]];
+        $options = ['formHandler' => $this->formHandlers[0], 'userRoles' => $authenticatedUser->getRoles()];
         // Set form without initial model data and set the request by binding it
         $createTrickForm = $this->formHandlers[0]->initForm(null, null, $options)->bindRequest($request);
         // Use router and user main role label as form type options
-        $options = ['router' => $this->router, 'userMainRoleLabel' => $userMainRoleLabel];
+        $options = ['router' => $this->router, 'userMainRoleLabel' => $authenticatedUser->getMainRoleLabel()];
         // Init ajax delete image form (used to delete temporary saved images) to pass it to trick creation view
         $deleteImageForm = $this->formHandlers[1]->initForm(null, null, $options)->getForm();
         // Process only on submit

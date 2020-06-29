@@ -11,12 +11,16 @@ use App\Domain\Entity\MediaSource;
 use App\Domain\Entity\MediaType;
 use App\Domain\Entity\Trick;
 use App\Domain\Entity\TrickGroup;
-use App\Domain\Entity\TrickMedia;
+use App\Domain\Entity\User;
+use App\Domain\ServiceLayer\UserManager;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NativeQuery;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
+use Doctrine\ORM\QueryBuilder;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Class TrickRepository.
@@ -31,16 +35,49 @@ class TrickRepository extends ServiceEntityRepository
     private $resultSetMapping;
 
     /**
+     * @var Security
+     */
+    private $security;
+
+    /**
+     * @var UserManager
+     */
+    private $userService;
+
+    /**
+     * @var UserInterface|null
+     */
+    private $currentUser;
+
+    /**
+     * @var string
+     */
+    private $currentUserAuthenticationState;
+
+    /**
      * TrickRepository constructor.
      *
      * @param RegistryInterface       $registry
      * @param ResultSetMappingBuilder $resultSetMapping
+     * @param Security                $security
+     * @param UserManager             $userService
      */
-    public function __construct(RegistryInterface $registry, ResultSetMappingBuilder $resultSetMapping)
+    public function __construct(
+        RegistryInterface $registry,
+        ResultSetMappingBuilder $resultSetMapping,
+        Security $security,
+        UserManager $userService
+    )
     {
         parent::__construct($registry, Trick::class);
         // ResultSetMappingBuilder extends ResultSetMapping.
         $this->resultSetMapping = $resultSetMapping;
+        $this->security = $security;
+        $this->userService = $userService;
+        // Get authenticated user (can be null)
+        $this->currentUser = $this->security->getUser();
+        // Store user authentication state as a kind of permissions information
+        $this->currentUserAuthenticationState = $this->userService->getUserAuthenticationState();
     }
 
     /**
@@ -54,8 +91,73 @@ class TrickRepository extends ServiceEntityRepository
     public function countAll() : int
     {
         $queryBuilder = $this->createQueryBuilder('t');
+        // Count all tricks when current user is authenticated
+        /** @var User|UserInterface $user */
+        if ($this->currentUser) {
+            $user = $this->currentUser;
+            $roles = $user->getRoles();
+            switch ($roles) {
+                // Current user is authenticated and is a simple member ("ROLE_ADMIN").
+                case  \in_array(User::ADMIN_ROLE, $user->getRoles()):
+                    return $this->countAllForAuthenticatedAdmin($queryBuilder);
+                // Current user is authenticated and is a simple member ("ROLE_USER").
+                case !\in_array(User::ADMIN_ROLE, $user->getRoles()):
+                    return $this->countAllForAuthenticatedMember($queryBuilder);
+            }
+        }
+        // Count only published tricks for anonymous (not authenticated) users
         return (int) $queryBuilder
             ->select($queryBuilder->expr()->count('t.uuid'))
+            ->where('t.isPublished = 1')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Get all published tricks and unpublished tricks
+     * for a particular authenticated administrator.
+     *
+     * @param QueryBuilder $queryBuilder
+     *
+     * @return int
+     *
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    private function countAllForAuthenticatedAdmin(QueryBuilder $queryBuilder) : int
+    {
+        // Return query result without filtering tricks moderation (published) state
+        return (int) $queryBuilder
+            ->select($queryBuilder->expr()->count('t.uuid'))
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Get all published tricks and unpublished tricks
+     * for a particular authenticated simple member.
+     *
+     * @param QueryBuilder  $queryBuilder
+     *
+     * @return int
+     *
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    private function countAllForAuthenticatedMember(QueryBuilder $queryBuilder) : int
+    {
+        /** @var UuidInterface $userUuid */
+        $userUuid =  $this->currentUser->getUuid();
+        // Prepare unpublished tricks filter for user
+        $and = $queryBuilder->expr()->andX();
+        $and->add($queryBuilder->expr()->eq('t.isPublished', '0'));
+        $and->add($queryBuilder->expr()->eq('t.user', '?1'));
+        // Return query result
+        return (int) $queryBuilder
+            ->select($queryBuilder->expr()->count('t.uuid'))
+            ->where('t.isPublished = 1')
+            ->orWhere($and)
+            ->setParameter(1, $userUuid->getBytes())
             ->getQuery()
             ->getSingleScalarResult();
     }
@@ -75,6 +177,10 @@ class TrickRepository extends ServiceEntityRepository
      * https://stackoverflow.com/questions/26795844/mysql-dynamic-column-alias
      * @see MySQL WHERE clause:
      * https://codeburst.io/filtering-select-queries-with-the-where-clause-in-mysql-b35740227e04
+     * @see CASE in WHERE clause:
+     * https://stackoverflow.com/questions/14614573/using-case-in-the-where-clause
+     * @see Dynamic WHERE with prepared statements:
+     * https://phpdelusions.net/pdo_examples/dynamical_where
      *
      * @return array|null
      */
@@ -86,16 +192,25 @@ class TrickRepository extends ServiceEntityRepository
     ) : ?array {
         // Get custom SQL query string to use it as native query with ResultSetMapping instance
         $customSQL = $this->getTrickListCustomSQL();
-        // get a native query thanks to a ResultSetMappingBuilder instance
+        // Get a native query thanks to a ResultSetMappingBuilder instance
         $customQuery = $this->getTrickListCustomNativeQuery($customSQL, $this->resultSetMapping);
+        // Get this state to adapt query depending on user permissions
+        $currentUserAuthenticationState = $this->currentUserAuthenticationState;
         // Use parameters to prepare the query and get result(s)
-        $result = $customQuery
+        $customQuery
+            ->setParameter('userAuthenticationState', $currentUserAuthenticationState)
             ->setParameter('initRank', $init)
             ->setParameter('sortDirection', $order)
             ->setParameter('mediaType', MediaType::TYPE_CHOICES['trickThumbnail'])
             ->setParameter('startRank', $start)
-            ->setParameter('endRank', $end)
-            ->getResult();
+            ->setParameter('endRank', $end);
+        // Set current user uuid parameter if he is authenticated!
+        /** @var UuidInterface $userUuid */
+        $userUuid = !\is_null($this->currentUser) ? $this->currentUser->getUuid() : null;
+        $userUuidBinary =  !\is_null($userUuid) ? $userUuid->getBytes() : null;
+        $customQuery->setParameter('userUuid', $userUuidBinary);
+        // Get query result;
+        $result = $customQuery->getResult();
         $count = \count($result);
         // No trick(s) is/are found!
         if (0 === $count) {
@@ -151,7 +266,7 @@ class TrickRepository extends ServiceEntityRepository
     /**
      * Find a Trick entity with query based on its uuid.
      *
-     * Please note only one query is used to get all need Trick data.
+     * Please note only one query is used to get all needed Trick data.
      *
      * @param UuidInterface $uuid
      *
@@ -239,7 +354,8 @@ class TrickRepository extends ServiceEntityRepository
                 (
                     -- Sub query to order tricks by date with sort direction 
                     -- and retrieve associated entities with necessary data for trick list
-                    SELECT t.uuid, t.name AS t_name, t.slug, t.creation_date, 
+                    SELECT t.uuid, t.name AS t_name, t.slug, t.is_published, t.creation_date,
+                           u.uuid AS u_uuid,
                            tg.uuid AS tg_uuid, tg.name AS tg_name,
                            mo.uuid AS mo_uuid,
                            m.uuid AS m_uuid,
@@ -248,11 +364,15 @@ class TrickRepository extends ServiceEntityRepository
                            i.uuid AS i_uuid, i.name AS i_name, i.description, i.format
                     FROM
                     (
+                        -- Init current user authentication state to adapt filters
                         -- Init user variables with parameters using SELECT
                         -- @curRank is initialized with -1 (ASC) or tricks total count + 1 (DESC).
-                        SELECT @curRank := :initRank, @sortDirection := :sortDirection
+                        SELECT @userAuthenticationState := :userAuthenticationState,
+                               @curRank := :initRank, 
+                               @sortDirection := :sortDirection
                     ) AS s, 
                     tricks t
+                    INNER JOIN users u ON t.user_uuid = u.uuid
                     INNER JOIN trick_groups tg ON t.trick_group_uuid = tg.uuid
                     INNER JOIN media_owners mo ON mo.trick_uuid = t.uuid 
                     INNER JOIN medias m ON m.media_owner_uuid = mo.uuid    
@@ -262,8 +382,16 @@ class TrickRepository extends ServiceEntityRepository
                     -- Filter with media type
                     WHERE mt.type = :mediaType
                     -- Filter with image main status 
-                    -- IMPORTANT: avoid issue by selecting, for each trick, only 1 one thumb image which the main one 
+                    -- IMPORTANT: avoid issue by selecting, for each trick, only 1 one thumb image which is the main one 
                     AND m.is_main = 1
+                    -- Filter with current user authentication state
+                    AND
+                    CASE WHEN @userAuthenticationState = '" . User::UNAUTHENTICATED_STATE . "' -- ANONYMOUS
+                         THEN t.is_published = 1
+                         WHEN @userAuthenticationState = '" . User::DEFAULT_ROLE . "' -- SIMPLE MEMBER
+                         THEN t.is_published = 1 OR (t.user_uuid = :userUuid AND t.is_published = 0) 
+                         WHEN @userAuthenticationState = '" . User::ADMIN_ROLE . "' -- ADMINISTRATOR 
+                         THEN t.is_published = 1 OR t.is_published = 0 END   
                     ORDER BY
                     CASE WHEN @sortDirection = 'DESC' THEN t.creation_date END DESC,
                     CASE WHEN @sortDirection = 'ASC' THEN t.creation_date END
@@ -288,8 +416,11 @@ class TrickRepository extends ServiceEntityRepository
             ->addFieldResult('t', 'uuid', 'uuid')
             ->addFieldResult('t', 't_name', 'name')
             ->addFieldResult('t', 'slug', 'slug')
+            ->addFieldResult('t', 'is_published', 'isPublished')
             ->addFieldResult('t', 'creation_date', 'creationDate')
             ->addScalarResult('rank', 'rank', 'integer');
+        $resultSetMapping->addJoinedEntityResult(User::class , 'u', 't', 'user')
+            ->addFieldResult('u', 'u_uuid', 'uuid');
         $resultSetMapping->addJoinedEntityResult(TrickGroup::class , 'tg', 't', 'trickGroup')
             ->addFieldResult('tg', 'tg_uuid', 'uuid')
             ->addFieldResult('tg', 'tg_name', 'name');

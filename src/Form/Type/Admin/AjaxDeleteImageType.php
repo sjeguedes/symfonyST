@@ -6,6 +6,7 @@ namespace App\Form\Type\Admin;
 
 use App\Domain\DTO\AjaxDeleteImageDTO;
 use App\Domain\Entity\MediaOwner;
+use App\Domain\Entity\User;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\Form\AbstractType;
@@ -79,7 +80,7 @@ class AjaxDeleteImageType extends AbstractType
                 'inherit_data' => true
             ]);
         $router = $options['router'];
-        $action = $router->generate('delete_image', ['mainRoleLabel' => $options['userMainRoleLabel']]);
+        $action = $router->generate('delete_image', ['mainRoleLabel' => lcfirst($options['userMainRoleLabel'])]);
         // Define a particular action
         $builder->setMethod('DELETE')->setAction($action);
         // Add data transformer to "uuid" data.
@@ -120,6 +121,11 @@ class AjaxDeleteImageType extends AbstractType
         });
         // Check authenticated user "main role label" option
         $resolver->setRequired('userMainRoleLabel');
-        $resolver->setAllowedTypes('userMainRoleLabel', 'string');
+        $resolver->setAllowedValues('userMainRoleLabel', function ($value) {
+            if (!\is_string($value) || !\in_array($value, User::ROLE_LABELS)) {
+                return false;
+            }
+            return true;
+        });
     }
 }

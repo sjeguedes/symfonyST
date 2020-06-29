@@ -117,8 +117,8 @@ inside included template when a loop is used! #}
     {# -------------------------------------------------------------------------------------------------------------------#}
     </div>
     <div class="uk-card-footer uk-padding-small st-background-blue">
-        <div class="uk-flex{{ is_granted('ROLE_USER') ? ' uk-flex-between' : ' uk-flex-right' }}">
-            <div class="uk-position-relative {{ is_granted('ROLE_USER') ? 'uk-text-left' : 'uk-text-right' }}">
+        <div class="uk-flex{{ is_granted('AUTHOR_OR_ADMIN_CAN_UPDATE_OR_DELETE_TRICKS', trick) ? ' uk-flex-between' : ' uk-flex-right' }}">
+            <div class="uk-position-relative {{ is_granted('AUTHOR_OR_ADMIN_CAN_UPDATE_OR_DELETE_TRICKS', trick) ? 'uk-text-left' : 'uk-text-right' }}">
                 <span class="uk-position-center st-modal-button-spinner">
                     <span class="st-single-button-spinner" uk-spinner="ratio: 0.4"></span>
                     <small>&nbsp;Loading</small>
@@ -127,7 +127,7 @@ inside included template when a loop is used! #}
                     <span uk-icon="icon: expand; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-other"><span uk-icon="icon: {{ custom.icon|e('html_attr') }}; ratio: 1" class="uk-icon"></span>&nbsp;</span>&nbsp;
                 </a>
             </div>
-            {% if is_granted('ROLE_USER') %}
+            {% if is_granted('AUTHOR_OR_ADMIN_CAN_UPDATE_OR_DELETE_TRICKS', trick) %}
                 <div class="uk-text-right">
                     <a href="{#{{ path('update_media', { 'encodedUuid': media.uuid|uuid_encode }) }}#}#" class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove" title="Update">
                         <span uk-icon="icon: pencil; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-update"></span>

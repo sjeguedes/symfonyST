@@ -27,6 +27,11 @@ App\Domain\DTOToEmbed\ImageToCropDTO:
                 max: 255
                 maxMessage: "This description should contain\na maximum of {{ limit }} characters or less."
 
+        isMain:
+            - Type:
+                type: bool
+                message: "The value \"{{ value }}\" is not valid.\nPlease do not tamper data."
+
     constraints:
         # Custom validator for:
         # - "image" field: user uploaded file

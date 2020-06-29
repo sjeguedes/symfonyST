@@ -6,6 +6,7 @@ namespace App\Form\Type\Admin;
 
 use App\Domain\DTO\CreateTrickDTO;
 use App\Domain\Entity\TrickGroup;
+use App\Domain\Entity\User;
 use App\Domain\ServiceLayer\ImageManager;
 use App\Domain\ServiceLayer\TrickGroupManager;
 use App\Domain\ServiceLayer\VideoManager;
@@ -14,6 +15,7 @@ use App\Form\TypeToEmbed\ImageToCropType;
 use App\Form\TypeToEmbed\VideoInfosType;
 use App\Utils\Traits\UuidHelperTrait;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -82,7 +84,6 @@ class CreateTrickType extends AbstractTrickType
         $trickGroupService = $this->trickGroupService;
         $builder
             ->add('group', EntityType::class, [
-                'multiple'      => false,
                 'class'         => TrickGroup::class,
                 // Order group names when feeding select
                 'query_builder' => function () use ($trickGroupService) {
@@ -91,12 +92,13 @@ class CreateTrickType extends AbstractTrickType
                         ->orderBy('tr.name', 'ASC');
                 },
                 // Show group names in select
-                'choice_label'   => 'name',
+                'choice_label'  => 'name',
                 // Use encoded uuid value to query entities
-                'choice_value'   => function (TrickGroup $trickGroup = null) {
-                    return !\is_null($trickGroup) ? $this->encode($trickGroup->getUuid()) : '';
+                // Replace the need to use a setter for "group" corresponding CreateTrickDTO property
+                'choice_value'  => function (TrickGroup $group = null) {
+                    return !\is_null($group) ? $this->encode($group->getUuid()) : '';
                 },
-                'placeholder'    => 'Choose an existing category'
+                'placeholder'   => 'Choose an existing category'
             ])
             ->add('name', TextType::class, [
             ])
@@ -107,7 +109,7 @@ class CreateTrickType extends AbstractTrickType
                 'allow_add'      => true,
                 'prototype_name' => '__imageIndex__',
                 // Used here to access fields in templates and customize a particular prototype
-                'prototype'      => true, // This is he default value but more explicit due to customization
+                'prototype'      => true, // This is he default value but more explicit due to customization.
                 // Custom root form options passed to entry type form
                 'entry_options'  => [
                     'rootFormHandler' =>  $options['formHandler']
@@ -120,13 +122,24 @@ class CreateTrickType extends AbstractTrickType
                 'allow_add'      => true,
                 'prototype_name' => '__videoIndex__',
                 // Used here to access fields in templates and customize a particular prototype
-                'prototype'      => true, // This is he default value but more explicit due to customization
+                'prototype'      => true, // This is he default value but more explicit due to customization.
                 // Maintain validation state at the collection form level, to be able to show errors near field
                 'error_bubbling' => false
             ])
             ->add('token', HiddenType::class, [
                 'inherit_data' => true
             ]);
+        // Add dynamically a choice type to enable publication moderation for admin users
+        if (\in_array(User::ADMIN_ROLE, $options['userRoles'])) {
+            $builder->add('isPublished', ChoiceType::class, [
+                'choices'    => [
+                    // Replace the need to use a setter for "isPublished" corresponding CreateTrickDTO property due to null default value
+                    'Choose a moderation state'           => null, // default value
+                    'Make this trick publicly accessible' => true,
+                    'Keep this trick unpublished'         => false
+                ],
+            ]);
+        }
     }
 
     /**
@@ -146,7 +159,8 @@ class CreateTrickType extends AbstractTrickType
                     $form->get('name')->getData(),
                     $form->get('description')->getData(),
                     $form->get('images')->getData(),
-                    $form->get('videos')->getData()
+                    $form->get('videos')->getData(),
+                    $form->get('isPublished')->getData() // "false" by default for members which are not administrator
                 );
             },
             'required'        => false,
@@ -160,6 +174,17 @@ class CreateTrickType extends AbstractTrickType
         $resolver->setAllowedValues('formHandler', function ($value) {
             if (!$value instanceof CreateTrickHandler) {
                 return false;
+            }
+            return true;
+        });
+        // Check authenticated user "roles" option
+        $resolver->setRequired('userRoles');
+        $resolver->setAllowedTypes('userRoles', ['array']);
+        $resolver->setAllowedValues('userRoles', function ($value) {
+            foreach ($value as $role) {
+                if (!\in_array($role, array_keys(User::ROLE_LABELS))) {
+                    return false;
+                }
             }
             return true;
         });

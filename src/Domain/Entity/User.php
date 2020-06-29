@@ -30,9 +30,19 @@ class User implements UserInterface, \Serializable
     const DEFAULT_ALGORITHM = 'BCrypt';
 
     /**
+     * Define a user default unauthenticated state.
+     */
+    const UNAUTHENTICATED_STATE = 'ANONYMOUS';
+
+    /**
      * Define a default role for authorization process.
      */
     const DEFAULT_ROLE = 'ROLE_USER';
+
+    /**
+     * Define an admin role for authorization process.
+     */
+    const ADMIN_ROLE = 'ROLE_ADMIN';
 
     /**
      * Define algorithms for password hash.

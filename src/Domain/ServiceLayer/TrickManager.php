@@ -185,7 +185,8 @@ class TrickManager extends AbstractServiceLayer
             $authenticatedUser,
             $createTrickDTO->getName(),
             $createTrickDTO->getDescription(),
-            $this->makeSlug($createTrickDTO->getName()) // At this time slug is not defined in form, so create it with trick name.
+            $this->makeSlug($createTrickDTO->getName()), // At this time slug is not customized in form, so create it with trick name.
+            $createTrickDTO->getIsPublished()
         );
         // Save data in database
         return $this->addAndSaveTrick($newTrick, $isPersisted, $isFlushed); // null or the entity

@@ -33,13 +33,19 @@
                         <p class="st-color-white st-text-shadow-dark uk-text-large">
                             {{ trick.name }}
                         </p>
-                        <p class="st-color-white st-text-shadow-dark uk-text-medium uk-visible@m">
+                        <p class="uk-text-medium uk-visible@m st-color-white st-text-shadow-dark">
                             Snowboard trick referenced in {{ trick.trickGroup.name }}
                         </p>
+                        {# Unpublished trick indicator #}
+                        {% if trick.isPublished == 0 and is_granted('AUTHOR_OR_ADMIN_CAN_VIEW_UNPUBLISHED_TRICKS', trick) %}
+                        <p class="uk-padding-small uk-text-small uk-text-bold uk-text-uppercase st-background-red st-color-white">
+                            <span uk-icon="icon: warning; ratio: 1.5"></span> This trick is unpublished! <br class="uk-hidden@m">It is Waiting for moderation.
+                        </p>
+                        {% endif %}
                         {# This can be a technical issue! Normally one image is saved as main! #}
                         {% if isMainAvailable == 0 %}
-                        <p class="uk-text-small uk-text-bold uk-text-uppercase st-background-white st-color-red">
-                            Main image for this trick is unavailable!
+                        <p class="uk-padding-small uk-text-small uk-text-bold uk-text-uppercase st-background-red st-color-white">
+                            <span uk-icon="icon: warning; ratio: 1.5"></span> Main image for this trick is unavailable!
                         </p>
                         {% endif %}
                     </div>
@@ -108,9 +114,8 @@
                     {% set showListRank = media.showListRank %}
                     <li id="st-single-trick-image-slide-{{ showListRank }}">
                         {# html attribute escaping is used inside when necessary! #}
-                        {# CAUTION: stragely 'html' autoescape strategy does not work in included template,
-                        so combined |e|e('html_attr') are used to apply only 'html_attr' filter! #}
                         {% include 'single-trick/media_card.html.twig' with {
+                            'trick': trick,
                             'mediaTypesValues': mediaTypesValues,
                             'mediaType': media.mediaType,
                             'mediaCreationDate': media.mediasource.image.creationDate,
@@ -132,9 +137,8 @@
                     {% set showListRank = media.showListRank %}
                     <li id="st-single-trick-video-slide-{{ showListRank }}">
                         {# html attribute escaping is used inside when necessary! #}
-                        {# CAUTION: stragely 'html' autoescape strategy does not work in included template,
-                        so for instance, combined |e|e('html_attr') are used to apply only 'html_attr' filter! #}
                         {% include 'single-trick/media_card.html.twig' with {
+                            'trick': trick,
                             'mediaTypesValues': mediaTypesValues,
                             'mediaType': media.mediaType,
                             'mediaTypesValues': mediaTypesValues,

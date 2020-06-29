@@ -33,3 +33,10 @@ App\Domain\DTO\CreateTrickDTO:
             - Count:
                 min: 1
                 minMessage: A new trick must contain at least one video.
+
+        isPublished:
+            - NotNull:
+                message: Please define a moderation state!
+            - Type:
+                type: bool
+                message: "The value \"{{ value }}\" is not valid.\nPlease do not tamper data."

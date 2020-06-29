@@ -7,6 +7,7 @@ namespace App\Action;
 use App\Domain\ServiceLayer\MediaTypeManager;
 use App\Domain\ServiceLayer\TrickManager;
 use App\Responder\SingleTrickResponder;
+use App\Service\Security\Voter\TrickVoter;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,6 +15,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * Class SingleTrickAction.
@@ -35,22 +38,31 @@ class SingleTrickAction
     private $trickService;
 
     /**
+     * @var AuthorizationCheckerInterface
+     */
+    private $authorizationChecker;
+
+    /**
      * SingleTrickAction constructor.
      *
-     * @param MediaTypeManager $mediaTypeService
-     * @param TrickManager     $trickService
-     * @param LoggerInterface  $logger
+     * @param MediaTypeManager              $mediaTypeService
+     * @param TrickManager                  $trickService
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param LoggerInterface               $logger
      *
      * @return void
      */
     public function __construct(
         MediaTypeManager $mediaTypeService,
         TrickManager $trickService,
+        AuthorizationCheckerInterface $authorizationChecker,
         LoggerInterface $logger
     ) {
         $this->mediaTypeService = $mediaTypeService;
         $this->trickService = $trickService;
+        $this->authorizationChecker = $authorizationChecker;
         $this->setLogger($logger);
+
     }
 
     /**
@@ -69,11 +81,15 @@ class SingleTrickAction
      */
     public function __invoke(SingleTrickResponder $responder, Request $request) : Response
     {
+        // Get trick
+        $trick = $this->trickService->findSingleByEncodedUuid($request->attributes->get('encodedUuid'));
+        // Check access to trick page
+        if (!$this->authorizationChecker->isGranted(TrickVoter::AUTHOR_OR_ADMIN_CAN_VIEW_UNPUBLISHED_TRICKS, $trick)) {
+            throw new AccessDeniedException("Current user can not view this unpublished trick!");
+        }
         // Get registered normal image type (corresponds particular dimensions)
         $trickNormalImageTypeValue = $this->mediaTypeService->getMandatoryDefaultTypes()['trickNormal'];
         $normalImageMediaType = $this->mediaTypeService->findSingleByUniqueType($trickNormalImageTypeValue);
-        // Get trick
-        $trick = $this->trickService->findSingleByEncodedUuid($request->attributes->get('encodedUuid'));
         // Check wrong parameters!
         if (\is_null($normalImageMediaType) || \is_null($trick)) {
             $error = \is_null($normalImageMediaType) ? 'Trick normal image type' : 'Trick uuid';
@@ -84,7 +100,11 @@ class SingleTrickAction
             'mediaError'           => 'Media loading error',
             'mediaTypesValues'     => $this->mediaTypeService->getMandatoryDefaultTypes(),
             'normalImageMediaType' => $normalImageMediaType,
-            'videoURLProxyPath'    => $this->trickService->generateURLFromRoute('load_trick_video_url_check', ['url' => ''], UrlGeneratorInterface::ABSOLUTE_URL), // Empty declared url is more explicit!
+            // Empty declared url is more explicit!
+            'videoURLProxyPath'    => $this->trickService->generateURLFromRoute(
+                'load_trick_video_url_check', ['url' => ''],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            ),
             'trick'                => $trick
         ];
         return $responder($data);

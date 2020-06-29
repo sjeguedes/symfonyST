@@ -46,5 +46,8 @@ App\Domain\DTO\RegisterUserDTO:
                 message: Please use a valid password format.
 
         agreement:
+            - Type:
+                type: bool
+                message: "The value \"{{ value }}\" is not valid.\nPlease do not tamper data."
             - IsTrue:
                 message: "You have to accept the terms of use\nto confirm registration."

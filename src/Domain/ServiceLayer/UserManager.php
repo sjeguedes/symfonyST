@@ -239,6 +239,25 @@ class UserManager
     }
 
     /**
+     * Generate user password token by updating corresponding data.
+     *
+     * @param User $user
+     *
+     * @return User
+     *
+     * @throws \Exception
+     */
+    public function generatePasswordRenewalToken(User $user) : User
+    {
+        $user->updateRenewalRequestDate(new \DateTime('now'));
+        $user->updateRenewalToken($this->generateCustomToken($user->getNickName()));
+        $this->entityManager->flush();
+        // Return an updated user
+        $updatedUser = $user;
+        return $updatedUser;
+    }
+
+    /**
      * Get entity manager.
      *
      * @return EntityManagerInterface
@@ -277,6 +296,28 @@ class UserManager
             : $this->request->attributes->get('userId');
         $user = $this->findSingleByEncodedUuid($encodedUuid);
         return $user;
+    }
+
+    /**
+     * Get a particular authentication state string to evaluate a kind of permissions.
+     *
+     * @return string
+     */
+    public function getUserAuthenticationState() : string
+    {
+        /** @var User|UserInterface $user */
+        if ($user = $this->security->getUser()) {
+            $roles = $user->getRoles();
+            switch ($roles) {
+                // Current user is authenticated and is a simple member ("ROLE_ADMIN").
+                case  \in_array(User::ADMIN_ROLE, $user->getRoles()):
+                    return User::ADMIN_ROLE;
+                // Current user is authenticated and is a simple member ("ROLE_USER").
+                case !\in_array(User::ADMIN_ROLE, $user->getRoles()):
+                    return User::DEFAULT_ROLE;
+            }
+        }
+        return User::UNAUTHENTICATED_STATE;
     }
 
     /**
@@ -465,24 +506,5 @@ class UserManager
         }
         // Save all user updated data
         $this->entityManager->flush();
-    }
-
-    /**
-     * Update user password token by updating corresponding data.
-     *
-     * @param User $user
-     *
-     * @return User
-     *
-     * @throws \Exception
-     */
-    public function generatePasswordRenewalToken(User $user) : User
-    {
-        $user->updateRenewalRequestDate(new \DateTime('now'));
-        $user->updateRenewalToken($this->generateCustomToken($user->getNickName()));
-        $this->entityManager->flush();
-        // Return an updated user
-        $updatedUser = $user;
-        return $updatedUser;
     }
 }
