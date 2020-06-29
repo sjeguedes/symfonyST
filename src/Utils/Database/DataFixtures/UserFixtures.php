@@ -36,7 +36,8 @@ class UserFixtures extends BaseFixture
                 $data[$i]['fields']['email'],
                 $data[$i]['fields']['password'],
                 User::DEFAULT_ALGORITHM,
-                $data[$i]['fields']['roles']
+                $data[$i]['fields']['roles'],
+                new \DateTime(sprintf("+%d days", -$i))
             );
             $user->modifyIsActivated(true);
             return $user;

@@ -65,7 +65,7 @@ class MediaFixtures extends BaseFixture implements DependentFixtureInterface
                 $data[$i]['fields']['is_main'],
                 $data[$i]['fields']['is_published'],
                 $data[$i]['fields']['show_list_rank'],
-                new \DateTime(sprintf("+%d days", $i - 1))
+                new \DateTime(sprintf("+%d days", -$i))
             );
         });
         $manager->flush();

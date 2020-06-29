@@ -56,7 +56,7 @@ class TrickFixtures extends BaseFixture implements DependentFixtureInterface
                 $data[$i]['fields']['description'],
                 $data[$i]['fields']['slug'],
                 true,
-                new \DateTime(sprintf("+%d days", $i - 1))
+                new \DateTime(sprintf("+%d days", -$i))
             );
         });
         $manager->flush();

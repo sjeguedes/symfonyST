@@ -34,7 +34,7 @@ class ImageFixtures extends BaseFixture
                 $data[$i]['fields']['description'],
                 $data[$i]['fields']['format'],
                 $data[$i]['fields']['size'],
-                new \DateTime(sprintf("+%d days", $i - 1))
+                new \DateTime(sprintf("+%d days", -$i))
             );
         });
         $manager->flush();

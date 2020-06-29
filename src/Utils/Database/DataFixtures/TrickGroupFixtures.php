@@ -32,7 +32,7 @@ class TrickGroupFixtures extends BaseFixture
             return new TrickGroup(
                 $data[$i]['fields']['name'],
                 $data[$i]['fields']['description'],
-                new \DateTime(sprintf("+%d days", $i - 1))
+                new \DateTime(sprintf("+%d days", -$i))
             );
         });
         $manager->flush();

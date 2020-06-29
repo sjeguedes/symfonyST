@@ -32,7 +32,7 @@ class VideoFixtures extends BaseFixture
             return new Video(
                 $data[$i]['fields']['url'],
                 $data[$i]['fields']['description'],
-                new \DateTime(sprintf("+%d days", $i - 1))
+                new \DateTime(sprintf("+%d days", -$i))
             );
         });
         $manager->flush();
