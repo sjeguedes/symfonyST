@@ -1,0 +1,60 @@
+ {# rootForm var is provided by root form template which calls this template #}
+{% set rootFormName = rootForm.vars.name %}
+{# Get "prototype_name" option value from videos Collection #}
+{% set videoIndex = createTrickForm.videos.vars.prototype.vars.name %}
+{# A wrapper <div id="st-video-infos-wrapper-{{ videoIndex }}" class="st-video-infos-wrapper"></div> is injected here with JavaScript
+   arround this "div" element below to add correctly the prototype to DOM as a new element. #}
+<div id="{{ rootFormName }}_videos_{{ videoIndex }}" class="uk-position-relative uk-border-rounded uk-padding-small uk-margin-small-bottom st-video-infos st-background-blue st-box-shadow-full-small">
+    {# Video block removal #}
+    <a id="st-video-remove-button-{{ videoIndex }}" href="#" class="uk-position-top-right uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-margin-small-top uk-margin-small-right st-video-remove-button" title="Cancel">
+        <span uk-icon="icon: close; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-delete st-svg-icon-actions"></span>
+    </a>
+    {# Video block sortable #}
+    <a href="#" class="uk-position-bottom-right uk-sortable-handle uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-margin-small-bottom uk-margin-small-right" title="Sort vertically">
+        <span uk-icon="icon: list; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-actions"></span>
+    </a>
+    {# form label for videoInfos form entry type #}
+    {{ form_label(rootForm.videos.vars.prototype, 'Video N° '~videoIndex, {
+        'label_attr': {
+            'class': 'uk-form-label uk-text-uppercase st-video-infos-label',
+            'data-video-index-name': videoIndex
+        }
+    }) }}
+    {# Video fields #}
+    <div class="uk-grid uk-grid-collapse uk-margin-small-top uk-margin-medium-bottom">
+        {# Video URL #}
+        <div class="uk-width-1-1 uk-margin-small-bottom">
+            {{ form_label(rootForm.videos.vars.prototype.url, 'Video URL (iframe "src" attribute)', {'label_attr': {'class': 'uk-form-label'}}) }}
+            <div class="uk-inline uk-position-relative uk-flex">
+                <span class="uk-form-icon st-textarea-icon" uk-icon="icon: link"></span>
+                {{ form_widget(rootForm.videos.vars.prototype.url, {
+                    'attr': {'class': 'uk-textarea', 'rows': 2},
+                    'value': rootForm.videos.vars.prototype.url.vars.value})
+                }}
+            </div>
+        </div>
+        {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+        {# Video description #}
+        <div class="uk-width-1-1 uk-margin-small-top uk-margin-small-bottom">
+            {{ form_label(rootForm.videos.vars.prototype.description, 'Video description (a kind of short title)', {'label_attr': {'class': 'uk-form-label'}}) }}
+            <div class="uk-inline uk-flex">
+                <span class="uk-form-icon" uk-icon="icon: bookmark"></span>
+                {{ form_widget(rootForm.videos.vars.prototype.description, {
+                    'attr': {'class': 'uk-input'},
+                    'value': rootForm.videos.vars.prototype.description.vars.value})
+                }}
+            </div>
+        </div>
+        {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+        {# Show list rank (sortable order) #}
+        <div id="st-show-list-rank-{{ videoIndex }}">
+            {# Please note this can be changed via JavaScript to update this and all other "video infos" boxes order when sortable/remove action is made! #}
+            {{ form_row(rootForm.videos.vars.prototype.showListRank, {
+                'attr': {'class': 'st-show-list-rank'},
+                'value': rootForm.videos.vars.prototype.showListRank.vars.value})
+            }}
+        </div>
+        {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+    </div>
+</div>
+

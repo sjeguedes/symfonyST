@@ -90,14 +90,16 @@ class DTOMapper implements DataMapperInterface
         $dtoPropertyValues = [];
         for ($i = 0; $i < \count($dtoProperties); $i ++) {
             $key = $dtoProperties[$i];
-            // Object property name and form data key to map Comparison does not match
+            // Object property name and form data key to map Comparison do not match
             if (!\array_key_exists($key, $data)) {
                 throw new \RuntimeException('Form data can not be mapped due to unmatched object property!');
             }
             // Use form dynamic value to feed array from data with no needed transformation.
-            $dtoPropertyValues[$i] = $forms[$key]->getData();
+            $value = $forms[$key]->isSubmitted() ? $forms[$key]->getData() : $data[$key];
+            $value = \is_string($value) && 0 === strlen($value) ? null : $value;
+            $dtoPropertyValues[$i] = $value;
         }
-        // Return corresponding DTO instance
+        // Return corresponding DTO instance with splat operator
         return new $dtoClassName(...$dtoPropertyValues);
     }
 }

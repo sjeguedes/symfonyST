@@ -1,0 +1,33 @@
+# https://symfony.com/doc/current/validation.html#validation-constraints
+# https://symfony.com/doc/current/validation/groups.html
+App\Domain\DTO\LoginUserDTO:
+    properties:
+        userName:
+            - NotBlank:
+                message: Please fill in your username or email.
+            - Regex:
+                # Test a nickname or an email address
+
+                # Nickname:
+                # Expected format: nickname contains between 3 and 15 characters or email address
+                # (nickname with letters, numbers, "-", "_") alphanumeric characters defined with [\w-] or possibly [\p{Xan}-_] or [[:alnum:]-_] work with unicode flag u
+                # https://www.pcre.org/current/doc/html/pcre2pattern.html
+                # https://stackoverflow.com/questions/2432868/php-regex-word-boundary-matching-in-utf-8
+
+                # Email:
+                # Use a more practical implementation of RFC 5322 and adapt the equivalent to html5 mode for "Email" constraint validator with "i" flag
+                # Please note this does not manage IP addresses and IDN domain names: http://en.wikipedia.org/wiki/Internationalized_domain_name
+                # This is inspired from: https://www.regular-expressions.info/email.html
+                # https://github.com/symfony/symfony/blob/4.3/src/Symfony/Component/Validator/Constraints/EmailValidator.php
+                # CAUTION: this must be filtered before database storage!
+                pattern: "/^[\\w-]{3,15}$|^[a-z0-9!#$%&'*+\\/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+\\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/ui"
+                message: "Please use a valid username format.\nA nickname or email is expected!"
+
+        password:
+            - NotBlank:
+                message: Please fill in your password.
+            - Regex:
+                # Expected format: plain-text password contains between 8 and 20 characters
+                # (password with at least 1 special, 1 number, 1 upper and 1 lower letter)
+                pattern: '/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W]).{8,20}$/'
+                message: Please use a valid password format.

@@ -6,7 +6,10 @@ namespace App\Form\Handler;
 
 use App\Domain\Entity\User;
 use App\Domain\ServiceLayer\ImageManager;
+use App\Domain\ServiceLayer\MediaManager;
+use App\Domain\ServiceLayer\TrickManager;
 use App\Domain\ServiceLayer\UserManager;
+use App\Domain\ServiceLayer\VideoManager;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,9 +27,13 @@ class AbstractFormHandler implements FormHandlerInterface
      * Define data keys and types to check which are used in form request process.
      */
     const DATA_CONFIG_TO_CHECK = [
-        'userToUpdate' => User::class,
-        'imageService' => ImageManager::class,
-        'userService'  => UserManager::class
+        'imageService'  => ImageManager::class,
+        'mediaService'  => MediaManager::class,
+        'request'       => Request::class,
+        'trickService'  => TrickManager::class,
+        'userService'   => UserManager::class,
+        'userToUpdate'  => User::class,
+        'videoService'  => VideoManager::class
     ];
 
     /**
@@ -169,11 +176,13 @@ class AbstractFormHandler implements FormHandlerInterface
             throw new \RuntimeException('The form handler must bind the request first!');
         }
         // Check constraints validation
-        if (!$this->form->isValid()) {
+        if ($this->form->isSubmitted() && !$this->form->isValid()) {
             // Validation failed.
-            $message = 'Validation failed!<br>Try to submit again by checking the form fields.';
+            $message = nl2br('Validation failed!' . "\n" . 'Try to submit again by checking the form fields.');
             // Do not create a flash message in case of ajax form validation
-            !$this->request->isXmlHttpRequest() ? $this->flashBag->add('danger', $message) : $this->customError = ['formError' => ['notification' => $message]];
+            !$this->request->isXmlHttpRequest()
+                ? $this->flashBag->add('danger', $message)
+                : $this->customError = ['formError' => ['notification' => $message]];
             return false;
         }
         // Add custom validation

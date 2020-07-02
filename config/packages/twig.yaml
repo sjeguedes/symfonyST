@@ -2,6 +2,7 @@ twig:
     paths: ['%kernel.project_dir%/templates']
     debug: '%kernel.debug%'
     strict_variables: '%kernel.debug%'
+    cache: false
     date:
         timezone: Europe/Paris
     # UIkit form themes
@@ -11,9 +12,10 @@ twig:
         # Texts to show configuration
         globalUrlLForHostedLogo: '%env(ABSOLUTE_URL_FOR_HOSTED_LOGO)%'
         globalContactEmail: '%env(MAILER_SENDER_EMAIL)%'
-        globalMediaTextError: 'Media loading Error'
+        globalMediaTextError: 'Media loading error'
         # Assets and Images paths config (from services.yaml)
         globalAssetsDirectory: '%app_twig_assets_directory%'
         globalImageDirectory: '%app_twig_image_directory%'
         globalImageUploadDirectory: '%app_twig_image_upload_directory%'
         globalAvatarUploadDirectory: '%app_twig_avatar_upload_directory%'
+        globalTrickUploadDirectory: '%app_twig_trick_upload_directory%'

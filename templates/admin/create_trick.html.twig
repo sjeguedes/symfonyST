@@ -1,0 +1,404 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}SnowTricks - Trick creation form{% endblock %}
+
+{% block header %}
+    {% include 'all/image_header_loader.html.twig' with {'spinnerRatio': '2.5'} %}
+    <div class="uk-position-relative uk-flex uk-flex-center uk-flex-middle uk-background-cover uk-background-blend-darken uk-invisible st-background-image-header" data-src="{{ asset(globalImageDirectory~'snowboard-4.jpg') }}" style="background-position: 40% 25%; height: 600px" uk-img>
+        <div class="uk-position-center uk-text-center uk-padding-small st-overlay-image-header-container">
+            <p class="st-color-white st-text-shadow-dark uk-text-large">
+                Please fill in the form to create a new snowboard trick!
+            </p>
+            <p class="st-color-white st-text-shadow-dark uk-text-medium uk-visible@m">
+                This will be proposed to our community.
+            </p>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="uk-heading-line uk-text-large uk-text-center uk-margin-top">
+        <span uk-icon="icon: unlock; ratio: 2"></span>
+    </div>
+    <div id="st-create-trick" class="uk-section uk-preserve-color">
+        <div class="uk-container uk-margin-medium-bottom">
+            <h1 class="uk-heading-bullet uk-text-large uk-text-center uk-text-uppercase uk-text-bold">
+                Use this form to share new resources about snowboard tips to execute this trick.
+            </h1>
+            <p class="uk-text-center uk-text-uppercase uk-text-bold st-color-red">
+                We invite you to add rich content and take care of your description,<br>
+                so please simply add images and videos to make user experience better.
+            </p>
+        </div>
+        <div id="st-create-trick-form" class="uk-container-expand st-create-trick-form">
+            <div class="uk-text-center">
+                <h2 class="uk-display-inline-block uk-padding-small uk-box-shadow-medium st-border-white-small uk-text-small uk-text-bold uk-text-uppercase st-background-yellow">
+                    Trick creation area
+                </h2>
+            </div>
+            <div class="uk-flex-center uk-grid uk-grid-collapse">
+                <div class="uk-width-5-6 uk-width-2-3@s uk-width-3-5@m uk-width-1-2@l uk-width-2-5@xl uk-card uk-card-primary uk-box-shadow-medium st-border-white-small">
+                    {% if trickCreationError %}
+                    <div class="uk-card-header uk-padding-small uk-text-center">
+                        {# Trick creation errors #}
+                        <div class="uk-label uk-form-danger uk-box-shadow-large uk-text-bold">
+                            <p class="uk-margin-remove">
+                                <span uk-icon="icon: warning; ratio: 0.8"></span>
+                                {{ trickCreationError|raw }}
+                            </p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {# Trick creation form #}
+                    <div id="st-form" class="uk-card-body uk-padding-medium{{ createTrickForm.vars.valid == 1 and trickCreationError == false ?: ' st-form-error' }}">
+                        {% form_theme createTrickForm 'form/uikit_3_form.html.twig' %}
+                        {{ form_start(createTrickForm, {'attr': {'class': 'uk-grid uk-grid-collapse', 'novalidate': ''}}) }}
+                            {# Group #}
+                            <div class="uk-width-1-1 uk-margin-small-bottom">
+                                {% if createTrickForm.group.vars.valid == 0 %}
+                                    {{ form_errors(createTrickForm.group) }}
+                                {% endif %}
+                                {{ form_label(createTrickForm.group, 'Group (category)', {'label_attr': {'class': 'uk-form-label'}}) }}
+                                {# --- Group reminder --- #}
+                                <div class="uk-inline">
+                                    <a href="#" class="uk-button-link">
+                                        <span class="st-color-yellow" uk-icon="icon: question; ratio: 1.25"></span>
+                                    </a>
+                                    <div uk-drop="mode: click; pos: top-center; animation: uk-animation-slide-top-small; duration: 500">
+                                        <div class="uk-inline uk-position-relative uk-padding-small uk-border-rounded uk-box-shadow-medium st-background-yellow st-color-black">
+                                            <a href="#" class="uk-drop-close uk-position-absolute uk-padding-small">
+                                                <span class="st-color-blue" uk-icon="icon: close"></span>
+                                            </a>
+                                            <p class="uk-margin-remove uk-text-center st-line-height-normal">
+                                                <small class="uk-display-block uk-margin-small-top uk-margin-small-bottom uk-text-bold">
+                                                    <span uk-icon="icon: info"></span> Group reminder<br>
+                                                </small>
+                                                <small>
+                                                    Trick group defines its category.
+                                                    It will appear on top of trick card in lists.
+                                                    Please choose the right category to avoid future necessary update.
+                                                </small>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                {# --- end Group reminder --- #}
+                                <div class="uk-inline uk-flex">
+                                    <span class="uk-form-icon" uk-icon="icon: album"></span>
+                                    {% if createTrickForm.group.vars.errors.form.submitted == 1 %}
+                                        {% set onValidationClass = createTrickForm.group.vars.valid == 0 ? ' st-select-error' : ' st-select-success' %}
+                                    {% else %}
+                                        {% set onValidationClass = '' %}
+                                    {% endif %}
+                                    {{ form_widget(createTrickForm.group, {
+                                        'attr': {'class': 'uk-select'~onValidationClass },
+                                        'value': createTrickForm.group.vars.value})
+                                    }}
+                                    {% if createTrickForm.group.vars.errors.form.submitted == 1 %}
+                                        {% set class = createTrickForm.group.vars.valid == 0 ? 'uk-form-danger' : 'uk-form-success' %}
+                                        {% set icon = createTrickForm.group.vars.valid == 0 ? 'warning' : 'check' %}
+                                        <span class="uk-form-icon uk-form-icon-flip {{ class }}" uk-icon="icon: {{ icon }}"></span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {# Name #}
+                            <div class="uk-width-1-1 uk-margin-small-bottom">
+                                {% if createTrickForm.name.vars.valid == 0 %}
+                                {{ form_errors(createTrickForm.name) }}
+                                {% endif %}
+                                {{ form_label(createTrickForm.name, 'Name (title)', {'label_attr': {'class': 'uk-form-label'}}) }}
+                                {# --- Name reminder --- #}
+                                <div class="uk-inline">
+                                    <a href="#" class="uk-button-link">
+                                        <span class="st-color-yellow" uk-icon="icon: question; ratio: 1.25"></span>
+                                    </a>
+                                    <div uk-drop="mode: click; pos: top-center; animation: uk-animation-slide-top-small; duration: 500">
+                                        <div class="uk-inline uk-position-relative uk-padding-small uk-border-rounded uk-box-shadow-medium st-background-yellow st-color-black">
+                                            <a href="#" class="uk-drop-close uk-position-absolute uk-padding-small">
+                                                <span class="st-color-blue" uk-icon="icon: close"></span>
+                                            </a>
+                                            <p class="uk-margin-remove uk-text-center st-line-height-normal">
+                                                <small class="uk-display-block uk-margin-small-top uk-margin-small-bottom uk-text-bold">
+                                                    <span uk-icon="icon: info"></span> Name reminder<br>
+                                                </small>
+                                                <small>
+                                                    Trick name defines a title which must be unique.
+                                                    It will be used to create url to access trick dedicated page.
+                                                    For instance "<strong>My title name</strong>" will be formatted like this: "<strong>my-title-name</strong>".
+                                                </small>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                {# --- end Name reminder --- #}
+                                <div class="uk-inline uk-flex">
+                                    <span class="uk-form-icon" uk-icon="icon: tag"></span>
+                                    {{ form_widget(createTrickForm.name, {
+                                        'attr': {'class': 'uk-input'},
+                                        'value': createTrickForm.name.vars.value})
+                                    }}
+                                    {% if createTrickForm.name.vars.errors.form.submitted == 1 %}
+                                        {% set class = createTrickForm.name.vars.valid == 0 ? 'uk-form-danger' : 'uk-form-success' %}
+                                        {% set icon = createTrickForm.name.vars.valid == 0 ? 'warning' : 'check' %}
+                                        <span class="uk-form-icon uk-form-icon-flip {{ class }}" uk-icon="icon: {{ icon }}"></span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {# Description #}
+                            <div class="uk-width-1-1 uk-margin-small-bottom">
+                                {% if createTrickForm.description.vars.valid == 0 %}
+                                    {{ form_errors(createTrickForm.description) }}
+                                {% endif %}
+                                {{ form_label(createTrickForm.description, 'Description', {'label_attr': {'class': 'uk-form-label'}}) }}
+                                {# --- Description reminder --- #}
+                                <div class="uk-inline">
+                                    <a href="#" class="uk-button-link">
+                                        <span class="st-color-yellow" uk-icon="icon: question; ratio: 1.25"></span>
+                                    </a>
+                                    <div uk-drop="mode: click; pos: top-center; animation: uk-animation-slide-top-small; duration: 500">
+                                        <div class="uk-inline uk-position-relative uk-padding-small uk-border-rounded uk-box-shadow-medium st-background-yellow st-color-black">
+                                            <a href="#" class="uk-drop-close uk-position-absolute uk-padding-small">
+                                                <span class="st-color-blue" uk-icon="icon: close"></span>
+                                            </a>
+                                            <p class="uk-margin-remove uk-text-center st-line-height-normal">
+                                                <small class="uk-display-block uk-margin-small-top uk-margin-small-bottom uk-text-bold">
+                                                    <span uk-icon="icon: info"></span> Description reminder<br>
+                                                </small>
+                                                <small>
+                                                    Trick description illustrates the way to execute the figure.
+                                                    No maximum length is defined. We encourage you to precise all the interesting details!
+                                                </small>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                {# --- end Description reminder --- #}
+                                <div class="uk-inline uk-position-relative uk-flex">
+                                    <span class="uk-form-icon st-textarea-icon" uk-icon="icon: file-edit"></span>
+                                    {{ form_widget(createTrickForm.description, {
+                                        'attr': {'class': 'uk-textarea', 'rows': 5},
+                                        'value': createTrickForm.description.vars.value})
+                                    }}
+                                    {% if createTrickForm.description.vars.errors.form.submitted == 1 %}
+                                        {% set class = createTrickForm.description.vars.valid == 0 ? 'uk-form-danger' : 'uk-form-success' %}
+                                        {% set icon = createTrickForm.description.vars.valid == 0 ? 'warning' : 'check' %}
+                                        <span class="uk-form-icon uk-form-icon-flip {{ class }} st-textarea-icon" uk-icon="icon: {{ icon }}"></span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {# Images #}
+                            <div class="uk-width-1-1 uk-margin-small-bottom">
+                                <hr class="uk-margin-small-top uk-padding-small-bottom">
+                                {% if (createTrickForm.images.vars.valid == 0) %}
+                                    {{ form_errors(createTrickForm.images) }}
+                                {% endif %}
+                                {# Avoid "images" Collection type to be rendered automatically when using form_start() function #}
+                                {# or use form_end(createTrickForm, {'render_rest': false}) function but do not rendered all the fields not called! #}
+                                {# see: https://stackoverflow.com/questions/32585047/symfony-form-prevent-form-fields-from-being-generated-automaticly #}
+                                {% do createTrickForm.images.setRendered %}
+                                {{ form_label(createTrickForm.images, 'Associated images to show', {'label_attr': {'class': 'uk-form-label'}}) }}
+                                {# --- Images reminder --- #}
+                                <div class="uk-inline">
+                                    <a href="#" class="uk-button-link">
+                                        <span class="st-color-yellow" uk-icon="icon: question; ratio: 1.25"></span>
+                                    </a>
+                                    <div uk-drop="mode: click; pos: top-center; animation: uk-animation-slide-top-small; duration: 500">
+                                        <div class="uk-inline uk-position-relative uk-padding-small uk-border-rounded uk-box-shadow-medium st-background-yellow st-color-black">
+                                            <a href="#" class="uk-drop-close uk-position-absolute uk-padding-small">
+                                                <span class="st-color-blue" uk-icon="icon: close"></span>
+                                            </a>
+                                            <p class="uk-margin-remove uk-text-center st-line-height-normal">
+                                                <small class="uk-display-block uk-margin-small-top uk-margin-small-bottom uk-text-bold">
+                                                    <span uk-icon="icon: info"></span> Associated images reminder<br>
+                                                </small>
+                                                <small>
+                                                    Trick images are present on its dedicated page.
+                                                    No maximum length is defined. <strong>At least 1 image is expected!</strong><br>
+                                                    Each image is expected to be a file with one of these extensions:<br><span class="uk-text-bold">.jpg, .jpeg, .png, .gif</span><br>
+                                                    Its minimum format must be:<br><span class="uk-text-bold">1600px (width) x 900px (height)</span><br>
+                                                    and its maximum size must be:<br><span class="uk-text-bold">2MB (MegaByte / Mo)</span>.<br>
+                                                    One image in set must be promoted as "<span class="uk-text-bold">Main image</span>" on trick header page.
+                                                </small>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                {# --- end Images reminder --- #}
+                                <div class="uk-inline uk-display-block uk-flex">
+                                    {# Images collection #}
+                                    {% set imageToCropTemplate = include('form/image_to_crop.html.twig', { rootForm: createTrickForm })|e('html_attr') %}
+                                    {# Get "prototype_name" option value from images Collection #}
+                                    {% set imageIndex = createTrickForm.images.vars.prototype.vars.name %}
+                                    <div id="st-images-collection" class="st-images-collection" data-prototype="{{ imageToCropTemplate }}" data-prototype-name="{{ imageIndex }}">
+                                        <div id="st-images-collection-sortable-wrapper">
+                                            {% if createTrickForm.images.children is not empty %}
+                                                {# Loop on children to retrieve all associated images (with corresponding box) on the way to be possibly created #}
+                                                {% for imageIndex, formView in createTrickForm.images.children %}
+                                                    {# index = imageIndex, value = formView  #}
+                                                    {% include 'form/editable_image_to_crop.html.twig' with {
+                                                            rootForm: createTrickForm,
+                                                            mediaOwnerType: 'trick',
+                                                            deleteImageForm: deleteImageForm,
+                                                            rank: loop.index,
+                                                            editableImageToCropForm: formView,
+                                                            editableImageIndexName: imageIndex
+                                                    } only %}
+                                                {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                        <!-- Here is added prototype template each time a new "image to crop" box is added! -->
+                                        {# Image add button #}
+                                        <button id="st-image-add-button" class="uk-button uk-button-default uk-margin-small-top st-image-add-button" type="button" tabindex="-1">
+                                            <span class="uk-icon" uk-icon="icon: plus-circle"></span>
+                                            <span class="uk-padding-small">Add a new image</span>
+                                            <span class="uk-icon" uk-icon="icon: image"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            {# Videos #}
+                            <div class="uk-width-1-1 uk-margin-small-bottom">
+                                <hr class="uk-margin-small-top uk-padding-small-bottom">
+                                {% if (createTrickForm.videos.vars.valid == 0) %}
+                                    {{ form_errors(createTrickForm.videos) }}
+                                {% endif %}
+                                {# Avoid "videos" Collection type to be rendered automatically when using form_start() function #}
+                                {# or use form_end(createTrickForm, {'render_rest': false}) function but do not rendered all the fields not called! #}
+                                {# see: https://stackoverflow.com/questions/32585047/symfony-form-prevent-form-fields-from-being-generated-automaticly #}
+                                {% do createTrickForm.videos.setRendered %}
+                                {{ form_label(createTrickForm.videos, 'Associated videos to show', {'label_attr': {'class': 'uk-form-label'}}) }}
+                                {# --- Videos reminder --- #}
+                                <div class="uk-inline">
+                                    <a href="#" class="uk-button-link">
+                                        <span class="st-color-yellow" uk-icon="icon: question; ratio: 1.25"></span>
+                                    </a>
+                                    <div uk-drop="mode: click; pos: top-center; animation: uk-animation-slide-top-small; duration: 500">
+                                        <div class="uk-inline uk-position-relative uk-padding-small uk-border-rounded uk-box-shadow-medium st-background-yellow st-color-black">
+                                            <a href="#" class="uk-drop-close uk-position-absolute uk-padding-small">
+                                                <span class="st-color-blue" uk-icon="icon: close"></span>
+                                            </a>
+                                            <p class="uk-margin-remove uk-text-center st-line-height-normal">
+                                                <small class="uk-display-block uk-margin-small-top uk-margin-small-bottom uk-text-bold">
+                                                    <span uk-icon="icon: info"></span> Associated videos reminder<br>
+                                                </small>
+                                                <small>
+                                                    Trick videos are present on its dedicated page thanks to iframe.
+                                                    No maximum length is defined. <strong>At least 1 video is expected!</strong><br>
+                                                    Each video is expected to come from <span class="uk-text-bold">Youtube, Vimeo, or Dailymotion</span> providers.<br>
+                                                    Iframe Integration source URL must use one of these:<br>
+                                                    <span class="uk-text-bold uk-text-break">
+                                                        https://www.youtube.com/embed/<em><span class="st-color-blue">videoId</span></em>
+                                                    </span><br>
+                                                    <span class="uk-text-bold uk-text-break">
+                                                        https://player.vimeo.com/video/<em><span class="st-color-blue">videoId</span></em>
+                                                    </span><br>
+                                                    <span class="uk-text-bold uk-text-break">
+                                                        https://www.dailymotion.com/embed/video/<em><span class="st-color-blue">videoId</span></em>
+                                                    </span>
+                                                </small>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                {# --- end Videos reminder --- #}
+                                <div class="uk-inline uk-display-block uk-flex">
+                                    {# Videos collection #}
+                                    {% set videoInfosTemplate = include('form/video_infos.html.twig', { rootForm: createTrickForm })|e('html_attr') %}
+                                    {# Get "prototype_name" option value from videos Collection #}
+                                    {% set videoIndex = createTrickForm.videos.vars.prototype.vars.name %}
+                                    <div id="st-videos-collection" class="st-images-collection" data-prototype="{{ videoInfosTemplate }}" data-prototype-name="{{ videoIndex }}">
+                                        <div id="st-videos-collection-sortable-wrapper">
+                                            {% if createTrickForm.videos.children is not empty %}
+                                                {# Loop on children to retrieve all associated videos (with corresponding box) on the way to be possibly created #}
+                                                {% for videoIndex, formView in createTrickForm.videos.children %}
+                                                    {# index = videoIndex, value = formView  #}
+                                                    {% include 'form/editable_video_infos.html.twig' with {
+                                                        rootForm: createTrickForm,
+                                                        mediaOwnerType: 'trick',
+                                                        rank: loop.index,
+                                                        editableVideoInfosForm: formView,
+                                                        editableVideoIndexName: videoIndex
+                                                    } only %}
+                                                {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                        <!-- Here is added prototype template each time a new "video infos" box is added! -->
+                                        {# Video add button #}
+                                        <button id="st-video-add-button" class="uk-button uk-button-default uk-margin-small-top st-video-add-button" type="button" tabindex="-1">
+                                            <span class="uk-icon" uk-icon="icon: plus-circle"></span>
+                                            <span class="uk-padding-small">Add a new video</span>
+                                            <span class="uk-icon" uk-icon="icon: play-circle"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            {% if is_granted('ROLE_ADMIN') and (createTrickForm.isPublished is defined) %}
+                            {# isPublished (trick moderation) #}
+                            <div class="uk-width-1-1 uk-margin-small-bottom">
+                                <hr class="uk-margin-small-top uk-padding-small-bottom">
+                                {% if createTrickForm.isPublished.vars.valid == 0 %}
+                                    {{ form_errors(createTrickForm.isPublished) }}
+                                {% endif %}
+                                {{ form_label(createTrickForm.isPublished, 'Moderation', {'label_attr': {'class': 'uk-form-label'}}) }}
+                                {# --- isPublished reminder --- #}
+                                <div class="uk-inline">
+                                    <a href="#" class="uk-button-link">
+                                        <span class="st-color-yellow" uk-icon="icon: question; ratio: 1.25"></span>
+                                    </a>
+                                    <div uk-drop="mode: click; pos: top-center; animation: uk-animation-slide-top-small; duration: 500">
+                                        <div class="uk-inline uk-position-relative uk-padding-small uk-border-rounded uk-box-shadow-medium st-background-yellow st-color-black">
+                                            <a href="#" class="uk-drop-close uk-position-absolute uk-padding-small">
+                                                <span class="st-color-blue" uk-icon="icon: close"></span>
+                                            </a>
+                                            <p class="uk-margin-remove uk-text-center st-line-height-normal">
+                                                <small class="uk-display-block uk-margin-small-top uk-margin-small-bottom uk-text-bold">
+                                                    <span uk-icon="icon: info"></span> Moderation reminder<br>
+                                                </small>
+                                                <small>
+                                                    Trick moderation is proposed to <strong><span class="st-color-red">administrators</span></strong> only!
+                                                    You can decide to publish (post) it immediately or not!
+                                                </small>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                {# --- end isPublished reminder --- #}
+                                <div class="uk-inline uk-flex">
+                                    <span class="uk-form-icon" uk-icon="icon: unlock"></span>
+                                    {% if createTrickForm.isPublished.vars.errors.form.submitted == 1 %}
+                                        {% set onValidationClass = createTrickForm.isPublished.vars.valid == 0 ? ' st-select-error' : ' st-select-success' %}
+                                    {% else %}
+                                        {% set onValidationClass = '' %}
+                                    {% endif %}
+                                    {{ form_widget(createTrickForm.isPublished, {
+                                        'attr': {'class': 'uk-select'~onValidationClass },
+                                        'value': createTrickForm.isPublished.vars.value})
+                                    }}
+                                    {% if createTrickForm.isPublished.vars.errors.form.submitted == 1 %}
+                                        {% set class = createTrickForm.isPublished.vars.valid == 0 ? 'uk-form-danger' : 'uk-form-success' %}
+                                        {% set icon = createTrickForm.isPublished.vars.valid == 0 ? 'warning' : 'check' %}
+                                        <span class="uk-form-icon uk-form-icon-flip {{ class }}" uk-icon="icon: {{ icon }}"></span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endif %}
+                            {# CSRF token #}
+                            {{ form_row(createTrickForm.token, {'value': csrf_token('create_trick_token')}) }}
+                            <div class="uk-width-1-1 uk-flex uk-flex-center">
+                                <button type="submit" class="uk-button uk-button-secondary uk-border-rounded uk-box-shadow-hover-medium uk-text-bold" title="Validate">
+                                    Create <span uk-icon="icon: chevron-right; ratio: 1.3"></span>
+                                </button>
+                            </div>
+                        {{ form_end(createTrickForm) }}
+                        <p class="uk-margin-small-top uk-text-center"><small>All fields are mandatory.</small></p>
+                        {# Get image removal ajax form in modal #}
+                        {% include 'form/delete_image.html.twig' with {
+                            removalText: 'This action is required since your image is temporary saved on server.',
+                            deleteImageForm: deleteImageForm
+                        } only %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

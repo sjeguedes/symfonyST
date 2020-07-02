@@ -51,7 +51,11 @@ trait UserHandlingHelperTrait
             $isUsernameUnique = $this->isUserUnique('username', $userNameToCheck, $userService);
         }
         if (false === $isEmailUnique || false === $isUsernameUnique) {
-            $this->flashBag->add('danger', 'Form validation failed!<br>Try to request again by checking the form fields.');
+            $this->flashBag->add(
+                'danger',
+                nl2br('Form validation failed!' . "\n" .
+                'Try to request again by checking the form fields.')
+            );
             return false;
         }
         return true;
@@ -78,11 +82,11 @@ trait UserHandlingHelperTrait
         if (false === $isUniqueUser) {
             switch ($type) {
                 case 'email':
-                    $uniqueEmailError = 'Please choose another email address!<br>It is already used!';
+                    $uniqueEmailError = nl2br('Please choose another email address!' . "\n" . 'It is already used!');
                     $this->customError = ['email' => $uniqueEmailError];
                     break;
                 case 'username':
-                    $uniqueUserNameError = 'Please choose another username!<br>Your nickname is already used!';
+                    $uniqueUserNameError = nl2br('Please choose another username!' . "\n" . 'Your nickname is already used!');
                     $this->customError = ['username' => $uniqueUserNameError];
                     break;
             }
@@ -91,7 +95,7 @@ trait UserHandlingHelperTrait
     }
 
     /**
-     * Slugify a user nickname.
+     * Make a particular slug with a user nickname.
      *
      * @param string $nickname
      *
@@ -99,7 +103,7 @@ trait UserHandlingHelperTrait
      *
      * @throws \Exception
      */
-    public function cleanAvatarNickNameForSlug(string $nickname) : string
+    public function makeSlugWithNickName(string $nickname) : string
     {
         if (!extension_loaded('iconv')) {
             throw new \Exception('Sorry, iconv module is not loaded!');
@@ -109,8 +113,10 @@ trait UserHandlingHelperTrait
         setlocale(LC_ALL, 'en_US.UTF-8');
         $clean = iconv('UTF-8', 'ASCII//TRANSLIT', $nickname);
         $clean = strtolower($clean);
-        // Optional for actual nickname format!
-        $clean = preg_replace('/\s/', '', $clean);
+        // Optional for actual nickname format, this is already cleaned by form!
+        $clean = trim($clean); // delete space before and after
+        // Optional for actual nickname format, indeed space character is not allowed!
+        $clean = preg_replace('/\s/', '-', $clean);
         // Revert back to the old locale
         setlocale(LC_ALL, $oldLocale);
         return $clean;

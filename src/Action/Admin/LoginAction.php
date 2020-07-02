@@ -53,7 +53,9 @@ class LoginAction
     /**
      *  Show login form (user connection) and validation or authentication errors.
      *
-     * @Route("/{_locale}/login", name="connect")
+     * @Route({
+     *     "en": "/{_locale<en>}/login"
+     * }, name="connect")
      *
      * @param RedirectionResponder $redirectionResponder
      * @param LoginResponder       $responder
@@ -67,7 +69,10 @@ class LoginAction
     {
         // Deny access if a user is already authenticated.
         if (!\is_null($this->security->getUser())) {
-            $this->flashBag->add('danger', 'A user is already authenticated!<br>Please logout first.');
+            $this->flashBag->add(
+                'danger',
+                nl2br('A user is already authenticated!' . "\n" . 'Please logout first.')
+            );
             return $redirectionResponder('home');
         }
         // Set form without initial model data and set the request by binding it

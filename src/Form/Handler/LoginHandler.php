@@ -59,8 +59,11 @@ final class LoginHandler extends AbstractFormHandler
         $authenticationError = $this->authenticationUtils->getLastAuthenticationError();
         // DTO is in valid state but with authentication error.
         if (!\is_null($authenticationError)) {
-            $this->customError = $authenticationError;
-            $this->flashBag->add('danger', 'Authentication failed!<br>Try to login again by checking the form fields.');
+            $this->customError = $authenticationError->getMessage();
+            $this->flashBag->add(
+                'danger',
+                nl2br('Authentication failed!' . "\n" . 'Try to login again by checking the form fields.')
+            );
             return false;
         }
         return true;

@@ -21,5 +21,11 @@
 
 ###> symfony/phpunit-bridge ###
 .phpunit
+.phpunit.result.cache
 /phpunit.xml
 ###< symfony/phpunit-bridge ###
+
+### PHPUnit installed with symfony bridge and html code coverage ###
+/bin/phpunit
+/tests-html
+/tests/bootstrap.php

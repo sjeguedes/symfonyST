@@ -6,8 +6,6 @@ namespace App\Domain\Entity;
 
 use App\Domain\Repository\TrickRepository;
 use App\Utils\Traits\StringHelperTrait;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
@@ -19,14 +17,6 @@ use Ramsey\Uuid\UuidInterface;
  *
  * @ORM\Entity(repositoryClass=TrickRepository::class)
  * @ORM\Table(name="tricks")
- * @ORM\SqlResultSetMappings(
- *      @ORM\SqlResultSetMapping(
- *          name    = "mappingTrickListSortOrder",
- *          columns = {
- *              @ORM\ColumnResult("rank")
- *          }
- *     )
- * )
  */
 class Trick
 {
@@ -82,10 +72,17 @@ class Trick
     private $slug;
 
     /**
+     * @var bool
+     *
+     * @ORM\Column(type="boolean")
+     */
+    private $isPublished;
+
+    /**
      *
      * @var \DateTimeInterface
      *
-     * @ORM\Column(type="datetime", name="creation_date")
+     * @ORM\Column(type="datetime")
      */
     private $creationDate;
 
@@ -93,9 +90,18 @@ class Trick
      *
      * @var \DateTimeInterface
      *
-     * @ORM\Column(type="datetime", name="update_date")
+     * @ORM\Column(type="datetime")
      */
     private $updateDate;
+
+    /**
+     * @var MediaOwner|null (inverse side of entity relation)
+     *
+     * The media owner can be null if application allows no media at creation/update!
+     *
+     * @ORM\OneToOne(targetEntity=MediaOwner::class, mappedBy="trick", cascade={"persist", "remove"}, orphanRemoval=true)
+     */
+    private $mediaOwner;
 
     /**
      * @var TrickGroup (owning side of entity relation)
@@ -114,13 +120,6 @@ class Trick
     private $user;
 
     /**
-     * @var Collection (inverse side of entity relation)
-     *
-     * @ORM\OneToMany(targetEntity=Media::class, mappedBy="trick")
-     */
-    private $medias;
-
-    /**
      * @var integer|null a rank value used in lists
      *
      */
@@ -129,38 +128,50 @@ class Trick
     /**
      * Trick constructor.
      *
-     * @param string                  $name
-     * @param string                  $description
      * @param TrickGroup              $trickGroup
      * @param User                    $user
+     * @param string                  $name
+     * @param string                  $description
      * @param string|null             $slug
+     * @param bool                    $isPublished  a publication state which an administrator can change
      * @param \DateTimeInterface|null $creationDate
-     *
-     * @return void
      *
      * @throws \Exception
      */
     public function __construct(
-        string $name,
-        string $description,
         TrickGroup $trickGroup,
         User $user,
+        string $name,
+        string $description,
         string $slug = null,
+        bool $isPublished = false,
         \DateTimeInterface $creationDate = null
     ) {
-        $this->uuid = Uuid::uuid4();
         \assert(!empty($name), 'Trick name can not be empty!');
-        $this->name = $name;
         \assert(!empty($description), 'Trick description can not be empty!');
-        $this->description = $description;
+        $this->uuid = Uuid::uuid4();
         $this->trickGroup = $trickGroup;
         $this->user = $user;
-        !\is_null($slug) ? $this->customizeSlug($slug) : $this->customizeSlug($name);
-        $createdAt = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
-        $this->creationDate = $createdAt;
-        $this->updateDate = $createdAt;
+        $this->name = $name;
+        $this->description = $description;
+        $this->slug = !\is_null($slug) && !empty($slug) ? $this->makeSlug($slug) : $this->makeSlug($name);
+        $this->isPublished = $isPublished;
+        $this->creationDate = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
+        $this->updateDate = $this->creationDate;
         $this->rank = null;
-        $this->medias = new ArrayCollection();
+    }
+
+    /**
+     * Assign a media owner.
+     *
+     * @param MediaOwner $mediaOwner
+     *
+     * @return $this
+     */
+    public function assignMediaOwner(MediaOwner $mediaOwner) : self
+    {
+        $this->mediaOwner = $mediaOwner;
+        return $this;
     }
 
     /**
@@ -169,6 +180,8 @@ class Trick
      * @param string $name
      *
      * @return Trick
+     *
+     * @throws \Exception
      */
     public function modifyName(string $name) : self
     {
@@ -185,6 +198,8 @@ class Trick
      * @param string $description
      *
      * @return Trick
+     *
+     * @throws \Exception
      */
     public function modifyDescription(string $description) : self
     {
@@ -209,7 +224,20 @@ class Trick
         if (empty($slug)) {
             throw new \InvalidArgumentException('Trick slug can not be empty!');
         }
-        $this->slug = $this->stringToSlug($slug);
+        $this->slug = $this->makeSlug($slug);
+        return $this;
+    }
+
+    /**
+     * Moderate a trick.
+     *
+     * @param bool $isPublished
+     *
+     * @return Trick
+     */
+    public function modifyIsPublished(bool $isPublished) : self
+    {
+        $this->isPublished = $isPublished;
         return $this;
     }
 
@@ -219,6 +247,8 @@ class Trick
      * @param \DateTimeInterface $updateDate
      *
      * @return Trick
+     *
+     * @throws \Exception
      */
     public function modifyUpdateDate(\DateTimeInterface $updateDate) : self
     {
@@ -230,7 +260,7 @@ class Trick
     }
 
     /**
-     * Change assigned trickGroup after creation.
+     * Change assigned trick group after creation.
      *
      * @param TrickGroup $trickGroup
      *
@@ -256,38 +286,7 @@ class Trick
     }
 
     /**
-     * Add Media entity to collection.
-     *
-     * @param Media $media
-     *
-     * @return Trick
-     */
-    public function addMedia(Media $media) : self
-    {
-        if (!$this->medias->contains($media)) {
-            $this->medias->add($media);
-            $media->modifyTrick($this);
-        }
-        return $this;
-    }
-
-    /**
-     * Remove Media entity from collection.
-     *
-     * @param Media $media
-     *
-     * @return Trick
-     */
-    public function removeMedia(Media $media) : self
-    {
-        if ($this->medias->contains($media)) {
-            $this->medias->removeElement($media);
-        }
-        return $this;
-    }
-
-    /**
-     * Assign a rank to sort trick (Used to manage a list to show)
+     * Assign a rank to sort trick (Used to manage a list to show).
      *
      * This data is not persisted but generated during a database query.
      *
@@ -295,13 +294,12 @@ class Trick
      *
      * @return Trick
      *
-     * @throws \InvalidArgumentException
+     * @throws \Exception
      */
     public function assignRank(int $rank) : self
     {
         if ($rank < 0) {
             throw new \InvalidArgumentException('Trick rank value can not be negative!');
-
         }
         $this->rank = $rank;
         return $this;
@@ -356,6 +354,24 @@ class Trick
     }
 
     /**
+     * @return bool
+     */
+    public function getIsPublished() : bool
+    {
+        return $this->isPublished;
+    }
+
+    /**
+     * @return MediaOwner|null
+     *
+     * * The media owner can be null when no media is set (trick creation/update)!
+     */
+    public function getMediaOwner() : ?MediaOwner
+    {
+        return $this->mediaOwner;
+    }
+
+    /**
      * @return TrickGroup
      */
     public function getTrickGroup() : TrickGroup
@@ -364,11 +380,13 @@ class Trick
     }
 
     /**
-     * @return Collection|Media[]
+     * @return User
+     *
+     * This is the trick author.
      */
-    public function getMedias() : Collection
+    public function getUser() : User
     {
-        return $this->medias;
+        return $this->user;
     }
 
     /**

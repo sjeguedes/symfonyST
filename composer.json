@@ -1,14 +1,21 @@
 {
+    "name": "sje-guedes/symfony-st",
+    "description": "Simple Symfony project",
     "type": "project",
     "license": "proprietary",
     "require": {
         "php": "^7.2.14",
         "ext-ctype": "*",
+        "ext-curl": "*",
+        "ext-fileinfo": "*",
+        "ext-gd": "*",
         "ext-gmp": "*",
         "ext-http": "*",
         "ext-iconv": "*",
+        "ext-intl": "*",
         "ext-json": "^1.6",
         "ext-openssl": "^7.2",
+        "ext-zlib": "*",
         "doctrine/doctrine-migrations-bundle": "^1.0",
         "psr/log": "^1.1",
         "ramsey/uuid-doctrine": "^1.4",
@@ -23,17 +30,17 @@
         "symfony/property-access": "^4.2",
         "symfony/property-info": "^4.2",
         "symfony/security-bundle": "^4.2",
+        "symfony/serializer": "4.2.*",
         "symfony/swiftmailer-bundle": "^3.2",
         "symfony/twig-bundle": "^4.2",
         "symfony/validator": "^4.2",
-        "symfony/yaml": "^4.2",
-        "ext-gd": "*"
+        "symfony/yaml": "^4.2"
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^3.0",
         "symfony/dotenv": "^4.2",
         "symfony/maker-bundle": "^1.5",
-        "symfony/phpunit-bridge": "^4.2",
+        "symfony/phpunit-bridge": "^5.1",
         "symfony/profiler-pack": "^1.0"
     },
     "config": {
@@ -79,7 +86,5 @@
             "allow-contrib": false,
             "require": "4.2.*"
         }
-    },
-  "name": "",
-  "description": ""
+    }
 }

@@ -4,12 +4,11 @@ declare(strict_types = 1);
 
 namespace App\Utils\Database\DataFixtures;
 
-use App\Domain\Entity\Image;
 use App\Domain\Entity\Media;
+use App\Domain\Entity\MediaOwner;
+use App\Domain\Entity\MediaSource;
 use App\Domain\Entity\MediaType;
-use App\Domain\Entity\Trick;
 use App\Domain\Entity\User;
-use App\Domain\Entity\Video;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
@@ -28,10 +27,9 @@ class MediaFixtures extends BaseFixture implements DependentFixtureInterface
     public function getDependencies() : array
     {
         return [
-            ImageFixtures::class,
-            VideoFixtures::class,
+            MediaOwnerFixtures::class,
+            MediaSourceFixtures::class,
             MediaTypeFixtures::class,
-            TrickFixtures::class,
             UserFixtures::class
         ];
     }
@@ -50,36 +48,25 @@ class MediaFixtures extends BaseFixture implements DependentFixtureInterface
         $array = $this->parseYamlFile('media_fixtures.yaml');
         $data = $array['medias'];
         // Create medias with image or video
-        $this->createFixtures(Media::class, \count($data), function($i) use($data) {
-            $proxy2 = $this->getReference(MediaType::class . '_' . $data[$i]['references']['media_type']);
-            $proxy3 = $this->getReference(Trick::class . '_' . $data[$i]['references']['trick']);
+        $this->createFixtures(Media::class, \count($data), function ($i) use ($data) {
+            /** @var $proxy object|MediaOwner */
+            $proxy = $this->getReference(MediaOwner::class . '_' . $data[$i]['references']['media_owner']);
+            /** @var $proxy2 object|MediaSource */
+            $proxy2 = $this->getReference(MediaSource::class . '_' . ($i + 1)); //$data[$i]['references']['media_source']
+            /** @var $proxy3 object|MediaType */
+            $proxy3 = $this->getReference(MediaType::class . '_' . $data[$i]['references']['media_type']);
+            /** @var $proxy4 object|User */
             $proxy4 = $this->getReference(User::class . '_' . $data[$i]['references']['user']);
-            switch ($data[$i]['references']) {
-                case \array_key_exists('image', $data[$i]['references']):
-                    $proxy = $this->getReference(Image::class . '_' . $data[$i]['references']['image']);
-                    return Media::createNewInstanceWithImage(
-                        $proxy,
-                        $proxy2,
-                        $proxy3,
-                        $proxy4,
-                        $data[$i]['fields']['is_main'],
-                        $data[$i]['fields']['is_published'],
-                        new \DateTime(sprintf("+%d days", $i - 1))
-                    );
-                    break;
-                case \array_key_exists('video', $data[$i]['references']):
-                    $proxy = $this->getReference(Video::class . '_' . $data[$i]['references']['video']);
-                    return Media::createNewInstanceWithVideo(
-                        $proxy,
-                        $proxy2,
-                        $proxy3,
-                        $proxy4,
-                        $data[$i]['fields']['is_main'],
-                        $data[$i]['fields']['is_published'],
-                        new \DateTime(sprintf("+%d days", $i - 1))
-                    );
-                    break;
-            }
+            return new Media(
+                $proxy,
+                $proxy2,
+                $proxy3,
+                $proxy4,
+                $data[$i]['fields']['is_main'],
+                $data[$i]['fields']['is_published'],
+                $data[$i]['fields']['show_list_rank'],
+                new \DateTime(sprintf("+%d days", -$i))
+            );
         });
         $manager->flush();
     }

@@ -28,11 +28,11 @@ class VideoFixtures extends BaseFixture
         $array = $this->parseYamlFile('video_fixtures.yaml');
         $data = $array['videos'];
         // Create trick videos
-        $this->createFixtures(Video::class, \count($data), function($i) use($data) {
+        $this->createFixtures(Video::class, \count($data), function ($i) use ($data) {
             return new Video(
                 $data[$i]['fields']['url'],
                 $data[$i]['fields']['description'],
-                new \DateTime(sprintf("+%d days", $i - 1))
+                new \DateTime(sprintf("+%d days", -$i))
             );
         });
         $manager->flush();

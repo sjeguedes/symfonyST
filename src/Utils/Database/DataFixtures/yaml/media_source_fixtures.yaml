@@ -1,0 +1,755 @@
+media_sources:
+    ### IMAGES ###
+    ## Normal format ##
+    -
+        #1
+        #trick: "Ollie" (big image)
+        type: "image"
+        references:
+            media: 1
+            image: 1
+    -
+        #2
+        #trick: "Nollie" (big image)
+        type: "image"
+        references:
+            media: 2
+            image: 2
+    -
+        #3
+        #trick: "One-Two" (big image)
+        type: "image"
+        references:
+            media: 3
+            image: 3
+    -
+        #4
+        #trick: "Back flip" (big image)
+        type: "image"
+        references:
+            media: 4
+            image: 4
+    -
+        #5
+        #trick: "Front flip" (big image)
+        type: "image"
+        references:
+            media: 5
+            image: 5
+    -
+        #6
+        #trick: "Invert" (big image)
+        type: "image"
+        references:
+            media: 6
+            image: 6
+    -
+        #7
+        #trick: "Handplant" (big image)
+        type: "image"
+        references:
+            media: 7
+            image: 7
+    -
+        #8
+        #trick: "50-50" (big image)
+        type: "image"
+        references:
+            media: 8
+            image: 8
+    -
+        #9
+        #trick: "Boardslide" (big image)
+        type: "image"
+        references:
+            media: 9
+            image: 9
+    -
+        #10
+        #trick: "Nose-pick" (big image)
+        type: "image"
+        references:
+            media: 10
+            image: 10
+    -
+        #11
+        #trick: "Board-stall" (big image)
+        type: "image"
+        references:
+            media: 11
+            image: 11
+    -
+        #12
+        #trick: "One-footed" (big image)
+        type: "image"
+        references:
+            media: 12
+            image: 12
+
+    ###########################################################################################
+    # Several medias for 1 trick
+    -
+        #13
+        #trick: "McTwist" (big image)
+        type: "image"
+        references:
+            media: 13
+            image: 13
+    -
+        #14
+        #trick: "McTwist" (big image)
+        type: "image"
+        references:
+            media: 14
+            image: 14
+    -
+        #15
+        #trick: "Tuck Knee" (big image)
+        type: "image"
+        references:
+            media: 15
+            image: 15
+    -
+        #16
+        #trick: "Tuck Knee" (big image)
+        type: "image"
+        references:
+            media: 16
+            image: 16
+    -
+        #17
+        #trick: "Stalefish" (big image)
+        type: "image"
+        references:
+            media: 17
+            image: 17
+    -
+        #18
+        #trick: "Stalefish" (big image)
+        type: "image"
+        references:
+            media: 18
+            image: 18
+    -
+        #19
+        #trick: "Stalefish" (big image)
+        type: "image"
+        references:
+            media: 19
+            image: 19
+
+    ###########################################################################################
+    ## Normal format ##
+    -
+        #20
+        #trick: "Ollie" (normal image)
+        type: "image"
+        references:
+            media: 20
+            image: 20
+    -
+        #21
+        #trick: "Nollie" (normal image)
+        type: "image"
+        references:
+            media: 21
+            image: 21
+    -
+        #22
+        #trick: "One-Two" (normal image)
+        type: "image"
+        references:
+            media: 22
+            image: 22
+    -
+        #23
+        #trick: "Back flip" (normal image)
+        type: "image"
+        references:
+            media: 23
+            image: 23
+    -
+        #24
+        #trick: "Front flip" (normal image)
+        type: "image"
+        references:
+            media: 24
+            image: 24
+    -
+        #25
+        #trick: "Invert" (normal image)
+        type: "image"
+        references:
+            media: 25
+            image: 25
+    -
+        #26
+        #trick: "Handplant" (normal image)
+        type: "image"
+        references:
+            media: 26
+            image: 26
+    -
+        #27
+        #trick: "50-50" (normal image)
+        type: "image"
+        references:
+            media: 27
+            image: 27
+    -
+        #28
+        #trick: "Boardslide" (normal image)
+        type: "image"
+        references:
+            media: 28
+            image: 28
+    -
+        #29
+        #trick: "Nose-pick" (normal image)
+        type: "image"
+        references:
+            media: 29
+            image: 29
+    -
+        #30
+        #trick: "Board-stall" (normal image)
+        type: "image"
+        references:
+            media: 30
+            image: 30
+    -
+        #31
+        #trick: "One-footed" (normal image)
+        type: "image"
+        references:
+            media: 31
+            image: 31
+
+    ###########################################################################################
+    # Several medias for 1 trick
+    -
+        #32
+        #trick: "McTwist" (normal image)
+        type: "image"
+        references:
+            media: 32
+            image: 32
+    -
+        #33
+        #trick: "McTwist" (normal image)
+        type: "image"
+        references:
+            media: 33
+            image: 33
+    -
+        #34
+        #trick: "Tuck Knee" (normal image)
+        type: "image"
+        references:
+            media: 34
+            image: 34
+    -
+        #35
+        #trick: "Tuck Knee" (normal image)
+        type: "image"
+        references:
+            media: 35
+            image: 35
+    -
+        #36
+        #trick: "Stalefish" (normal image)
+        type: "image"
+        references:
+            media: 36
+            image: 36
+    -
+        #37
+        #trick: "Stalefish" (normal image)
+        type: "image"
+        references:
+            media: 37
+            image: 37
+    -
+        #38
+        #trick: "Stalefish" (normal image)
+        type: "image"
+        references:
+            media: 38
+            image: 38
+
+    ###########################################################################################
+
+    ## Thumbnail format ##
+    -
+        #39
+        #trick: "Ollie" (thumbnail image)
+        type: "image"
+        references:
+            media: 39
+            image: 39
+    -
+        #40
+        #trick: "Nollie" (thumbnail image)
+        type: "image"
+        references:
+            media: 40
+            image: 40
+    -
+        #41
+        #trick: "One-Two" (thumbnail image)
+        type: "image"
+        references:
+            media: 41
+            image: 41
+    -
+        #42
+        #trick: "Back flip" (thumbnail image)
+        type: "image"
+        references:
+            media: 42
+            image: 42
+    -
+        #43
+        #trick: "Front flip" (thumbnail image)
+        type: "image"
+        references:
+            media: 43
+            image: 43
+    -
+        #44
+        #trick: "Invert" (thumbnail image)
+        type: "image"
+        references:
+            media: 44
+            image: 44
+    -
+        #45
+        #trick: "Handplant" (thumbnail image)
+        type: "image"
+        references:
+            media: 45
+            image: 45
+    -
+        #46
+        #trick: "50-50" (thumbnail image)
+        type: "image"
+        references:
+            media: 46
+            image: 46
+    -
+        #47
+        #trick: "Boardslide" (thumbnail image)
+        type: "image"
+        references:
+            media: 47
+            image: 47
+    -
+        #48
+        #trick: "Nose-pick" (thumbnail image)
+        type: "image"
+        references:
+            media: 48
+            image: 48
+    -
+        #49
+        #trick: "Board-stall" (thumbnail image)
+        type: "image"
+        references:
+            media: 49
+            image: 49
+    -
+        #50
+        #trick: "One-footed" (thumbnail image)
+        type: "image"
+        references:
+            media: 50
+            image: 50
+
+    ###########################################################################################
+    # Several medias for 1 trick
+    -
+        #51
+        #trick: "McTwist" (thumbnail image)
+        type: "image"
+        references:
+            media: 51
+            image: 51
+    -
+        #52
+        #trick: "McTwist" (thumbnail image)
+        type: "image"
+        references:
+            media: 52
+            image: 52
+    -
+        #53
+        #trick: "Tuck Knee" (thumbnail image)
+        type: "image"
+        references:
+            media: 53
+            image: 53
+    -
+        #54
+        #trick: "Tuck Knee" (thumbnail image)
+        type: "image"
+        references:
+            media: 54
+            image: 54
+    -
+        #55
+        #trick: "Stalefish" (thumbnail image)
+        type: "image"
+        references:
+            media: 55
+            image: 55
+    -
+        #56
+        #trick: "Stalefish" (thumbnail image)
+        type: "image"
+        references:
+            media: 56
+            image: 56
+    -
+        #57
+        #trick: "Stalefish" (thumbnail image)
+        type: "image"
+        references:
+            media: 57
+            image: 57
+
+    ###########################################################################################
+    ### VIDEOS ###
+    ## Youtube ##
+    -
+        #58
+        #trick: "Ollie"
+        type: "video"
+        references:
+            media: 58
+            video: 1
+    -
+        #59
+        #trick: "Nollie"
+        type: "video"
+        references:
+            media: 59
+            video: 2
+    -
+        #60
+        #trick: "One-Two"
+        type: "video"
+        references:
+            media: 60
+            video: 3
+    -
+        #61
+        #trick: "Back flip"
+        type: "video"
+        references:
+            media: 61
+            video: 4
+    -
+        #62
+        #trick: "Front flip"
+        type: "video"
+        references:
+            media: 62
+            video: 5
+    -
+        #63
+        #trick: "Invert"
+        type: "video"
+        references:
+            media: 63
+            video: 6
+    -
+        #64
+        #trick: "Handplant"
+        type: "video"
+        references:
+            media: 64
+            video: 7
+    -
+        #65
+        #trick: "50-50"
+        type: "video"
+        references:
+            media: 65
+            video: 8
+    -
+        #66
+        #trick: "Boardslide"
+        type: "video"
+        references:
+            media: 66
+            video: 9
+    -
+        #67
+        #trick: "Nose-pick"
+        type: "video"
+        references:
+            media: 67
+            video: 10
+    -
+        #68
+        #trick: "Board-stall"
+        type: "video"
+        references:
+            media: 68
+            video: 11
+    -
+        #69
+        #trick: "One-footed"
+        type: "video"
+        references:
+            media: 69
+            video: 12
+    ## Vimeo ##
+    -
+        #70
+        #trick: "Ollie"
+        type: "video"
+        references:
+            media: 70
+            video: 16
+    -
+        #71
+        #trick: "Nollie"
+        type: "video"
+        references:
+            media: 71
+            video: 17
+    -
+        #72
+        #trick: "One-Two"
+        type: "video"
+        references:
+            media: 72
+            video: 18
+    -
+        #73
+        #trick: "Back flip"
+        type: "video"
+        references:
+            media: 73
+            video: 19
+    -
+        #74
+        #trick: "Front flip"
+        type: "video"
+        references:
+            media: 74
+            video: 20
+    -
+        #75
+        #trick: "Invert"
+        type: "video"
+        references:
+            media: 75
+            video: 21
+    -
+        #76
+        #trick: "Handplant"
+        type: "video"
+        references:
+            media: 76
+            video: 22
+    -
+        #77
+        #trick: "50-50"
+        type: "video"
+        references:
+            media: 77
+            video: 23
+    -
+        #78
+        #trick: "Boardslide"
+        type: "video"
+        references:
+            media: 78
+            video: 24
+    -
+        #79
+        #trick: "Nose-pick"
+        type: "video"
+        references:
+            media: 79
+            video: 25
+    -
+        #80
+        #trick: "Board-stall"
+        type: "video"
+        references:
+            media: 80
+            video: 26
+    -
+        #81
+        #trick: "One-footed"
+        type: "video"
+        references:
+            media: 81
+            video: 27
+    ## Dailymotion ##
+    -
+        #82
+        #trick: "Ollie"
+        type: "video"
+        references:
+            media: 82
+            video: 30
+    -
+        #83
+        #trick: "Nollie"
+        type: "video"
+        references:
+            media: 83
+            video: 31
+    -
+        #84
+        #trick: "One-Two"
+        type: "video"
+        references:
+            media: 84
+            video: 32
+    -
+        #85
+        #trick: "Back flip"
+        type: "video"
+        references:
+            media: 85
+            video: 33
+    -
+        #86
+        #trick: "Front flip"
+        type: "video"
+        references:
+            media: 86
+            video: 34
+    -
+        #87
+        #trick: "Invert"
+        type: "video"
+        references:
+            media: 87
+            video: 35
+    -
+        #88
+        #trick: "Handplant"
+        type: "video"
+        references:
+            media: 88
+            video: 36
+    -
+        #89
+        #trick: "50-50"
+        type: "video"
+        references:
+            media: 89
+            video: 37
+    -
+        #90
+        #trick: "Boardslide"
+        type: "video"
+        references:
+            media: 90
+            video: 38
+    -
+        #91
+        #trick: "Nose-pick"
+        type: "video"
+        references:
+            media: 91
+            video: 39
+    -
+        #92
+        #trick: "Board-stall"
+        type: "video"
+        references:
+            media: 92
+            video: 40
+    -
+        #93
+        #trick: "One-footed"
+        type: "video"
+        references:
+            media: 93
+            video: 41
+
+    ###########################################################################################
+    # Several medias for 1 trick
+    -
+        #94
+        #trick: "McTwist"
+        type: "video"
+        references:
+            media: 94
+            video: 13
+    -
+        #95
+        #trick: "McTwist"
+        type: "video"
+        references:
+            media: 95
+            video: 28
+    -
+        #96
+        #trick: "Tuck Knee"
+        type: "video"
+        references:
+            media: 96
+            video: 14
+    -
+        #97
+        #trick: "Tuck Knee"
+        type: "video"
+        references:
+            media: 97
+            video: 42
+    -
+        #98
+        #trick: "Stalefish"
+        type: "video"
+        references:
+            media: 98
+            video: 15
+    -
+        #99
+        #trick: "Stalefish"
+        type: "video"
+        references:
+            media: 99
+            video: 29
+    -
+        #100
+        #trick: "Stalefish"
+        type: "video"
+        references:
+            media: 100
+            video: 43
+
+    ###########################################################################################
+    ## Avatars
+    -
+        #101
+        #user Miky
+        type: "image"
+        references:
+            media: 101
+            image: 59
+    -
+        #102
+        #user Rooky
+        type: "image"
+        references:
+            media: 102
+            image: 60
+    -
+        #103
+        #user Arny
+        type: "image"
+        references:
+            media: 103
+            image: 58
+
+    ###########################################################################################
+

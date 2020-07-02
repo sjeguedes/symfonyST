@@ -1,3 +1,4 @@
 controllers:
-    resource: ../../src/Action/
+    resource: '../../src/Action/'
     type: annotation
+    # routing parameters linked to annotation: https://symfony.com/doc/4.2/routing.html#routing-requirements

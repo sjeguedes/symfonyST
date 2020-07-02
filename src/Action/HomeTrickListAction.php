@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Class HomeTrickListAction.
@@ -43,7 +44,9 @@ class HomeTrickListAction
     /**
      * Show homepage with starting list of tricks.
      *
-     * @Route("/{_locale}", name="home")
+     * @Route({
+     *     "en": "/en"
+     * }, name="home")
      *
      * @param HomeTrickListResponder $responder
      * @param Request                $request
@@ -51,11 +54,12 @@ class HomeTrickListAction
      * @return Response
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws \Doctrine\ORM\NoResultException
      */
     public function __invoke(HomeTrickListResponder $responder, Request $request) : Response
     {
         // Initialize default list.
-        $parameters = $this->trickService->getDefaultTrickList();
+        $parameters = $this->trickService->getTrickListParameters();
         // Check values which are not allowed!
         if (($parameters['error'])) {
             $this->logger->error("[trace app snowTricks] HomeTrickListAction/__invoke => parameters: " . serialize($parameters));
@@ -63,10 +67,11 @@ class HomeTrickListAction
         }
         $data = [
             'listEnded'             => 'No more trick to load!',
-            'technicalError'        => 'Sorry, something wrong happened<br>during trick list loading!<br>Please contact us or try again later.<br>',
-            'trickAjaxLoadingPath'  => $this->trickService->generateURLFromRoute('home_load_tricks_offset_only', []),
+            'noList'                => 'Sorry, no trick was found!',
+            'technicalError'        => nl2br('Sorry, something wrong happened' . "\n" . 'during trick list loading!' . "\n" . 'Please contact us or try again later.' . "\n"),
+            'trickAjaxLoadingPath'  => $this->trickService->generateURLFromRoute('home_load_tricks_offset_limit', [], UrlGeneratorInterface::ABSOLUTE_URL),
             'trickCount'            => $this->trickService->countAll(),
-            'trickLoadingMode'      => $this->trickService->getListDefaultParameters()['loadingMode'],
+            'trickLoadingMode'      => $this->trickService->getTrickListConfigParameters()['loadingMode'],
             'trickNumberPerLoading' => $parameters['limit'],
             'tricks'                => $this->trickService->getFilteredList($parameters['offset'], $parameters['limit'])
         ];

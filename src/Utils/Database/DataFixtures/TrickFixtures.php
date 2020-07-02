@@ -44,16 +44,19 @@ class TrickFixtures extends BaseFixture implements DependentFixtureInterface
         $array = $this->parseYamlFile('trick_fixtures.yaml');
         $data = $array['tricks'];
         // Create tricks
-        $this->createFixtures(Trick::class, \count($data), function($i) use($data) {
+        $this->createFixtures(Trick::class, \count($data), function ($i) use ($data) {
+            /** @var $proxy object|TrickGroup */
             $proxy = $this->getReference(TrickGroup::class . '_' . $data[$i]['references']['trick_group']);
+            /** @var $proxy2 object|User */
             $proxy2 = $this->getReference(User::class . '_' . $data[$i]['references']['user']);
             return new Trick(
-                $data[$i]['fields']['name'],
-                $data[$i]['fields']['description'],
                 $proxy,
                 $proxy2,
+                $data[$i]['fields']['name'],
+                $data[$i]['fields']['description'],
                 $data[$i]['fields']['slug'],
-                new \DateTime(sprintf("+%d days", $i - 1))
+                true,
+                new \DateTime(sprintf("+%d days", -$i))
             );
         });
         $manager->flush();

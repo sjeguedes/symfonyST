@@ -2,728 +2,1268 @@ medias:
     ### IMAGES ###
     ## Normal format ##
     -
-        #trick: "Ollie" (big image)
+        #1
+        # "Ollie" (big image)
         fields:
             is_main: true
             is_published: true
+            show_list_rank: 1
         references:
-            image: 1
+            #image: 1
             media_type: 3
-            trick: 1
+            media_owner: 1
             user: 1
     -
-        #trick: "Nollie" (big image)
+        #2
+        # "Nollie" (big image)
         fields:
             is_main: true
             is_published: true
+            show_list_rank: 1
         references:
-            image: 2
+            #image: 2
             media_type: 3
-            trick: 2
+            media_owner: 2
             user: 2
     -
-        #trick: "One-Two" (big image)
+        #3
+        # "One-Two" (big image)
         fields:
             is_main: true
             is_published: true
+            show_list_rank: 1
         references:
-            image: 3
+            #image: 3
             media_type: 3
-            trick: 3
+            media_owner: 3
             user: 1
     -
-        #trick: "Back flip" (big image)
+        #4
+        # "Back flip" (big image)
         fields:
             is_main: true
             is_published: true
+            show_list_rank: 1
         references:
-            image: 4
+            #image: 4
             media_type: 3
-            trick: 4
+            media_owner: 4
             user: 2
     -
-        #trick: "Front flip" (big image)
+        #5
+        # "Front flip" (big image)
         fields:
             is_main: true
             is_published: true
+            show_list_rank: 1
         references:
-            image: 5
+            #image: 5
             media_type: 3
-            trick: 5
+            media_owner: 5
             user: 1
     -
-        #trick: "Invert" (big image)
+        #6
+        # "Invert" (big image)
         fields:
             is_main: true
             is_published: true
+            show_list_rank: 1
         references:
-            image: 6
+            #image: 6
             media_type: 3
-            trick: 6
+            media_owner: 6
             user: 2
     -
-        #trick: "Handplant" (big image)
+        #7
+        # "Handplant" (big image)
         fields:
             is_main: true
             is_published: true
+            show_list_rank: 1
         references:
-            image: 7
+            #image: 7
             media_type: 3
-            trick: 7
+            media_owner: 7
             user: 1
     -
-        #trick: "50-50" (big image)
+        #8
+        # "50-50" (big image)
         fields:
             is_main: true
             is_published: true
+            show_list_rank: 1
         references:
-            image: 8
+            #image: 8
             media_type: 3
-            trick: 8
+            media_owner: 8
             user: 2
     -
-        #trick: "Boardslide" (big image)
+        #9
+        # "Boardslide" (big image)
         fields:
             is_main: true
             is_published: true
+            show_list_rank: 1
         references:
-            image: 9
+            #image: 9
             media_type: 3
-            trick: 9
+            media_owner: 9
             user: 1
     -
-        #trick: "Nose-pick" (big image)
+        #10
+        # "Nose-pick" (big image)
         fields:
             is_main: true
             is_published: true
+            show_list_rank: 1
         references:
-            image: 10
+            #image: 10
             media_type: 3
-            trick: 10
+            media_owner: 10
             user: 2
     -
-        #trick: "Board-stall" (big image)
+        #11
+        # "Board-stall" (big image)
         fields:
             is_main: true
             is_published: true
+            show_list_rank: 1
         references:
-            image: 11
+            #image: 11
             media_type: 3
-            trick: 11
+            media_owner: 11
             user: 1
     -
-        #trick: "One-footed" (big image)
+        #12
+        # "One-footed" (big image)
         fields:
             is_main: true
             is_published: true
+            show_list_rank: 1
         references:
-            image: 12
+            #image: 12
             media_type: 3
-            trick: 12
+            media_owner: 12
             user: 2
+
+    ###########################################################################################
+    # Several medias for 1 media_owner
+    -
+        #13
+        # "McTwist" (big image)
+        fields:
+            is_main: false
+            is_published: true
+            show_list_rank: 1
+        references:
+            #image: 13
+            media_type: 3
+            media_owner: 13
+            user: 1
+    -
+        #14
+        # "McTwist" (big image)
+        fields:
+            is_main: true
+            is_published: true
+            show_list_rank: 2
+        references:
+            #image: 14
+            media_type: 3
+            media_owner: 13
+            user: 1
+    -
+        #15
+        # "Tuck Knee" (big image)
+        fields:
+            is_main: true
+            is_published: true
+            show_list_rank: 1
+        references:
+            #image: 15
+            media_type: 3
+            media_owner: 14
+            user: 2
+    -
+        #16
+        # "Tuck Knee" (big image)
+        fields:
+            is_main: false
+            is_published: true
+            show_list_rank: 2
+        references:
+            #image: 16
+            media_type: 3
+            media_owner: 14
+            user: 2
+    -
+        #17
+        # "Stalefish" (big image)
+        fields:
+            is_main: false
+            is_published: true
+            show_list_rank: 1
+        references:
+            #image: 17
+            media_type: 3
+            media_owner: 15
+            user: 1
+    -
+        #18
+        # "Stalefish" (big image)
+        fields:
+            is_main: false
+            is_published: true
+            show_list_rank: 3
+        references:
+            #image: 18
+            media_type: 3
+            media_owner: 15
+            user: 1
+    -
+        #19
+        # "Stalefish" (big image)
+        fields:
+            is_main: true
+            is_published: true
+            show_list_rank: 2
+        references:
+            #image: 19
+            media_type: 3
+            media_owner: 15
+            user: 1
+
+    ###########################################################################################
     ## Normal format ##
     -
-        #trick: "Ollie" (normal image)
+        #20
+        # "Ollie" (normal image)
         fields:
             is_main: true
             is_published: true
+            show_list_rank: 1
         references:
-            image: 13
+            #image: 20
             media_type: 2
-            trick: 1
+            media_owner: 1
             user: 1
     -
-        #trick: "Nollie" (normal image)
+        #21
+        # "Nollie" (normal image)
         fields:
             is_main: true
             is_published: true
+            show_list_rank: 1
         references:
-            image: 14
+            #image: 21
             media_type: 2
-            trick: 2
+            media_owner: 2
             user: 2
     -
-        #trick: "One-Two" (normal image)
+        #22
+        # "One-Two" (normal image)
         fields:
             is_main: true
             is_published: true
+            show_list_rank: 1
         references:
-            image: 15
+            #image: 22
             media_type: 2
-            trick: 3
+            media_owner: 3
             user: 1
     -
-        #trick: "Back flip" (normal image)
+        #23
+        # "Back flip" (normal image)
         fields:
             is_main: true
             is_published: true
+            show_list_rank: 1
         references:
-            image: 16
+            #image: 23
             media_type: 2
-            trick: 4
+            media_owner: 4
             user: 2
     -
-        #trick: "Front flip" (normal image)
+        #24
+        # "Front flip" (normal image)
         fields:
             is_main: true
             is_published: true
+            show_list_rank: 1
         references:
-            image: 17
+            #image: 24
             media_type: 2
-            trick: 5
+            media_owner: 5
             user: 1
     -
-        #trick: "Invert" (normal image)
+        #25
+        # "Invert" (normal image)
         fields:
             is_main: true
             is_published: true
+            show_list_rank: 1
         references:
-            image: 18
+            #image: 25
             media_type: 2
-            trick: 6
+            media_owner: 6
             user: 2
     -
-        #trick: "Handplant" (normal image)
+        #26
+        # "Handplant" (normal image)
         fields:
             is_main: true
             is_published: true
+            show_list_rank: 1
         references:
-            image: 19
+            #image: 26
             media_type: 2
-            trick: 7
+            media_owner: 7
             user: 1
     -
-        #trick: "50-50" (normal image)
+        #27
+        # "50-50" (normal image)
         fields:
             is_main: true
             is_published: true
+            show_list_rank: 1
         references:
-            image: 20
+            #image: 27
             media_type: 2
-            trick: 8
+            media_owner: 8
             user: 2
     -
-        #trick: "Boardslide" (normal image)
+        #28
+        # "Boardslide" (normal image)
         fields:
             is_main: true
             is_published: true
+            show_list_rank: 1
         references:
-            image: 21
+            #image: 28
             media_type: 2
-            trick: 9
+            media_owner: 9
             user: 1
     -
-        #trick: "Nose-pick" (normal image)
+        #29
+        # "Nose-pick" (normal image)
         fields:
             is_main: true
             is_published: true
+            show_list_rank: 1
         references:
-            image: 22
+            #image: 29
             media_type: 2
-            trick: 10
+            media_owner: 10
             user: 2
     -
-        #trick: "Board-stall" (normal image)
+        #30
+        # "Board-stall" (normal image)
         fields:
             is_main: true
             is_published: true
+            show_list_rank: 1
         references:
-            image: 23
+            #image: 30
             media_type: 2
-            trick: 11
+            media_owner: 11
             user: 1
     -
-        #trick: "One-footed" (normal image)
+        #31
+        # "One-footed" (normal image)
         fields:
             is_main: true
             is_published: true
+            show_list_rank: 1
         references:
-            image: 24
+            #image: 31
             media_type: 2
-            trick: 12
+            media_owner: 12
             user: 2
+
+    ###########################################################################################
+    # Several medias for 1 media_owner
+    -
+        #32
+        # "McTwist" (normal image)
+        fields:
+            is_main: false
+            is_published: true
+            show_list_rank: 1
+        references:
+            #image: 32
+            media_type: 2
+            media_owner: 13
+            user: 1
+    -
+        #33
+        # "McTwist" (normal image)
+        fields:
+            is_main: true
+            is_published: true
+            show_list_rank: 2
+        references:
+            #image: 33
+            media_type: 2
+            media_owner: 13
+            user: 1
+    -
+        #34
+        # "Tuck Knee" (normal image)
+        fields:
+            is_main: true
+            is_published: true
+            show_list_rank: 1
+        references:
+            #image: 34
+            media_type: 2
+            media_owner: 14
+            user: 2
+    -
+        #35
+        # "Tuck Knee" (normal image)
+        fields:
+            is_main: false
+            is_published: true
+            show_list_rank: 2
+        references:
+            #image: 35
+            media_type: 2
+            media_owner: 14
+            user: 2
+    -
+        #36
+        # "Stalefish" (normal image)
+        fields:
+            is_main: false
+            is_published: true
+            show_list_rank: 1
+        references:
+            #image: 36
+            media_type: 2
+            media_owner: 15
+            user: 1
+    -
+        #37
+        # "Stalefish" (normal image)
+        fields:
+            is_main: false
+            is_published: true
+            show_list_rank: 3
+        references:
+            #image: 37
+            media_type: 2
+            media_owner: 15
+            user: 1
+    -
+        #38
+        # "Stalefish" (normal image)
+        fields:
+            is_main: true
+            is_published: true
+            show_list_rank: 2
+        references:
+            #image: 38
+            media_type: 2
+            media_owner: 15
+            user: 1
+
+    ###########################################################################################
+
     ## Thumbnail format ##
     -
-        #trick: "Ollie" (thumbnail image)
+        #39
+        # "Ollie" (thumbnail image)
         fields:
             is_main: true
             is_published: true
+            show_list_rank: 1
         references:
-            image: 25
+            #image: 39
             media_type: 1
-            trick: 1
+            media_owner: 1
             user: 1
     -
-        #trick: "Nollie" (thumbnail image)
+        #40
+        # "Nollie" (thumbnail image)
         fields:
             is_main: true
             is_published: true
+            show_list_rank: 1
         references:
-            image: 26
+            #image: 40
             media_type: 1
-            trick: 2
+            media_owner: 2
             user: 2
     -
-        #trick: "One-Two" (thumbnail image)
+        #41
+        # "One-Two" (thumbnail image)
         fields:
             is_main: true
             is_published: true
+            show_list_rank: 1
         references:
-            image: 27
+            #image: 41
             media_type: 1
-            trick: 3
+            media_owner: 3
             user: 1
     -
-        #trick: "Back flip" (thumbnail image)
+        #42
+        # "Back flip" (thumbnail image)
         fields:
             is_main: true
             is_published: true
+            show_list_rank: 1
         references:
-            image: 28
+            #image: 42
             media_type: 1
-            trick: 4
+            media_owner: 4
             user: 2
     -
-        #trick: "Front flip" (thumbnail image)
+        #43
+        # "Front flip" (thumbnail image)
         fields:
             is_main: true
             is_published: true
+            show_list_rank: 1
         references:
-            image: 29
+            #image: 43
             media_type: 1
-            trick: 5
+            media_owner: 5
             user: 1
     -
-        #trick: "Invert" (thumbnail image)
+        #44
+        # "Invert" (thumbnail image)
         fields:
             is_main: true
             is_published: true
+            show_list_rank: 1
         references:
-            image: 30
+            #image: 44
             media_type: 1
-            trick: 6
+            media_owner: 6
             user: 2
     -
-        #trick: "Handplant" (thumbnail image)
+        #45
+        # "Handplant" (thumbnail image)
         fields:
             is_main: true
             is_published: true
+            show_list_rank: 1
         references:
-            image: 31
+            #image: 45
             media_type: 1
-            trick: 7
+            media_owner: 7
             user: 1
     -
-        #trick: "50-50" (thumbnail image)
+        #46
+        # "50-50" (thumbnail image)
         fields:
             is_main: true
             is_published: true
+            show_list_rank: 1
         references:
-            image: 32
+            #image: 46
             media_type: 1
-            trick: 8
+            media_owner: 8
             user: 2
     -
-        #trick: "Boardslide" (thumbnail image)
+        #47
+        # "Boardslide" (thumbnail image)
         fields:
             is_main: true
             is_published: true
+            show_list_rank: 1
         references:
-            image: 33
+            #image: 47
             media_type: 1
-            trick: 9
+            media_owner: 9
             user: 1
     -
-        #trick: "Nose-pick" (thumbnail image)
+        #48
+        # "Nose-pick" (thumbnail image)
         fields:
             is_main: true
             is_published: true
+            show_list_rank: 1
         references:
-            image: 34
+            #image: 48
             media_type: 1
-            trick: 10
+            media_owner: 10
             user: 2
     -
-        #trick: "Board-stall" (thumbnail image)
+        #49
+        # "Board-stall" (thumbnail image)
         fields:
             is_main: true
             is_published: true
+            show_list_rank: 1
         references:
-            image: 35
+            #image: 49
             media_type: 1
-            trick: 11
+            media_owner: 11
             user: 1
     -
-        #trick: "One-footed" (thumbnail image)
+        #50
+        # "One-footed" (thumbnail image)
         fields:
             is_main: true
             is_published: true
+            show_list_rank: 1
         references:
-            image: 36
+            #image: 50
             media_type: 1
-            trick: 12
+            media_owner: 12
             user: 2
+
+    ###########################################################################################
+    # Several medias for 1 media_owner
+    -
+        #51
+        # "McTwist" (thumbnail image)
+        fields:
+            is_main: false
+            is_published: true
+            show_list_rank: 1
+        references:
+            #image: 51
+            media_type: 1
+            media_owner: 13
+            user: 1
+    -
+        #52
+        # "McTwist" (thumbnail image)
+        fields:
+            is_main: true
+            is_published: true
+            show_list_rank: 2
+        references:
+            #image: 52
+            media_type: 1
+            media_owner: 13
+            user: 1
+    -
+        #53
+        # "Tuck Knee" (thumbnail image)
+        fields:
+            is_main: true
+            is_published: true
+            show_list_rank: 1
+        references:
+            #image: 53
+            media_type: 1
+            media_owner: 14
+            user: 2
+    -
+        #54
+        # "Tuck Knee" (thumbnail image)
+        fields:
+            is_main: false
+            is_published: true
+            show_list_rank: 2
+        references:
+            #image: 54
+            media_type: 1
+            media_owner: 14
+            user: 2
+    -
+        #55
+        # "Stalefish" (thumbnail image)
+        fields:
+            is_main: false
+            is_published: true
+            show_list_rank: 1
+        references:
+            #image: 55
+            media_type: 1
+            media_owner: 15
+            user: 1
+    -
+        #56
+        # "Stalefish" (thumbnail image)
+        fields:
+            is_main: false
+            is_published: true
+            show_list_rank: 3
+        references:
+            #image: 56
+            media_type: 1
+            media_owner: 15
+            user: 1
+    -
+        #57
+        # "Stalefish" (thumbnail image)
+        fields:
+            is_main: true
+            is_published: true
+            show_list_rank: 2
+        references:
+            #image: 57
+            media_type: 1
+            media_owner: 15
+            user: 1
+
+    ###########################################################################################
     ### VIDEOS ###
     ## Youtube ##
     -
-        #trick: "Ollie"
+        #58
+        # "Ollie"
         fields:
             is_main: false
             is_published: true
+            show_list_rank: 1
         references:
-            video: 1
+            #video: 1
             media_type: 5
-            trick: 1
+            media_owner: 1
             user: 1
     -
-        #trick: "Nollie"
+        #59
+        # "Nollie"
         fields:
             is_main: false
             is_published: true
+            show_list_rank: 1
         references:
-            video: 2
+            #video: 2
             media_type: 5
-            trick: 2
+            media_owner: 2
             user: 2
     -
-        #trick: "One-Two"
+        #60
+        # "One-Two"
         fields:
             is_main: false
             is_published: true
+            show_list_rank: 1
         references:
-            video: 3
+            #video: 3
             media_type: 5
-            trick: 3
+            media_owner: 3
             user: 1
     -
-        #trick: "Back flip"
+        #61
+        # "Back flip"
         fields:
             is_main: false
             is_published: true
+            show_list_rank: 1
         references:
-            video: 4
+            #video: 4
             media_type: 5
-            trick: 4
+            media_owner: 4
             user: 2
     -
-        #trick: "Front flip"
+        #62
+        # "Front flip"
         fields:
             is_main: false
             is_published: true
+            show_list_rank: 1
         references:
-            video: 5
+            #video: 5
             media_type: 5
-            trick: 5
+            media_owner: 5
             user: 1
     -
-        #trick: "Invert"
+        #63
+        # "Invert"
         fields:
             is_main: false
             is_published: true
+            show_list_rank: 1
         references:
-            video: 6
+            #video: 6
             media_type: 5
-            trick: 6
+            media_owner: 6
             user: 2
     -
-        #trick: "Handplant"
+        #64
+        # "Handplant"
         fields:
             is_main: false
             is_published: true
+            show_list_rank: 1
         references:
-            video: 7
+            #video: 7
             media_type: 5
-            trick: 7
+            media_owner: 7
             user: 1
     -
-        #trick: "50-50"
+        #65
+        # "50-50"
         fields:
             is_main: false
             is_published: true
+            show_list_rank: 1
         references:
-            video: 8
+            #video: 8
             media_type: 5
-            trick: 8
+            media_owner: 8
             user: 2
     -
-        #trick: "Boardslide"
+        #66
+        # "Boardslide"
         fields:
             is_main: false
             is_published: true
+            show_list_rank: 1
         references:
-            video: 9
+            #video: 9
             media_type: 5
-            trick: 9
+            media_owner: 9
             user: 1
     -
-        #trick: "Nose-pick"
+        #67
+        # "Nose-pick"
         fields:
             is_main: false
             is_published: true
+            show_list_rank: 1
         references:
-            video: 10
+            #video: 10
             media_type: 5
-            trick: 10
+            media_owner: 10
             user: 2
     -
-        #trick: "Board-stall"
+        #68
+        # "Board-stall"
         fields:
             is_main: false
             is_published: true
+            show_list_rank: 1
         references:
-            video: 11
+            #video: 11
             media_type: 5
-            trick: 11
+            media_owner: 11
             user: 1
     -
-        #trick: "One-footed"
+        #69
+        # "One-footed"
         fields:
             is_main: false
             is_published: true
+            show_list_rank: 1
         references:
-            video: 12
+            #video: 12
             media_type: 5
-            trick: 12
+            media_owner: 12
             user: 2
     ## Vimeo ##
     -
-        #trick: "Ollie"
+        #70
+        # "Ollie"
         fields:
             is_main: false
             is_published: true
+            show_list_rank: 2
         references:
-            video: 13
+            #video: 16
             media_type: 6
-            trick: 1
+            media_owner: 1
             user: 1
     -
-        #trick: "Nollie"
+        #71
+        # "Nollie"
         fields:
             is_main: false
             is_published: true
+            show_list_rank: 2
         references:
-            video: 14
+            #video: 17
             media_type: 6
-            trick: 2
+            media_owner: 2
             user: 2
     -
-        #trick: "One-Two"
+        #72
+        # "One-Two"
         fields:
             is_main: false
             is_published: true
+            show_list_rank: 2
         references:
-            video: 15
+            #video: 18
             media_type: 6
-            trick: 3
+            media_owner: 3
             user: 1
     -
-        #trick: "Back flip"
+        #73
+        # "Back flip"
         fields:
             is_main: false
             is_published: true
+            show_list_rank: 2
         references:
-            video: 16
+            #video: 19
             media_type: 6
-            trick: 4
+            media_owner: 4
             user: 2
     -
-        #trick: "Front flip"
+        #74
+        # "Front flip"
         fields:
             is_main: false
             is_published: true
+            show_list_rank: 2
         references:
-            video: 17
+            #video: 20
             media_type: 6
-            trick: 5
+            media_owner: 5
             user: 1
     -
-        #trick: "Invert"
+        #75
+        # "Invert"
         fields:
             is_main: false
             is_published: true
+            show_list_rank: 2
         references:
-            video: 18
+            #video: 21
             media_type: 6
-            trick: 6
+            media_owner: 6
             user: 2
     -
-        #trick: "Handplant"
+        #76
+        # "Handplant"
         fields:
             is_main: false
             is_published: true
+            show_list_rank: 2
         references:
-            video: 19
+            #video: 22
             media_type: 6
-            trick: 7
+            media_owner: 7
             user: 1
     -
-        #trick: "50-50"
+        #77
+        # "50-50"
         fields:
             is_main: false
             is_published: true
+            show_list_rank: 2
         references:
-            video: 20
+            #video: 23
             media_type: 6
-            trick: 8
+            media_owner: 8
             user: 2
     -
-        #trick: "Boardslide"
+        #78
+        # "Boardslide"
         fields:
             is_main: false
             is_published: true
+            show_list_rank: 2
         references:
-            video: 21
+            #video: 24
             media_type: 6
-            trick: 9
+            media_owner: 9
             user: 1
     -
-        #trick: "Nose-pick"
+        #79
+        # "Nose-pick"
         fields:
             is_main: false
             is_published: true
+            show_list_rank: 2
         references:
-            video: 22
+            #video: 25
             media_type: 6
-            trick: 10
+            media_owner: 10
             user: 2
     -
-        #trick: "Board-stall"
+        #80
+        # "Board-stall"
         fields:
             is_main: false
             is_published: true
+            show_list_rank: 2
         references:
-            video: 23
+            #video: 26
             media_type: 6
-            trick: 11
+            media_owner: 11
             user: 1
     -
-        #trick: "One-footed"
+        #81
+        # "One-footed"
         fields:
             is_main: false
             is_published: true
+            show_list_rank: 2
         references:
-            video: 24
+            #video: 27
             media_type: 6
-            trick: 12
+            media_owner: 12
             user: 2
     ## Dailymotion ##
     -
-        #trick: "Ollie"
+        #82
+        # "Ollie"
         fields:
             is_main: false
             is_published: true
+            show_list_rank: 3
         references:
-            video: 25
+            #video: 30
             media_type: 7
-            trick: 1
+            media_owner: 1
             user: 1
     -
-        #trick: "Nollie"
+        #83
+        # "Nollie"
         fields:
             is_main: false
             is_published: true
+            show_list_rank: 3
         references:
-            video: 26
+            #video: 31
             media_type: 7
-            trick: 2
+            media_owner: 2
             user: 2
     -
-        #trick: "One-Two"
+        #84
+        # "One-Two"
         fields:
             is_main: false
             is_published: true
+            show_list_rank: 3
         references:
-            video: 27
+            #video: 32
             media_type: 7
-            trick: 3
+            media_owner: 3
             user: 1
     -
-        #trick: "Back flip"
+        #85
+        # "Back flip"
         fields:
             is_main: false
             is_published: true
+            show_list_rank: 3
         references:
-            video: 28
+            #video: 33
             media_type: 7
-            trick: 4
+            media_owner: 4
             user: 2
     -
-        #trick: "Front flip"
+        #86
+        # "Front flip"
         fields:
             is_main: false
             is_published: true
+            show_list_rank: 3
         references:
-            video: 29
+            #video: 34
             media_type: 7
-            trick: 5
+            media_owner: 5
             user: 1
     -
-        #trick: "Invert"
+        #87
+        # "Invert"
         fields:
             is_main: false
             is_published: true
+            show_list_rank: 3
         references:
-            video: 30
+            #video: 35
             media_type: 7
-            trick: 6
+            media_owner: 6
             user: 2
     -
-        #trick: "Handplant"
+        #88
+        # "Handplant"
         fields:
             is_main: false
             is_published: true
+            show_list_rank: 3
         references:
-            video: 31
+            #video: 36
             media_type: 7
-            trick: 7
+            media_owner: 7
             user: 1
     -
-        #trick: "50-50"
+        #89
+        # "50-50"
         fields:
             is_main: false
             is_published: true
+            show_list_rank: 3
         references:
-            video: 32
+            #video: 37
             media_type: 7
-            trick: 8
+            media_owner: 8
             user: 2
     -
-        #trick: "Boardslide"
+        #90
+        # "Boardslide"
         fields:
             is_main: false
             is_published: true
+            show_list_rank: 3
         references:
-            video: 33
+            #video: 38
             media_type: 7
-            trick: 9
+            media_owner: 9
             user: 1
     -
-        #trick: "Nose-pick"
+        #91
+        # "Nose-pick"
         fields:
             is_main: false
             is_published: true
+            show_list_rank: 3
         references:
-            video: 34
+            #video: 39
             media_type: 7
-            trick: 10
+            media_owner: 10
             user: 2
     -
-        #trick: "Board-stall"
+        #92
+        # "Board-stall"
         fields:
             is_main: false
             is_published: true
+            show_list_rank: 3
         references:
-            video: 35
+            #video: 40
             media_type: 7
-            trick: 11
+            media_owner: 11
             user: 1
     -
-        #trick: "One-footed"
+        #93
+        # "One-footed"
         fields:
             is_main: false
             is_published: true
+            show_list_rank: 3
         references:
-            video: 36
+            #video: 41
             media_type: 7
-            trick: 12
+            media_owner: 12
             user: 2
+
+    ###########################################################################################
+    # Several medias for 1 media_owner
+    -
+        #94
+        # "McTwist" Youtube
+        fields:
+            is_main: false
+            is_published: true
+            show_list_rank: 1
+        references:
+            #video: 13
+            media_type: 5
+            media_owner: 13
+            user: 1
+    -
+        #95
+        # "McTwist" Vimeo
+        fields:
+            is_main: false
+            is_published: true
+            show_list_rank: 2
+        references:
+            #video: 28
+            media_type: 6
+            media_owner: 13
+            user: 1
+    -
+        #96
+        # "Tuck Knee" Youtube
+        fields:
+            is_main: false
+            is_published: true
+            show_list_rank: 1
+        references:
+            #video: 14
+            media_type: 5
+            media_owner: 14
+            user: 2
+    -
+        #97
+        # "Tuck Knee" Dailymotion
+        fields:
+            is_main: false
+            is_published: true
+            show_list_rank: 2
+        references:
+            #video: 42
+            media_type: 7
+            media_owner: 14
+            user: 2
+    -
+        #98
+        # "Stalefish" Youtube
+        fields:
+            is_main: false
+            is_published: true
+            show_list_rank: 1
+        references:
+            #video: 15
+            media_type: 5
+            media_owner: 15
+            user: 1
+    -
+        #99
+        # "Stalefish" Vimeo
+        fields:
+            is_main: false
+            is_published: true
+            show_list_rank: 2
+        references:
+            #video: 29
+            media_type: 6
+            media_owner: 15
+            user: 1
+    -
+        #100
+        # "Stalefish" Dailymotion
+        fields:
+            is_main: false
+            is_published: true
+            show_list_rank: 3
+        references:
+            #video: 43
+            media_type: 7
+            media_owner: 15
+            user: 1
+
+    ###########################################################################################
+    ## Avatars
+    -
+        #101
+        #user Miky
+        fields:
+            is_main: false
+            is_published: true
+            show_list_rank: null
+        references:
+            #image: 59
+            media_type: 4
+            media_owner: 16
+            user: 1
+    -
+        #102
+        #user Rooky
+        fields:
+            is_main: false
+            is_published: true
+            show_list_rank: null
+        references:
+            #image: 60
+            media_type: 4
+            media_owner: 17
+            user: 2
+    -
+        #103
+        #user Arny
+        fields:
+            is_main: false
+            is_published: true
+            show_list_rank: null
+        references:
+            #image: 58
+            media_type: 4
+            media_owner: 18
+            user: 3
+
+    ###########################################################################################

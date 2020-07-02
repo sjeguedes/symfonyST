@@ -1,0 +1,20 @@
+# https://symfony.com/doc/current/validation.html#validation-constraints
+# https://symfony.com/doc/current/validation/groups.html
+App\Domain\DTOToEmbed\VideoInfosDTO:
+    properties:
+        url:
+            - NotBlank:
+                message: Please fill in an absolute link.
+
+        description:
+            - NotBlank:
+                message: Please fill in a short description.
+            - Length:
+                max: 255
+                maxMessage: "This description should contain\na maximum of {{ limit }} characters or less."
+
+    constraints:
+        # Custom validator for:
+        # - "url" field: check video URL format (equals "Regex validation constraint"), and existing content with VideoURLProxyChecker service
+        # - "showListRank" field: check coherent sortable order for each video
+        - App\Form\Validator\Constraint\VideoInfosConstraint: ~

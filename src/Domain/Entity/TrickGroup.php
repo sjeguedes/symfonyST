@@ -63,7 +63,7 @@ class TrickGroup
     /**
      * @var Collection (inverse side of entity relation)
      *
-     * @ORM\OneToMany(targetEntity=Trick::class, mappedBy="trickGroup")
+     * @ORM\OneToMany(targetEntity=Trick::class, cascade={"remove"}, orphanRemoval=true, mappedBy="trickGroup")
      */
     private $tricks;
 
@@ -73,8 +73,6 @@ class TrickGroup
      * @param string                  $name
      * @param string                  $description
      * @param \DateTimeInterface|null $creationDate
-     *
-     * @return void
      *
      * @throws \Exception
      */
@@ -88,9 +86,8 @@ class TrickGroup
         $this->name = $name;
         \assert(!empty($description), 'TrickGroup description can not be empty!');
         $this->description = $description;
-        $createdAt = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
-        $this->creationDate = $createdAt;
-        $this->updateDate = $createdAt;
+        $this->creationDate = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
+        $this->updateDate = $this->creationDate;
         $this->tricks = new ArrayCollection();
     }
 
@@ -100,6 +97,8 @@ class TrickGroup
      * @param string $name
      *
      * @return TrickGroup
+     *
+     * @throws \Exception
      */
     public function modifyName(string $name) : self
     {
@@ -116,6 +115,8 @@ class TrickGroup
     * @param string $description
     *
     * @return TrickGroup
+    *
+    * @throws \Exception
     */
     public function modifyDescription(string $description) : self
     {
@@ -132,6 +133,8 @@ class TrickGroup
      * @param \DateTimeInterface $updateDate
      *
      * @return TrickGroup
+     *
+     * @throws \Exception
      */
     public function modifyUpdateDate(\DateTimeInterface $updateDate) : self
     {

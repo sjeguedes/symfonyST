@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *
  * Define User entity schema in database, its initial state and behaviors.
  *
- * Avatar image reference is shared with Image - Media - MediaType entities.
+ * His avatar image reference is defined with Image - Media - MediaType entities.
  *
  * @ORM\Entity(repositoryClass=UserRepository::class)
  * @ORM\Table(name="users")
@@ -30,15 +30,28 @@ class User implements UserInterface, \Serializable
     const DEFAULT_ALGORITHM = 'BCrypt';
 
     /**
+     * Define a user default unauthenticated state.
+     */
+    const UNAUTHENTICATED_STATE = 'ANONYMOUS';
+
+    /**
      * Define a default role for authorization process.
      */
     const DEFAULT_ROLE = 'ROLE_USER';
+
+    /**
+     * Define an admin role for authorization process.
+     */
+    const ADMIN_ROLE = 'ROLE_ADMIN';
 
     /**
      * Define algorithms for password hash.
      */
     const HASH_ALGORITHMS = ['BCrypt', 'Argon2i'];
 
+    /**
+     * Define a label for each type of user.
+     */
     const ROLE_LABELS = [
         'ROLE_USER'  => 'Member',
         'ROLE_ADMIN' => 'Admin',
@@ -96,7 +109,8 @@ class User implements UserInterface, \Serializable
     private $password;
 
     /**
-     * @var string|null a custom salt for password hash (e.g. BCrypt but Symfony does not use custom value for that kind of algorithm!)
+     * @var string|null a custom salt for password hash
+     *                  (e.g. BCrypt but Symfony does not use custom value for that kind of algorithm!)
      */
     private $salt;
 
@@ -127,7 +141,7 @@ class User implements UserInterface, \Serializable
      *
      * @var \DateTimeInterface
      *
-     * @ORM\Column(type="datetime", name="creation_date")
+     * @ORM\Column(type="datetime")
      */
     private $creationDate;
 
@@ -135,7 +149,7 @@ class User implements UserInterface, \Serializable
      *
      * @var \DateTimeInterface
      *
-     * @ORM\Column(type="datetime", name="update_date")
+     * @ORM\Column(type="datetime")
      */
     private $updateDate;
 
@@ -150,29 +164,37 @@ class User implements UserInterface, \Serializable
     /**
      * @var Collection (inverse side of entity relation)
      *
-     * @ORM\OneToMany(targetEntity=Media::class, cascade={"persist"}, mappedBy="user")
+     * @ORM\OneToMany(targetEntity=Media::class, orphanRemoval=true, mappedBy="user")
      */
     private $medias;
 
     /**
+     * @var MediaOwner|null (inverse side of entity relation)
+     *
+     * The media owner can be null when user just created his account!
+     *
+     * @ORM\OneToOne(targetEntity=MediaOwner::class, mappedBy="user", cascade={"persist", "remove"}, orphanRemoval=true)
+     */
+    private $mediaOwner;
+
+    /**
      * @var Collection (inverse side of entity relation)
      *
-     * @ORM\OneToMany(targetEntity=Trick::class, cascade={"persist"}, mappedBy="user")
+     * @ORM\OneToMany(targetEntity=Trick::class, orphanRemoval=true, mappedBy="user")
      */
     private $tricks;
 
     /**
      * User constructor.
      *
-     * @param string $familyName
-     * @param string $firstName
-     * @param string $nickName
-     * @param string $email
-     * @param string $password  an encoded password
-     * @param string $algorithm a hash algorithm type for password
-     * @param array  $roles
-     *
-     * @return void
+     * @param string                  $familyName
+     * @param string                  $firstName
+     * @param string                  $nickName
+     * @param string                  $email
+     * @param string                  $password   an encoded password
+     * @param string                  $algorithm  a hash algorithm type for password
+     * @param array                   $roles
+     * @param \DateTimeInterface|null $creationDate
      *
      * @throws \Exception
      */
@@ -183,7 +205,8 @@ class User implements UserInterface, \Serializable
         string $email,
         string $password,
         string $algorithm = self::DEFAULT_ALGORITHM,
-        array $roles = [self::DEFAULT_ROLE]
+        array $roles = [self::DEFAULT_ROLE],
+        \DateTimeInterface $creationDate = null
     ) {
         \assert(!empty($familyName), 'User family name can not be empty!');
         \assert(!empty($firstName), 'User first name can not be empty!');
@@ -200,9 +223,23 @@ class User implements UserInterface, \Serializable
         $this->roles = $roles;
         $this->salt = null; // can be updated with encoder factory
         $this->isActivated = false;
-        $this->creationDate = new \DateTime();
+        $this->creationDate = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
         $this->updateDate = $this->creationDate;
         $this->medias = new ArrayCollection();
+        $this->tricks = new ArrayCollection();
+    }
+
+    /**
+     * Assign a media owner.
+     *
+     * @param MediaOwner $mediaOwner
+     *
+     * @return $this
+     */
+    public function assignMediaOwner(MediaOwner $mediaOwner) : self
+    {
+        $this->mediaOwner = $mediaOwner;
+        return $this;
     }
 
     /**
@@ -302,7 +339,7 @@ class User implements UserInterface, \Serializable
      *
      * @return User
      *
-     * @throws \InvalidArgumentException
+     * @throws \Exception
      */
     public function modifyFamilyName(string $familyName) : self
     {
@@ -320,7 +357,7 @@ class User implements UserInterface, \Serializable
      *
      * @return User
      *
-     * @throws \InvalidArgumentException
+     * @throws \Exception
      */
     public function modifyFirstName(string $firstName) : self
     {
@@ -338,7 +375,7 @@ class User implements UserInterface, \Serializable
      *
      * @return User
      *
-     * @throws \InvalidArgumentException
+     * @throws \Exception
      */
     public function modifyNickName(string $userName) : self
     {
@@ -356,7 +393,7 @@ class User implements UserInterface, \Serializable
      *
      * @return User
      *
-     * @throws \InvalidArgumentException
+     * @throws \Exception
      */
     public function modifyEmail(string $email) : self
     {
@@ -375,7 +412,7 @@ class User implements UserInterface, \Serializable
      *
      * @return User
      *
-     * @throws \InvalidArgumentException
+     * @throws \Exception
      */
     public function modifyPassword(string $password, string $algorithm) : self
     {
@@ -394,7 +431,7 @@ class User implements UserInterface, \Serializable
      *
      * @return User
      *
-     * @throws \InvalidArgumentException
+     * @throws \Exception
      */
     public function modifyRoles(array $roles) : self
     {
@@ -411,6 +448,8 @@ class User implements UserInterface, \Serializable
      * @param string $salt
      *
      * @return $this
+     *
+     * @throws \Exception
      */
     public function modifySalt(string $salt) : self
     {
@@ -444,7 +483,7 @@ class User implements UserInterface, \Serializable
      *
      * @return User|null
      *
-     * @throws \InvalidArgumentException
+     * @throws \Exception
      */
     public function updateRenewalToken(?string $renewalToken) : self
     {
@@ -462,7 +501,7 @@ class User implements UserInterface, \Serializable
      *
      * @return User
      *
-     * @throws \RuntimeException
+     * @throws \Exception
      */
     public function modifyUpdateDate(\DateTimeInterface $updateDate) : self
     {
@@ -482,7 +521,7 @@ class User implements UserInterface, \Serializable
      *
      * @return User
      *
-     * @throws \RuntimeException
+     * @throws \Exception
      */
     public function updateRenewalRequestDate(?\DateTimeInterface $renewalRequestDate) : self
     {
@@ -655,7 +694,7 @@ class User implements UserInterface, \Serializable
      */
     public function getUsername() : string
     {
-        // nickname equals username in App.
+        // Nickname equals username in App.
         return $this->nickName;
     }
 
@@ -697,6 +736,16 @@ class User implements UserInterface, \Serializable
     public function getRenewalRequestDate() : ?\DateTimeInterface
     {
         return $this->renewalRequestDate;
+    }
+
+    /**
+     * @return MediaOwner|null
+     *
+     * The media owner can be null when no avatar is set (user registration)!
+     */
+    public function getMediaOwner() : ?MediaOwner
+    {
+        return $this->mediaOwner;
     }
 
     /**

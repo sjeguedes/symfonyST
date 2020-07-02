@@ -7,12 +7,16 @@ parameters:
     app_website_name: '%env(WEBSITE_NAME)%'
     app_swift_mailer_sender_email: '%env(MAILER_SENDER_EMAIL)%' # admin email
     app_swift_mailer_sender_name: '%env(MAILER_SENDER_NAME)%' # admin email name
+    # PHP paths retrieved with parameter bag:
     app_images_upload_directory: '%kernel.project_dir%/public/assets/images/uploads'
-    app_avatar_upload_directory: '%app_images_upload_directory%/avatars'
+    app_avatar_image_upload_directory: '%app_images_upload_directory%/avatars'
+    app_trick_image_upload_directory: '%app_images_upload_directory%/tricks'
+    # Twig paths:
     app_twig_assets_directory: 'assets'
     app_twig_image_directory: '%app_twig_assets_directory%/images/'
-    app_twig_image_upload_directory: '%app_twig_image_directory%/uploads'
-    app_twig_avatar_upload_directory: '%app_twig_image_upload_directory%/avatars/'
+    app_twig_image_upload_directory: '%app_twig_image_directory%uploads/'
+    app_twig_avatar_upload_directory: '%app_twig_image_upload_directory%avatars/'
+    app_twig_trick_upload_directory: '%app_twig_image_upload_directory%tricks/'
 
 services:
     # default configuration for services in *this* file
@@ -30,7 +34,7 @@ services:
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/*'
-        exclude: '../src/{DependencyInjection,Domain/Entity,Kernel.php,Service,Tests,Utils/Traits,Utils/Database/Migrations}'
+        exclude: '../src/{DependencyInjection,Domain/Entity,Kernel.php,Service,Tests,Utils/Command,Utils/Traits,Utils/Database/Migrations}'
 
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
@@ -43,6 +47,18 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    # add form handler when creating a new trick
+    App\Action\Admin\CreateTrickAction:
+        tags: ['controller.service_arguments']
+        arguments:
+            $formHandlers: ['@App\Form\Handler\CreateTrickHandler', '@App\Form\Handler\AjaxDeleteImageHandler']
+
+    # add form handler when deleting a particular image
+    App\Action\Admin\AjaxDeleteImageAction:
+        tags: ['controller.service_arguments']
+        arguments:
+            $formHandler: '@App\Form\Handler\AjaxDeleteImageHandler'
 
     # add form handler when calling login
     App\Action\Admin\LoginAction:
@@ -83,28 +99,35 @@ services:
     # add logout handler
     App\Event\Handler\LogoutHandler:
 
-    # add request new password handler
-    App\Form\Handler\RequestNewPasswordHandler:
-        arguments:
-            $emailConfigFactory: '@App\Service\Mailer\Email\EmailConfigFactory'
+    # add trick creation handler
+    App\Form\Handler\CreateTrickHandler:
+
+    # add image deletion handler
+    App\Form\Handler\AjaxDeleteImageHandler:
 
     # add renew password handler
     App\Form\Handler\RenewPasswordHandler:
         arguments:
             $emailConfigFactory: '@App\Service\Mailer\Email\EmailConfigFactory'
 
+    # add request new password handler
+    App\Form\Handler\RequestNewPasswordHandler:
+        arguments:
+            $emailConfigFactory: '@App\Service\Mailer\Email\EmailConfigFactory'
+
     # add update profile avatar handler
     App\Form\Handler\UpdateProfileAvatarHandler:
-        arguments:
-            $imageUploader: '@App\Service\Medias\Upload\ImageUploader'
 
     # add update profile infos handler
     App\Form\Handler\UpdateProfileInfosHandler:
-        arguments:
-            $imageUploader: '@App\Service\Medias\Upload\ImageUploader'
 
     # add custom DTO mapper
     App\Form\DataMapper\DTOMapper:
+
+    # add (trick) image to crop creation type
+    App\Form\TypeToEmbed\ImageToCropType:
+        arguments:
+            $dataMapper: '@App\Form\DataMapper\DTOMapper'
 
     # add user update profile avatar type
     App\Form\Type\Admin\UpdateProfileAvatarType:
@@ -115,6 +138,9 @@ services:
     App\Form\Type\Admin\UpdateProfileInfosType:
         arguments:
             $formSubscriber: '@App\Event\Subscriber\FormSubscriber'
+
+    # add custom constraint validator as concerns ImageToCropDTO class
+    App\Form\Validator\ImageToCropConstraintValidator:
 
     # add SwiftMailer manager
     App\Service\Mailer\SwiftMailerManager:
@@ -135,20 +161,43 @@ services:
     # add login form guard authenticator
     App\Service\Security\LoginFormAuthenticationManager:
 
-    # add template engine renderer default service when calling interface: Twig
+    # add Trick voter
+    App\Service\Security\Voter\TrickVoter:
+        tags: ['security.voter']
+
+    # add Twig template engine renderer default service when calling interface:
     App\Service\Templating\TwigTemplateRenderer: ~
     App\Service\Templating\TemplateRendererInterface: '@App\Service\Templating\TwigTemplateRenderer'
     App\Service\Templating\TemplateBlockRendererInterface: '@App\Service\Templating\TwigTemplateRenderer'
 
-    # custom Twig extensions
+    App\Utils\Command\DeleteUnusedImageCommand:
+        public: false
+        tags: ['console.command']
+
+    # add "preg_replace" function
+    App\Utils\Templating\StringReplaceTwigExtension:
+        public: false
+        tags: ['twig.extension']
+
     # add "uuid_encode" filter
     App\Utils\Templating\UuidTwigExtension:
+        public: false
+        tags: ['twig.extension']
 
     # add ResultSetMappingBuilder as a service for native queries
     Doctrine\ORM\Query\ResultSetMappingBuilder:
 
     # add PSR3 logger as default logger for actions (controllers)
     Symfony\Component\HttpKernel\Log\Logger:
+        arguments: ['critical','%kernel.project_dir%/var/log/dev.log']
 
     # add options resolver
     Symfony\Component\OptionsResolver\OptionsResolver:
+
+    # Activate StringLoader Twig extension
+    # enable the use of template_string() function
+    # https://stackoverflow.com/questions/19478219/activate-stringloader-twig-extension-in-symfony
+    # https://twig.symfony.com/doc/2.x/functions/template_from_string.html
+    Twig\Extension\StringLoaderExtension:
+        public: false
+        tags: ['twig.extension']

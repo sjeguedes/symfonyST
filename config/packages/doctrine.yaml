@@ -7,26 +7,39 @@ parameters:
 
 doctrine:
     dbal:
-        # configure these for your database server
-        driver: 'pdo_mysql'
-        #server_version: '5.7'
-        # https://marenkay.com/2018/06/12/symfony-doctrine-mariadb/
-        # https://stackoverflow.com/questions/23786359/laravel-migration-unique-key-is-too-long-even-if-specified/39750202#39750202
-        server_version: '10.2.21-MariaDB'
-        charset: utf8mb4
-        default_table_options:
-            charset: utf8mb4
-            collate: utf8mb4_unicode_ci
-
-        url: '%env(resolve:DATABASE_URL)%'
+        default_connection: default
+        connections:
+            default:
+                url: '%env(resolve:DATABASE_URL)%'
+                # configure these for your database server
+                driver: 'pdo_mysql'
+                #server_version: '5.7'
+                # https://marenkay.com/2018/06/12/symfony-doctrine-mariadb/
+                # https://stackoverflow.com/questions/23786359/laravel-migration-unique-key-is-too-long-even-if-specified/39750202#39750202
+                server_version: '10.2.21-MariaDB'
+                charset: utf8mb4
+                default_table_options:
+                    charset: utf8mb4
+                    collate: utf8mb4_unicode_ci
     orm:
         auto_generate_proxy_classes: '%kernel.debug%'
-        naming_strategy: doctrine.orm.naming_strategy.underscore
-        auto_mapping: true
-        mappings:
-            App:
-                is_bundle: false
-                type: annotation
-                dir: '%kernel.project_dir%/src/Domain/Entity'
-                prefix: 'App\Domain\Entity'
-                alias: App
+        default_entity_manager: default
+        entity_managers:
+            default:
+                naming_strategy: doctrine.orm.naming_strategy.underscore
+                quote_strategy: doctrine.orm.quote_strategy.ansi
+                auto_mapping: true
+                mappings:
+                    App:
+                        is_bundle: false
+                        type: annotation
+                        dir: '%kernel.project_dir%/src/Domain/Entity'
+                        prefix: 'App\Domain\Entity'
+                        alias: App
+                # https://www.doctrine-project.org/projects/doctrine-bundle/en/latest/configuration.html
+                dql:
+                    # declare custom string functions to parse in dql
+                    string_functions:
+                        # IMPORTANT! Array key "FIELD" must exactly be declared as it is used in query (can be a custom function name like "my_string_function")!
+                        # FIELD() MySQL function
+                        FIELD: App\Utils\Database\DoctrineExtensions\Query\MySQL\FieldStringFunction

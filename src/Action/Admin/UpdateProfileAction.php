@@ -6,6 +6,7 @@ namespace App\Action\Admin;
 
 use App\Domain\Entity\User;
 use App\Domain\ServiceLayer\ImageManager;
+use App\Domain\ServiceLayer\MediaManager;
 use App\Domain\ServiceLayer\UserManager;
 use App\Form\Handler\FormHandlerInterface;
 use App\Form\Type\Admin\UpdateProfileAvatarType;
@@ -35,6 +36,11 @@ class UpdateProfileAction
     private $imageService;
 
     /**
+     * @var MediaManager
+     */
+    private $mediaService;
+
+    /**
      * @var UserManager $userService
      */
     private $userService;
@@ -58,6 +64,7 @@ class UpdateProfileAction
      * UpdateProfileAction constructor.
      *
      * @param ImageManager                 $imageService
+     * @param MediaManager                 $mediaService
      * @param UserManager                  $userService
      * @param array|FormHandlerInterface[] $formHandlers
      * @param RouterInterface              $router
@@ -65,12 +72,14 @@ class UpdateProfileAction
      */
     public function __construct(
         ImageManager $imageService,
+        MediaManager $mediaService,
         UserManager $userService,
         array $formHandlers,
         RouterInterface $router,
         Security $security
     ) {
         $this->imageService = $imageService;
+        $this->mediaService = $mediaService;
         $this->userService = $userService;
         $this->formHandlers = $formHandlers;
         $this->setRouter($router);
@@ -80,7 +89,12 @@ class UpdateProfileAction
     /**
      *  Show profile update forms (user avatar, account) and validation errors.
      *
-     * @Route("/{_locale}/{mainRoleLabel}/update-profile", name="update_profile", requirements={"mainRoleLabel":"admin|member"})
+     * Please not this action is used for both non AJAX/AJAX mode!
+     * If this action is a simple AJAX request, this url is always the same even if language changed: "locale" parameter can be null.
+     *
+     * @Route({
+     *     "en": "/{_locale?<en>}/{mainRoleLabel<admin|member>}/update-profile"
+     * }, name="update_profile", methods={"GET", "POST"})
      *
      * @param RedirectionResponder   $redirectionResponder
      * @param UpdateProfileResponder $responder
@@ -104,13 +118,16 @@ class UpdateProfileAction
             $actionData = ['userService' => $this->userService, 'userToUpdate' => $identifiedUser];
             // Manage the forms
             switch ($submittedRequest = $request->request) {
+                // Update profile avatar image
                 case $submittedRequest->has($updateProfileAvatarForm->getName()): // 'update_profile_avatar'
                     $actionData['imageService'] = $this->imageService;
+                    $actionData['mediaService'] = $this->mediaService;
                     // Constraints and custom validation: call actions to perform if necessary on success
                     $isFormRequestValid = $this->formHandlers[0]->processFormRequest($actionData);
                     // Adapt the response depending on ajax mode de/activation
                     $response = $this->getAvatarUploadResponse($isFormRequestValid, $redirectionResponder, $request);
                     break;
+                // Update other profile infos
                 case $submittedRequest->has($updateProfileInfosForm->getName()): // 'update_profile_infos'
                     // Constraints and custom validation: call actions to perform if necessary on success
                     $isFormRequestValid =$this->formHandlers[1]->processFormRequest($actionData);
@@ -153,7 +170,7 @@ class UpdateProfileAction
             if ($isFormRequestValid) {
                 $redirectionURL = $this->generateURLFromRoute($routeName, $routeParameters);
                 $response = new JsonResponse(['redirectionURL' => $redirectionURL]);
-                // Return a JSON response to show an invalid form or a custom check error notification
+            // Return a JSON response to show an invalid form or a custom check error notification
             } else {
                 $avatarUploadError = $this->formHandlers[0]->getUserAvatarError();
                 $response = new JsonResponse($avatarUploadError);

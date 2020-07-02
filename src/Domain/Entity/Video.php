@@ -5,8 +5,6 @@ declare(strict_types = 1);
 namespace App\Domain\Entity;
 
 use App\Domain\Repository\VideoRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
@@ -29,12 +27,12 @@ class Video
      * @ORM\Id()
      * @ORM\Column(type="uuid_binary", unique=true)
      */
-    private $uuid;
+    protected $uuid;
 
     /**
      * @var string
      *
-     * @ORM\Column(type="string", unique=true)
+     * @ORM\Column(type="string")
      */
     private $url;
 
@@ -60,11 +58,11 @@ class Video
     private $updateDate;
 
     /**
-     * @var Collection (inverse side of entity relation)
+     * @var MediaSource (inverse side of relation)
      *
-     * @ORM\OneToMany(targetEntity=Media::class, cascade={"persist", "remove"}, orphanRemoval=true, mappedBy="video")
+     * @ORM\OneToOne(targetEntity=MediaSource::class, mappedBy="video", cascade={"persist", "remove"}, orphanRemoval=true)
      */
-    private $medias;
+    private $mediaSource;
 
     /**
      * Image constructor.
@@ -73,8 +71,6 @@ class Video
      * @param string                  $description
      * @param \DateTimeInterface|null $creationDate
      *
-     * @return void
-     *
      * @throws \Exception
      */
     public function __construct(
@@ -82,15 +78,26 @@ class Video
         string $description,
         \DateTimeInterface $creationDate = null
     ) {
-        $this->uuid = Uuid::uuid4();
         \assert(!empty($url), 'Video URL can not be empty!');
-        $this->url = $url;
         \assert(!empty($description), 'Video description can not be empty!');
+        $this->uuid = Uuid::uuid4();
+        $this->url = $url;
         $this->description = $description;
-        $createdAt = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
-        $this->creationDate = $createdAt;
-        $this->updateDate = $createdAt;
-        $this->medias = new ArrayCollection();
+        $this->creationDate = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
+        $this->updateDate = $this->creationDate;
+    }
+
+    /**
+     * Assign a media source.
+     *
+     * @param MediaSource $mediaSource
+     *
+     * @return $this
+     */
+    public function assignMediaSource(MediaSource $mediaSource) : self
+    {
+        $this->mediaSource = $mediaSource;
+        return $this;
     }
 
     /**
@@ -99,6 +106,8 @@ class Video
     * @param string $url
     *
     * @return Video
+    *
+    * @throws \Exception
     */
     public function modifyUrl(string $url) : self
     {
@@ -115,6 +124,8 @@ class Video
      * @param string $description
      *
      * @return Video
+     *
+     * @throws \Exception
      */
     public function modifyDescription(string $description) : self
     {
@@ -131,6 +142,8 @@ class Video
      * @param \DateTimeInterface $updateDate
      *
      * @return Video
+     *
+     * @throws \Exception
      */
     public function modifyUpdateDate(\DateTimeInterface $updateDate) : self
     {
@@ -138,37 +151,6 @@ class Video
             throw new \RuntimeException('Update date is not logical: Video can not be created after modified update date!');
         }
         $this->updateDate = $updateDate;
-        return $this;
-    }
-
-    /**
-     * Add Media entity to collection.
-     *
-     * @param Media $media
-     *
-     * @return Video
-     */
-    public function addMedia(Media $media) : self
-    {
-        if (!$this->medias->contains($media)) {
-            $this->medias->add($media);
-            $media->modifyImage($this);
-        }
-        return $this;
-    }
-
-    /**
-     * Remove Media entity from collection.
-     *
-     * @param Media $media
-     *
-     * @return Video
-     */
-    public function removeMedia(Media $media) : self
-    {
-        if ($this->medias->contains($media)) {
-            $this->medias->removeElement($media);
-        }
         return $this;
     }
 
@@ -213,10 +195,10 @@ class Video
     }
 
     /**
-     * @return Collection|Media[]
+     * @return MediaSource|null
      */
-    public function getMedias() : Collection
+    public function getMediaSource() : ?MediaSource
     {
-        return $this->medias;
+        return $this->mediaSource;
     }
 }

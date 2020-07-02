@@ -40,10 +40,11 @@ class AjaxTrickListAction
     }
 
     /**
-     * Load tricks from ajax request.
+     * Load tricks from AJAX request.
      *
-     * @Route("/{_locale}/home-load-tricks/{offset}/{limit}", name="home_load_tricks_offset_limit", requirements={"offset":"\d+", "limit":"\d+"})
-     * @Route("/{_locale}/home-load-tricks/{offset}", name="home_load_tricks_offset_only", defaults={"offset"=null}, requirements={"offset"="\d+"})
+     * Please not url is always the same even if language changed. This is a simple AJAX request and locale parameter is null.
+     *
+     * @Route("/home-load-tricks/{offset?<\d+>}/{limit?<\d+>?}", name="home_load_tricks_offset_limit")
      *
      * @param AjaxTrickListResponder $responder
      * @param Request                $request
@@ -60,9 +61,13 @@ class AjaxTrickListAction
         // Total count has changed during trick list ajax loading!
         if ($this->trickService->isCountAllOutdated($trickCount)) {
             $this->trickService->storeInSession('trickCount', $trickCount);
-            $parameters = $this->trickService->getDefaultTrickList();
+            $parameters = $this->trickService->getTrickListParameters();
             $this->logger->error("[trace app snowTricks] AjaxTrickListAction/__invoke => trickCount: $trickCount");
-            $listError = 'Trick list was reinitialized!<br>Wrong total count is used<br>due to outdated or unexpected value.';
+            $listError = nl2br(
+                'Trick list was reinitialized!' . "\n" .
+                'Wrong total count is used' . "\n" .
+                'due to outdated or unexpected value.'
+            );
         } else {
             // Filter request attributes (offset, limit, ...)
             $attributes = $this->trickService->filterListRequestAttributes($request);
@@ -71,14 +76,14 @@ class AjaxTrickListAction
             // Check values which are not allowed!
             if (($parameters['error'])) {
                 $this->logger->error("[trace app snowTricks] AjaxTrickListAction/__invoke => parameters: " . serialize($parameters));
-                $listError = 'Trick list was reinitialized!<br>Wrong parameters are used.';
+                $listError = nl2br('Trick list was reinitialized!' . "\n" . 'Wrong parameters are used.');
             }
         }
         $data = [
             'ajaxMode'         => true,
             'listError'        => $listError ?? null,
             'trickCount'       => $trickCount,
-            'trickLoadingMode' => $this->trickService->getListDefaultParameters()['loadingMode'],
+            'trickLoadingMode' => $this->trickService->getTrickListConfigParameters()['loadingMode'],
             'tricks'           => $this->trickService->getFilteredList($parameters['offset'], $parameters['limit'])
         ];
         return $responder($data);

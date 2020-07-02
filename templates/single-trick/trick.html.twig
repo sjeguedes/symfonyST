@@ -3,54 +3,49 @@
 {% block title %}SnowTricks - {{ trick.name }} Trick detail{% endblock %}
 
 {# Initialize needed variables #}
-{% set mainImage = asset(globalImageDirectory~'/snowboard-6.jpg') %}
+{% set mainImage = asset(globalImageDirectory~'trick-default-image-880x495.png') %}
 {% set isMainAvailable = 0 %}
-{% set mainImageDesc = 'No description available' %}
-{% set trickImages = '' %}
-{% set trickVideos = '' %}
+{% set mainImageDesc = 'No description is available.' %}
 {% set mediaToExpandDimensions = '' %}
-{# Loop only once for trick medias using variables! #}
-{% for media in trick.medias %}
+{# Loop on trick medias using variables to get main image only ! #}
+{% set break = false %}
+{% for media in trick.mediaOwner.medias if not break %}
     {# Media must be published to be shown. #}
     {% if media.isPublished == 1 %}
         {# Extract main image to show #}
         {% if media.isMain == 1 and media.mediaType.type == mediaTypesValues['trickNormal'] %}
-            {% set mainImage = asset(globalImageDirectory~'/uploads/'~media.image.name~'.'~media.image.format) %}
+            {% set mainImage = asset(globalTrickUploadDirectory~media.mediasource.image.name~'.'~media.mediasource.image.format) %}
             {% set isMainAvailable = 1 %}
-            {% set mainImageDesc = media.image.description %}
-        {# Prepare medias with concatenation #}
-        {% elseif media.mediaType.type == mediaTypesValues['trickThumbnail'] %}
-            {# Image to show in slide #}
-            {% set mediaForSlide = media.image.name~'.'~media.image.format %}
-            {% set mediaToExpandDimensions = normalImageMediaType.width~'x'~normalImageMediaType.height %}
-            {# Image to show in modal: switch to normal image dimensions #}
-            {% set mediaToExpand = preg_replace('/\\d{3,4}x\\d{3,4}/', mediaToExpandDimensions, mediaForSlide) %}
-            {% set trickImages = trickImages~'<li>'~include('single-trick/media_card.html.twig', {'mediaForSlide': mediaForSlide, 'mediaToExpand': mediaToExpand, 'custom': {'icon': 'image', 'title': 'Look at this image with expanded mode.'}, 'index': loop.index })~'</li>' %}
-        {% elseif media.mediaType.type matches '/'~mediaTypesValues['trickYoutube']~'|'~mediaTypesValues['trickVimeo']~'|'~mediaTypesValues['trickDailymotion']~'/' %}
-            {# Video to show both in slide and modal #}
-            {% set mediaForSlide = media.video.url %}
-            {% set trickVideos = trickVideos~'<li>'~include('single-trick/media_card.html.twig', {'mediaForSlide': mediaForSlide, 'mediaToExpand': mediaForSlide, 'custom': {'icon': 'video-camera', 'title': 'Watch this video with expanded mode.'}, 'index': loop.index })~'</li>' %}
+            {% set mainImageDesc = media.mediasource.image.description %}
+            {% set break = true %}
         {% endif %}
     {% endif %}
 {% endfor %}
 
 {% block header %}
     {% include 'all/image_header_loader.html.twig' with {'spinnerRatio': '2.5'} %}
-    <div class="uk-position-relative uk-background-cover uk-background-blend-darken uk-invisible st-background-image-header" data-src="{{ asset(globalImageDirectory~'/snowboard-6.jpg') }}" style="background-position: 50% 50%; height: 600px" uk-img>
+    <div class="uk-position-relative uk-background-cover uk-background-blend-darken uk-invisible st-background-image-header" data-src="{{ asset(globalImageDirectory~'snowboard-6.jpg') }}" style="background-position: 50% 50%; height: 600px" uk-img>
         <div class="uk-padding">
-            <div class="uk-position-center uk-card uk-card-default uk-card-body uk-box-shadow-large uk-padding-small st-overlay-main-image-header-container">
+            <div class="uk-position-center uk-card uk-card-default uk-card-body uk-box-shadow-large uk-padding-remove st-overlay-main-image-header-container st-background-black">
                 {% include 'all/image_header_loader.html.twig' with {'spinnerRatio': '2.5'} %}
-                <div class="uk-background-cover uk-background-blend-darken st-background-image-header" data-src="{{ mainImage }}" style="background-position: 50% 50%; display: table-cell; width: 100%; height: 100%" uk-img>
+                <div class="uk-background-blend-darken st-background-image-header st-border-white-small" data-src="{{ mainImage }}" style="background-position: 50% 50%; display: table-cell; width: 100%; height: 100%" uk-img>
                     <div class="uk-position-center uk-text-center">
                         <p class="st-color-white st-text-shadow-dark uk-text-large">
                             {{ trick.name }}
                         </p>
-                        <p class="st-color-white st-text-shadow-dark uk-text-medium uk-visible@m">
+                        <p class="uk-text-medium uk-visible@m st-color-white st-text-shadow-dark">
                             Snowboard trick referenced in {{ trick.trickGroup.name }}
                         </p>
+                        {# Unpublished trick indicator #}
+                        {% if trick.isPublished == 0 and is_granted('AUTHOR_OR_ADMIN_CAN_VIEW_UNPUBLISHED_TRICKS', trick) %}
+                        <p class="uk-padding-small uk-text-small uk-text-bold uk-text-uppercase st-background-red st-color-white">
+                            <span uk-icon="icon: warning; ratio: 1.5"></span> This trick is unpublished! <br class="uk-hidden@m">It is Waiting for moderation.
+                        </p>
+                        {% endif %}
+                        {# This can be a technical issue! Normally one image is saved as main! #}
                         {% if isMainAvailable == 0 %}
-                        <p class="uk-text-small uk-text-bold uk-text-uppercase st-background-white st-color-red">
-                            Main image for this trick is unavailable!
+                        <p class="uk-padding-small uk-text-small uk-text-bold uk-text-uppercase st-background-red st-color-white">
+                            <span uk-icon="icon: warning; ratio: 1.5"></span> Main image for this trick is unavailable!
                         </p>
                         {% endif %}
                     </div>
@@ -83,37 +78,111 @@
         </div>
         <!-- Trick medias slider (invisible by default on mobile: look at button above!) -->
         <div id="st-single-slider-container" class="uk-visible@s uk-position-relative uk-margin-medium-bottom st-single-slider-container" uk-slider="autoplay: true; autoplay-interval: 6000; pause-on-hover: true">
-                <div id="st-single-slider" class="uk-slider-container uk-position-relative st-card-container" data-current-path="{{ path(app.request.attributes.get('_route'),
-                    app.request.attributes.get('_route_params')) }}" data-video-proxy="{{ videoURLProxyPath }}" data-media-error="{{ mediaError|e('html_attr') }}">
-                    <ul class="uk-slider-items uk-child-width-1-1 uk-child-width-1-2@s uk-child-width-1-3@m uk-child-width-1-4@l uk-child-width-1-5@xl uk-grid uk-grid-small">
-                        {{ trickImages|raw }}
-                        {{ trickVideos|raw }}
-                    </ul>
-                </div>
-                <a class="uk-position-center-left uk-slidenav-large" href="#" uk-slidenav-previous uk-slider-item="previous"></a>
-                <a class="uk-position-center-right uk-slidenav-large" href="#" uk-slidenav-next uk-slider-item="next"></a>
+            {# Create a slider only if it is necessary #}
+            {% if trick.mediaOwner.medias|length != 0 %}
+            <div id="st-single-slider" class="uk-slider-container uk-position-relative st-card-container" data-current-path="{{ path(app.request.attributes.get('_route'),
+                    app.request.attributes.get('_route_params'))|e('html_attr') }}" data-video-proxy="{{ videoURLProxyPath|e('html_attr') }}" data-media-error="{{ mediaError|e('html_attr') }}">
+                {# ---------------------------------------------------------------------------- #}
+                {# Create slider items grid dynamic centering based on a maximum of 5 items #}
+                {% set mediaQueryLabels = ['@s', '@m', '@l', '@xl'] %}
+                {% set itemCounter = 0 %}
+                {% set sliderDynamicCenterClass = '' %}
+                {% for media in trick.mediaOwner.medias %}
+                    {% if (media.mediaType.type == mediaTypesValues['trickThumbnail']) or
+                          (media.mediaType.type matches '/'~mediaTypesValues['trickYoutube']~'|'~mediaTypesValues['trickVimeo']~'|'~mediaTypesValues['trickDailymotion']~'/') %}
+                        {% set itemCounter = itemCounter + 1 %}
+                    {% endif %}
+                {% endfor %}
+                {# Slide length number is between 1 and 5 included! #}
+                {% if itemCounter < 6 %}
+                    {% set sliderDynamicCenterClass = (itemCounter == 1) ? 'uk-flex-center'~mediaQueryLabels[0]~' ' : 'uk-flex-center'~mediaQueryLabels[itemCounter - 1]~' ' %}
+                {# If slide length number is greater than 5, do nothing! #}
+                {% endif %}
+                {# ---------------------------------------------------------------------------- #}
+                <ul class="{{ sliderDynamicCenterClass }}uk-slider-items uk-child-width-1-1 uk-child-width-1-2@s uk-child-width-1-3@m uk-child-width-1-4@l uk-child-width-1-5@xl uk-grid uk-grid-small">
+                {# ---------------------------------------------------------------------------- #}
+                {# Loop on trick medias to feed the slider #}
+                {% for media in trick.mediaOwner.medias %}
+                    {# ---------------------------------------------------------------------------- #}
+                    {# List trick medias images #}
+                    {% if media.mediaType.type == mediaTypesValues['trickThumbnail'] %}
+                    {# Image to show in slide #}
+                    {% set mediaForSlide = media.mediasource.image.name~'.'~media.mediasource.image.format %}
+                    {% set mediaToExpandDimensions = normalImageMediaType.width~'x'~normalImageMediaType.height %}
+                    {# Image to show in modal: switch to normal image dimensions #}
+                    {% set mediaToExpand = preg_replace('/\\d{3,4}x\\d{3,4}/', mediaToExpandDimensions, mediaForSlide) %}
+                    {% set showListRank = media.showListRank %}
+                    <li id="st-single-trick-image-slide-{{ showListRank }}">
+                        {# html attribute escaping is used inside when necessary! #}
+                        {% include 'single-trick/media_card.html.twig' with {
+                            'trick': trick,
+                            'mediaTypesValues': mediaTypesValues,
+                            'mediaType': media.mediaType,
+                            'mediaCreationDate': media.mediasource.image.creationDate,
+                            'mediaDescription': media.mediasource.image.description,
+                            'mediaRank': media.showListRank,
+                            'mediaForSlide': mediaForSlide,
+                            'mediaToExpand': mediaToExpand,
+                            'normalImageMediaType': normalImageMediaType,
+                            'custom': {'icon': 'image', 'title': 'Look at this image with expanded mode.'},
+                            'index': loop.index
+                        } only %}
+                    </li>
+                    {% endif %}
+                    {# ---------------------------------------------------------------------------- #}
+                    {# List trick medias videos #}
+                    {% if media.mediaType.type matches '/'~mediaTypesValues['trickYoutube']~'|'~mediaTypesValues['trickVimeo']~'|'~mediaTypesValues['trickDailymotion']~'/' %}
+                    {# Video to show both in slide and modal #}
+                    {% set mediaForSlide = media.mediaSource.video.url %}
+                    {% set showListRank = media.showListRank %}
+                    <li id="st-single-trick-video-slide-{{ showListRank }}">
+                        {# html attribute escaping is used inside when necessary! #}
+                        {% include 'single-trick/media_card.html.twig' with {
+                            'trick': trick,
+                            'mediaTypesValues': mediaTypesValues,
+                            'mediaType': media.mediaType,
+                            'mediaTypesValues': mediaTypesValues,
+                            'mediaCreationDate': media.mediaSource.video.creationDate,
+                            'mediaDescription': media.mediaSource.video.description,
+                            'mediaRank': media.showListRank,
+                            'mediaForSlide': mediaForSlide,
+                            'mediaToExpand': mediaForSlide,
+                            'custom': {'icon': 'video-camera', 'title': 'Watch this video with expanded mode.'},
+                            'index': loop.index
+                        } only %}
+                    </li>
+                    {% endif %}
+                    {# ---------------------------------------------------------------------------- #}
+                {% endfor %}
+                </ul>
+            </div>
+            <a class="uk-position-center-left uk-slidenav-large" href="#" uk-slidenav-previous uk-slider-item="previous"></a>
+            <a class="uk-position-center-right uk-slidenav-large" href="#" uk-slidenav-next uk-slider-item="next"></a>
+            {% endif %}
         </div>
         <!-- End trick medias slider -->
         <div class="uk-container uk-section uk-section-muted uk-padding-remove">
             <p class="uk-padding-small uk-margin-remove uk-margin-bottom">
-                <span class="uk-display-block uk-text-center">
+                <span class="uk-display-block uk-text-center" uk-margin>
                     <!-- Description -->
                     <span class="uk-label uk-border-circle uk-padding-small uk-text-small uk-text-bold st-background-yellow st-color-blue">Trick description</span>
-                    <span class="uk-display-block uk-padding-small uk-text-left">{{ trick.description }}</span>
+                    <span class="uk-display-block uk-padding-small uk-text-left">{{ trick.description|nl2br }}</span>
                     <!-- Secondary information -->
                     <span class="uk-badge uk-padding-small uk-text-bold"><em class="st-color-yellow">In</em>&nbsp;{{ trick.trickGroup.name }}&nbsp;<em class="st-color-yellow">group</em></span>
                     <span class="uk-badge uk-padding-small uk-text-bold"><em class="st-color-yellow">Created on</em>&nbsp;{{ trick.creationDate|date('d/m/Y') }}</span>
-                    {% if trick.creationDate|date('d/m/Y') != trick.updateDate|date('d/m/Y') %}<span class="uk-badge uk-padding-small uk-text-bold"><em class="st-color-yellow">Update on</em>&nbsp;{{ trick.updateDate|date('d/m/Y') }}</em></span>{% endif %}
+                    {% if trick.creationDate|date('d/m/Y') != trick.updateDate|date('d/m/Y') %}
+                    <span class="uk-badge uk-padding-small uk-text-bold"><em class="st-color-yellow">Update on</em>&nbsp;{{ trick.updateDate|date('d/m/Y') }}</em></span>
+                    {% endif %}
                 </span>
             </p>
         </div>
         <hr class="uk-margin-medium-top uk-margin-medium-bottom">
         <div class="uk-container uk-margin-large-top">
             <h1 class="uk-heading-bullet uk-text-large uk-text-center uk-text-uppercase uk-text-bold">
-                Follow comments about this trick from members.
+                Follow comments from members about this trick.
             </h1>
             <p class="uk-text-center uk-text-uppercase uk-text-bold st-color-red">
-            {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+            {% if is_granted('ROLE_USER') %}
                 Use the form below to create a new comment.
                 {# TODO: here, create and include comment form template #}
             {% else %}
@@ -131,9 +200,9 @@
                         <div class="uk-grid-divider" uk-grid>
                             <div class="uk-width-1-3@m">
                                 <div class="uk-grid-small uk-flex-middle" uk-grid>
-                                    <div class="uk-width-auto st-avatar-default">
-                                        <div class="uk-comment-avatar uk-display-block svg-container uk-border-circle">
-                                            <object class="svg-content" type="image/svg+xml" width="100%" height="100%" data="{{ asset(globalImageDirectory~'/avatar-default.svg') }}"></object>
+                                    <div class="uk-width-auto">
+                                        <div class="uk-comment-avatar">
+                                            <img class="uk-border-circle st-avatar-default st-border-white-small" width="80" height="80" src="{{ asset(globalImageDirectory~'profile-default-avatar.png') }}" alt="Author name" >
                                         </div>
                                     </div>
                                     <div class="uk-width-expand">
@@ -147,9 +216,9 @@
                                     <p class="uk-margin-top-remove uk-margin-large-right st-color-blue">
                                         Message text is here.
                                     </p>
-                                    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                                    {% if is_granted('ROLE_USER') %}
                                     <div class="uk-position-top-right uk-hidden-hover">
-                                        <a class="uk-link-text uk-icon-link" uk-icon="comments" href="{#{{ path('reply_to_comment', { 'encodedUuid': comment.uuid|uuid_encode }) }}#}#" title="Reply to this particular comment">Reply</a>
+                                        <a class="uk-link-text uk-icon-link" href="{#{{ path('reply_to_comment', { 'encodedUuid': comment.uuid|uuid_encode }) }}#}#" title="Reply to this particular comment">Reply <span uk-icon="comments" ></span></a>
                                     </div>
                                     {% endif %}
                                 </div>

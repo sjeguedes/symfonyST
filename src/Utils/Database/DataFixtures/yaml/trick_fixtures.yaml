@@ -6,6 +6,7 @@ tricks:
             description: "A trick in which the snowboarder springs off the tail of the board and into the air."
             slug: "ollie"
         references:
+            #media_owner: 1
             trick_group: 1
             user: 1
     -
@@ -15,6 +16,7 @@ tricks:
             description: "A trick in which the snowboarder springs off the nose of the board and into the air."
             slug: "nollie"
         references:
+            #media_owner: 2
             trick_group: 1
             user: 2
     -
@@ -24,6 +26,7 @@ tricks:
             description: "A trick in which the rider's front hand grabs the heel edge behind their back foot."
             slug: "one-two"
         references:
+            #media_owner: 3
             trick_group: 2
             user: 1
     -
@@ -33,6 +36,7 @@ tricks:
             description: "Flipping backwards (like a standing backflip) off of a jump."
             slug: "back-flip"
         references:
+            #media_owner: 4
             trick_group: 4
             user: 2
     -
@@ -42,6 +46,7 @@ tricks:
             description: "Flipping forward (like a standing frontflip) off of a jump."
             slug: "front-flip"
         references:
+             #media_owner: 5
              trick_group: 4
              user: 1
     -
@@ -51,6 +56,7 @@ tricks:
             description: "Overlaying term for handstands on the edge of a halfpipe."
             slug: "invert"
         references:
+            #media_owner: 6
             trick_group: 5
             user: 2
     -
@@ -60,6 +66,7 @@ tricks:
             description: "A 180° degree handplant in which the rear hand is planted on the lip of the wall and the rotation is frontside."
             slug: "handplant"
         references:
+            #media_owner: 7
             trick_group: 5
             user: 1
     -
@@ -69,6 +76,7 @@ tricks:
             description: "A slide in which a snowboarder rides straight along a rail or other obstacle. This trick has its origin in skateboarding, where the trick is performed with both skateboard trucks grinding along a rail."
             slug: "50-50"
         references:
+            #media_owner: 8
             trick_group: 6
             user: 2
     -
@@ -78,6 +86,7 @@ tricks:
             description: "A slide performed where the riders leading foot passes over the rail on approach, with their snowboard traveling perpendicular along the rail or other obstacle. When performing a frontside boardslide, the snowboarder is facing uphill. When performing a backside boardslide, a snowboarder is facing downhill. This is often confusing to new riders learning the trick because with a frontside boardslide you are moving backward and with a backside boardslide you are moving forward."
             slug: "boardslide"
         references:
+            #media_owner: 9
             trick_group: 6
             user: 1
     -
@@ -87,6 +96,7 @@ tricks:
             description: "Stalling on an object with the nose of the snowboard, while grabbing frontside, and then jumping back off the object into the jump you came off."
             slug: "nose-pick"
         references:
+            #media_owner: 10
             trick_group: 7
             user: 2
     -
@@ -96,6 +106,7 @@ tricks:
             description: "A trick performed when a rider stalls on an object with their snowboard, with the point of contact between both bindings. The Disaster variation comes from skateboarding, and involves performing a frontside or backside 180 before stalling on the lip of the obstacle, and then re-entering."
             slug: "board-stall"
         references:
+            #media_owner: 11
             trick_group: 7
             user: 1
     -
@@ -105,5 +116,41 @@ tricks:
             description: "Tricks performed with one foot removed from the binding (typically the rear foot) are referred to as one-footed tricks. One footed tricks include fast plants in which the rear foot is dropped and initiates a straight air or rotation, the boneless, which is a fast-plant with a grab; and the no-comply, which is a front-footed fast plant."
             slug: "one-footed"
         references:
+            #media_owner: 12
             trick_group: 8
             user: 2
+
+    ###########################################################################################
+    # Tricks with more medias to check main image, or show list rank for images and videos
+    -
+        #13
+        fields:
+            name: "McTwist"
+            description: "A forward-flipping backside 540, performed in a halfpipe, quarterpipe, or similar obstacle. The rotation may continue beyond 540° (e.g., McTwist 720).\nThe origin of this trick comes from vert ramp skateboarding, and was first performed on a skateboard by Mike McGill."
+            slug: "mctwist"
+        references:
+            #media_owner: 13
+            trick_group: 4
+            user: 1
+    -
+        #14
+        fields:
+            name: "Tuck Knee"
+            description: "Where the knee of either leg is dropped down to touch the top of the board.\nWhen referring to snowboarding it means that the rider attempts to put their knee on the board by putting their knee underneath the torso and then pulling down to the board."
+            slug: "tuck-knee"
+        references:
+            #media_owner: 14
+            trick_group: 8
+            user: 2
+    -
+        #15
+        fields:
+            name: "Stalefish"
+            description: "Back hand grabs the heel edge of the board between the feet, around the outside of the knee."
+            slug: "stalefish"
+        references:
+            #media_owner: 15
+            trick_group: 2
+            user: 1
+
+    ###########################################################################################

@@ -4,178 +4,314 @@ videos:
         fields:
             url: "https://www.youtube.com/embed/SXFQCgw-V_k"
             description: "How to Ollie on a Snowboard - Snowboarding Tricks"
+        references:
+            #media_source: 58
     -
         #2 Nollie Youtube
         fields:
             url: "https://www.youtube.com/embed/xyPeVKGv58w"
             description: "Snowboard Nollie Tips"
+        references:
+            #media_source: 59
     -
         #3 One-Two Youtube
         fields:
             url: "https://www.youtube.com/embed/OMxJRz06Ujc"
             description: "How to Grab Melon | TransWorld SNOWboarding Grab Directory"
+        references:
+            #media_source: 60
     -
         #4 Back flip Youtube
         fields:
             url: "https://www.youtube.com/embed/IEstbsCJvaU"
             description: "Learning how to back flip on a snowboard"
+        references:
+            #media_source: 61
     -
         #5 Front flip Youtube
         fields:
             url: "https://www.youtube.com/embed/hzPyzr3WSh4"
             description: "How To Front Flip On A Snowboard!"
+        references:
+            #media_source: 62
     -
         #6 Invert Youtube
         fields:
             url: "https://www.youtube.com/embed/_E5mkdoXTX0"
             description: "Methodology Frontside 540 invert"
+        references:
+            #media_source: 63
     -
         #7 Handplant Youtube
         fields:
             url: "https://www.youtube.com/embed/us8tZcQ1GrY"
             description: "How to handplant - Snowboarding tutorial"
+        references:
+            #media_source: 64
     -
         #8 50-50 Youtube
         fields:
             url: "https://www.youtube.com/embed/zWxBgxq5rP0"
             description: "How to 50-50 - Beginner Snowboarding Trick"
+        references:
+            #media_source: 65
     -
         #9 Boardslide Youtube
         fields:
             url: "https://www.youtube.com/embed/gO5GLk7oQhU"
             description: "Beginner Boardslide snowboard trick progression"
+        references:
+            #media_source: 66
     -
         #10 Nose-pick Youtube
         fields:
             url: "https://www.youtube.com/embed/czpV-FOBHY4"
             description: "How to Butter Nose Roll - Snowboarding Tricks"
+        references:
+            #media_source: 67
     -
         #11 Board-stall Youtube
         fields:
             url: "https://www.youtube.com/embed/LFl259j_Oss"
             description: "Stall Tips in the Stash Park - Snowboard Trick Tutorial"
+        references:
+            #media_source: 68
     -
         #12 One-footed Youtube
         fields:
             url: "https://www.youtube.com/embed/4IVdWdvsrVA"
             description: "Snowboard Trick Tips: One-Footers With Scott Stevens"
+        references:
+            #media_source: 69
+
+    ###########################################################################################
+    # Several videos for 1 trick
     -
-        #13 Ollie Vimeo
+        #13 McTwist Youtube
+        fields:
+            url: "https://www.youtube.com/embed/jkaTAARrD7M"
+            description: "20 Years, 20 Firsts: Shaun White McTwist - Winter X Games"
+        references:
+            #media_source: 94
+    -
+        #14 Tuck Knee Youtube
+        fields:
+            url: "https://www.youtube.com/embed/X_WhGuIY9Ak"
+            description: "How To Japan and Tuck Knee"
+        references:
+            #media_source: 96
+    -
+        #15 Stalefish Youtube
+        fields:
+            url: "https://www.youtube.com/embed/f0PyFsOcnIw"
+            description: "How To Improve Your Stalefish - Grabs"
+        references:
+            #media_source: 98
+
+    ###########################################################################################
+    -
+        #16 Ollie Vimeo
         fields:
             url: "https://player.vimeo.com/video/11823266"
             description: "Snowboard Trick Tips: Ollie"
+        references:
+            #media_source: 70
     -
-        #14 Nollie Vimeo
+        #17 Nollie Vimeo
         fields:
             url: "https://player.vimeo.com/video/62755353"
             description: "Ollie and Nollie"
+        references:
+            #media_source: 71
     -
-        #15 One-Two Vimeo
+        #18 One-Two Vimeo
         fields:
             url: "https://player.vimeo.com/video/85596049"
             description: "SuperPro Snowboarding Launch Trailer"
+        references:
+            #media_source: 72
     -
-        #16 Back flip Vimeo
+        #19 Back flip Vimeo
         fields:
             url: "https://player.vimeo.com/video/14023758"
             description: "Snowboard Trick Tips: Backflip"
+        references:
+            #media_source: 73
     -
-        #17 Front flip Vimeo
+        #20 Front flip Vimeo
         fields:
             url: "https://player.vimeo.com/video/63097667"
             description: "How to front flip"
+        references:
+            #media_source: 74
     -
-        #18 Invert Vimeo
+        #21 Invert Vimeo
         fields:
             url: "https://player.vimeo.com/video/150033071"
-            description: "\"because I was inverted\" Trailer Tom Cruise snowboard"
+            description: "\"Because I was inverted\" - Trailer Tom Cruise snowboard"
+        references:
+            #media_source: 75
     -
-        #19 Handplant Vimeo
+        #22 Handplant Vimeo
         fields:
             url: "https://player.vimeo.com/video/37337177"
             description: "The Burton Academy at Northstar Trick Tip: The Handplant"
+        references:
+            #media_source: 76
     -
-        #20 50-50 Vimeo
+        #23 50-50 Vimeo
         fields:
             url: "https://player.vimeo.com/video/11449086"
             description: "Snowboard Trick Tips: 50-50"
+        references:
+            #media_source: 77
     -
-        #21 Boardslide Vimeo
+        #24 Boardslide Vimeo
         fields:
             url: "https://player.vimeo.com/video/259139716"
             description: "Snowboard Trick Tip: Boardslide by Dr. Style & Mc White"
+        references:
+            #media_source: 78
     -
-        #22 Nose-pick Vimeo
+        #25 Nose-pick Vimeo
         fields:
             url: "https://player.vimeo.com/video/46743218"
             description: "Trick Tips episode 1, Nose Press"
+        references:
+            #media_source: 79
     -
-        #23 Board-stall Vimeo
+        #26 Board-stall Vimeo
         fields:
             url: "https://player.vimeo.com/video/189454424"
             description: "The Bruners Video"
+        references:
+            #media_source: 80
     -
-        #24 One-footed Vimeo
+        #27 One-footed Vimeo
         fields:
             url: "https://player.vimeo.com/video/120096104"
             description: "One foot snowboarding on a sunny day – Vail Daily On the Hill 2.19.15"
+        references:
+            #media_source: 81
+
+    ###########################################################################################
+    # Several videos for 1 trick
     -
-        #25 Ollie Dailymotion
+        #28 McTwist Vimeo
+        fields:
+            url: "https://player.vimeo.com/video/3661763"
+            description: "One Footed McTwist, Snowboard, Zach Allott"
+        references:
+            #media_source: 95
+    -
+        #29 Stalefish Vimeo
+        fields:
+            url: "https://player.vimeo.com/video/6124976"
+            description: "How To Improve Your Stalefish - Grabs"
+        references:
+            #media_source: 99
+
+   ###########################################################################################
+    -
+        #30 Ollie Dailymotion
         fields:
             url: "https://www.dailymotion.com/embed/video/x5d9ieq"
             description: "How to Ollie a Snowboard"
+        references:
+            #media_source: 82
     -
-        #26 Nollie Dailymotion
+        #31 Nollie Dailymotion
         fields:
             url: "https://www.dailymotion.com/embed/video/x2msydw"
             description: "Snowboard Trick Tips: Ollie and Nollie"
+        references:
+            #media_source: 83
     -
-        #27 One-Two Dailymotion
+        #32 One-Two Dailymotion
         fields:
             url: "https://www.dailymotion.com/embed/video/x6uab92"
             description: "How to grab Methods on a Snowboard (Regular) - Free Full Length Tutorial"
+        references:
+            #media_source: 84
     -
-        #28 Back flip Dailymotion
+        #33 Back flip Dailymotion
         fields:
             url: "https://www.dailymotion.com/embed/video/x1brk"
             description: "How To Do Backflips On A Snowboard"
+        references:
+            #media_source: 85
     -
-        #29 Front flip Dailymotion
+        #34 Front flip Dailymotion
         fields:
             url: "https://www.dailymotion.com/embed/video/xiibe9"
             description: "How to Frontflip on a Snowboard (Regular) - Tamedogs Trick Tip"
+        references:
+            #media_source: 86
     -
-        #30 Invert Dailymotion
+        #35 Invert Dailymotion
         fields:
             url: "https://www.dailymotion.com/embed/video/x7hd8h"
             description: "The Best trick of Shaun White"
+        references:
+            #media_source: 87
     -
-        #31 Handplant Dailymotion
+        #36 Handplant Dailymotion
         fields:
             url: "https://www.dailymotion.com/embed/video/x22cnn5"
             description: "20 Tricks - TransWorld SNOWboarding"
+        references:
+            #media_source: 88
     -
-        #32 50-50 Dailymotion
+        #37 50-50 Dailymotion
         fields:
             url: "https://www.dailymotion.com/embed/video/x3qlsda"
             description: "How To 50-50 on a Snowboard - Goofy Riders"
+        references:
+            #media_source: 89
     -
-        #33 Boardslide Dailymotion
+        #38 Boardslide Dailymotion
         fields:
             url: "https://www.dailymotion.com/embed/video/xggee7"
             description: "How To Boardslide On A Snowboard"
+        references:
+            #media_source: 90
     -
-        #34 Nose-pick Dailymotion
+        #39 Nose-pick Dailymotion
         fields:
             url: "https://www.dailymotion.com/embed/video/x3rqaog"
             description: "How to Frontside Nosepress with Nick Poohachoff TransWorld SNOWboarding"
+        references:
+            #media_source: 91
     -
-        #35 Board-stall Dailymotion
+        #40 Board-stall Dailymotion
         fields:
             url: "https://www.dailymotion.com/embed/video/x3rq9oo"
-            description: "Trick Tip Tuesday- blunt stall"
+            description: "Trick Tip Tuesday - blunt stall"
+        references:
+            #media_source: 92
     -
-        #36 One-footed Dailymotion
+        #41 One-footed Dailymotion
         fields:
             url: "https://www.dailymotion.com/embed/video/x2hdawm"
             description: "First Ever Feck'n Snowboard Comp in Kashmir and One-Footer Fail | The Daily Blizzard, Ep. 47"
+        references:
+            #media_source: 93
+
+    ###########################################################################################
+    # Several videos for 1 trick
+    -
+        #42 Tuck Knee Dailymotion
+        fields:
+            url: "https://www.dailymotion.com/embed/video/x266uqc"
+            description: "A week on the Road of Switzerland and Austria for Freeride Contest for ENGADINSNOW and BIG MOUNTAIN HOCHFUGEN"
+        references:
+            #media_source: 97
+    -
+        #43 Stalefish Dailymotion
+        fields:
+            url: "https://www.dailymotion.com/embed/video/x78ic0v"
+            description: "How to Grab Stalefish - TransWorld SNOWboarding"
+        references:
+            #media_source: 100
+
+    ###########################################################################################

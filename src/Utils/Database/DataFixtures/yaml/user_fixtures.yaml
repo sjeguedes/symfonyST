@@ -9,6 +9,8 @@ users:
             password: "$2y$10$FG3LeBBCW0J4o.j3TYCoSOeAQqrDO/2Ovbpitv.yB8sJvMq37WPEq"
             roles: ['ROLE_ADMIN', 'ROLE_USER']
             salt: null
+        references:
+            #media_owner: 16
     -
         #2 member profile
         fields:
@@ -19,3 +21,17 @@ users:
             password: "$2y$10$fHFC.NaUGHFZRwR7t3ZD8OxqdXi7xhxxM29EIfLDpkQMkf/2xrzRu"
             roles: ['ROLE_USER']
             salt: null
+        references:
+            #media_owner: 17
+    -
+        #3 member profile
+        fields:
+            family_name: "WESTMAN"
+            first_name: "Arnold"
+            user_name: "Arny"
+            email: "member2@test.com"
+            password: "$2y$12$qSAJs2NzTWil0O32h85kHuzcGxsUgOgY6RbY8oU4krC60PCC/6Rr2"
+            roles: ['ROLE_USER']
+            salt: null
+        references:
+            #media_owner: 18

@@ -38,21 +38,8 @@ final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateB
         $this->templateRenderer = $twig;
         $this->templates = [
             [
-                'class' => 'App\\Responder\\AjaxTrickListResponder',
-                'name'  => 'home/trick_list.html.twig',
-                'block' => 'trick_cards'
-            ],
-            [
-                'class' => 'App\\Responder\\HomeTrickListResponder',
-                'name'  => 'home/trick_list.html.twig'
-            ],
-            [
-                'class' => 'App\\Responder\\PaginatedTrickListResponder',
-                'name'  => 'tricks/paginated_list.html.twig'
-            ],
-            [
-                'class' => 'App\\Responder\\SingleTrickResponder',
-                'name'  => 'single-trick/trick.html.twig'
+                'class' => 'App\\Responder\\Admin\\CreateTrickResponder',
+                'name'  => 'admin/create_trick.html.twig'
             ],
             [
                 'class' => 'App\\Responder\\Admin\\LoginResponder',
@@ -73,6 +60,23 @@ final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateB
             [
                 'class' => 'App\\Responder\\Admin\\UpdateProfileResponder',
                 'name'  => 'admin/update_profile.html.twig'
+            ],
+            [
+                'class' => 'App\\Responder\\AjaxTrickListResponder',
+                'name'  => 'home/trick_list.html.twig',
+                'block' => 'trick_cards'
+            ],
+            [
+                'class' => 'App\\Responder\\HomeTrickListResponder',
+                'name'  => 'home/trick_list.html.twig'
+            ],
+            [
+                'class' => 'App\\Responder\\PaginatedTrickListResponder',
+                'name'  => 'tricks/paginated_list.html.twig'
+            ],
+            [
+                'class' => 'App\\Responder\\SingleTrickResponder',
+                'name'  => 'single-trick/trick.html.twig'
             ],
             // Emails
             [

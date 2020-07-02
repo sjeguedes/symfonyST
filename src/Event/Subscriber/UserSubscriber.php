@@ -11,7 +11,6 @@ use App\Domain\ServiceLayer\UserManager;
 use App\Event\CustomEventFactory;
 use App\Event\FormUnchangedEvent;
 use App\Event\UserRetrievedEvent;
-use App\Form\Type\Admin\UpdateProfileInfosType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -36,11 +35,6 @@ class UserSubscriber implements EventSubscriberInterface
      * Define a custom session key to check first access to password renewal page.
      */
     private const PASSWORD_RENEWAL_FIRST_ACCESS = 'PasswordRenewalFirstAccess';
-
-    /**
-     * @var string|null
-     */
-    private $calledAction;
 
     /**
      * @var FlashBagInterface
@@ -109,7 +103,14 @@ class UserSubscriber implements EventSubscriberInterface
         if ($isUpdateProfileAction) {
             $userNickName = $event->getUser()->getNickName();
             $text = !empty($this->request->files->all()) ? 'avatar' : 'infos';
-            $this->flashBag->add('info', sprintf('Hey <strong>%s</strong>!<br>Please note you changed nothing about your profile %s.', $userNickName, $text));
+            $this->flashBag->add(
+                'info',
+                sprintf(
+                    nl2br('Hey "%s",' . "\n" . 'please note you changed nothing about your profile %s!'),
+                    htmlentities($userNickName, ENT_QUOTES | ENT_HTML5, 'UTF-8'),
+                    $text
+                )
+            );
         }
     }
 
@@ -144,7 +145,13 @@ class UserSubscriber implements EventSubscriberInterface
     {
         $user = $event->getAuthenticationToken()->getUser();
         $userNickName = $user->getNickName();
-        $this->flashBag->add('success', sprintf('Welcome on board <strong>%s</strong>!<br>You logged in successfully.', $userNickName));
+        $this->flashBag->add(
+            'success',
+            sprintf(
+                nl2br('Welcome on board "%s"!' . "\n" . 'You logged in successfully.'),
+                htmlentities($userNickName, ENT_QUOTES | ENT_HTML5, 'UTF-8')
+            )
+        );
     }
 
     /**
@@ -197,7 +204,10 @@ class UserSubscriber implements EventSubscriberInterface
             // Add flash message
             $this->flashBag->add(
                 'info',
-                sprintf('Well done <strong>%s</strong>!<br>Please fill in the form below<br>to renew your password!', $identifiedUser->getUsername())
+                sprintf(
+                    nl2br('Well done "%s"!' . "\n" . 'Please fill in the form below' . "\n" . 'to renew your password!'),
+                    htmlentities($identifiedUser->getUsername(), ENT_QUOTES | ENT_HTML5, 'UTF-8')
+                )
             );
         }
     }

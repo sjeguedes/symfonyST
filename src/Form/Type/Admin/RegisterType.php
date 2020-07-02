@@ -80,6 +80,8 @@ class RegisterType extends AbstractType
                 );
             },
             'required'        => false,
+            // Disable automatic CSRF validation: this validation/protection is checked/done in form handler manually!
+            'csrf_protection' => false,
             'csrf_field_name' => 'token',
             'csrf_token_id'   => 'register_token',
         ]);

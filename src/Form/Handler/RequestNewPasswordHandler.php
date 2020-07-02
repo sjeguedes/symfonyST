@@ -97,9 +97,12 @@ final class RequestNewPasswordHandler extends AbstractFormHandler
         $loadedUser = $userService->getRepository()->loadUserByUsername($this->form->getData()->getUserName()); // or $this->form->get('userName')->getData()
         // DTO is in valid state but user can not be found.
         if (\is_null($loadedUser)) {
-            $userError = 'Please check your credentials!<br>User can not be found.';
+            $userError = nl2br('Please check your credentials!' . "\n" . 'User can not be found.');
             $this->customError = $userError;
-            $this->flashBag->add('danger', 'Authentication failed!<br>Try to request again by checking the form fields.');
+            $this->flashBag->add(
+                'danger',
+                nl2br('Authentication failed!' . "\n" . 'Try to request again by checking the form fields.')
+            );
             return false;
         }
         $this->userToUpdate = $loadedUser;
@@ -141,11 +144,19 @@ final class RequestNewPasswordHandler extends AbstractFormHandler
         $isEmailSent = $this->mailer->notify($emailConfig);
         // Technical error when trying to send
         if (!$isEmailSent) {
-            throw new \Exception(sprintf('Notification failed: email was not sent to %s due to technical error or wrong parameters!', $updatedUser->getEmail()));
+            throw new \Exception(
+                sprintf(
+                    'Notification failed: email was not sent to %s due to technical error or wrong parameters!',
+                    $updatedUser->getEmail()
+                )
+            );
         }
         $this->flashBag->add(
             'success',
-            'An email was sent successfully!<br>Please check your box and<br>use your personalized link<br>to renew your password.'
+            nl2br('An email was sent successfully!' . "\n" .
+            'Please check your box and' . "\n" .
+            'use your personalized link' . "\n" .
+            'to renew your password.')
         );
     }
 

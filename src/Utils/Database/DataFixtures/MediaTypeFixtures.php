@@ -28,14 +28,15 @@ class MediaTypeFixtures extends BaseFixture
         $array = $this->parseYamlFile('media_type_fixtures.yaml');
         $data = $array['media_types'];
         // Create media types
-        $this->createFixtures(MediaType::class, \count($data), function($i) use($data) {
+        $this->createFixtures(MediaType::class, \count($data), function ($i) use ($data) {
             return new MediaType(
                 $data[$i]['fields']['type'],
+                $data[$i]['fields']['source_type'],
                 $data[$i]['fields']['name'],
                 $data[$i]['fields']['description'],
                 $data[$i]['fields']['width'],
                 $data[$i]['fields']['height'],
-                new \DateTime(sprintf("+%d days", $i - 1))
+                new \DateTime(sprintf("+%d days", -$i))
             );
         });
         $manager->flush();

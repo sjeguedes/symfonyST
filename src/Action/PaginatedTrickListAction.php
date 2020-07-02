@@ -44,7 +44,9 @@ class PaginatedTrickListAction
     /**
      * Show complete list directly on dedicated page "tricks".
      *
-     * @Route("/{_locale}/trick-list/{page}", name="list_tricks", defaults={"page"=1}, requirements={"page"="\d+"})
+     * @Route({
+     *     "en": "/{_locale<en>}/trick-list/page/{page<\d+>?}"
+     * }, name="list_tricks")
      *
      * @param PaginatedTrickListResponder $responder
      * @param RedirectionResponder        $redirectionResponder
@@ -53,22 +55,25 @@ class PaginatedTrickListAction
      * @return Response
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws \Doctrine\ORM\NoResultException
      */
     public function __invoke(PaginatedTrickListResponder $responder, RedirectionResponder $redirectionResponder, Request $request) : Response
     {
-        // Particular redirection (optional)
-        if ('/' . $request->get('_locale') . '/trick-list/1' === $request->getPathInfo()) {
-            return $redirectionResponder('list_tricks');
+        // Make a redirection to page index "1" by default, if page attribute is empty (allowed in route)
+        // CAUTION: be aware of defining route "page" attribute requirements and default value carefully!
+        if (\is_null($request->attributes->get('page'))) {
+            return $redirectionResponder('list_tricks', ['page' => 1]);
         }
         // Get necessary data to create pagination filtering wrong parameters if necessary
-        $pageIndex = $this->trickService->filterPaginationRequestAttribute($request, 'list_tricks');
-        $paginationParameters = $this->trickService->getPaginationParameters($pageIndex);
+        $pageIndex = $this->trickService->filterPaginationRequestAttribute($request);
+        $paginationParameters = $this->trickService->getTrickListPaginationParameters($pageIndex);
         if (\is_null($paginationParameters)) {
             $this->logger->error("[trace app snowTricks] PaginatedTrickListAction/__invoke => pagination parameters: null");
             throw new NotFoundHttpException('Trick list page can not be reached! Wrong parameter is used.');
         }
         $data = [
             'currentPage'      => $paginationParameters['currentPage'],
+            'noList'           => 'Sorry, no trick was found!',
             'pageCount'        => $paginationParameters['pageCount'],
             'trickCount'       => $paginationParameters['trickCount'],
             'trickLoadingMode' => $paginationParameters['loadingMode'],

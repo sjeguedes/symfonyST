@@ -5,8 +5,6 @@ declare(strict_types = 1);
 namespace App\Domain\Entity;
 
 use App\Domain\Repository\ImageRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
@@ -29,7 +27,7 @@ class Image
      * @ORM\Id()
      * @ORM\Column(type="uuid_binary", unique=true)
      */
-    private $uuid;
+    protected $uuid;
 
     /**
      * @var string
@@ -75,11 +73,11 @@ class Image
     private $updateDate;
 
     /**
-     * @var Collection (inverse side of entity relation)
+     * @var MediaSource (inverse side of relation)
      *
-     * @ORM\OneToMany(targetEntity=Media::class, cascade={"persist", "remove"}, orphanRemoval=true, mappedBy="image")
+     * @ORM\OneToOne(targetEntity=MediaSource::class, mappedBy="image", cascade={"persist", "remove"}, orphanRemoval=true)
      */
-    private $medias;
+    private $mediaSource;
 
     /**
      * Image constructor.
@@ -90,8 +88,6 @@ class Image
      * @param int                     $size
      * @param \DateTimeInterface|null $creationDate
      *
-     * @return void
-     *
      * @throws \Exception
      */
     public function __construct(
@@ -101,19 +97,30 @@ class Image
         int $size,
         \DateTimeInterface $creationDate = null
     ) {
-        $this->uuid = Uuid::uuid4();
         \assert(!empty($name), 'Image name can not be empty!');
-        $this->name = $name;
         \assert(!empty($description), 'Image description can not be empty!');
-        $this->description = $description;
         \assert(!empty($format), 'Image format can not be empty!');
-        $this->format = $format;
         \assert($size > 0, 'Image size must be greater than 0!');
+        $this->uuid = Uuid::uuid4();
+        $this->name = $name;
+        $this->description = $description;
+        $this->format = $format;
         $this->size = $size;
-        $createdAt = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
-        $this->creationDate = $createdAt;
-        $this->updateDate = $createdAt;
-        $this->medias = new ArrayCollection();
+        $this->creationDate = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
+        $this->updateDate = $this->creationDate;
+    }
+
+    /**
+     * Assign a media source.
+     *
+     * @param MediaSource $mediaSource
+     *
+     * @return $this
+     */
+    public function assignMediaSource(MediaSource $mediaSource) : self
+    {
+        $this->mediaSource = $mediaSource;
+        return $this;
     }
 
     /**
@@ -122,6 +129,8 @@ class Image
      * @param string $name
      *
      * @return Image
+     *
+     * @throws \Exception
      */
     public function modifyName(string $name) : self
     {
@@ -138,6 +147,8 @@ class Image
     * @param string $description
     *
     * @return Image
+    *
+    * @throws \Exception
     */
     public function modifyDescription(string $description) : self
     {
@@ -154,6 +165,8 @@ class Image
      * @param \DateTimeInterface $updateDate
      *
      * @return Image
+     *
+     * @throws \Exception
      */
     public function modifyUpdateDate(\DateTimeInterface $updateDate) : self
     {
@@ -161,37 +174,6 @@ class Image
             throw new \RuntimeException('Update date is not logical: Image can not be created after modified update date!');
         }
         $this->updateDate = $updateDate;
-        return $this;
-    }
-
-    /**
-     * Add Media entity to collection.
-     *
-     * @param Media $media
-     *
-     * @return Image
-     */
-    public function addMedia(Media $media) : self
-    {
-        if (!$this->medias->contains($media)) {
-            $this->medias->add($media);
-            $media->modifyImage($this);
-        }
-        return $this;
-    }
-
-    /**
-     * Remove Media entity from collection.
-     *
-     * @param Media $media
-     *
-     * @return Image
-     */
-    public function removeMedia(Media $media) : self
-    {
-        if ($this->medias->contains($media)) {
-            $this->medias->removeElement($media);
-        }
         return $this;
     }
 
@@ -252,10 +234,10 @@ class Image
     }
 
     /**
-     * @return Collection|Media[]
+     * @return MediaSource|null
      */
-    public function getMedias() : Collection
+    public function getMediaSource() : ?MediaSource
     {
-        return $this->medias;
+        return $this->mediaSource;
     }
 }

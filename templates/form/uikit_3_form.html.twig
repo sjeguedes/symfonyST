@@ -1,16 +1,19 @@
 {# https://github.com/symfony/symfony/blob/master/src/Symfony/Bridge/Twig/Resources/views/Form/form_div_layout.html.twig #}
+{# Override form elements display or define custom element #}
 
 {# Errors #}
 {%- block form_errors -%}
     {%- if errors|length > 0 -%}
-        <ul class="uk-list">
+        {# CAUTION: this defines a global way to display all forms errors! #}
+        <ul class="uk-list uk-flex uk-flex-column">
             {%- for error in errors -%}
-                <li>
-                    <div class="uk-label uk-form-danger uk-box-shadow-large uk-text-bold uk-text">
-                        <p class="uk-margin-remove uk-text-center">
-                            <span uk-icon="icon: arrow-down"></span> {{ error.message|raw }}
-                        </p>
-                    </div>
+                <li class="uk-flex uk-flex-middle">
+                    <span class="uk-label uk-flex uk-flex-middle uk-form-danger uk-box-shadow-large uk-text-bold uk-text">
+                        <span uk-icon="icon: arrow-down"></span>
+                        <span class="uk-display-inline-block uk-margin-small-left st-color-red">
+                            {{ error.message|nl2br }}
+                        </span>
+                    </span>
                 </li>
             {%- endfor -%}
         </ul>
@@ -24,10 +27,10 @@
         {# Attribute "required" is not supported #}
         {%- set required = false -%}
     {%- endif -%}
-    <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
+        <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}"{% endif %}/>
 {%- endblock form_widget_simple -%}
 
 {# Checkboxes #}
 {%- block checkbox_widget -%}
-    <input type="checkbox" {{ block('widget_attributes') }}{% if value is not empty %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
+    <input type="checkbox" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
 {%- endblock checkbox_widget -%}

@@ -1,0 +1,44 @@
+# https://symfony.com/doc/current/validation.html#validation-constraints
+# https://symfony.com/doc/current/validation/groups.html
+App\Domain\DTOToEmbed\ImageToCropDTO:
+    properties:
+        image:
+            - Image:
+                mimeTypes:
+                    - image/pjpeg
+                    - image/jpeg
+                    - image/gif
+                    - image/png
+                    # The use of a svg sanitizer service is necessary to accept this image type.
+                    #- image/svg+xml
+                mimeTypesMessage: This file is not a valid image.
+                # Max size is inherited from File constraint
+                maxSize: 2M
+                maxSizeMessage: "The file is too large ({{ size }} {{ suffix }}).\nAllowed maximum size is {{ limit }} {{ suffix }}."
+                minWidth: 1600
+                minWidthMessage: "The image width is too small ({{ width }} px).\nMinimum width expected is {{ min_width }} px."
+                minHeight: 900
+                minHeightMessage: "The image height is too small ({{ height }} px).\nMinimum height expected is {{ min_height }} px."
+
+        description:
+            - NotBlank:
+                message: Please fill in a short description.
+            - Length:
+                max: 255
+                maxMessage: "This description should contain\na maximum of {{ limit }} characters or less."
+
+        isMain:
+            - Type:
+                type: bool
+                message: "The value \"{{ value }}\" is not valid.\nPlease do not tamper data."
+
+    constraints:
+        # Custom validator for:
+        # - "image" field: user uploaded file
+        # - "cropJSONData" field: user data to crop image
+        # - "imagePreviewDataURI" field: base64 encoded small image preview
+        # - "savedImageName" field: identifier to retrieve created image (highest cropped format) on server (based on "image" uploaded file)
+        # - "isMain" field: determine which image must be promoted
+        # - "showListRank" field: check coherent sortable order for each image
+        - App\Form\Validator\Constraint\ImageToCropConstraint: ~
+

@@ -51,7 +51,9 @@ class RegisterAction
     /**
      *  Show registration form (user registration) and validation errors.
      *
-     * @Route("/{_locale}/register", name="register")
+     * @Route({
+     *     "en": "/{_locale<en>}/register"
+     * }, name="register")
      *
      * @param RedirectionResponder  $redirectionResponder
      * @param RegisterResponder     $responder
@@ -83,7 +85,9 @@ class RegisterAction
     /**
      * Activate user account after registration.
      *
-     * @Route("/{_locale}/validate-account/{userId}", name="validate_account")
+     * @Route({
+     *     "en": "/{_locale<en>}/validate-account/{userId}"
+     * }, name="validate_account")
      *
      * @param RedirectionResponder $redirectionResponder
      * @param Request              $request
@@ -97,9 +101,19 @@ class RegisterAction
         $userId = $request->attributes->get('userId');
         $isActivated = $this->userService->activateAccount($userId);
         if (!$isActivated) {
-            $this->flashBag->add('danger', 'You are not allowed to access<br>account activation process!<br>Please contact us if necessary.');
+            $this->flashBag->add(
+                'danger',
+                nl2br('You are not allowed to access' . "\n" .
+                'account activation process!' . "\n" .
+                'Please contact us if necessary.')
+            );
         } else {
-            $this->flashBag->add('success', 'Good job!<br>Your account was successfully activated.<br>Please login to access member area.');
+            $this->flashBag->add(
+                'success',
+                'Good job!' . "\n" .
+                nl2br('Your account was successfully activated.' . "\n" .
+                'Please login to access member area.')
+            );
         }
         return $redirectionResponder('home');
     }

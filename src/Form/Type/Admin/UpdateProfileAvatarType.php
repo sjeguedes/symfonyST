@@ -79,7 +79,7 @@ class UpdateProfileAvatarType extends AbstractType
     }
 
     /**
-     * Add String to boolean model transformer to a form data.
+     * Add String to boolean view transformer to a form data.
      *
      * @param FormBuilderInterface $formBuilder
      * @param string               $formName    a Form instance name
@@ -92,7 +92,7 @@ class UpdateProfileAvatarType extends AbstractType
             ->get($formName)
             ->addViewTransformer(
             new CallbackTransformer(
-                //  View data (transform)
+                // View data (transform)
                 function ($boolAsString) {
                     if (\is_null($boolAsString)) {
                         $boolAsString = false;
@@ -158,6 +158,8 @@ class UpdateProfileAvatarType extends AbstractType
                 );
             },
             'required'        => false,
+            // Disable automatic CSRF validation: this validation/protection is checked/done in form handler manually!
+            'csrf_protection' => false,
             'csrf_field_name' => 'token',
             'csrf_token_id'   => 'update_profile_avatar_token',
         ]);

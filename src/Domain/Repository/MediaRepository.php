@@ -19,8 +19,6 @@ class MediaRepository extends ServiceEntityRepository
      * MediaRepository constructor.
      *
      * @param RegistryInterface $registry
-     *
-     * @return void
      */
     public function __construct(RegistryInterface $registry)
     {

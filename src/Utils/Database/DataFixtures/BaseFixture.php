@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types = 1);
 
 namespace App\Utils\Database\DataFixtures;
@@ -28,7 +29,7 @@ abstract class BaseFixture extends Fixture
     /**
      * BaseFixture constructor.
      *
-     * @param ParameterBagInterface $parameterBag
+     * @param ParameterBagInterface  $parameterBag
      */
     public function __construct(ParameterBagInterface $parameterBag)
     {
@@ -50,6 +51,7 @@ abstract class BaseFixture extends Fixture
      * Parse a yaml file to load fixture data
      *
      * @param string $dataFile
+     *
      * @return array
      */
     protected function parseYamlFile(string $dataFile) : array

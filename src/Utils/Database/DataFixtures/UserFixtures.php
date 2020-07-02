@@ -28,7 +28,7 @@ class UserFixtures extends BaseFixture
         $array = $this->parseYamlFile('user_fixtures.yaml');
         $data = $array['users'];
         // Create users
-        $this->createFixtures(User::class, \count($data), function($i) use($data) {
+        $this->createFixtures(User::class, \count($data), function ($i) use ($data) {
             $user = new User(
                 $data[$i]['fields']['family_name'],
                 $data[$i]['fields']['first_name'],
@@ -36,7 +36,8 @@ class UserFixtures extends BaseFixture
                 $data[$i]['fields']['email'],
                 $data[$i]['fields']['password'],
                 User::DEFAULT_ALGORITHM,
-                $data[$i]['fields']['roles']
+                $data[$i]['fields']['roles'],
+                new \DateTime(sprintf("+%d days", -$i))
             );
             $user->modifyIsActivated(true);
             return $user;
