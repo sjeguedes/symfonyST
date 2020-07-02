@@ -1,5 +1,7 @@
 import htmlStringHelper from './all/encode-decode-string';
 import cropper from './all/cropper';
+import deleteMedia from './medias/delete-media';
+import removeImageBox from "./medias/remove-image-box";
 import Sortable from 'sortablejs';
 export default () => {
     // Resources:
@@ -59,6 +61,7 @@ export default () => {
         // ------------------------------------------------------------------------------------------------------------
 
         // Implement logic for images collection
+
         imagesCollectionContainer.addEventListener('click', event => {
             // Initialize event target element for bubbling up
             let targetElement = event.target;
@@ -172,28 +175,26 @@ export default () => {
                     const clickRemoveImageButtonHandler = event => {
                         // Prevent link anchor to scroll up the window
                         event.preventDefault();
-                        let targetedElement = event.currentTarget; // item
-                        // Remove corresponding "image to crop" box by using its wrapper which was created dynamically.
-                        // Look at "addImageButton" click event listener!
-                        if (targetedElement.parentElement.parentElement.classList.contains('st-image-to-crop-wrapper')) {
-                            targetedElement.parentElement.parentElement.remove();
-                        // Remove directly "image to crop" box (.st-image-to-crop) if no wrapper exists.
+                        // Get current image removal button which is clicked
+                        let removeImageButtonElement = event.currentTarget; // item
+                        // Delete existing image on server with AJAX if necessary
+                        // If deletion failed, image to crop box will not be removed.
+                        if (removeImageButtonElement.hasAttribute('data-uuid')) {
+                            // Prepare element to which window will scroll after deletion
+                            // Here it is the same principle as in form.js!
+                            let referenceElementToScroll = document.getElementById('st-form');
+                            referenceElementToScroll = referenceElementToScroll.parentElement.parentElement.parentElement;
+                            // Image box element removal will be called internally if it is ok!
+                            deleteMedia(
+                                removeImageButtonElement,
+                                referenceElementToScroll,
+                                imageToCropBoxElements
+                            );
+                        // Remove image to crop box directly
                         } else {
-                            targetedElement.parentElement.remove();
-                        }
-                        // Loop on existing "image to crop" boxes to update image box index name
-                        imageToCropBoxElements = document.querySelectorAll('.st-image-to-crop');
-                        if (imageToCropBoxElements.length !== 0) {
-                            imageToCropBoxElements.forEach((imageBox, index) => {
-                                // Prepare rank to show in image box label
-                                let rank = index + 1;
-                                // Update only image box number in label as regards image box visual rank!
-                                let imageBoxLabel = imageBox.querySelector('.st-image-to-crop-label');
-                                // Update image box label text
-                                imageBoxLabel.textContent = imageBoxLabel.innerText.replace(new RegExp(/\d+$/, 'g'), rank.toString());
-                                // Update show list rank to avoid constraint violation issue on remove
-                                imageBox.querySelector('.st-show-list-rank').value = rank;
-                            });
+                            // Remove corresponding "image to crop" box by using its wrapper which was created dynamically.
+                            // Look at "addImageButton" click event listener!
+                            removeImageBox(removeImageButtonElement, imageToCropBoxElements);
                         }
                         removeImageButtonElement.removeEventListener('click', clickRemoveImageButtonHandler);
                     };
@@ -233,6 +234,18 @@ export default () => {
                         isMainCheckBoxElement.removeEventListener('click', clickMainCheckBoxHandler);
                     };
                     isMainCheckBoxElement.addEventListener('click', clickMainCheckBoxHandler);
+
+                    // ------------------------------------------------------------------------------------------------------------
+
+                    // Add media box sortable button element action
+                    let mediaSortableButton = imageBox.querySelector('.uk-sortable-handle');
+                    // Prevent window to scroll to top when sortable handler link is clicked (no id is defined on anchor!).
+                    mediaSortableButton.addEventListener('click', event => {
+                        event.preventDefault();
+                    });
+
+                    // ------------------------------------------------------------------------------------------------------------
+
                     // Stop while
                     return;
                 }
@@ -296,6 +309,15 @@ export default () => {
             // Add new box to DOM
             //addImageButton.insertAdjacentElement('beforebegin', newImageBox);
             document.getElementById('st-images-collection-sortable-wrapper').insertAdjacentElement('beforeend', newImageBox);
+
+            // ------------------------------------------------------------------------------------------------------------
+
+            // Add media box sortable button element action
+            let mediaSortableButton = newImageBox.querySelector('.uk-sortable-handle');
+            // Prevent window to scroll to top when sortable handler link is clicked (no id is defined on anchor!).
+            mediaSortableButton.addEventListener('click', event => {
+                event.preventDefault();
+            });
         });
 
         // ------------------------------------------------------------------------------------------------------------
@@ -380,6 +402,18 @@ export default () => {
                         removeVideoButtonElement.removeEventListener('click', clickRemoveVideoButtonHandler);
                     };
                     removeVideoButtonElement.addEventListener('click', clickRemoveVideoButtonHandler);
+
+                    // ------------------------------------------------------------------------------------------------------------
+
+                    // Add media box sortable button element action
+                    let mediaSortableButton = videoBox.querySelector('.uk-sortable-handle');
+                    // Prevent window to scroll to top when sortable handler link is clicked (no id is defined on anchor!).
+                    mediaSortableButton.addEventListener('click', event => {
+                        event.preventDefault();
+                    });
+
+                    // ------------------------------------------------------------------------------------------------------------
+
                     // Stop while
                     return;
                 }
@@ -479,4 +513,4 @@ export default () => {
             collectionBoxLabel.textContent = collectionBoxLabel.innerText.replace(new RegExp(/\d+$/, 'g'), collectionBoxRank.toString());
         };
     }
-}
+};

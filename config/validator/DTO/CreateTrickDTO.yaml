@@ -36,7 +36,7 @@ App\Domain\DTO\CreateTrickDTO:
 
         isPublished:
             - NotNull:
-                message: Please define a moderation state!
+                message: Please define a moderation state.
             - Type:
                 type: bool
                 message: "The value \"{{ value }}\" is not valid.\nPlease do not tamper data."

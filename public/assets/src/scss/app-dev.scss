@@ -1,4 +1,40 @@
 // **** App styles which concern UIkit **** \\
+// 1. Custom variables and variable overwrites per components.
+//@import "uikit-themes/symfonyST-theme/variables.scss";
+//@import "uikit-themes/symfonyST-theme/variables-theme.scss";
+
+//@import "uikit-themes/symfonyST-theme/accordion.scss";
+//@import "uikit-themes/symfonyST-theme/alert.scss";
+//@import "uikit-themes/symfonyST-theme/align.scss";
+
+
+
+// Layout
+//@import "uikit-themes/symfonyST-theme/card.scss";
+// Common
+//@import "uikit-themes/symfonyST-theme/label.scss";
+//@import "uikit-themes/symfonyST-theme/spinner.scss";
+// Navs
+//@import "uikit-themes/symfonyST-theme/navbar.scss";
+// Utilities
+//@import "uikit-themes/symfonyST-theme/text.scss";
+//@import "uikit-themes/symfonyST-theme/background.scss";
+// ... import all
+//@import "uikit-themes/symfonyST-theme/notification.scss";
+
+// 2. Import UIkit default variables and available mixins.
+//@import "../../uikit/src/scss/variables.scss";
+//@import "../../uikit/src/scss/mixins.scss";
+
+// 3. Custom mixin overwrites per components.
+//@import "uikit-themes/symfonyST-theme/accordion-mixins.scss";
+//@import "uikit-themes/symfonyST-theme/alert-mixins.scss";
+//@import "uikit-themes/symfonyST-theme/align-mixins.scss";
+// ... import all
+
+// 4. Import UIkit
+//@import "../../uikit/src/scss/uikit.scss";
+
 // Styles for cropper js
 @import '../../node_modules/cropperjs/dist/cropper.css';
 
@@ -326,9 +362,9 @@ $navbar-background: rgba(172, 15, 15, 1); //#AC0F0F
         .st-card-image, .st-card-iframe {
             min-height: 150px;
         }
-        .uk-card-badge { // Home
+        .uk-card-badge { // Home or paginated page
             width: 100%;
-            min-height: 30px;
+            min-height: 50px;
             box-sizing: border-box;
             position: relative;
             top: 0;
@@ -532,23 +568,34 @@ main {
 }
 
 // Icons
+.st-svg-icon-button-default {
+    border: 1px solid transparent !important;
+    transition: border .3s ease-in-out, background-color .3s ease-in-out !important;
+}
 .st-svg-icon-button {
-    padding: 10px;
-    border: 1px solid $site-white-color;
-    transition: background-color .3s ease-in-out;
-    &.st-svg-icon-update:hover {
-        background-color: rgba(226, 210, 29, 1); //#e2d21d //$site-yellow-color;
-    }
-    &.st-svg-icon-delete:hover {
-        background-color: $site-red-color;
-    }
-    &.st-svg-icon-other:hover {
-        background-color: $site-blue-color;
-    }
-    &.st-svg-icon-actions {
-        border-color: transparent;
-        border-radius: 5px;
-    }
+    padding: 10px !important;
+    @extend .st-svg-icon-button-default;
+}
+.st-svg-icon-cancel:hover {
+    color: $site-black-color !important;
+    border-color: $site-black-color !important;
+    background-color: $site-white-color !important;
+}
+.st-svg-icon-update:hover {
+    border-color: rgba(226, 210, 29, 1) !important;
+    background-color: rgba(226, 210, 29, 1) !important; //#e2d21d //$site-yellow-color;
+}
+.st-svg-icon-delete:hover {
+    border-color: $site-red-color !important;
+    background-color: $site-red-color !important;
+}
+.st-svg-icon-other:hover {
+    border-color: $site-blue-color !important;
+    background-color: $site-blue-color !important;
+}
+.st-svg-icon-actions {
+    border-color: transparent !important;
+    border-radius: 5px !important;
 }
 
 // Shadows
@@ -733,6 +780,21 @@ footer.st-footer {
 .st-cropper-preview {
     width: 100%;
 }
+// Cropper js override
+.cropper-modal {
+    //background-color: rgba(51, 51, 51, 0.5);
+    opacity: 0;
+}
+.cropper-face {
+    background-color: rgba(30, 135, 240, 0.5);
+}
+.cropper-face, .cropper-line, .cropper-point {
+    opacity: 1;
+}
+.cropper-line {
+    background-color: rgba(236, 221, 19, 1);
+}
+
 /************************** Create/Update trick **************************/
 // image crop box label
 .st-image-to-crop-label {

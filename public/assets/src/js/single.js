@@ -1,6 +1,5 @@
 import request from './all/ajax-request';
 import UIkit from '../../uikit/dist/js/uikit.min';
-import URIHelper from "./all/encode-decode-uri";
 import stringHelper from "./all/encode-decode-string";
 export default () => {
     // Resources:
@@ -64,7 +63,7 @@ export default () => {
                 let modalElementID = '#' + media.nextElementSibling.getAttribute('id');
                 let mediaElement;
                 let matches = modalElementID.match(/(image|video)/gi);
-                if (modalElementID.match(/(image|video)/gi) !== null) {
+                if (matches !== null) {
                     mediaElement = document.querySelector(modalElementID + ` .st-modal-${matches[0] === 'image' ? 'image' : 'iframe'}`); // ".st-modal-image" or ".st-modal-iframe" (video)
                 } else {
                     return;

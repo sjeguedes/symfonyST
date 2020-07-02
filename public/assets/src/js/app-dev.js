@@ -32,6 +32,7 @@ import updateProfile from './update-profile';
 // Trick creation and update page scripts
 import manageTrickCreationAndUpdate from './manage-trick-creation-and-update';
 
+// Init necessary scripts when DOM is ready
 window.addEventListener('DOMContentLoaded', function() {
     // Common elements
     imageHeaderLoader();

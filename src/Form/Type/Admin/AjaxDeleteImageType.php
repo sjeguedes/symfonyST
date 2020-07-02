@@ -5,7 +5,6 @@ declare(strict_types = 1);
 namespace App\Form\Type\Admin;
 
 use App\Domain\DTO\AjaxDeleteImageDTO;
-use App\Domain\Entity\MediaOwner;
 use App\Domain\Entity\User;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
@@ -122,7 +121,7 @@ class AjaxDeleteImageType extends AbstractType
         // Check authenticated user "main role label" option
         $resolver->setRequired('userMainRoleLabel');
         $resolver->setAllowedValues('userMainRoleLabel', function ($value) {
-            if (!\is_string($value) || !\in_array($value, User::ROLE_LABELS)) {
+            if (!\is_string($value) || !\in_array(ucfirst($value), User::ROLE_LABELS)) {
                 return false;
             }
             return true;

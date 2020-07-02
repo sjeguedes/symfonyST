@@ -129,7 +129,7 @@ export default () => {
                     };
                     request(obj).then(response => {
                         let tmp = document.createElement("div");
-                        tmp.innerHTML = response;
+                        tmp.innerHTML = response.toString();
                         let cards = tmp.querySelectorAll('.st-card-container');
                         let listError = false;
                         let endReached = false;
@@ -187,6 +187,7 @@ export default () => {
                             }, (index + 1) * 250);
                         });
                     })
+                    // It is important to chain to prevent ajax request from being called twice!
                     .catch(xhr => {
                         // Hide spinner
                         document.querySelector('#st-home-load-more').classList.add('uk-hidden');

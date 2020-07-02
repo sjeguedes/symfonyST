@@ -170,8 +170,8 @@ final class AjaxDeleteImageHandler extends AbstractFormHandler
             // Prepare image deletion success message
             $message = nl2br(
                 'Your image was removed successfully!' . "\n" .
-                'Please note,' . "\n" .
-                'it did not exist on server anymore.'
+                'Please note corresponding file' . "\n" .
+                'did not exist on server anymore.'
             );
             $this->customSuccess = [
                 'formSuccess' => ['notification' => sprintf(nl2br('%s'), $message)]

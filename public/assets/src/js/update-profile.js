@@ -1,6 +1,7 @@
 import cropper from './all/cropper';
 import UIkit from "../../uikit/dist/js/uikit.min";
 import request from './all/ajax-request';
+import stringHelper from "./all/encode-decode-string";
 import URIHelper from './all/encode-decode-uri';
 export default () => {
     // Resources:
@@ -19,6 +20,8 @@ export default () => {
 
     const formElement = document.getElementById('st-update-profile-form');
     if (formElement) {
+        // String helper to decode string
+        const htmlStringHandler = stringHelper();
         // Crop data hidden input
         const cropJSONDataInputElement = formElement.querySelector('.st-crop-data');
         // Avatar file input
@@ -49,7 +52,7 @@ export default () => {
                 previewElement: previewElement,
                 modalElement: modalElement,
                 showResultElement: avatarImagePreview,
-                errors: { unCropped: false},
+                errors: {unCropped: false},
                 notificationGroup: 'profile',
                 getParams: () => {
                     return {
@@ -122,7 +125,6 @@ export default () => {
                 }
                 // Avoid normal submission
                 event.preventDefault();
-                const technicalError = avatarUpdateFormElement.getAttribute('data-technical-error');
                 // Submit button
                 const submitButton = document.getElementById('st-avatar-submit-button');
                 const buttonSpinner = document.querySelector('#st-avatar-submit-button .st-profile-spinner');
@@ -133,6 +135,7 @@ export default () => {
                 const progressContainer = document.getElementById('st-avatar-upload-progress');
                 const avatarActionTextInfo = document.getElementById('st-avatar-text-info');
                 let ratio = 0;
+                let technicalError = avatarUpdateFormElement.getAttribute('data-technical-error');
 
                 // ------------------------------------------------------------------------------------------------------------
 
@@ -198,7 +201,9 @@ export default () => {
                                         UIkit.notification.closeAll();
                                         // Add info to check file type, size and dimensions
                                         let additionalMessage = fileInputElement.getAttribute('data-error-6');
-                                        // Notification error
+                                        additionalMessage = htmlStringHandler.htmlSpecialCharsOnString.encode(additionalMessage);
+                                        additionalMessage = htmlStringHandler.formatOnString.nl2br(additionalMessage);
+                                        // Error notification
                                         UIkit.notification({
                                             message: `<div class="uk-text-center">
                                     <span uk-icon='icon: warning'></span>&nbsp;` + response.formError.notification + `<br>` + additionalMessage +
@@ -218,8 +223,9 @@ export default () => {
                             }
                         }
                     });
-                });
-                request(obj).catch(xhr => {
+                })
+                // It is important to chain to prevent ajax request from being called twice!
+                .catch(xhr => {
                     // Hide spinner but do not re-enable button
                     buttonSpinner.classList.add('uk-hidden');
                     // Technical error: show notification
@@ -227,6 +233,8 @@ export default () => {
                     error = (xhr.status !== undefined && xhr.statusText !== undefined) ? `error: ${xhr.status} - ${xhr.statusText}` : '';
                     // Aborted request
                     error = 0 !== xhr.status ? error : '';
+                    technicalError = htmlStringHandler.htmlSpecialCharsOnString.encode(technicalError);
+                    technicalError = htmlStringHandler.formatOnString.nl2br(technicalError);
                     UIkit.notification({
                         message: `<div class="uk-text-center">
                                     <span uk-icon='icon: warning'></span>&nbsp;` + technicalError + error +

@@ -1,4 +1,5 @@
 import coords from './element-coords';
+import UIkit from "../../../uikit/dist/js/uikit.min";
 export default (element, adjustYPosition = null) => { // HHTMLNodeElement, + or - integer
     // Pure JavaScript cross browser smooth scroll:
     // https://www.youtube.com/watch?v=hPT1SSHptWA
@@ -16,6 +17,8 @@ export default (element, adjustYPosition = null) => { // HHTMLNodeElement, + or 
     // https://developer.mozilla.org/en-US/docs/Web/API/Navigation_timing_API
     // https://developer.mozilla.org/en-US/docs/Web/API/PerformanceNavigationTiming/type
 
+    // Close all existing notifications on scroll
+    UIkit.notification.closeAll();
     // Scroll to form automatically when a form is not valid.
     const targetPosition = coords(element).y + adjustYPosition;
     let startPosition = window.pageYOffset;

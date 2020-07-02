@@ -1,10 +1,9 @@
+import createNotification from './create-notification';
 import Cropper from 'cropperjs/dist/cropper.min';
 //import canvasToBlob from './polyfill-canvas-to-blob';
-import htmlStringHelper from './encode-decode-string';
 import URIHelper from './encode-decode-uri';
 import UIkit from "../../../uikit/dist/js/uikit.min";
 import smoothScroll from "./smooth-vertical-scroll";
-import {removeAttr} from "../../../uikit/src/js/util";
 export default (cropParams) =>  {
     // Resources:
     // https://github.com/fengyuanchen/cropperjs/blob/master/README.md
@@ -19,6 +18,7 @@ export default (cropParams) =>  {
     // https://dev.to/saigowthamr/how-to-loop-through-object-in-javascript-es6-3d26
     // Data URI to File object: https://stackoverflow.com/questions/4998908/convert-data-uri-to-file-then-append-to-formdata
     // Compress and resize image with javaScript: https://zocada.com/compress-resize-images-javascript-browser/
+    // Box width - height calculation: https://www.javascripttutorial.net/javascript-dom/javascript-width-height/
 
     // ------------------------------------------------------------------------------------------------------------
 
@@ -26,30 +26,6 @@ export default (cropParams) =>  {
     let file = cropParams.fileInputElement.files[cropParams.fileInputElement.files.length - 1];
     // Set UIkit notification group
     let groupOption = cropParams.notificationGroup !== undefined ? cropParams.notificationGroup : null;
-
-    // ------------------------------------------------------------------------------------------------------------
-
-    // Create common notification
-    const createNotification = (message, status = 'error', icon = 'warning', timeout = 5000) => {
-        // Escape html message
-        // String helper
-        const htmlStringHandler = htmlStringHelper();
-        message = htmlStringHandler.htmlSpecialCharsOnString.encode(message);
-        message = htmlStringHandler.formatOnString.nl2br(message);
-        // Cancel previous notification(s) by closing it(them)
-        // Use of "closeAll()" method is a tip to avoid notification to be shown multiple times probably
-        // due to loop when image crop boxes are used (e.g. trick creation or update).
-        UIkit.notification.closeAll(groupOption);
-        // Activate new notification
-        UIkit.notification({
-            message: `<div class="uk-text-center">
-                     <span uk-icon='icon: ${icon}'></span>&nbsp;` + message + `</div>`,
-            status: status,
-            pos: 'top-center',
-            group: groupOption,
-            timeout: timeout
-        });
-    };
 
     // ------------------------------------------------------------------------------------------------------------
 
@@ -61,7 +37,7 @@ export default (cropParams) =>  {
         // WARNING: "file" variable is the last uploaded file but crop process must be adapted to be functional with multiple upload!
         if (false === file || false === /^image\/(pjpeg|jpeg|png|gif)$/gi.test(file.type)) {
             // Inform user with notification
-            createNotification(cropParams.fileInputElement.getAttribute('data-error'));
+            createNotification(cropParams.fileInputElement.getAttribute('data-error'), groupOption, true);
             // Update error state to use it in scripts
             cropParams.errors.unCropped = true;
             // Stop crop action in this case
@@ -71,8 +47,6 @@ export default (cropParams) =>  {
     };
     // Prevent crop process by not showing modal and un-instantiating a cropper object
     if (isFileRefused(file)) {
-        //TODO: delete this line below which causes an issue!
-        //cropParams.fileInputElement.files.splice(cropParams.fileInputElement.files.length - 1, 1);
         return;
     }
 
@@ -94,7 +68,7 @@ export default (cropParams) =>  {
         }
         if (invalidDimensions || invalidSize) {
             // Inform user with notification
-            createNotification(errorMessage);
+            createNotification(errorMessage, groupOption, true);
             // Update error state to use it in scripts
             cropParams.errors.unCropped = true;
             // Stop crop action in this case
@@ -182,13 +156,14 @@ export default (cropParams) =>  {
 
         // ------------------------------------------------------------------------------------------------------------
 
+        // TODO: maybe delete this!
         // Callback before modal is shown, to fix a container generated twice after multiple changes
-        UIkit.util.on(modalElementID, 'beforeshow', () => {
+        /*UIkit.util.on(modalElementID, 'beforeshow', () => {
             let container = cropParams.modalElement.querySelector('.cropper-container');
             if (container !== null) {
                 container.parentElement.removeChild(container);
             }
-        });
+        });*/
 
         // ------------------------------------------------------------------------------------------------------------
 
@@ -202,19 +177,21 @@ export default (cropParams) =>  {
             // https://stackoverflow.com/questions/8485027/javascript-url-safe-filename-safe-string
             // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURI
             // https://locutus.io/php/url/urlencode/
-            cropParams.modalElement.currentFilename = uriStringHandler.uriOnString.encodeParamWithRFC3986(file.name);
+            cropParams.currentFilename = uriStringHandler.uriOnString.encodeParamWithRFC3986(file.name);
             // Will check resize event
             let currentCropBoxData = {};
             let data = {};
-            let lastValidPosition = {x: 0, y: 0};
             let state = {
                 counter: 1,
                 isAutoCrop: false,
                 isCropped: false,
+                isCropHandled: false,
+                isCropMove: false,
                 isCropValid: true,
-                isWindowResized: false,
                 firstLoad: false
             };
+            // Get cropper container custom wrapper before "ready" state
+            let container = cropParams.modalElement.querySelector('.st-cropper-container-content');
             // Initialize a cropper
             // Issue ans resources:
             // A way to reset cropper for several successive uploads:
@@ -228,7 +205,7 @@ export default (cropParams) =>  {
                 // Must be 1 to not define dimensions over natural values
                 viewMode: params.viewMode,
                 // CAUTION: avoid activation to keep control on crop box position (or even size) when window is resized or during "auto crop"!
-                //autoCropArea: params.autoCropArea,
+                autoCropArea: params.autoCropArea,
                 initialAspectRatio: params.ratio,
                 aspectRatio: params.ratio,
                 imageSmoothingQuality: 'high',
@@ -238,35 +215,36 @@ export default (cropParams) =>  {
                 zoomable: params.zoomable,
                 // CAUTION: avoid their use alone or with auto crop, to keep control on crop box position (or even size) on window resize!
                 // Do not limit crop box minimum dimensions not to have issue and since it is made in "crop" event callback!
-                /*minCropBoxWidth: 0,
-                minCropBoxHeight: 0,*/
+                minCropBoxWidth: params.minCropBoxWidth * container.clientWidth / uploadedImage.width,
+                minCropBoxHeight: params.minCropBoxHeight * container.clientHeight / uploadedImage.height,
                 ready: () => {
                     state.firstLoad = true;
                     // Define cropper for image element to use it easily in handlers functions
-                    cropParams.modalElement.cropper = newCropper;
-                    // Hide crop box when ready for first load to improve appearance effect due to repositioning
-                    //cropParams.modalElement.querySelector('.cropper-crop-box').classList.add('uk-hidden');
-                    // Get crop box maximum size corresponding to defined ratio as default size
-                    currentCropBoxData = renderDefaultCropBoxWithMinMaxsize(newCropper, currentCropBoxData, true);
-                    // Set defined crop box with default values (call "crop" event)
-                    newCropper.setCropBoxData(currentCropBoxData);
+                    cropParams.cropper = newCropper;
                     // This is used to avoid crop box data modification during "auto crop" event on first load
                     newCropper.element.addEventListener('crop', () => {
                         state.isAutoCrop = true;
-                        if (state.firstLoad) {
-                           renderDefaultCropBoxWithMinMaxsize(newCropper, currentCropBoxData, true);
-                        }
                         clearTimeout(newCropper.element.autoCropFinished);
                         // End of "auto crop" event
                         newCropper.element.autoCropFinished = setTimeout(() => {
-                            state.isAutoCrop = false;
-                            // Initial crop box data setting above calls this twice!
                             if (state.firstLoad && state.counter === 2) {
-                                renderDefaultCropBoxWithMinMaxsize(newCropper, currentCropBoxData, true);
-                                // Show crop box for first load after repositioning
-                                //cropParams.modalElement.querySelector('.cropper-crop-box').classList.remove('uk-hidden');
+                                state.firstLoad = false;
+                                // Get crop box maximum size corresponding to defined ratio as default size
+                                // CAUTION: This must be synchronized with cropper "autoCropArea" option!
+                                currentCropBoxData = renderDefaultCropBoxWithMinMaxsize(newCropper, currentCropBoxData, true);
+                                // Set defined crop box with default values (call "crop" event)
+                                newCropper.setCropBoxData(currentCropBoxData);
+                                // These data will be set at the end of crop event!
+                                data = {
+                                    x: Math.round(currentCropBoxData.left * newCropper.element.width / container.clientWidth),
+                                    y: Math.round(currentCropBoxData.top * newCropper.element.height / container.clientHeight),
+                                    width: Math.round(currentCropBoxData.width *  newCropper.element.width / container.clientWidth),
+                                    height: Math.round(currentCropBoxData.height * newCropper.element.height / container.clientHeight),
+                                    rotate: 0,
+                                    scale: 1
+                                };
                             }
-                            // Do not use counter after 2 iterations
+                            // Do not use counter after 2 iterations launched automatically at start
                             if (state.counter < 2) state.counter ++;
                         }, 0);
                     });
@@ -278,71 +256,79 @@ export default (cropParams) =>  {
                     cropParams.modalElement.querySelector('.st-crop-button').addEventListener('click', cropHandler);
                 },
                 cropmove: () => {
-                    // Crop box is handled for the first time
-                    if (state.firstLoad) {
-                        state.firstLoad = false;
+                    state.isCropMove = true;
+                },
+                cropstart: event => {
+                    if ('all' !== event.detail.action) {
+                        state.isCropHandled = true;
                     }
+                    // Disable crop button
+                    cropParams.modalElement.querySelector('.st-crop-button').classList.add('uk-disabled');
                 },
                 // resize end check: https://stackoverflow.com/questions/5489946/how-to-wait-for-the-end-of-resize-event-and-only-then-perform-an-action
                 crop: event => {
+                    newCropper.options.minCropBoxWidth = params.minCropBoxWidth * container.clientWidth / uploadedImage.width;
+                    newCropper.options.minCropBoxHeight = params.minCropBoxHeight * container.clientHeight / uploadedImage.height;
                     // Avoid infinite loop with crop end callback
                     if (state.isCropped) {
                         state.isCropped = false;
                         return;
                     }
-                    // Get last data object
-                    data = newCropper.getData();
-                    // Fix data if they are under minimum size to limit crop box
-                    if (Math.ceil(event.detail.width) < params.minCropBoxWidth || Math.ceil(event.detail.height) < params.minCropBoxHeight) {
-                        state.isCropValid = false;
-                        // Improve position effect
-                        data.x = event.detail.x + (lastValidPosition.x !== 0 ? (lastValidPosition.x - event.detail.x) : 0);
-                        data.y = event.detail.y + (lastValidPosition.y !== 0 ? (lastValidPosition.y - event.detail.y) : 0);
-                        // Set minimum dimensions
-                        data.width = params.minCropBoxWidth;
-                        data.height = params.minCropBoxHeight;
-                        // Re-create min crop box size options with the right visual effect thanks to style
-                        let container = cropParams.modalElement.querySelector('.st-cropper-container-content');
+
+                    // Adjust wrong behavior with "auto-crop" which modifies crop box position or dimensions
+                    if (state.isAutoCrop && !state.isCropMove) {
+                        state.isAutoCrop = false;
                         let left = Math.round(data.x * container.clientWidth / newCropper.element.width);
                         let top =  Math.round(data.y * container.clientHeight / newCropper.element.height);
                         let width = Math.round(data.width * container.clientWidth / newCropper.element.width);
                         let height = Math.round(data.height * container.clientHeight / newCropper.element.height);
                         // Get concerned elements
-                        let cb = cropParams.modalElement.querySelector('.cropper-crop-box');
-                        let cvb = cropParams.modalElement.querySelector('.cropper-view-box img');
-                        cb.setAttribute(
-                            'style',
-                             `width: ${width}px; height: ${height}px;
-                                   transform: translateX(${left}px) translateY(${top}px) !important;`
-                        );
-                        cvb.setAttribute(
-                            'style',
-                            `width: ${container.clientWidth}px; height: ${container.clientHeight}px;
-                                   transform: translateX(-${left}px) translateY(-${top}px) !important;`
-                        );
+                        currentCropBoxData = {
+                            left: left,
+                            top: top,
+                            width: width,
+                            height: height
+                        };
+                        // Set defined crop box visually
+                        setVisualCropBox(container, currentCropBoxData);
                     } else {
-                        state.isCropValid = true;
-                        lastValidPosition.x = event.detail.x;
-                        lastValidPosition.y = event.detail.y;
-                        data.x = lastValidPosition.x;
-                        data.y = lastValidPosition.y;
+                        // Crop box minimum dimensions are forced!
+                        if (state.isCropHandled && (Math.ceil(event.detail.width) <= params.minCropBoxWidth || Math.ceil(event.detail.height) <= params.minCropBoxHeight)) {
+                            state.isCropHandled = false;
+                            state.isCropValid = false;
+                            // Define clean data to avoid strange decimal values
+                            data.width = params.minCropBoxWidth;
+                            data.height = params.minCropBoxHeight;
+                        }
+                        data.x = event.detail.x;
+                        data.y = event.detail.y;
+                        // Redefine dimensions if there is no invalid dimensions when box is forced! (see above)
+                        if (state.isCropValid) {
+                            data.width = event.detail.width;
+                            data.height = event.detail.height;
+                        }
                     }
-                    // Call "cropend" callback manually when crop ended to limit crop box size visually
-                    clearTimeout(newCropper.cropFinished);
-                    newCropper.cropFinished = setTimeout(() => {
-                        newCropper.options.cropend();
-                    }, 250);
                 },
                 cropend: () => {
                     if (!state.isCropValid) {
                         // Inform user with notification (Minimum crop box size is reached!)
-                        createNotification(cropParams.fileInputElement.getAttribute('data-error-5'), 'info', 'info', 2500);
+                        createNotification(cropParams.fileInputElement.getAttribute('data-error-5'), groupOption, true, 'info', 'info', 2500);
                         state.isCropValid = true;
                     }
                     newCropper.setData(data);
                     state.isCropped = true;
+                    state.isCropMove = false;
+                    // Re-enable crop button
+                    cropParams.modalElement.querySelector('.st-crop-button').classList.remove('uk-disabled');
                 }
             });
+        });
+
+        // ------------------------------------------------------------------------------------------------------------
+
+        // Callback when modal close functionality is called
+        UIkit.util.on(modalElementID, 'hide', () => {
+            UIkit.notification.closeAll(groupOption);
         });
 
         // ------------------------------------------------------------------------------------------------------------
@@ -352,7 +338,7 @@ export default (cropParams) =>  {
             // Destruct Cropper instance when modal is definitively hidden to enable next update
             newCropper.destroy();
             // CAUTION - tricky tip: reset image preview object to reinitialize cropper correctly between two successive uploads
-            cropParams.previewElement = new Image(); // cropParams.previewElement.src = ''; can be used instead!
+            cropParams.previewElement = new Image();  // cropParams.previewElement.src = ''; // can be used instead!
             // Re-position window scroll at form level
             smoothScroll(cropParams.formElement, -50);
         });
@@ -371,10 +357,15 @@ export default (cropParams) =>  {
         event.target.removeEventListener(event.type, abortCropHandler);
         // Close modal immediately
         hideModalHandler(null);
-        // Inform user with notification: image will not be validated on server side and constraints violations will be shown!
-        createNotification(cropParams.fileInputElement.getAttribute('data-error-4'), 'info', 'info');
         // Reset crop data elements (will be possible constraints violations) to avoid exception on server side
         resetCropDataElements();
+        // Delay notification to make a better visual effect
+        let ti = setTimeout(() => {
+            // Inform user with notification: image will not be validated on server side and constraints violations will be shown!
+            createNotification(cropParams.fileInputElement.getAttribute('data-error-4'), groupOption, true, 'info', 'info');
+            clearTimeout(ti);
+        }, 1500);
+
     };
 
     // ------------------------------------------------------------------------------------------------------------
@@ -386,14 +377,17 @@ export default (cropParams) =>  {
             Base64ImagePreviewDataURI;
         // IMPORTANT: This stores file.name which is not accessible in this event listener handler
         // https://stackoverflow.com/questions/256754/how-to-pass-arguments-to-addeventlistener-listener-function
-        let newFilename = cropParams.modalElement.currentFilename;
+        let newFilename = cropParams.currentFilename;
+
         // Get crop box and canvas data
-        newCropBoxData = cropParams.modalElement.cropper.getCropBoxData();
-        newCanvasData = cropParams.modalElement.cropper.getCanvasData();
+        newCropBoxData = cropParams.cropper.getCropBoxData();
+        newCanvasData = cropParams.cropper.getCanvasData();
         // Should set crop box data first here
-        cropParams.modalElement.cropper.setCropBoxData(newCropBoxData).setCanvasData(newCanvasData);
+        cropParams.cropper.setCropBoxData(newCropBoxData);
+        cropParams.cropper.setCanvasData(newCanvasData);
+
         // Get cropped data to feed hidden particular field to effectively crop image on server-side
-        let cropData = cropParams.modalElement.cropper.getData();
+        let cropData = cropParams.cropper.getData();
         let roundedData = {};
         for (let prop in cropData) {
             if (Object.prototype.hasOwnProperty.call(cropData, prop)) {
@@ -410,7 +404,7 @@ export default (cropParams) =>  {
         // Use hidden input to store crop data for constraints validation
         cropParams.hiddenInputElement.setAttribute('value', cropParams.getCropJSONData());
         // Create a base 64 encoded image URi, with crop area (reduced to preview width and height), thanks to default autoCrop option set to true
-        Base64ImagePreviewDataURI = cropParams.modalElement.cropper.getCroppedCanvas({width: params.previewWidth, height: params.previewHeight}).toDataURL(file.type);
+        Base64ImagePreviewDataURI = cropParams.cropper.getCroppedCanvas({width: params.previewWidth, height: params.previewHeight}).toDataURL(file.type);
         if (cropParams.hiddenInputForImagePreviewDataURIElement) {
             // Store reduced image preview data URI  in corresponding hidden input
             cropParams.hiddenInputForImagePreviewDataURIElement.setAttribute('value', Base64ImagePreviewDataURI);
@@ -439,19 +433,23 @@ export default (cropParams) =>  {
     // ------------------------------------------------------------------------------------------------------------
 
     // Render default the crop box with the maximum possible size
-    const renderDefaultCropBoxWithMinMaxsize = (newCropper, currentCropBoxData, maxSize = false) => {
+    const renderDefaultCropBoxWithMinMaxsize = (newCropper, currentCropBoxData, maxSize) => {
         // Get real container and concerned elements
-        let container = cropParams.modalElement.querySelector('.cropper-container');
-        let cb = cropParams.modalElement.querySelector('.cropper-crop-box');
-        let cvb = cropParams.modalElement.querySelector('.cropper-view-box img');
+        let container = cropParams.modalElement.querySelector('.st-cropper-container-content');
         // Retrieve maximum size by calculation
+        // Get max width which is container width.
         let width = container.clientWidth;
-        let realHeight = Math.round(newCropper.element.width * params.minCropBoxHeight / params.minCropBoxWidth);
-        let height = Math.round(realHeight * container.clientHeight / newCropper.element.height);
+        // Calculate corresponding height
+        let height = Math.ceil(width * params.minCropBoxHeight / params.minCropBoxWidth);
+        // Adjust dimensions if needed to keep crop box size inside container size
+        if (container.clientHeight <= height) {
+            height = container.clientHeight;
+            width = Math.ceil(height * params.minCropBoxWidth / params.minCropBoxHeight);
+        }
         // Switch to these lines below to get crop box minimum size as default size (can also be used for options settings)
         if (!maxSize) {
-            width = Math.round(params.minCropBoxWidth * container.clientWidth / uploadedImage.width);
-            height = Math.round(params.minCropBoxHeight * container.clientHeight / uploadedImage.height);
+            width = Math.ceil(params.minCropBoxWidth * container.clientWidth / uploadedImage.width);
+            height = Math.ceil(params.minCropBoxHeight * container.clientHeight / uploadedImage.height);
         }
         // Prepare crop box data
         currentCropBoxData = {
@@ -460,18 +458,40 @@ export default (cropParams) =>  {
             width: width,
             height: height
         };
-        // Set defined crop box visually with default values (call "crop" event)
+        // Set defined crop box visually with default values instead of view box settings
+        setVisualCropBox(container, currentCropBoxData);
+        return currentCropBoxData;
+    };
+
+    // ------------------------------------------------------------------------------------------------------------
+
+    // Set crop box HTML element to update it visually
+    const setVisualCropBox = (cropContainer, cropBoxData) => {
+        let cb = cropContainer.querySelector('.cropper-crop-box');
+        let cvb = cropContainer.querySelector('.cropper-view-box');
+        let cvbi = cropContainer.querySelector('.cropper-view-box img');
+        let cc = cropContainer.querySelector('.cropper-canvas');
+        let cci = cropContainer.querySelector('.cropper-canvas img');
         cb.setAttribute(
             'style',
-            `width: ${currentCropBoxData.width}px !important; height: ${currentCropBoxData.height}px !important;
-                   transform: translateX(${currentCropBoxData.left}px) translateY(${currentCropBoxData.top}px) !important;`
+            `width: ${cropBoxData.width}px !important; height: ${cropBoxData.height}px !important;
+                   transform: translateX(${cropBoxData.left}px) translateY(${cropBoxData.top}px) !important;`
         );
-        cvb.setAttribute(
+        cvbi.setAttribute(
             'style',
-            `width: ${container.clientWidth}px !important; height: ${container.clientHeight}px !important;
-                   transform: translateX(-${currentCropBoxData.left}px) translateY(-${currentCropBoxData.top}px) !important;`
+            `width: ${cropContainer.clientWidth}px !important; height: ${cropContainer.clientHeight}px !important;
+                   transform: translateX(-${cropBoxData.left}px) translateY(-${cropBoxData.top}px) !important;`
         );
-        return currentCropBoxData;
+        cc.setAttribute(
+            'style',
+            `width: ${cropContainer.clientWidth}px !important; height: ${cropContainer.clientHeight}px !important;
+                   transform: none !important;`
+        );
+        cci.setAttribute(
+            'style',
+            `width: ${cropContainer.clientWidth}px !important; height: ${cropContainer.clientHeight}px !important;
+                   transform: none !important;`
+        );
     };
 
     // ------------------------------------------------------------------------------------------------------------
