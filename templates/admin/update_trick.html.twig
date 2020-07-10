@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}SnowTricks - Trick update form{% endblock %}
+
+{% block header %}
+    {% include 'all/image_header_loader.html.twig' with {'spinnerRatio': '2.5'} %}
+    <div class="uk-position-relative uk-flex uk-flex-center uk-flex-middle uk-background-cover uk-background-blend-darken uk-invisible st-background-image-header" data-src="{{ asset(globalImageDirectory~'snowboard-4.jpg') }}" style="background-position: 40% 25%; height: 600px" uk-img>
+        <div class="uk-position-center uk-text-center uk-padding-small st-overlay-image-header-container">
+            <p class="st-color-white st-text-shadow-dark uk-text-large">
+                Please modify the form to update this snowboard trick!
+            </p>
+            <p class="st-color-white st-text-shadow-dark uk-text-medium uk-visible@m">
+                This review will be submitted to our community.
+            </p>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+<div class="uk-heading-line uk-text-large uk-text-center uk-margin-top">
+    <span uk-icon="icon: unlock; ratio: 2"></span>
+</div>
+<div id="st-create-trick" class="uk-section uk-preserve-color">
+    <div class="uk-container uk-margin-medium-bottom">
+        <h1 class="uk-heading-bullet uk-text-large uk-text-center uk-text-uppercase uk-text-bold">
+            Use this form to modify content, and also add, change or remove resources about this snowboard trick.
+        </h1>
+        <p class="uk-text-center uk-text-uppercase uk-text-bold st-color-red">
+            Please keep rich content and take care of your description,<br>
+            so please rearrange properly images and videos to maintain an attractive user experience.
+        </p>
+    </div>
+    <div id="st-create-trick-form" class="uk-container-expand st-create-trick-form">
+        <div class="uk-text-center">
+            <h2 class="uk-display-inline-block uk-padding-small uk-box-shadow-medium st-border-white-small uk-text-small uk-text-bold uk-text-uppercase st-background-yellow">
+                Trick update area
+            </h2>
+        </div>
+    </div>
+{% endblock %}

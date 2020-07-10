@@ -62,6 +62,10 @@ final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateB
                 'name'  => 'admin/update_profile.html.twig'
             ],
             [
+                'class' => 'App\\Responder\\Admin\\UpdateTrickResponder',
+                'name'  => 'admin/update_trick.html.twig'
+            ],
+            [
                 'class' => 'App\\Responder\\AjaxTrickListResponder',
                 'name'  => 'home/trick_list.html.twig',
                 'block' => 'trick_cards'

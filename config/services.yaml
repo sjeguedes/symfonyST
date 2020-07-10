@@ -90,6 +90,12 @@ services:
         arguments:
             $formHandlers: ['@App\Service\Form\Handler\UpdateProfileAvatarHandler', '@App\Service\Form\Handler\UpdateProfileInfosHandler']
 
+    # add form handler when updating a trick
+    App\Action\Admin\UpdateTrickAction:
+        tags: ['controller.service_arguments']
+        arguments:
+            $formHandlers: ['@App\Service\Form\Handler\UpdateTrickHandler', '@App\Service\Form\Handler\AjaxDeleteImageHandler']
+
     # add custom form subscriber
     App\Service\Event\Subscriber\FormSubscriber:
         arguments:
@@ -100,22 +106,16 @@ services:
     #App\Service\Event\Handler\LogoutHandler:
 
     # add login handler
-    #App\Service\Form\Handler\LoginHandler:
+    App\Service\Form\Handler\LoginHandler:
 
     # add trick creation handler
-    #App\Service\Form\Handler\CreateTrickHandler:
+    App\Service\Form\Handler\CreateTrickHandler:
 
     # add image deletion handler
-    #App\Service\Form\Handler\AjaxDeleteImageHandler:
+    App\Service\Form\Handler\AjaxDeleteImageHandler:
 
     # add register handler
-    #App\Service\Form\Handler\RegisterHandler:
-
-    # add login handler
-    App\Form\Handler\LoginHandler:
-
-    # add registration handler
-    App\Form\Handler\RegisterHandler:
+    App\Service\Form\Handler\RegisterHandler:
 
     # add renew password handler
     App\Service\Form\Handler\RenewPasswordHandler:
@@ -128,13 +128,13 @@ services:
             $emailConfigFactory: '@App\Service\Mailer\Email\EmailConfigFactory'
 
     # add update profile avatar handler
-    #App\Service\Form\Handler\UpdateProfileAvatarHandler:
+    App\Service\Form\Handler\UpdateProfileAvatarHandler:
 
     # add update profile infos handler
-    #App\Service\Form\Handler\UpdateProfileInfosHandler:
+    App\Service\Form\Handler\UpdateProfileInfosHandler:
 
     # add custom DTO mapper
-    #App\Service\Form\DataMapper\DTOMapper:
+    App\Service\Form\DataMapper\DTOMapper:
 
     # add (trick) image to crop creation type
     App\Service\Form\TypeToEmbed\ImageToCropType:
