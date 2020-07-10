@@ -37,42 +37,10 @@ abstract class BaseFixture extends Fixture
     }
 
     /**
-     * Load entity manager.
-     *
-     * @param ObjectManager $manager
-     */
-    public function load(ObjectManager $manager) : void
-    {
-        $this->manager = $manager;
-        $this->loadData($manager);
-    }
-
-    /**
-     * Parse a yaml file to load fixture data
-     *
-     * @param string $dataFile
-     *
-     * @return array
-     */
-    protected function parseYamlFile(string $dataFile) : array
-    {
-        return Yaml::parseFile( $this->yamlFilePath . $dataFile);
-    }
-
-    /**
-     * Method to be called in class to load fixtures.
-     *
-     * @param ObjectManager $manager
-     *
-     * @return mixed
-     */
-    abstract protected function loadData(ObjectManager $manager);
-
-    /**
      * Creates multiple entity instance with parameters.
      *
-     * @param string $className
-     * @param int $count
+     * @param string   $className
+     * @param int      $count
      * @param callable $factory
      *
      * @return void
@@ -87,5 +55,37 @@ abstract class BaseFixture extends Fixture
             // Used to reference fixtures in between (inherited from AbstractFixture)
             $this->addReference($className . '_' . ($i + 1), $entity);
         }
+    }
+
+    /**
+     * Load entity manager.
+     *
+     * @param ObjectManager $manager
+     */
+    public function load(ObjectManager $manager) : void
+    {
+        $this->manager = $manager;
+        $this->loadData($manager);
+    }
+
+    /**
+     * Method to be called in class to load fixtures.
+     *
+     * @param ObjectManager $manager
+     *
+     * @return void
+     */
+    abstract protected function loadData(ObjectManager $manager);
+
+    /**
+     * Parse a yaml file to load fixture data
+     *
+     * @param string $dataFile
+     *
+     * @return array
+     */
+    protected function parseYamlFile(string $dataFile) : array
+    {
+        return Yaml::parseFile( $this->yamlFilePath . $dataFile);
     }
 }
