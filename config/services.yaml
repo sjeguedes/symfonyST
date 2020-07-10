@@ -105,6 +105,12 @@ services:
     # add image deletion handler
     App\Form\Handler\AjaxDeleteImageHandler:
 
+    # add login handler
+    App\Form\Handler\LoginHandler:
+
+    # add registration handler
+    App\Form\Handler\RegisterHandler:
+
     # add renew password handler
     App\Form\Handler\RenewPasswordHandler:
         arguments:

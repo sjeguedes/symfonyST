@@ -140,7 +140,7 @@ class CreateTrickAction
                 // Failure (redirect to empty trick creation form page)
                 if (\is_null($newTrick)) {
                     $routeName = 'create_trick';
-                    $routeParameters = ['mainRoleLabel' => $userMainRoleLabel];
+                    $routeParameters = ['mainRoleLabel' => lcfirst($authenticatedUser->getMainRoleLabel())];
                 // Success (redirect to new trick page)
                 } else {
                     $routeName = 'show_single_trick';
