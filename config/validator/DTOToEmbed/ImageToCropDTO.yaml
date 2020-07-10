@@ -40,5 +40,5 @@ App\Domain\DTOToEmbed\ImageToCropDTO:
         # - "savedImageName" field: identifier to retrieve created image (highest cropped format) on server (based on "image" uploaded file)
         # - "isMain" field: determine which image must be promoted
         # - "showListRank" field: check coherent sortable order for each image
-        - App\Form\Validator\Constraint\ImageToCropConstraint: ~
+        - App\Service\Form\Validator\Constraint\ImageToCropConstraint: ~
 

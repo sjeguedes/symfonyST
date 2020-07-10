@@ -33,7 +33,7 @@ security:
                     - App\Service\Security\LoginFormAuthenticationManager
             logout:
                 path: disconnect
-                success_handler: App\Event\Handler\LogoutHandler
+                success_handler: App\Service\Event\Handler\LogoutHandler
                 invalidate_session: false
             remember_me:
                 secret: '%kernel.secret%'

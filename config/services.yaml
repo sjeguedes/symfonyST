@@ -34,7 +34,7 @@ services:
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/*'
-        exclude: '../src/{DependencyInjection,Domain/Entity,Kernel.php,Service,Tests,Utils/Command,Utils/Traits,Utils/Database/Migrations}'
+        exclude: '../src/{DependencyInjection,Domain/Entity,Kernel.php,Tests,Utils/Command,Utils/Traits,Utils/Database/Migrations}'
 
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
@@ -52,58 +52,64 @@ services:
     App\Action\Admin\CreateTrickAction:
         tags: ['controller.service_arguments']
         arguments:
-            $formHandlers: ['@App\Form\Handler\CreateTrickHandler', '@App\Form\Handler\AjaxDeleteImageHandler']
+            $formHandlers: ['@App\Service\Form\Handler\CreateTrickHandler', '@App\Service\Form\Handler\AjaxDeleteImageHandler']
 
     # add form handler when deleting a particular image
     App\Action\Admin\AjaxDeleteImageAction:
         tags: ['controller.service_arguments']
         arguments:
-            $formHandler: '@App\Form\Handler\AjaxDeleteImageHandler'
+            $formHandler: '@App\Service\Form\Handler\AjaxDeleteImageHandler'
 
     # add form handler when calling login
     App\Action\Admin\LoginAction:
         tags: ['controller.service_arguments']
         arguments:
-            $formHandler: '@App\Form\Handler\LoginHandler'
+            $formHandler: '@App\Service\Form\Handler\LoginHandler'
 
     # add form handler when renewing password
     App\Action\Admin\RenewPasswordAction:
         tags: ['controller.service_arguments']
         arguments:
-            $formHandler: '@App\Form\Handler\RenewPasswordHandler'
+            $formHandler: '@App\Service\Form\Handler\RenewPasswordHandler'
 
     # add form handler when requesting new password
     App\Action\Admin\RequestNewPasswordAction:
         tags: ['controller.service_arguments']
         arguments:
-            $formHandler: '@App\Form\Handler\RequestNewPasswordHandler'
+            $formHandler: '@App\Service\Form\Handler\RequestNewPasswordHandler'
 
     # add form handler when creating a new user account
     App\Action\Admin\RegisterAction:
         tags: ['controller.service_arguments']
         arguments:
-            $formHandler: '@App\Form\Handler\RegisterHandler'
+            $formHandler: '@App\Service\Form\Handler\RegisterHandler'
 
     # add form handler when updating a user avatar or account (profile)
     App\Action\Admin\UpdateProfileAction:
         tags: ['controller.service_arguments']
         arguments:
-            $formHandlers: ['@App\Form\Handler\UpdateProfileAvatarHandler', '@App\Form\Handler\UpdateProfileInfosHandler']
+            $formHandlers: ['@App\Service\Form\Handler\UpdateProfileAvatarHandler', '@App\Service\Form\Handler\UpdateProfileInfosHandler']
 
     # add custom form subscriber
-    App\Event\Subscriber\FormSubscriber:
+    App\Service\Event\Subscriber\FormSubscriber:
         arguments:
-            $dataMapper: '@App\Form\DataMapper\DTOMapper'
+            $dataMapper: '@App\Service\Form\DataMapper\DTOMapper'
             $userService: '@App\Domain\ServiceLayer\UserManager'
 
     # add logout handler
-    App\Event\Handler\LogoutHandler:
+    #App\Service\Event\Handler\LogoutHandler:
+
+    # add login handler
+    #App\Service\Form\Handler\LoginHandler:
 
     # add trick creation handler
-    App\Form\Handler\CreateTrickHandler:
+    #App\Service\Form\Handler\CreateTrickHandler:
 
     # add image deletion handler
-    App\Form\Handler\AjaxDeleteImageHandler:
+    #App\Service\Form\Handler\AjaxDeleteImageHandler:
+
+    # add register handler
+    #App\Service\Form\Handler\RegisterHandler:
 
     # add login handler
     App\Form\Handler\LoginHandler:
@@ -112,67 +118,67 @@ services:
     App\Form\Handler\RegisterHandler:
 
     # add renew password handler
-    App\Form\Handler\RenewPasswordHandler:
+    App\Service\Form\Handler\RenewPasswordHandler:
         arguments:
             $emailConfigFactory: '@App\Service\Mailer\Email\EmailConfigFactory'
 
     # add request new password handler
-    App\Form\Handler\RequestNewPasswordHandler:
+    App\Service\Form\Handler\RequestNewPasswordHandler:
         arguments:
             $emailConfigFactory: '@App\Service\Mailer\Email\EmailConfigFactory'
 
     # add update profile avatar handler
-    App\Form\Handler\UpdateProfileAvatarHandler:
+    #App\Service\Form\Handler\UpdateProfileAvatarHandler:
 
     # add update profile infos handler
-    App\Form\Handler\UpdateProfileInfosHandler:
+    #App\Service\Form\Handler\UpdateProfileInfosHandler:
 
     # add custom DTO mapper
-    App\Form\DataMapper\DTOMapper:
+    #App\Service\Form\DataMapper\DTOMapper:
 
     # add (trick) image to crop creation type
-    App\Form\TypeToEmbed\ImageToCropType:
+    App\Service\Form\TypeToEmbed\ImageToCropType:
         arguments:
-            $dataMapper: '@App\Form\DataMapper\DTOMapper'
+            $dataMapper: '@App\Service\Form\DataMapper\DTOMapper'
 
     # add user update profile avatar type
-    App\Form\Type\Admin\UpdateProfileAvatarType:
+    App\Service\Form\Type\Admin\UpdateProfileAvatarType:
         arguments:
-            $formSubscriber: '@App\Event\Subscriber\FormSubscriber'
+            $formSubscriber: '@App\Service\Event\Subscriber\FormSubscriber'
 
     # add user update profile infos type
-    App\Form\Type\Admin\UpdateProfileInfosType:
+    App\Service\Form\Type\Admin\UpdateProfileInfosType:
         arguments:
-            $formSubscriber: '@App\Event\Subscriber\FormSubscriber'
+            $formSubscriber: '@App\Service\Event\Subscriber\FormSubscriber'
 
     # add custom constraint validator as concerns ImageToCropDTO class
-    App\Form\Validator\ImageToCropConstraintValidator:
+    #App\Service\Form\Validator\ImageToCropConstraintValidator:
 
     # add SwiftMailer manager
-    App\Service\Mailer\SwiftMailerManager:
+    #App\Service\Mailer\SwiftMailerManager:
 
     # add image uploader
-    App\Service\Medias\Upload\ImageUploader:
+    #App\Service\Medias\Upload\ImageUploader:
 
     # add trick video URL "proxy" checker
-    App\Service\Medias\VideoURLProxyChecker:
+    #App\Service\Medias\VideoURLProxyChecker:
 
     # add EmailConfigFactory
-    App\Service\Mailer\Email\EmailConfigFactory: ~
+    #App\Service\Mailer\Email\EmailConfigFactory: ~
     App\Service\Mailer\Email\EmailConfigFactoryInterface: '@App\Service\Mailer\Email\EmailConfigFactory'
 
     # add authentication checker
-    App\Service\Security\AuthenticationUserChecker:
+    #App\Service\Security\AuthenticationUserChecker:
 
     # add login form guard authenticator
-    App\Service\Security\LoginFormAuthenticationManager:
+    #App\Service\Security\LoginFormAuthenticationManager:
 
     # add Trick voter
-    App\Service\Security\Voter\TrickVoter:
-        tags: ['security.voter']
+    #App\Service\Security\Voter\TrickVoter:
+        #tags: ['security.voter']
 
     # add Twig template engine renderer default service when calling interface:
-    App\Service\Templating\TwigTemplateRenderer: ~
+    #App\Service\Templating\TwigTemplateRenderer: ~
     App\Service\Templating\TemplateRendererInterface: '@App\Service\Templating\TwigTemplateRenderer'
     App\Service\Templating\TemplateBlockRendererInterface: '@App\Service\Templating\TwigTemplateRenderer'
 
@@ -204,6 +210,6 @@ services:
     # enable the use of template_string() function
     # https://stackoverflow.com/questions/19478219/activate-stringloader-twig-extension-in-symfony
     # https://twig.symfony.com/doc/2.x/functions/template_from_string.html
-    Twig\Extension\StringLoaderExtension:
-        public: false
-        tags: ['twig.extension']
+    #Twig\Extension\StringLoaderExtension:
+        #public: false
+        #tags: ['twig.extension']

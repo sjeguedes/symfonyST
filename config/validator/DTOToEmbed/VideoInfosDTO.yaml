@@ -17,4 +17,4 @@ App\Domain\DTOToEmbed\VideoInfosDTO:
         # Custom validator for:
         # - "url" field: check video URL format (equals "Regex validation constraint"), and existing content with VideoURLProxyChecker service
         # - "showListRank" field: check coherent sortable order for each video
-        - App\Form\Validator\Constraint\VideoInfosConstraint: ~
+        - App\Service\Form\Validator\Constraint\VideoInfosConstraint: ~

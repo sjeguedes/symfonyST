@@ -9,7 +9,7 @@ use App\Domain\ServiceLayer\ImageManager;
 use App\Domain\ServiceLayer\MediaManager;
 use App\Domain\ServiceLayer\TrickManager;
 use App\Domain\ServiceLayer\VideoManager;
-use App\Form\Handler\FormHandlerInterface;
+use App\Service\Form\Handler\FormHandlerInterface;
 use App\Responder\Admin\CreateTrickResponder;
 use App\Responder\Redirection\RedirectionResponder;
 use App\Utils\Traits\RouterHelperTrait;

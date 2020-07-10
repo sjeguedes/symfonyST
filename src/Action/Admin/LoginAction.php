@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Action\Admin;
 
-use App\Form\Handler\FormHandlerInterface;
+use App\Service\Form\Handler\FormHandlerInterface;
 use App\Responder\Admin\LoginResponder;
 use App\Responder\Redirection\RedirectionResponder;
 use Symfony\Component\Security\Core\Security;

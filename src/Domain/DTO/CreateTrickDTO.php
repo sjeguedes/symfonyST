@@ -7,7 +7,7 @@ namespace App\Domain\DTO;
 use App\Domain\DTOToEmbed\ImageToCropDTO;
 use App\Domain\DTOToEmbed\VideoInfosDTO;
 use App\Domain\Entity\TrickGroup;
-use App\Form\Collection\DTOCollection;
+use App\Service\Form\Collection\DTOCollection;
 
 /**
  * Class CreateTrickDTO.

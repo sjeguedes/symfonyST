@@ -6,7 +6,7 @@ namespace App\Action\Admin;
 
 use App\Domain\ServiceLayer\ImageManager;
 use App\Domain\ServiceLayer\MediaManager;
-use App\Form\Handler\FormHandlerInterface;
+use App\Service\Form\Handler\FormHandlerInterface;
 use App\Responder\Json\JsonResponder;
 use App\Responder\Redirection\RedirectionResponder;
 use App\Utils\Traits\RouterHelperTrait;

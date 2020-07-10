@@ -5,7 +5,7 @@ declare(strict_types = 1);
 namespace App\Action\Admin;
 
 use App\Domain\ServiceLayer\UserManager;
-use App\Form\Handler\FormHandlerInterface;
+use App\Service\Form\Handler\FormHandlerInterface;
 use App\Responder\Admin\RequestNewPasswordResponder;
 use App\Responder\Redirection\RedirectionResponder;
 use Symfony\Component\HttpFoundation\Request;
