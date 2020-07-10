@@ -290,6 +290,8 @@
                         {{ form_end(registerForm) }}
                         <p class="uk-margin-small-top uk-text-center"><small>All fields are mandatory.</small></p>
                     </div>
+                    {# Here, enable login link only for unauthenticated user! #}
+                    {% if app.user is null %}
                     <div class="uk-card-footer">
                         {# Login #}
                         <div class="uk-text-center">
@@ -299,6 +301,7 @@
                             </a>
                         </div>
                     </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
