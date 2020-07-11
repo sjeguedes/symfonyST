@@ -128,8 +128,6 @@ final class CreateTrickDTO
         return $this->isPublished;
     }
 
-    // TODO: complete setters for Trick update
-
     /**
      * @param array|null $images
      *

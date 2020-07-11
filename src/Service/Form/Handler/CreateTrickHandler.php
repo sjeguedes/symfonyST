@@ -58,7 +58,7 @@ final class CreateTrickHandler extends AbstractUploadFormHandler
     private $security;
 
     /**
-     * RegisterHandler constructor.
+     * CreateTrickHandler constructor.
      *
      * @param CsrfTokenManagerInterface $csrfTokenManager
      * @param FlashBagInterface         $flashBag
