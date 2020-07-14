@@ -24,7 +24,7 @@ use Symfony\Component\Routing\RouterInterface;
 class AjaxDeleteImageType extends AbstractType
 {
     /**
-     * Add String to uuid model transformer from a form data.
+     * Add string to uuid model transformer from a form data.
      *
      * @param FormBuilderInterface $formBuilder
      * @param string               $formName    a Form instance name

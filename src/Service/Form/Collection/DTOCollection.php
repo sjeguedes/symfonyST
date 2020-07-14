@@ -11,11 +11,14 @@ use App\Domain\DTO\AbstractReadableDTO;
  *
  * Data Transfer Object (DTO) Collection is used to handle a set of DTO instances.
  *
+ * Inspired from:
  * @see https://www.sitepoint.com/collection-classes-in-php/
  * @see https://dev.to/drearytown/collection-objects-in-php-1cbk
  * @see https://medium.com/2dotstwice-connecting-the-dots/creating-strictly-typed-arrays-and-collections-in-php-37036718c921
+ * @see https://www.php.net/manual/fr/class.arrayaccess.php
+ * @see https://github.com/doctrine/collections/blob/master/lib/Doctrine/Common/Collections/ArrayCollection.php
  */
-class DTOCollection implements \IteratorAggregate, \Countable
+class DTOCollection implements \IteratorAggregate, \Countable, \ArrayAccess
 {
     /*
      * @var array
@@ -69,6 +72,18 @@ class DTOCollection implements \IteratorAggregate, \Countable
     }
 
     /**
+     * Check if a key exists in items array.
+     *
+     * @param int $key
+     *
+     * @return bool
+     */
+    public function contains(int $key) : bool
+    {
+        return isset($this->items[$key]) || array_key_exists($key, $this->items);
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function count() : int
@@ -91,6 +106,18 @@ class DTOCollection implements \IteratorAggregate, \Countable
             throw new \InvalidArgumentException("Item key $key is not valid!");
         }
         unset($this->items[$key]);
+    }
+
+    /**
+     * Get a particular item in collection.
+     *
+     * @param $key
+     *
+     * @return AbstractReadableDTO|null
+     */
+    public function get($key) :?AbstractReadableDTO
+    {
+        return $this->items[$key] ?? null;
     }
 
     /**
@@ -128,5 +155,43 @@ class DTOCollection implements \IteratorAggregate, \Countable
             }
         }
         return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function offsetExists($offset) : bool
+    {
+        $offset = (int) $offset;
+        return $this->contains($offset);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function offsetGet($offset) : ?AbstractReadableDTO
+    {
+        $offset = (int) $offset;
+        return $this->get($offset);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws \Exception
+     */
+    public function offsetSet($offset, $value) : void
+    {
+        $offset = (int) $offset;
+        $this->add($value, $offset);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function offsetUnset($offset) : void
+    {
+        $offset = (int) $offset;
+        $this->delete($offset);
     }
 }

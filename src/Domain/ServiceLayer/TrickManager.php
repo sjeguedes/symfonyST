@@ -207,7 +207,7 @@ class TrickManager extends AbstractServiceLayer
     }
 
     /**
-     * Find Trick by encoded uuid string.
+     * Find Trick to show on single page by encoded uuid string.
      *
      * @param string $encodedUuid
      *
@@ -215,10 +215,25 @@ class TrickManager extends AbstractServiceLayer
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function findSingleByEncodedUuid(string $encodedUuid) : ?Trick
+    public function findSingleToShowByEncodedUuid(string $encodedUuid) : ?Trick
     {
         $uuid = $this->decode($encodedUuid);
-        return $this->repository->findOneByUuid($uuid);
+        return $this->repository->findOneToShowByUuid($uuid);
+    }
+
+    /**
+     * Find Trick to update in form by encoded uuid string.
+     *
+     * @param string $encodedUuid
+     *
+     * @return Trick|null
+     *
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function findSingleToUpdateInFormByEncodedUuid(string $encodedUuid) : ?Trick
+    {
+        $uuid = $this->decode($encodedUuid);
+        return $this->repository->findOneToUpdateInFormByUuid($uuid);
     }
 
     /**

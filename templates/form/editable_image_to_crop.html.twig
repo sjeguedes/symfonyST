@@ -8,12 +8,15 @@
 {% set imageIndex = editableImageIndexName %}
 <div id="st-image-to-crop-wrapper-{{ imageIndex }}" class="st-image-to-crop-wrapper">
     <div id="{{ rootFormName }}_images_{{ imageIndex }}" class="uk-position-relative uk-border-rounded uk-padding-small uk-margin-small-bottom st-image-to-crop st-background-blue st-box-shadow-full-small">
+        {% set isSavedImageNameNotEmpty = imageToCropForm.savedImageName.vars.value != '' %}
+        {% set isImageUploadedanValid = isSavedImageNameNotEmpty and (imageToCropForm.savedImageName.vars.valid == 1) and (imageToCropForm.vars.bigImageUuid is defined) %}
+        {% set isImageToUpdate = isSavedImageNameNotEmpty and (imageToCropForm.vars.submitted == 0) %}
         {# Saved (uploaded) image block removal: look at AbstractTrickType::finishView() #}
         {# Prepare vars image removal modal by testing a valid and uploaded image #}
-        {% if (imageToCropForm.savedImageName.vars.value != '') and (imageToCropForm.savedImageName.vars.valid == 1) and (imageToCropForm.vars.entityUuid is defined) %}
+        {% if isImageUploadedanValid or isImageToUpdate %}
             {% set removeImageLink = 'id="st-image-remove-button-'~imageIndex~'" href="#st-modal-delete-image"' %}
             {% set removalIcon = 'trash' %}
-            {% set imageDataAttributes = 'data-uuid="'~imageToCropForm.vars.entityUuid~'" data-name="'~imageToCropForm.savedImageName.vars.value~'" data-type="'~imageOwnerType~'"' %}
+            {% set imageDataAttributes = 'data-uuid="'~imageToCropForm.vars.bigImageUuid~'" data-name="'~imageToCropForm.savedImageName.vars.value~'" data-type="'~imageOwnerType~'"' %}
         {% else %}
             {% set removeImageLink = 'href="#"' %}
             {% set removalIcon = 'close' %}
@@ -64,12 +67,26 @@
                 {{ form_label(imageToCropForm.image, 'Image file', {'label_attr': {'class': 'uk-form-label'}}) }}
                 <div class="uk-inline uk-flex uk-flex-middle">
                     <div class="uk-flex-column uk-position-relative uk-box-shadow-small uk-border-rounded uk-padding-small uk-margin-small-right st-background-white">
-                        {# Image preview (with JavaScript cropped area data URI #}
-                        {% set isImagePreview = (imageToCropForm.imagePreviewDataURI.vars.value != '') and (imageToCropForm.imagePreviewDataURI.vars.valid == 1) ? true : false %}
-                        {% set isImageDescription = imageToCropForm.description.vars.value != '' ? true : false %}
-                        {% set imageNamePath = isImagePreview ? imageToCropForm.imagePreviewDataURI.vars.value : asset(globalImageDirectory~'image-crop-box-default-thumb.png') %}
+                        {# image name path: determine which kind of image source has to be shown in image preview #}
+                        {% set isImagePreviewNotEmpty = imageToCropForm.imagePreviewDataURI.vars.value != '' %}
+                        {% set isImageToUpdate = (isImagePreviewNotEmpty == 0) and (imageToCropForm.vars.thumbnailImageDataURI is defined) %}
+                        {% set isImagePreview = (isImagePreviewNotEmpty == 1) and (imageToCropForm.imagePreviewDataURI.vars.valid == 1) %}
+                        {% if isImageToUpdate %}
+                            {# Used for trick update: look at AbstractTrickType::finishView(): this is used to ensure data persitence for img tag #}
+                            {% set imageNamePath = imageToCropForm.vars.thumbnailImageDataURI %}
+                        {% elseif isImagePreview %}
+                            {# Used when an image is cropped ans set with Javascript #}
+                            {% set imageNamePath = imageToCropForm.imagePreviewDataURI.vars.value %}
+                        {% else %}
+                            {# Used by default #}
+                            {% set imageNamePath = asset(globalImageDirectory~'image-crop-box-default-thumb.png') %}
+                        {% endif %}
+                        {# end image name path #}
+                        {% set isImageDescription = imageToCropForm.description.vars.value != '' %}
                         {% set imageDescription = isImageDescription ? 'Description will be: '~imageToCropForm.description.vars.value : 'Image description must be filled in!' %}
+                        {# Image preview (with JavaScript cropped area data URI #}
                         <img id="st-image-preview-{{ imageIndex }}" class="st-image-preview" width="142" src="{{ imageNamePath|e('html_attr') }}" data-default-image-path="{{ asset(globalImageDirectory~'image-crop-box-default-thumb.png') }}" alt="{{ imageDescription|e('html_attr') }}" >
+                        {# Image preview data URI hidden input #}
                         {{ form_row(imageToCropForm.imagePreviewDataURI, {
                             'attr': {'class': 'st-image-preview-data-uri'},
                             'value': imageToCropForm.imagePreviewDataURI.vars.value})
@@ -165,7 +182,7 @@
                     </div>
                 </div>
                 {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
-                {# Image crop JSON data #}
+                {# Image crop JSON data hidden input #}
                 <div id="st-crop-data-{{ imageIndex }}">
                     {# Hidden field used to store crop data after crop action #}
                     {{ form_row(imageToCropForm.cropJSONData, {
@@ -174,7 +191,7 @@
                     }}
                 </div>
                 {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
-                {# Saved image name (must correspond to a standalone uploaded image) #}
+                {# Saved image name (must correspond to a standalone uploaded image) hidden input #}
                 <div id="st-save-image-name-{{ imageIndex }}">
                      {# Hidden field used to store saved uploaded image during validation:
                         Please note this field is used because non persistence of image file,
@@ -201,7 +218,7 @@
                     </div>
                 </div>
                 {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
-                {# Show list rank (sortable order) #}
+                {# Show list rank (sortable order) hidden input #}
                 <div id="st-show-list-rank-{{ imageIndex }}">
                     {# Please note this can be changed via JavaScript to update this and all other "image to crop" boxes order when sortable/remove action is made! #}
                     {{ form_row(imageToCropForm.showListRank, {

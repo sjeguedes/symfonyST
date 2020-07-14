@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Service\Form\Handler;
 
+use App\Domain\Entity\Trick;
 use App\Domain\Entity\User;
 use App\Domain\ServiceLayer\ImageManager;
 use App\Domain\ServiceLayer\MediaManager;
@@ -31,6 +32,7 @@ class AbstractFormHandler implements FormHandlerInterface
         'mediaService'  => MediaManager::class,
         'request'       => Request::class,
         'trickService'  => TrickManager::class,
+        'trickToUpdate' => Trick::class,
         'userService'   => UserManager::class,
         'userToUpdate'  => User::class,
         'videoService'  => VideoManager::class

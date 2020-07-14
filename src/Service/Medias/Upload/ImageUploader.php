@@ -73,11 +73,13 @@ class ImageUploader
     public function __construct(ParameterBagInterface $parameterBag, LoggerInterface $logger)
     {
         $this->parameterBag = $parameterBag;
+        $avatarImageDirectory = $this->parameterBag->get('app_avatar_image_upload_directory');
+        $trickImageDirectory = $this->parameterBag->get('app_trick_image_upload_directory');
         $this->uploadDirectories = [
-            self::AVATAR_IMAGE_DIRECTORY_KEY      => $this->parameterBag->get('app_avatar_image_upload_directory'),
-            self::AVATAR_TEMP_IMAGE_DIRECTORY_KEY => $this->parameterBag->get('app_avatar_image_upload_directory') . '/' . self::TEMPORARY_DIRECTORY_NAME,
-            self::TRICK_IMAGE_DIRECTORY_KEY       => $this->parameterBag->get('app_trick_image_upload_directory'),
-            self::TRICK_TEMP_IMAGE_DIRECTORY_KEY  => $this->parameterBag->get('app_trick_image_upload_directory') . '/' . self::TEMPORARY_DIRECTORY_NAME
+            self::AVATAR_IMAGE_DIRECTORY_KEY      => $avatarImageDirectory,
+            self::AVATAR_TEMP_IMAGE_DIRECTORY_KEY => $avatarImageDirectory . '/' . self::TEMPORARY_DIRECTORY_NAME,
+            self::TRICK_IMAGE_DIRECTORY_KEY       => $trickImageDirectory,
+            self::TRICK_TEMP_IMAGE_DIRECTORY_KEY  => $trickImageDirectory . '/' . self::TEMPORARY_DIRECTORY_NAME
         ];
         // Use a PSR3 logger
         $this->setLogger($logger);
@@ -229,6 +231,22 @@ class ImageUploader
         // Free up memory by destroying resources
         imagedestroy($imageResource);
         return $finalImageFile;
+    }
+
+    /**
+     * Convert an image to base64 encoding.
+     *
+     * @param string $imagePath
+     *
+     * @return string
+     */
+    public function encodeImageWithBase64(string $imagePath) : string
+    {
+        // Read image path, convert it to base64 encoding
+        $imageData = base64_encode(file_get_contents($imagePath));
+        // Format the image source with the expected format: data:{mime};base64,{data}
+        $source = 'data: '. mime_content_type($imagePath) . ';base64,' . $imageData;
+        return $source;
     }
 
     /**

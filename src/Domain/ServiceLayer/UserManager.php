@@ -278,6 +278,16 @@ class UserManager
     }
 
     /**
+     * Get security helper.
+     *
+     * @return Security
+     */
+    public function getSecurity() : Security
+    {
+        return $this->security;
+    }
+
+    /**
      * Get user from password renewal request.
      *
      * @return User|null

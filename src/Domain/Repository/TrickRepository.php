@@ -264,9 +264,9 @@ class TrickRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find a Trick entity with query based on its uuid.
+     * Find a Trick entity with query based on its uuid to show data on a single page.
      *
-     * Please note only one query is used to get all needed Trick data.
+     * Please note only one query is used to get all needed Trick data on single page.
      *
      * @param UuidInterface $uuid
      *
@@ -286,16 +286,14 @@ class TrickRepository extends ServiceEntityRepository
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function findOneByUuid(UuidInterface $uuid) : ?Trick
+    public function findOneToShowByUuid(UuidInterface $uuid) : ?Trick
     {
         // TODO: complete query later with users messages or use Message (Comment) Repository to limit result!
         $queryBuilder = $this->createQueryBuilder('t');
-        // No need to join media types and trick group due to no particular filter on data
-        // trick group and media type data are added automatically thanks to lazy loading!
         // Specifying joins reduces query numbers!
         $result = $queryBuilder
             // IMPORTANT! This feeds all objects properties correctly!
-            ->select(['t', 'tg','mo', 'm', 'mt', 'ms', 'i', 'v']) // same as ['t', 'tg', 'tm', 'm', 'mt', 'i', 'v']
+            ->select(['t', 'tg','mo', 'm', 'mt', 'ms', 'i', 'v'])
             // CAUTION! 'HIDDEN' is a DQL keyword and
             // uses 'INVISIBLE' (or limited query result "tips") equivalence for MariaDB/MySQL up to date server version,
             // not to keep this column in final result.
@@ -331,6 +329,42 @@ class TrickRepository extends ServiceEntityRepository
             ->setParameter(7, MediaType::TYPE_CHOICES['trickDailymotion'])
             ->setParameter(8, MediaType::SOURCE_TYPES[0]) // image
             ->setParameter(9, MediaType::SOURCE_TYPES[1]) // video
+            ->getQuery()
+            ->getOneOrNullResult();
+        return $result;
+    }
+
+    /**
+     * Find a Trick entity with query based on its uuid to update data in form.
+     *
+     * Please note only one query is used to get all needed Trick data on single page.
+     *
+     * @param UuidInterface $uuid
+     *
+     * @return Trick|null
+     *
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function findOneToUpdateInFormByUuid(UuidInterface $uuid) : ?Trick
+    {
+        $queryBuilder = $this->createQueryBuilder('t');
+        // Specifying joins reduces query numbers!
+        $result = $queryBuilder
+            // IMPORTANT! This feeds all objects properties correctly!
+            ->select(['t', 'tg', 'u', 'mo', 'm', 'mt', 'ms', 'i', 'v'])
+            ->leftJoin('t.trickGroup', 'tg', 'WITH', 't.trickGroup = tg.uuid')
+            ->leftJoin('t.user', 'u', 'WITH', 't.user = u.uuid')
+            ->leftJoin('t.mediaOwner', 'mo', 'WITH', 'mo.trick = t.uuid')
+            ->leftJoin('mo.medias', 'm', 'WITH', 'm.mediaOwner = mo.uuid')
+            ->leftJoin('m.mediaType', 'mt', 'WITH', 'm.mediaType = mt.uuid')
+            ->leftJoin('m.mediaSource', 'ms', 'WITH', 'm.mediaSource = ms.uuid')
+            ->leftJoin('ms.image', 'i', 'WITH', 'ms.image = i.uuid')
+            ->leftJoin('ms.video', 'v', 'WITH', 'ms.video = v.uuid')
+            // Expression is equivalent to 't.uuid= ?1' in WHERE clause.
+            ->where($queryBuilder->expr()->eq('t.uuid', '?1'))
+            // Each group of medias sorted earlier by types are sorted by show list rank data.
+            ->addOrderBy('m.showListRank', 'ASC')
+            ->setParameter(1, $uuid->getBytes())
             ->getQuery()
             ->getOneOrNullResult();
         return $result;

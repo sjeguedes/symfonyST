@@ -1,0 +1,42 @@
+# https://symfony.com/doc/current/validation.html#validation-constraints
+# https://symfony.com/doc/current/validation/groups.html
+App\Domain\DTO\UpdateTrickDTO:
+    properties:
+        group:
+            - NotNull:
+                message: Please select a group as expected.
+
+        name:
+            - NotBlank:
+                message: Please fill in a name which is a title.
+            - Length:
+                max: 255
+                maxMessage: "This name should contain\na maximum of {{ limit }} characters or less."
+
+        description:
+            - NotBlank:
+                message: Please fill in a description.
+
+        # a "Slug" field is not managed (personalized) by form since it is based on name property and created automatically.
+        #slug:
+
+        images:
+            - Valid: ~
+            # Image collection must contain at least one item.
+            - Count:
+                min: 1
+                minMessage: A new trick must contain at least one image.
+
+        videos:
+            - Valid: ~
+            # Video collection must contain at least one item.
+            - Count:
+                min: 1
+                minMessage: A new trick must contain at least one video.
+
+        isPublished:
+            - NotNull:
+                message: Please define a moderation state.
+            - Type:
+                type: bool
+                message: "The value \"{{ value }}\" is not valid.\nPlease do not tamper data."

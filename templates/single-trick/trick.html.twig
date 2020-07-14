@@ -176,6 +176,17 @@
                 </span>
             </p>
         </div>
+        <!-- Update trick link -->
+        {% if is_granted('AUTHOR_OR_ADMIN_CAN_UPDATE_OR_DELETE_TRICKS', trick) %}
+            <div class="uk-flex uk-flex-center uk-margin-medium-top">
+                <p class="uk-text-center uk-text-uppercase uk-text-bold st-color-red">
+                    <a id="st-update-trick" class="uk-display-inline-block uk-button uk-button-secondary uk-border-rounded uk-box-shadow-hover-medium"
+                       href="{{ path('update_trick', { 'mainRoleLabel': app.user.mainRoleLabel|lower, 'slug': trick.slug, 'encodedUuid': trick.uuid|uuid_encode }) }}" title="Update this trick">
+                        Update this trick&nbsp;&nbsp;<span uk-icon="refresh"></span>
+                    </a>
+                </p>
+            </div>
+        {% endif %}
         <hr class="uk-margin-medium-top uk-margin-medium-bottom">
         <div class="uk-container uk-margin-large-top">
             <h1 class="uk-heading-bullet uk-text-large uk-text-center uk-text-uppercase uk-text-bold">

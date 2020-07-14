@@ -8,6 +8,7 @@ use App\Domain\DTO\CreateTrickDTO;
 use App\Domain\Entity\TrickGroup;
 use App\Domain\Entity\User;
 use App\Domain\ServiceLayer\ImageManager;
+use App\Domain\ServiceLayer\MediaTypeManager;
 use App\Domain\ServiceLayer\TrickGroupManager;
 use App\Domain\ServiceLayer\VideoManager;
 use App\Service\Form\Handler\CreateTrickHandler;
@@ -48,19 +49,21 @@ class CreateTrickType extends AbstractTrickType
     /**
      * CreateTrickType constructor.
      *
+     * @param MediaTypeManager  $mediaTypeService,
      * @param ImageManager      $imageService
      * @param VideoManager      $videoService
      * @param RequestStack      $requestStack
      * @param TrickGroupManager $trickGroupService the trick group entity service layer
      */
     public function __construct(
+        MediaTypeManager $mediaTypeService,
         ImageManager $imageService,
         VideoManager $videoService,
         RequestStack $requestStack,
         TrickGroupManager $trickGroupService
     )
     {
-        parent::__construct($imageService, $videoService);
+        parent::__construct($mediaTypeService, $imageService, $videoService);
         $this->request = $requestStack->getCurrentRequest();
         $this->trickGroupService = $trickGroupService;
     }

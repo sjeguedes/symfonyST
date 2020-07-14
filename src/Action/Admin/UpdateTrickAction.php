@@ -5,21 +5,26 @@ declare(strict_types = 1);
 namespace App\Action\Admin;
 
 use App\Domain\Entity\Trick;
+use App\Domain\Entity\User;
 use App\Domain\ServiceLayer\ImageManager;
 use App\Domain\ServiceLayer\MediaManager;
 use App\Domain\ServiceLayer\TrickManager;
+use App\Domain\ServiceLayer\UserManager;
 use App\Domain\ServiceLayer\VideoManager;
-use App\Service\Form\Handler\FormHandlerInterface;
 use App\Responder\Admin\UpdateTrickResponder;
 use App\Responder\Redirection\RedirectionResponder;
+use App\Service\Form\Handler\FormHandlerInterface;
+use App\Service\Security\Voter\TrickVoter;
 use App\Utils\Traits\RouterHelperTrait;
 use App\Utils\Traits\UuidHelperTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Class UpdateTrickAction.
@@ -30,6 +35,11 @@ class UpdateTrickAction
 {
     use RouterHelperTrait;
     use UuidHelperTrait;
+
+    /**
+     * @var UserManager
+     */
+    private $userService;
 
     /**
      * @var TrickManager
@@ -62,13 +72,9 @@ class UpdateTrickAction
     private $formHandlers;
 
     /**
-     * @var Security
-     */
-    private $security;
-
-    /**
      * UpdateTrickAction constructor.
      *
+     * @param UserManager       $userService,
      * @param TrickManager      $trickService
      * @param ImageManager      $imageService
      * @param VideoManager      $videoService
@@ -76,18 +82,18 @@ class UpdateTrickAction
      * @param FlashBagInterface $flashBag
      * @param RouterInterface   $router
      * @param array             $formHandlers
-     * @param Security          $security
      */
     public function __construct(
+        UserManager  $userService,
         TrickManager $trickService,
         ImageManager $imageService,
         VideoManager $videoService,
         MediaManager $mediaService,
         FlashBagInterface $flashBag,
         array $formHandlers,
-        RouterInterface $router,
-        Security $security
+        RouterInterface $router
     ) {
+        $this->userService = $userService;
         $this->trickService = $trickService;
         $this->imageService = $imageService;
         $this->videoService = $videoService;
@@ -95,15 +101,15 @@ class UpdateTrickAction
         $this->flashBag = $flashBag;
         $this->formHandlers = $formHandlers;
         $this->setRouter($router);
-        $this->security = $security;
+        $this->userService = $userService;
     }
 
     /**
      *  Show trick update form and validation errors.
      *
      * @Route({
-     *     "en": "/{_locale<en>}/{mainRoleLabel<admin|member>}/update-trick/{name}"
-     * }, name="update_trick")
+     *     "en": "/{_locale<en>}/{mainRoleLabel<admin|member>}/update-trick/{slug<[\w-]+>}-{encodedUuid<\w+>}"
+     * }, name="update_trick", methods={"GET", "POST"})
      *
      * @param RedirectionResponder $redirectionResponder
      * @param UpdateTrickResponder $responder
@@ -112,12 +118,94 @@ class UpdateTrickAction
      * @return Response
      *
      * @throws \Exception
+     * @throws NotFoundHttpException
      */
     public function __invoke(RedirectionResponder $redirectionResponder, UpdateTrickResponder $responder, Request $request) : Response
     {
+        // Check access to update form page
+        $trick = $this->checkAccessToUpdateAction($request);
         // Get authenticated user
-        $authenticatedUser = $this->security->getUser();
-        $data = [];
+        $authenticatedUser = $this->userService->getAuthenticatedMember();
+        // Use form handler as form type option
+        $options = ['formHandler' => $this->formHandlers[0], 'userRoles' => $authenticatedUser->getRoles()];
+        // Set form with initial model data and set the request by binding it
+        $updateTrickForm = $this->formHandlers[0]->initForm(['trickToUpdate' => $trick], null, $options)->bindRequest($request);
+        // Use router and user main role label as form type options
+        $options = ['router' => $this->router, 'userMainRoleLabel' => $authenticatedUser->getMainRoleLabel()];
+        // Init ajax delete image form (used to delete temporary saved images) to pass it to trick update view
+        $deleteImageForm = $this->formHandlers[1]->initForm(null, null, $options)->getForm();
+        // Process only on submit
+        if ($updateTrickForm->isSubmitted()) {
+            // Constraints and custom validation: call actions to perform if necessary on success
+            $isFormRequestValid = $this->formHandlers[0]->processFormRequest([
+                'trickService' => $this->trickService,
+                'imageService' => $this->imageService,
+                'videoService' => $this->videoService,
+                'mediaService' => $this->mediaService
+            ]);
+            if ($isFormRequestValid) {
+                // Get redirection routing parameters which depend on trick update result
+                $routingParameters = $this->manageTrickUpdateResultRouting($authenticatedUser, $trick);
+                return $redirectionResponder($routingParameters['routeName'], $routingParameters['routeParameters']);
+            }
+        }
+        $data = [
+            'trickUpdateError' => $this->formHandlers[0]->getTrickUpdateError() ?? null,
+            'updateTrickForm'  => $updateTrickForm->createView(),
+            'deleteImageForm'  => $deleteImageForm->createView() // Used to delete images with direct upload
+            // TODO: need to add 'deleteVideoForm' here!
+        ];
         return $responder($data);
+    }
+
+    /**
+     * Check trick update form access.
+     *
+     * @param Request $request
+     *
+     * @return Trick
+     *
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    private function checkAccessToUpdateAction(Request $request) : Trick
+    {
+        // Check if a trick can be retrieved thanks to its uuid
+        $trick = $this->trickService->findSingleToUpdateInFormByEncodedUuid($request->attributes->get('encodedUuid'));
+        if (\is_null($trick)) {
+            throw new NotFoundHttpException('Sorry, no trick was found due to wrong identifier!');
+        }
+        // Check access permissions to trick update page
+        $security = $this->userService->getSecurity();
+        if (!$security->isGranted(TrickVoter::AUTHOR_OR_ADMIN_CAN_VIEW_UNPUBLISHED_TRICKS, $trick)) {
+            throw new AccessDeniedException("Current user can not view this unpublished trick!");
+        }
+        return $trick;
+    }
+
+    /**
+     * Manage trick update redirection routing parameters.
+     *
+     * @param User|UserInterface $authenticatedUser
+     * @param Trick              $trick
+     *
+     * @return array
+     */
+    private function manageTrickUpdateResultRouting(UserInterface $authenticatedUser, Trick $trick) : array
+    {
+        $trickUpdateError = $this->formHandlers[0]->getTrickUpdateError();
+        // Failure (redirect to reinitialized trick update form page)
+        if (!\is_null($trickUpdateError)) {
+            $routeName = 'update_trick';
+            $routeParameters = [
+                'mainRoleLabel' => lcfirst($authenticatedUser->getMainRoleLabel()),
+                'slug' => $trick->getSlug(),
+                'encodedUuid' => $this->encode($trick->getUuid())
+            ];
+        // Success (redirect to new trick page)
+        } else {
+            $routeName = 'show_single_trick';
+            $routeParameters = ['slug' => $trick->getSlug(), 'encodedUuid' => $this->encode($trick->getUuid())];
+        }
+        return ['routeName' => $routeName, 'routeParameters' => $routeParameters];
     }
 }

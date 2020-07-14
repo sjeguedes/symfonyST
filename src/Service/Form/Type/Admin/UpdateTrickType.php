@@ -8,6 +8,7 @@ use App\Domain\DTO\UpdateTrickDTO;
 use App\Domain\Entity\TrickGroup;
 use App\Domain\Entity\User;
 use App\Domain\ServiceLayer\ImageManager;
+use App\Domain\ServiceLayer\MediaTypeManager;
 use App\Domain\ServiceLayer\TrickGroupManager;
 use App\Domain\ServiceLayer\VideoManager;
 use App\Service\Form\Handler\UpdateTrickHandler;
@@ -48,19 +49,21 @@ class UpdateTrickType extends AbstractTrickType
     /**
      * UpdateTrickType constructor.
      *
+     * @param MediaTypeManager  $mediaTypeService,
      * @param ImageManager      $imageService
      * @param VideoManager      $videoService
      * @param RequestStack      $requestStack
      * @param TrickGroupManager $trickGroupService the trick group entity service layer
      */
     public function __construct(
+        MediaTypeManager $mediaTypeService,
         ImageManager $imageService,
         VideoManager $videoService,
         RequestStack $requestStack,
         TrickGroupManager $trickGroupService
     )
     {
-        parent::__construct($imageService, $videoService);
+        parent::__construct($mediaTypeService, $imageService, $videoService);
         $this->request = $requestStack->getCurrentRequest();
         $this->trickGroupService = $trickGroupService;
     }
@@ -115,7 +118,8 @@ class UpdateTrickType extends AbstractTrickType
                     'rootFormHandler' =>  $options['formHandler']
                 ],
                 // Maintain validation state at the collection form level, to be able to show errors near field
-                'error_bubbling' => false
+                'error_bubbling' => false,
+                //'by_reference'   => false
             ])
             ->add('videos', CollectionType::class, [
                 'entry_type'     => VideoInfosType::class,
@@ -124,7 +128,8 @@ class UpdateTrickType extends AbstractTrickType
                 // Used here to access fields in templates and customize a particular prototype
                 'prototype'      => true, // This is he default value but more explicit due to customization.
                 // Maintain validation state at the collection form level, to be able to show errors near field
-                'error_bubbling' => false
+                'error_bubbling' => false,
+                //'by_reference'   => false
             ])
             ->add('token', HiddenType::class, [
                 'inherit_data' => true

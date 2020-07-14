@@ -176,9 +176,19 @@ final class ImageToCropConstraintValidator extends AbstractTrickCollectionConstr
                 // Check if a real image is present in base 64 encoded string.
                 $this->dataUriDeNormalizer->denormalize($object->getImagePreviewDataURI(), 'SplFileObject');
             } catch (\Exception $exception) {
-                // CAUTION: this condition is useful in case of Trick update when the image used in preview is not a base 64 encoded image!
-                // If a normal image present on server is found here, that means the field data was feed by initial injected model data to update
-                $imageFiles[0] = $this->imageService->getImageUploader()->checkFileUploadOnServer($object->getImagePreviewDataURI(), null, true);
+                // CAUTION: this condition is useful in case of Trick update!
+                // Check if the image used in preview is not a base 64 encoded image is present on server.
+                // If a normal image present on server is found here,
+                // that means the field data was feed by initial injected model data to update.
+                $temporaryIdentifierPattern = preg_quote(ImageManager::DEFAULT_IMAGE_IDENTIFIER_NAME, '/');
+                $imageUploader = $this->imageService->getImageUploader();
+                // Adapt search depending on temporary image or not
+                $isTemporaryImage = preg_match('/'. $temporaryIdentifierPattern . '$/', $object->getSavedImageName());
+                $imageFiles[0] = $imageUploader->checkFileUploadOnServer(
+                    $object->getImagePreviewDataURI(),
+                    null,
+                    1 === $isTemporaryImage ? true : false
+                );
                 // Data was tampered by malicious user: image source is not a base 64 encoded string and image does not exist on server!
                 if (null === $imageFiles[0]) {
                     $context->buildViolation('You are not allowed to tamper image preview data URI!')
@@ -264,18 +274,36 @@ final class ImageToCropConstraintValidator extends AbstractTrickCollectionConstr
     {
         // Get current validated object (ImageToCropDTO)
         $object = $context->getObject();
-        // Saved image name (which is a kind of identifier) is automatically feed each time a image is uploaded in corresponding "image to crop" box.
+        // Saved image name (which is a kind of identifier) is automatically feed
+        // each time a image is uploaded in corresponding "image to crop" box.
         if (!\is_null($object->getSavedImageName())) {
             $isImageFileValid = false;
+            // CAUTION: this condition is useful in case of Trick update!
             // Check if a real image which corresponds to saved image name is present on server.
-            $imageFiles[0] = $this->imageService->getImageUploader()->checkFileUploadOnServer($object->getSavedImageName(), null, true);
-            // Image file may not have been created physically yet, so we check if "cropJSONData" identifier is the same as "savedImageName" value!
-            if (!\is_null($imageFiles[0]) && !\is_null($object->getCropJSONData())) {
-                $dataObjectFromJSONData = json_decode($object->getCropJSONData());
-                if (json_last_error() === JSON_ERROR_NONE && property_exists($dataObjectFromJSONData[0],'identifier')) {
-                    $imageJSONIdentifier = $dataObjectFromJSONData[0]->identifier;
-                    // We presume image file will be created on server as a result of direct upload action!
-                    $isImageFileValid = $imageJSONIdentifier === $object->getSavedImageName();
+            // If a normal image present on server is found here,
+            // that means the field data was feed by initial injected model data to update.
+            $temporaryIdentifierPattern = preg_quote(ImageManager::DEFAULT_IMAGE_IDENTIFIER_NAME, '/');
+            $imageUploader = $this->imageService->getImageUploader();
+            // Adapt search depending on temporary image or not
+            $isTemporaryImage = preg_match('/'. $temporaryIdentifierPattern . '$/', $object->getSavedImageName());
+            $imageFiles[0] = $imageUploader->checkFileUploadOnServer(
+                $object->getSavedImageName(),
+                null,
+                1 === $isTemporaryImage ? true : false
+            );
+            // Image was not found in search or file may not have been created physically yet,
+            if (!\is_null($imageFiles[0])) {
+                // A image was found on server with saved image name!
+                $isImageFileValid = true;
+                // so we check if "cropJSONData" identifier is the same as "savedImageName" value!
+                if (!\is_null($object->getCropJSONData())) {
+                    $dataObjectFromJSONData = json_decode($object->getCropJSONData());
+                    if (json_last_error() === JSON_ERROR_NONE && property_exists($dataObjectFromJSONData[0], 'identifier')) {
+                        $imageJSONIdentifier = $dataObjectFromJSONData[0]->identifier;
+                        // Re-evaluate image validity: we presume image file will be created on server
+                        // as a result of direct upload action!
+                        $isImageFileValid = $imageJSONIdentifier === $object->getSavedImageName();
+                    }
                 }
             }
             // No matching image was found

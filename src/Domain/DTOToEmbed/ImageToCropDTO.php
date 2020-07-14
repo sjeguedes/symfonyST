@@ -137,4 +137,81 @@ final class ImageToCropDTO extends AbstractReadableDTO
     {
         return $this->isMain;
     }
+
+    /**
+     * @param UploadedFile|null $image
+     *
+     * @return ImageToCropDTO
+     */
+    public function setImage(?UploadedFile $image) : self
+    {
+        $this->image = $image;
+        return $this;
+    }
+
+    /**
+     * @param string|null $description
+     *
+     * @return ImageToCropDTO
+     */
+    public function setDescription(?string $description) : self
+    {
+        $this->description = $description;
+        return $this;
+    }
+
+    /**
+     * @param string|null $cropJSONData
+     *
+     * @return ImageToCropDTO
+     */
+    public function setCropJSONData(?string $cropJSONData) : self
+    {
+        $this->cropJSONData = $cropJSONData;
+        return $this;
+    }
+
+    /**
+     * @param string|null $imagePreviewDataURI
+     *
+     * @return ImageToCropDTO
+     */
+    public function setImagePreviewDataURI(?string $imagePreviewDataURI) : self
+    {
+        $this->imagePreviewDataURI = $imagePreviewDataURI;
+        return $this;
+    }
+
+    /**
+     * @param string|null $savedImageName
+     *
+     * @return ImageToCropDTO
+     */
+    public function setSavedImageName(?string $savedImageName) : self
+    {
+        $this->savedImageName = $savedImageName;
+        return $this;
+    }
+
+    /**
+     * @param int $showListRank
+     *
+     * @return ImageToCropDTO
+     */
+    public function setShowListRank(int $showListRank) : self
+    {
+        $this->showListRank = $showListRank;
+        return $this;
+    }
+
+    /**
+     * @param bool $isMain
+     *
+     * @return ImageToCropDTO
+     */
+    public function setIsMain(bool $isMain) : self
+    {
+        $this->isMain = $isMain;
+        return $this;
+    }
 }

@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Service\Form\Handler;
 
+use App\Domain\DTO\UpdateTrickDTO;
 use App\Domain\DTOToEmbed\ImageToCropDTO;
 use App\Domain\DTOToEmbed\VideoInfosDTO;
 use App\Domain\Entity\Image;
@@ -21,6 +22,7 @@ use App\Service\Form\Type\Admin\UpdateTrickType;
 use App\Service\Medias\Upload\ImageUploader;
 use App\Utils\Traits\CSRFTokenHelperTrait;
 use App\Utils\Traits\StringHelperTrait;
+use http\Exception\RuntimeException;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -39,7 +41,7 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
  * Please note authenticated member must be trick author or administrator
  * to be able to update a trick.
  */
-final class UpdateTrickHandler extends AbstractUploadFormHandler
+final class UpdateTrickHandler extends AbstractUploadFormHandler implements InitModelDataInterface
 {
     use CSRFTokenHelperTrait;
     use LoggerAwareTrait;
@@ -146,5 +148,81 @@ final class UpdateTrickHandler extends AbstractUploadFormHandler
     public function getTrickUpdateError() : ?string
     {
         return $this->customError;
+    }
+
+    /**
+     * Initialize a set of images and videos DTO instances as array
+     * to be used in collections.
+     *
+     * @param Trick  $trick
+     * @param string $type
+     *
+     * @return array
+     *
+     * @throws \Exception
+     */
+    public function initTrickMediasDataBySourceType(Trick $trick, string $type): array
+    {
+        if (!preg_match('/image|video/', $type)) {
+            throw new RuntimeException('Media source type label to create collection is unknown!');
+        }
+        $trickMedias = $trick->getMediaOwner()->getMedias();
+        $dtoArray = [];
+        foreach ($trickMedias as $media) {
+            if ($type === $media->getMediaType()->getSourceType()) {
+                switch ($type) {
+                    case 'image':
+                        // Keep only big images to retrieve saved image name in form
+                        if (MediaType::TYPE_CHOICES['trickBig'] !== $media->getMediaType()->getType()) {
+                            continue;
+                        }
+                        $image = $media->getMediaSource()->getImage();
+                        $dtoArray[] = new ImageToCropDTO(
+                            null, // No uploaded file exists for image to crop initial data model!
+                            $image->getDescription(),
+                            // TODO: need to change JSON data structure in JS and PHP methods to avoid XSSI issue!
+                            // TODO: need to change -> '[{}]' to simple '{}'
+                            '[{}]', // An empty JSON is set (feed with JS only) to avoid validation issue.
+                            null, // This is set to null (feed with JS only)
+                            $image->getName(),
+                            $media->getShowListRank(),
+                            $media->getIsMain()
+                        );
+                        break;
+                    case 'video':
+                        $video = $media->getMediaSource()->getVideo();
+                        $dtoArray[] = new VideoInfosDTO(
+                            $video->getUrl(),
+                            $video->getDescription(),
+                            $media->getShowListRank()
+                        );
+                        break;
+                }
+            }
+        }
+        return $dtoArray;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return object a UpdateTrickDTO instance
+     *
+     * @throws \Exception
+     */
+    public function initModelData(array $data) : object
+    {
+        // Check Trick instance in passed data
+        $this->checkNecessaryData($data);
+        /** @var Trick $trick */
+        $trick = $data['trickToUpdate'];
+        return new UpdateTrickDTO(
+            $trick->getTrickGroup(),
+            $trick->getName(),
+            $trick->getDescription(),
+            $this->initTrickMediasDataBySourceType($trick, 'image'),
+            $this->initTrickMediasDataBySourceType($trick, 'video'),
+            $trick->getIsPublished()
+        );
     }
 }

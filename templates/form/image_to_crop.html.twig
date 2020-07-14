@@ -1,7 +1,7 @@
 {# rootForm var is provided by root form template which calls this template #}
 {% set rootFormName = rootForm.vars.name %}
 {# Get "prototype_name" option value from images Collection #}
-{% set imageIndex = createTrickForm.images.vars.prototype.vars.name %}
+{% set imageIndex = rootForm.images.vars.prototype.vars.name %}
 {# A wrapper <div id="st-image-to-crop-wrapper-{{ imageIndex }}" class="st-image-to-crop-wrapper"></div> is injected here with JavaScript
 arround this "div" element below to add correctly the prototype to DOM as a new element. #}
 <div id="{{ rootFormName }}_images_{{ imageIndex }}" class="uk-position-relative uk-border-rounded uk-padding-small uk-margin-small-bottom st-image-to-crop st-background-blue st-box-shadow-full-small">

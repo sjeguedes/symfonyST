@@ -46,7 +46,7 @@
     {# User profile information #}
     {% if app.user %}
     <li class="st-background-blue">
-        <a class="uk-position-relative" href="{{ path('update_profile', {'mainRoleLabel': app.user.mainRoleLabel|lower}) }}" title="{{ app.user.nickName|e('html_attr') }}'s Profile">
+        <a class="uk-position-relative" href="{{ path('update_profile', { 'mainRoleLabel': app.user.mainRoleLabel|lower }) }}" title="{{ app.user.nickName|e('html_attr') }}'s Profile">
             <div>
                 <span class="uk-text-break uk-text-uppercase">
                     {# This HTML content is safely escaped due to default html strategy #}

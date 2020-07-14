@@ -128,7 +128,38 @@ final class UpdateTrickDTO
         return $this->isPublished;
     }
 
-    // TODO: complete setters for Trick update
+    /**
+     * @param TrickGroup $group|null
+     *
+     * @return UpdateTrickDTO
+     */
+    public function setGroup(?TrickGroup $group) : self
+    {
+        $this->group = $group;
+        return $this;
+    }
+
+    /**
+     * @param string $name|null
+     *
+     * @return UpdateTrickDTO
+     */
+    public function setName(?string $name) : self
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    /**
+     * @param string $description|null
+     *
+     * @return UpdateTrickDTO
+     */
+    public function setDescription(?string $description) : self
+    {
+        $this->description = $description;
+        return $this;
+    }
 
     /**
      * @param array|null $images
@@ -153,6 +184,17 @@ final class UpdateTrickDTO
     public function setVideos(?array $videos) : self
     {
         $this->videos = new DTOCollection($videos);
+        return $this;
+    }
+
+    /**
+     * @param bool $isPublished|null
+     *
+     * @return UpdateTrickDTO
+     */
+    public function setIsPublished(?bool $isPublished) : self
+    {
+        $this->isPublished = $isPublished;
         return $this;
     }
 }

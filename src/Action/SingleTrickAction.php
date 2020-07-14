@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Action;
 
+use App\Domain\Entity\Trick;
 use App\Domain\ServiceLayer\MediaTypeManager;
 use App\Domain\ServiceLayer\TrickManager;
 use App\Responder\SingleTrickResponder;
@@ -81,12 +82,8 @@ class SingleTrickAction
      */
     public function __invoke(SingleTrickResponder $responder, Request $request) : Response
     {
-        // Get trick
-        $trick = $this->trickService->findSingleByEncodedUuid($request->attributes->get('encodedUuid'));
-        // Check access to trick page
-        if (!$this->authorizationChecker->isGranted(TrickVoter::AUTHOR_OR_ADMIN_CAN_VIEW_UNPUBLISHED_TRICKS, $trick)) {
-            throw new AccessDeniedException("Current user can not view this unpublished trick!");
-        }
+        // Check access to single page
+        $trick = $this->checkAccessToSingleAction($request);
         // Get registered normal image type (corresponds particular dimensions)
         $trickNormalImageTypeValue = $this->mediaTypeService->getMandatoryDefaultTypes()['trickNormal'];
         $normalImageMediaType = $this->mediaTypeService->findSingleByUniqueType($trickNormalImageTypeValue);
@@ -108,5 +105,28 @@ class SingleTrickAction
             'trick'                => $trick
         ];
         return $responder($data);
+    }
+
+    /**
+     * Check single trick page access.
+     *
+     * @param Request $request
+     *
+     * @return Trick
+     *
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    private function checkAccessToSingleAction(Request $request) : Trick
+    {
+        // Check if a trick can be retrieved thanks to its uuid
+        $trick = $this->trickService->findSingleToShowByEncodedUuid($request->attributes->get('encodedUuid'));
+        if (\is_null($trick)) {
+            throw new NotFoundHttpException('Sorry, no trick was found due to wrong identifier!');
+        }
+        // Check access permissions to view this trick
+        if (!$this->authorizationChecker->isGranted(TrickVoter::AUTHOR_OR_ADMIN_CAN_VIEW_UNPUBLISHED_TRICKS, $trick)) {
+            throw new AccessDeniedException("Current user can not view this unpublished trick!");
+        }
+        return $trick;
     }
 }

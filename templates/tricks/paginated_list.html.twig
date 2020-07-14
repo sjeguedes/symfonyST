@@ -76,7 +76,7 @@
                             </div>
                             {% if is_granted('AUTHOR_OR_ADMIN_CAN_UPDATE_OR_DELETE_TRICKS', trick) %}
                             <div class="uk-text-right">
-                                <a href="{#{{ path('update_trick', { 'encodedUuid': trick.uuid|uuid_encode }) }}#}#" class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove" title="Update">
+                                <a href="{{ path('update_trick', { 'mainRoleLabel': app.user.mainRoleLabel|lower, 'slug': trick.slug, 'encodedUuid': trick.uuid|uuid_encode }) }}" class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove" title="Update">
                                     <span uk-icon="icon: pencil; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-update"></span>
                                 </a>
                                 <a href="{#{{{ path('delete_trick', { 'encodedUuid': trick.uuid|uuid_encode }) }}#}#" class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove" title="Delete">

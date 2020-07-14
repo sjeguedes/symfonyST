@@ -72,4 +72,37 @@ final class VideoInfosDTO extends AbstractReadableDTO
     {
         return $this->showListRank;
     }
+
+    /**
+     * @param string|null $url
+     *
+     * @return VideoInfosDTO
+     */
+    public function setUrl(?string $url) : self
+    {
+        $this->url = $url;
+        return $this;
+    }
+
+    /**
+     * @param string|null $description
+     *
+     * @return VideoInfosDTO
+     */
+    public function setDescription(?string $description) : self
+    {
+        $this->description = $description;
+        return $this;
+    }
+
+    /**
+     * @param int $showListRank
+     *
+     * @return VideoInfosDTO
+     */
+    public function setShowListRank(int $showListRank) : self
+    {
+        $this->showListRank = $showListRank;
+        return $this;
+    }
 }

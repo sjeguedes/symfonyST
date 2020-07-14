@@ -4,8 +4,11 @@ declare(strict_types = 1);
 
 namespace App\Service\Form\Type\Admin;
 
+use App\Domain\Entity\MediaType;
 use App\Domain\ServiceLayer\ImageManager;
+use App\Domain\ServiceLayer\MediaTypeManager;
 use App\Domain\ServiceLayer\VideoManager;
+use App\Service\Medias\Upload\ImageUploader;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -17,6 +20,11 @@ use Symfony\Component\Form\FormView;
  */
 abstract class AbstractTrickType extends AbstractType
 {
+    /**
+     * @var MediaTypeManager
+     */
+    private $mediaTypeService;
+
     /**
      * @var ImageManager
      */
@@ -30,11 +38,13 @@ abstract class AbstractTrickType extends AbstractType
     /**
      * AbstractTrickType constructor.
      *
-     * @param ImageManager $imageService
-     * @param VideoManager $videoService
+     * @param MediaTypeManager $mediaTypeService
+     * @param ImageManager     $imageService
+     * @param VideoManager     $videoService
      */
-    public function __construct(ImageManager $imageService, VideoManager $videoService)
+    public function __construct(MediaTypeManager $mediaTypeService, ImageManager $imageService, VideoManager $videoService)
     {
+        $this->mediaTypeService = $mediaTypeService;
         $this->imageService = $imageService;
         $this->videoService = $videoService;
     }
@@ -50,6 +60,8 @@ abstract class AbstractTrickType extends AbstractType
      * @param array         $options
      *
      * @return void
+     *
+     * @throws \Exception
      */
     public function finishView(FormView $view, FormInterface $form, array $options) : void
     {
@@ -66,13 +78,15 @@ abstract class AbstractTrickType extends AbstractType
      * @param FormInterface $form
      *
      * @return void
+     *
+     * @throws \Exception
      */
     private function manageImagesCollectionData(FormView $view, FormInterface $form) : void
     {
         // Reorder "image to crop" boxes data in images collection and redefine rank if necessary
         $this->updateCollectionOrderAndRanks('images', $view, $form);
 
-        $this->retrieveEntitiesUuid('images', $view, $form);
+        $this->retrieveMediasSourcesEntities('images', $view, $form);
     }
 
     /**
@@ -82,66 +96,122 @@ abstract class AbstractTrickType extends AbstractType
      * @param FormInterface $form
      *
      * @return void
+     *
+     * @throws \Exception
      */
     private function manageVideosCollectionData(FormView $view, FormInterface $form) : void
     {
         // Reorder "video infos" boxes data in videos collection and redefine rank if necessary
         $this->updateCollectionOrderAndRanks('videos', $view, $form);
         // TODO: add logic for video trick update
-        // TODO: make changes in Video, VideoInfosType, VideoInfosDTO, VideoInfosDTO.yaml to add logic for "name" / "savedVideoName"
-        //$this->retrieveEntitiesUuid('videos', $view, $form);
+        // TODO: make changes in Video, VideoRepository, VideoInfosType, VideoInfosDTO, VideoInfosDTO.yaml to add logic for "name" / "savedVideoName"
+        //$this->retrieveMediasSourcesEntities('videos', $view, $form);
     }
 
     /**
-     * Retrieve existing entities uuid identifiers to pass them to collections in order to update/delete items.
+     * Retrieve existing medias sources (images or videos) entities
+     * to pass them to collections in order to update/delete items.
      *
      * @param string        $collectionName
      * @param FormView      $view
      * @param FormInterface $form
      *
      * @return void
+     *
+     * @throws \Exception
      */
-    private function retrieveEntitiesUuid(string $collectionName, FormView $view, FormInterface $form) : void
+    private function retrieveMediasSourcesEntities(string $collectionName, FormView $view, FormInterface $form) : void
     {
         $config = [
-            'images' => [
-                // This array will store all valid collection entity items "identifier" names.
-                'validSavedNames' => [],
-                'childFormName'   => 'savedImageName',
-                'serviceLayer'    => $this->imageService
-            ],
-            'videos' => [
-                // This array will store all valid collection entity items "identifier" names.
-                'validSavedNames' => [],
-                'childFormName'   => 'savedVideoName',
-                'serviceLayer'    => $this->videoService
-            ]
+            // This array will store all valid image collection entity items "identifier" names.
+            'images' => ['validSavedNames' => [], 'childFormName' => 'savedImageName', 'serviceLayer' => $this->imageService],
+            // This empty array will store all valid video collection entity items "identifier" names.
+            'videos' => ['validSavedNames' => [], 'childFormName' => 'savedVideoName',  'serviceLayer' => $this->videoService]
         ];
-        $validImagesNames = $config[$collectionName]['validSavedNames'];
+        // Get images or videos names
+        $validMediasSourcesNames = $config[$collectionName]['validSavedNames'];
         $childFormName = $config[$collectionName]['childFormName'];
         // Get an array of valid saved image name to perform a database query later
         foreach ($form->get($collectionName)->all() as $form) {
-            // Be aware of saved name which can be null even if it is a valid data.
-            if ($form->get($childFormName)->isValid() && !\is_null($form->get($childFormName)->getData())) {
-                $validImagesNames[] = $form->get($childFormName)->getData();
+            // This condition will be used to check a temporary saved image:
+            // Be aware of saved name which cannot be null even if it is a submitted and valid data.
+            $isFormSubmittedAndValid = $form->get($childFormName)->isSubmitted() && $form->get($childFormName)->isValid();
+            // This condition will be used to check a image to update:
+            // Be aware of saved name which cannot be null event if image to update already valid before submit
+            $isFormNotSubmitted = !$form->get($childFormName)->isSubmitted();
+            // If at least one condition matched, check also necessarily if saved name is not null event.
+            if (($isFormNotSubmitted or $isFormSubmittedAndValid) && !\is_null($form->get($childFormName)->getData())) {
+                $validMediasSourcesNames[] = $form->get($childFormName)->getData();
             }
         }
-        // Query database to get all uuid values which corresponds to valid saved names (can be considered as "identifier")
-        if (0 !== \count($validImagesNames)) {
+        // Query database to get all needed data values (e.g. uuid and saved name for both cases, format for images)
+        // which corresponds to valid saved names (can be considered as "identifier")
+        if (0 !== \count($validMediasSourcesNames)) {
             $serviceLayer = $config[$collectionName]['serviceLayer'];
-            $results = $serviceLayer->getRepository()->findManyUuidByNames($validImagesNames);
-            $collectionFormViews = $view->children[$collectionName]->children;
+            $results = $serviceLayer->getRepository()->findManyToShowInFomByNames($validMediasSourcesNames);
+            $formViewsCollection = $view->children[$collectionName]->children;
             // Pass a new entity uuid variable entity uuid template for each corresponding form view
             if (0 !== \count($results)) {
-                // Iterate on each
-                foreach ($collectionFormViews as $formView) {
-                    // Retrieve child form view which store entity valid saved name
-                    // For instance, form view name is "savedImageName" or "savedVideoName".
-                    $childFormViewValue = $formView->children[$childFormName]->vars['value'];
-                    // Pass collection item entity uuid to corresponding form view to use it in template
-                    if (isset($results[$childFormViewValue])) {
-                        $formView->vars['entityUuid'] = (string) $results[$childFormViewValue];
-                    }
+                // Pass new custom form view data to template
+                $this->transmitMediasSourcesDataToTemplate($results, $formViewsCollection, $childFormName);
+
+            }
+        }
+    }
+
+    /**
+     * Transmit newly created FormView data to form template by querying corresponding data in database.
+     *
+     * Please note data are filtered thanks to media source saved names to get data results.
+     *
+     * @param array            $results             an array of queried data
+     * @param array|FormView[] $formViewsCollection a collection of FormView instances
+     * @param string           $childFormName       a field name to filter FormView instances
+     *                                              (e.g. media source saved name)
+     *
+     * @return void
+     *
+     * @see https://www.php.net/manual/en/function.base64-encode.php
+     *
+     * @throws \Exception
+     */
+    private function transmitMediasSourcesDataToTemplate(array $results, array $formViewsCollection, string $childFormName) : void
+    {
+        // Get image thumbnail type by querying once
+        $type = MediaType::TYPE_CHOICES['trickThumbnail'];
+        $thumbnailTypeEntity = $this->mediaTypeService->findSingleByUniqueType($type);
+        // Iterate on each
+        foreach ($formViewsCollection as $formView) {
+            // Retrieve child form view which store entity valid saved name
+            // For instance, form view name is "savedImageName" or "savedVideoName".
+            $childFormViewValue = $formView->children[$childFormName]->vars['value'];
+            // Pass collection item entity uuid to corresponding form view to use it in template
+            if (isset($results[$childFormViewValue]) && !empty($results[$childFormViewValue])) {
+                // Add entity uuid for both image and video
+                $formView->vars['bigImageUuid'] = $results[$childFormViewValue]['uuid'];
+                switch ($results[$childFormViewValue]['sourceType']) {
+                    case 'image':
+                        // Get thumbnail image name
+                        $pattern = '/^.*-(\d{2,}x\d{2,})(\.[a-z]{3,4})?$/';
+                        $bigImageName = $childFormViewValue;
+                        preg_match($pattern, $bigImageName, $matches, PREG_UNMATCHED_AS_NULL);
+                        // Replace big image dimensions ("with"x"height") in group 1 by thumbnail corresponding dimensions
+                        $width = $thumbnailTypeEntity->getWidth();
+                        $height = $thumbnailTypeEntity->getHeight();
+                        $thumbnailNameWithoutExtension = preg_replace(
+                            '/' . $matches[1] . '/',  $width . 'x' . $height, $bigImageName
+                        );
+                        $thumbnailName = $thumbnailNameWithoutExtension . '.' . $results[$childFormViewValue]['format'];
+                        // Add and will also use thumbnail image as dataURI to show image preview in form
+                        $imageUploader = $this->imageService->getImageUploader();
+                        $thumbnailUploadDirectory = $imageUploader->getUploadDirectory(ImageUploader::TRICK_IMAGE_DIRECTORY_KEY);
+                        $thumbnailPath = $thumbnailUploadDirectory . '/' . $thumbnailName;
+                        $thumbnailImageDataURI = $imageUploader->encodeImageWithBase64($thumbnailPath);
+                        $formView->vars['thumbnailImageDataURI'] = $thumbnailImageDataURI;
+                        break;
+                    case 'video':
+                        // TODO: add logic to transmit videos uuid and name to template!
+                        break;
                 }
             }
         }
@@ -155,13 +225,16 @@ abstract class AbstractTrickType extends AbstractType
      * @param FormInterface $form
      *
      * @return void
+     *
+     * @throws \Exception
      */
     private function updateCollectionOrderAndRanks(string $collectionName, FormView $view, FormInterface $form) : void
     {
         $isShowListRankValid = true;
         // Check if at least one show list rank was tampered by malicious user thanks to custom validator!
         foreach ($form->get($collectionName)->all() as $form) {
-            if (!$form->get('showListRank')->isValid()) {
+            $isFormSubmittedAndValid = $form->get('showListRank')->isSubmitted() && $form->get('showListRank')->isValid();
+            if (!$isFormSubmittedAndValid) {
                 $isShowListRankValid = false;
                 break;
             }
