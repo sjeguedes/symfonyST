@@ -183,7 +183,7 @@ final class ImageToCropConstraintValidator extends AbstractTrickCollectionConstr
                 $temporaryIdentifierPattern = preg_quote(ImageManager::DEFAULT_IMAGE_IDENTIFIER_NAME, '/');
                 $imageUploader = $this->imageService->getImageUploader();
                 // Adapt search depending on temporary image or not
-                $isTemporaryImage = preg_match('/'. $temporaryIdentifierPattern . '$/', $object->getSavedImageName());
+                $isTemporaryImage = preg_match('/'. $temporaryIdentifierPattern . '/', $object->getSavedImageName());
                 $imageFiles[0] = $imageUploader->checkFileUploadOnServer(
                     $object->getImagePreviewDataURI(),
                     null,
@@ -285,7 +285,7 @@ final class ImageToCropConstraintValidator extends AbstractTrickCollectionConstr
             $temporaryIdentifierPattern = preg_quote(ImageManager::DEFAULT_IMAGE_IDENTIFIER_NAME, '/');
             $imageUploader = $this->imageService->getImageUploader();
             // Adapt search depending on temporary image or not
-            $isTemporaryImage = preg_match('/'. $temporaryIdentifierPattern . '$/', $object->getSavedImageName());
+            $isTemporaryImage = preg_match('/'. $temporaryIdentifierPattern . '/', $object->getSavedImageName());
             $imageFiles[0] = $imageUploader->checkFileUploadOnServer(
                 $object->getSavedImageName(),
                 null,

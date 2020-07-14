@@ -101,7 +101,6 @@ class UpdateTrickAction
         $this->flashBag = $flashBag;
         $this->formHandlers = $formHandlers;
         $this->setRouter($router);
-        $this->userService = $userService;
     }
 
     /**
@@ -117,6 +116,7 @@ class UpdateTrickAction
      *
      * @return Response
      *
+     * @throws AccessDeniedException
      * @throws \Exception
      * @throws NotFoundHttpException
      */
@@ -165,7 +165,9 @@ class UpdateTrickAction
      *
      * @return Trick
      *
+     * @throws AccessDeniedException
      * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NotFoundHttpException
      */
     private function checkAccessToUpdateAction(Request $request) : Trick
     {
@@ -176,8 +178,8 @@ class UpdateTrickAction
         }
         // Check access permissions to trick update page
         $security = $this->userService->getSecurity();
-        if (!$security->isGranted(TrickVoter::AUTHOR_OR_ADMIN_CAN_VIEW_UNPUBLISHED_TRICKS, $trick)) {
-            throw new AccessDeniedException("Current user can not view this unpublished trick!");
+        if (!$security->isGranted(TrickVoter::AUTHOR_OR_ADMIN_CAN_UPDATE_OR_DELETE_TRICKS, $trick)) {
+            throw new AccessDeniedException("Current user can not update this trick!");
         }
         return $trick;
     }

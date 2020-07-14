@@ -13,6 +13,7 @@ use App\Domain\Entity\MediaSource;
 use App\Domain\ServiceLayer\ImageManager;
 use App\Domain\ServiceLayer\MediaManager;
 use App\Service\Form\Type\Admin\CreateTrickType;
+use App\Service\Form\Type\Admin\UpdateTrickType;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -184,9 +185,12 @@ class ImageToCropType extends AbstractTrickCollectionEntryType
      */
     private function generateImageWithDirectUpload(FormtypeInterface $rootFormType, ImageToCropDTO $imageToCropDataModel) : ?Image
     {
+        // Apply this only for trick creation or update forms!
         switch ($rootFormType) {
             // Create a Trick image with the highest expected format
+            // TODO: here, declare also the same case for future trick update form => OK DONE!
             case $rootFormType instanceof CreateTrickType:
+            case $rootFormType instanceof UpdateTrickType:
                 // At this level, Trick slug can't be used due to not validated Trick name,
                 // so we used a image basic identifier name to replace it later on Trick creation or update actions.
                 $imageIdentifierName = ImageManager::TRICK_IMAGE_TYPE_KEY . ImageManager::DEFAULT_IMAGE_IDENTIFIER_NAME;
@@ -194,7 +198,6 @@ class ImageToCropType extends AbstractTrickCollectionEntryType
                 $imageFile = $this->imageService->generateTrickImageFile($imageToCropDataModel, 'trickBig', true, $imageIdentifierName);
                 $newTemporaryImage = $this->imageService->createTrickImage($imageToCropDataModel, $imageFile, true);
                 break;
-            // TODO: here, declare also the same case for future trick update form
             // Stop process for other root form types
             default:
                 $newTemporaryImage = null;

@@ -160,6 +160,53 @@ abstract class AbstractTrickType extends AbstractType
     }
 
     /**
+     * Set image dataURI with base64 encoding for both temporary image or existing image to update.
+     *
+     * @param MediaType $thumbnailTypeEntity
+     * @param array     $results
+     * @param FormView  $imageFormView
+     * @param string    $savedImageName
+     *
+     * @return void
+     *
+     * @throws \Exception
+     */
+    private function setImageDataURIForTemplate(
+        MediaType $thumbnailTypeEntity,
+        array $results,
+        FormView $imageFormView,
+        string $savedImageName
+    ) : void
+    {
+        // Check temporary saved image or existing image to update
+        $temporaryIdentifierPattern = preg_quote(ImageManager::DEFAULT_IMAGE_IDENTIFIER_NAME, '/');
+        $isTemporaryImage = preg_match('/'. $temporaryIdentifierPattern . '/', $savedImageName);
+        // Image exists thanks and can be updated: encode it to use dataURI.
+        if (!$isTemporaryImage) {
+            // Get thumbnail image name
+            $pattern = '/^.*-(\d{2,}x\d{2,})(\.[a-z]{3,4})?$/';
+            $bigImageName = $savedImageName;
+            preg_match($pattern, $bigImageName, $matches, PREG_UNMATCHED_AS_NULL);
+            // Replace big image dimensions ("with"x"height") in group 1 by thumbnail corresponding dimensions
+            $width = $thumbnailTypeEntity->getWidth();
+            $height = $thumbnailTypeEntity->getHeight();
+            $thumbnailNameWithoutExtension = preg_replace(
+                '/' . $matches[1] . '/',  $width . 'x' . $height, $bigImageName
+            );
+            $thumbnailName = $thumbnailNameWithoutExtension . '.' . $results[$savedImageName]['format'];
+            $imageUploader = $this->imageService->getImageUploader();
+            $thumbnailUploadDirectory = $imageUploader->getUploadDirectory(ImageUploader::TRICK_IMAGE_DIRECTORY_KEY);
+            $thumbnailPath = $thumbnailUploadDirectory . '/' . $thumbnailName;
+            $thumbnailImageDataURI = $imageUploader->encodeImageWithBase64($thumbnailPath);
+            $imageFormView->vars['thumbnailImageDataURI'] = $thumbnailImageDataURI;
+            // Image is temporary: simply use dataURI from field feed with JavaScript.
+        } else {
+            $imagePreviewFieldValue = $imageFormView->children['imagePreviewDataURI']->vars['value'];
+            $imageFormView->vars['thumbnailImageDataURI'] = $imagePreviewFieldValue;
+        }
+    }
+
+    /**
      * Transmit newly created FormView data to form template by querying corresponding data in database.
      *
      * Please note data are filtered thanks to media source saved names to get data results.
@@ -180,7 +227,7 @@ abstract class AbstractTrickType extends AbstractType
         // Get image thumbnail type by querying once
         $type = MediaType::TYPE_CHOICES['trickThumbnail'];
         $thumbnailTypeEntity = $this->mediaTypeService->findSingleByUniqueType($type);
-        // Iterate on each
+        // Iterate on each form view
         foreach ($formViewsCollection as $formView) {
             // Retrieve child form view which store entity valid saved name
             // For instance, form view name is "savedImageName" or "savedVideoName".
@@ -191,23 +238,13 @@ abstract class AbstractTrickType extends AbstractType
                 $formView->vars['bigImageUuid'] = $results[$childFormViewValue]['uuid'];
                 switch ($results[$childFormViewValue]['sourceType']) {
                     case 'image':
-                        // Get thumbnail image name
-                        $pattern = '/^.*-(\d{2,}x\d{2,})(\.[a-z]{3,4})?$/';
-                        $bigImageName = $childFormViewValue;
-                        preg_match($pattern, $bigImageName, $matches, PREG_UNMATCHED_AS_NULL);
-                        // Replace big image dimensions ("with"x"height") in group 1 by thumbnail corresponding dimensions
-                        $width = $thumbnailTypeEntity->getWidth();
-                        $height = $thumbnailTypeEntity->getHeight();
-                        $thumbnailNameWithoutExtension = preg_replace(
-                            '/' . $matches[1] . '/',  $width . 'x' . $height, $bigImageName
+                        // Get dataURI for both temporary image or image to update, to use it for image preview
+                        $this->setImageDataURIForTemplate(
+                            $thumbnailTypeEntity,
+                            $results,
+                            $formView,
+                            $childFormViewValue
                         );
-                        $thumbnailName = $thumbnailNameWithoutExtension . '.' . $results[$childFormViewValue]['format'];
-                        // Add and will also use thumbnail image as dataURI to show image preview in form
-                        $imageUploader = $this->imageService->getImageUploader();
-                        $thumbnailUploadDirectory = $imageUploader->getUploadDirectory(ImageUploader::TRICK_IMAGE_DIRECTORY_KEY);
-                        $thumbnailPath = $thumbnailUploadDirectory . '/' . $thumbnailName;
-                        $thumbnailImageDataURI = $imageUploader->encodeImageWithBase64($thumbnailPath);
-                        $formView->vars['thumbnailImageDataURI'] = $thumbnailImageDataURI;
                         break;
                     case 'video':
                         // TODO: add logic to transmit videos uuid and name to template!

@@ -161,9 +161,9 @@ final class UpdateTrickHandler extends AbstractUploadFormHandler implements Init
      *
      * @throws \Exception
      */
-    public function initTrickMediasDataBySourceType(Trick $trick, string $type): array
+    public function initTrickMediasDataBySourceType(Trick $trick, string $type) : array
     {
-        if (!preg_match('/image|video/', $type)) {
+        if (!preg_match('/^image|video$/', $type)) {
             throw new RuntimeException('Media source type label to create collection is unknown!');
         }
         $trickMedias = $trick->getMediaOwner()->getMedias();
