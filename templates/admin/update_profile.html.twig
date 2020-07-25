@@ -274,16 +274,44 @@
             </div>
             <!-- //------------------------------------------------------------------------------------------------------------------------------------// -->
             {# User available actions #}
-
-            <!-- Create trick -->
             <div class="uk-flex uk-flex-center uk-margin-medium-top">
-                <p class="uk-text-center uk-text-uppercase uk-text-bold st-color-red">
+                <div class="uk-text-center uk-text-uppercase uk-text-bold st-color-red">
                     Your available actions<br>
+                    <!-- Create trick -->
                     <a id="st-create-trick" class="uk-display-inline-block uk-button uk-button-secondary uk-border-rounded uk-box-shadow-hover-medium uk-margin-medium-top"
                        href="{{ path('create_trick', {'mainRoleLabel': app.user.mainRoleLabel|lower}) }}" title="Create a trick">
                         Create a trick&nbsp;&nbsp;<span uk-icon="plus-circle"></span>
-                    </a>
-                </p>
+                    </a><br>
+                    {% if userCreatedTricks|length > 0 %}
+                    <hr>
+                    <!-- Update tricks which were created by current authenticated user -->
+                    <div class="boundary-align uk-margin-small-top">
+                        <button id="st-update-tricks"
+                                class="uk-display-inline-block uk-button uk-button-secondary uk-border-rounded uk-box-shadow-hover-medium" type="button"
+                                title="Update created tricks">
+                            Update created tricks <span uk-icon="refresh"></span>
+                        </button>
+                        <div uk-dropdown="mode: click; pos: top-center; boundary: .boundary-align; boundary-align: true"
+                             class="uk-overflow-auto uk-height-small">
+                            <ul class="uk-nav uk-dropdown-nav uk-text-truncate">
+                                <li class="uk-nav-header"><span class="st-color-blue">- You are author for this list -</span></li>
+                                {% for i in 0..(userCreatedTricks|length - 1) %}
+                                    {% set trickData = userCreatedTricks[i] %}
+                                <li>
+                                    <a href="{{ path('update_trick', { 'mainRoleLabel': app.user.mainRoleLabel|lower, 'slug': trickData.slug, 'encodedUuid': trickData.uuid|uuid_encode }) }}"
+                                       title="Update">
+                                        {{ trickData.name }} <span uk-icon="chevron-right"></span>
+                                    </a>
+                                </li>
+                                {% if i != (userCreatedTricks|length - 1) %}
+                                <li class="uk-nav-divider"></li>
+                                {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>

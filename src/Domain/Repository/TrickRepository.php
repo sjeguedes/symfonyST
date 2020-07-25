@@ -163,6 +163,28 @@ class TrickRepository extends ServiceEntityRepository
     }
 
     /**
+     * Find tricks expected data with query based on their user author uuid.
+     *
+     * @param UuidInterface $userUuid
+     *
+     * @return mixed
+     */
+    public function findAllByAuthor(UuidInterface $userUuid) : array
+    {
+        $queryBuilder = $this->createQueryBuilder('t');
+        $result = $queryBuilder
+            // IMPORTANT! This retrieves expected data correctly!
+            ->select('u.uuid, t.uuid, t.name, t.slug')
+            ->join('t.user', 'u', 'WITH', 't.user = u.uuid')
+            ->where('u.uuid = ?1')
+            ->orderBy('t.creationDate', 'DESC')
+            ->setParameter(1, $userUuid->getBytes())
+            ->getQuery()
+            ->getResult();
+        return $result;
+    }
+
+    /**
      * Retrieve rows between $start (included) and $end (excluded) with sort direction.
      *
      * Please note only one query is used to get all need Trick data.

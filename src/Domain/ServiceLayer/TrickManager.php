@@ -14,6 +14,7 @@ use App\Utils\Traits\UuidHelperTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
+use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -190,6 +191,20 @@ class TrickManager extends AbstractServiceLayer
         );
         // Save data in database
         return $this->addAndSaveTrick($newTrick, $isPersisted, $isFlushed); // null or the entity
+    }
+
+    /**
+     * Find all created tricks necessary data associated to a particular user author.
+     *
+     * Please note this is used to generate links to tricks update form.
+     *
+     * @param UuidInterface $userUuid
+     *
+     * @return array
+     */
+    public function findOnesByAuthor(UuidInterface $userUuid) : array
+    {
+        return $this->repository->findAllByAuthor($userUuid);
     }
 
     /**

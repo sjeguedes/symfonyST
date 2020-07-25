@@ -1,3 +1,5 @@
+# run "git status --ignored" to check
+
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
@@ -26,6 +28,5 @@
 ###< symfony/phpunit-bridge ###
 
 ### PHPUnit installed with symfony bridge and html code coverage ###
-/bin/phpunit
 /tests-html
 /tests/bootstrap.php

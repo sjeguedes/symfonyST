@@ -199,7 +199,7 @@ abstract class AbstractTrickType extends AbstractType
             $thumbnailPath = $thumbnailUploadDirectory . '/' . $thumbnailName;
             $thumbnailImageDataURI = $imageUploader->encodeImageWithBase64($thumbnailPath);
             $imageFormView->vars['thumbnailImageDataURI'] = $thumbnailImageDataURI;
-            // Image is temporary: simply use dataURI from field feed with JavaScript.
+        // Image is temporary: simply use dataURI from field feed with JavaScript.
         } else {
             $imagePreviewFieldValue = $imageFormView->children['imagePreviewDataURI']->vars['value'];
             $imageFormView->vars['thumbnailImageDataURI'] = $imagePreviewFieldValue;
