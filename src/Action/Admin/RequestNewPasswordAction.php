@@ -46,7 +46,7 @@ class RequestNewPasswordAction
      *
      * @Route({
      *     "en": "/{_locale<en>}/request-new-password"
-     * }, name="request_new_password")
+     * }, name="request_new_password", methods={"GET", "POST"})
      *
      * @param RedirectionResponder        $redirectionResponder
      * @param RequestNewPasswordResponder $responder

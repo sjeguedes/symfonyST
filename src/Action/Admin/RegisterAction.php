@@ -53,7 +53,7 @@ class RegisterAction
      *
      * @Route({
      *     "en": "/{_locale<en>}/register"
-     * }, name="register")
+     * }, name="register", methods={"GET", "POST"})
      *
      * @param RedirectionResponder  $redirectionResponder
      * @param RegisterResponder     $responder

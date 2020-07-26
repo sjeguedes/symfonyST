@@ -11,18 +11,16 @@ use App\Domain\ServiceLayer\MediaManager;
 use App\Domain\ServiceLayer\TrickManager;
 use App\Domain\ServiceLayer\UserManager;
 use App\Domain\ServiceLayer\VideoManager;
-use App\Service\Form\Handler\FormHandlerInterface;
 use App\Responder\Admin\CreateTrickResponder;
 use App\Responder\Redirection\RedirectionResponder;
+use App\Service\Form\Handler\FormHandlerInterface;
 use App\Utils\Traits\RouterHelperTrait;
 use App\Utils\Traits\UuidHelperTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -142,7 +140,7 @@ class CreateTrickAction
         $data = [
             'trickCreationError' => $this->formHandlers[0]->getTrickCreationError() ?? null,
             'createTrickForm'    => $createTrickForm->createView(),
-            'deleteImageForm'    => $deleteImageForm->createView() // Used to delete images with direct upload
+            'deleteImageForm'    => $deleteImageForm->createView() // Used to delete temporary images with direct upload
             // No need to add a video deletion form since videos are not temporarily saved!
         ];
         return $responder($data);

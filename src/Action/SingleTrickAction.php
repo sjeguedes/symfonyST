@@ -71,7 +71,7 @@ class SingleTrickAction
      *
      * @Route({
      *     "en": "/{_locale<en>}/trick/{slug<[\w-]+>}-{encodedUuid<\w+>}"
-     * }, name="show_single_trick")
+     * }, name="show_single_trick", methods={"GET"})
      *
      * @param SingleTrickResponder $responder
      * @param Request              $request

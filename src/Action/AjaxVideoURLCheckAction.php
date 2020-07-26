@@ -48,7 +48,7 @@ class AjaxVideoURLCheckAction
      * Particular "url" attribute value can be empty in some cases! Its declared placeholder requirement can be: {url<(.+)?>},
      * but choice is made to check if "url" attribute is null (optional placeholder) instead of checking its value with this placeholder requirement: {url<(.+)>?}
      *
-     * @Route("/load-trick-video/url/{url<(.+)>?}", name="load_trick_video_url_check")
+     * @Route("/load-trick-video/url/{url<(.+)>?}", name="load_trick_video_url_check", methods={"GET"})
      *
      * @param JsonResponder $responder
      * @param Request       $request

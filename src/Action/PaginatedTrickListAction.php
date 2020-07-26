@@ -46,7 +46,7 @@ class PaginatedTrickListAction
      *
      * @Route({
      *     "en": "/{_locale<en>}/trick-list/page/{page<\d+>?}"
-     * }, name="list_tricks")
+     * }, name="list_tricks", methods={"GET"})
      *
      * @param PaginatedTrickListResponder $responder
      * @param RedirectionResponder        $redirectionResponder

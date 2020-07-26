@@ -55,7 +55,7 @@ class LoginAction
      *
      * @Route({
      *     "en": "/{_locale<en>}/login"
-     * }, name="connect")
+     * }, name="connect", methods={"GET", "POST"})
      *
      * @param RedirectionResponder $redirectionResponder
      * @param LoginResponder       $responder

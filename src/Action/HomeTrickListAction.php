@@ -46,7 +46,7 @@ class HomeTrickListAction
      *
      * @Route({
      *     "en": "/en"
-     * }, name="home")
+     * }, name="home", methods={"GET"})
      *
      * @param HomeTrickListResponder $responder
      * @param Request                $request

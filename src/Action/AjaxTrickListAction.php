@@ -44,7 +44,7 @@ class AjaxTrickListAction
      *
      * Please not url is always the same even if language changed. This is a simple AJAX request and locale parameter is null.
      *
-     * @Route("/home-load-tricks/{offset?<\d+>}/{limit?<\d+>?}", name="home_load_tricks_offset_limit")
+     * @Route("/home-load-tricks/{offset?<\d+>}/{limit?<\d+>?}", name="home_load_tricks_offset_limit", methods={"GET"})
      *
      * @param AjaxTrickListResponder $responder
      * @param Request                $request

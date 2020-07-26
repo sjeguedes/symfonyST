@@ -54,7 +54,7 @@ class RenewPasswordAction
      *
      * @Route({
      *     "en": "/{_locale<en>}/renew-password/{userId}/{renewalToken}"
-     * }, name="renew_password_with_personal_link")
+     * }, name="renew_password_with_personal_link", methods={"GET", "POST"})
      *
      * @param RedirectionResponder   $redirectionResponder
      * @param RenewPasswordResponder $responder
