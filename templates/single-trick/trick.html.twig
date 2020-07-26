@@ -14,6 +14,7 @@
     {% if media.isPublished == 1 %}
         {# Extract main image to show #}
         {% if media.isMain == 1 and media.mediaType.type == mediaTypesValues['trickNormal'] %}
+            {% set mainImageUuid = media.uuid %}
             {% set mainImage = asset(globalTrickUploadDirectory~media.mediasource.image.name~'.'~media.mediasource.image.format) %}
             {% set isMainAvailable = 1 %}
             {% set mainImageDesc = media.mediasource.image.description %}
@@ -26,10 +27,31 @@
     {% include 'all/image_header_loader.html.twig' with {'spinnerRatio': '2.5'} %}
     <div class="uk-position-relative uk-background-cover uk-background-blend-darken uk-invisible st-background-image-header" data-src="{{ asset(globalImageDirectory~'snowboard-6.jpg') }}" style="background-position: 50% 50%; height: 600px" uk-img>
         <div class="uk-padding">
-            <div class="uk-position-center uk-card uk-card-default uk-card-body uk-box-shadow-large uk-padding-remove st-overlay-main-image-header-container st-background-black">
+            <div class="uk-position-center uk-card uk-card-default uk-card-body uk-box-shadow-large uk-padding-remove st-overlay-main-image-header-container st-background-black st-border-white-small">
                 {% include 'all/image_header_loader.html.twig' with {'spinnerRatio': '2.5'} %}
-                <div class="uk-background-blend-darken st-background-image-header st-border-white-small" data-src="{{ mainImage }}" style="background-position: 50% 50%; display: table-cell; width: 100%; height: 100%" uk-img>
+                <div class="uk-background-blend-darken st-background-image-header" data-src="{{ mainImage }}" style="background-position: 50% 50%; display: table-cell; width: 100%; height: 100%" uk-img>
+                    {# Trick main image update or delete actions #}
+                    {% if (isMainAvailable is defined) and (isMainAvailable == 1) and is_granted('AUTHOR_OR_ADMIN_CAN_UPDATE_OR_DELETE_TRICKS', trick) %}
+                        <div class="uk-position-top-right uk-text-right st-background-blue">
+                            <div class="uk-padding-small">
+                                {# TODO: need to review this link with media block smoothscroll on trick update form! #}
+                                <a href="{#{{ path('update_media', { 'encodedUuid': media.uuid|uuid_encode }) }}#}#" class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove" title="Update">
+                                    <span uk-icon="icon: pencil; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-update st-svg-icon-actions"></span>
+                                </a>
+                                {# TODO: need to review this link (use it in modal) by creating a confirmation modal! #}
+                                <a href="{#{{ path('delete_media', { 'encodedUuid': media.uuid|uuid_encode }) }}#}#" class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove" title="Delete">
+                                    <span uk-icon="icon: trash; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-delete st-svg-icon-actions"></span>
+                                </a>
+                            </div>
+                            {# Main image indicator #}
+                            <div id="st-main-image-header-indicator" class="uk-text-center uk-text-small uk-text-uppercase uk-text-bold st-background-yellow st-main-image-indicator">
+                                <span class="st-color-blue st-svg-icon-padding">Main image</span>
+                            </div>
+                        </div>
+                    {% endif %}
+                    {# Trick header texts #}
                     <div class="uk-position-center uk-text-center">
+                        {# Trick name and group name #}
                         <p class="st-color-white st-text-shadow-dark uk-text-large">
                             {{ trick.name }}
                         </p>
@@ -37,7 +59,7 @@
                             Snowboard trick referenced in {{ trick.trickGroup.name }}
                         </p>
                         {# Unpublished trick indicator #}
-                        {% if trick.isPublished == 0 and is_granted('AUTHOR_OR_ADMIN_CAN_VIEW_UNPUBLISHED_TRICKS', trick) %}
+                        {% if trick.isPublished == 0 %}
                         <p class="uk-padding-small uk-text-small uk-text-bold uk-text-uppercase st-background-red st-color-white">
                             <span uk-icon="icon: warning; ratio: 1.5"></span> This trick is unpublished! <br class="uk-hidden@m">It is Waiting for moderation.
                         </p>
@@ -124,6 +146,7 @@
                             'mediaForSlide': mediaForSlide,
                             'mediaToExpand': mediaToExpand,
                             'normalImageMediaType': normalImageMediaType,
+                            'mediaIsMain': media.isMain,
                             'custom': {'icon': 'image', 'title': 'Look at this image with expanded mode.'},
                             'index': loop.index
                         } only %}
@@ -176,13 +199,18 @@
                 </span>
             </p>
         </div>
-        <!-- Update trick link -->
+        <!-- Trick update and deletion links -->
         {% if is_granted('AUTHOR_OR_ADMIN_CAN_UPDATE_OR_DELETE_TRICKS', trick) %}
             <div class="uk-flex uk-flex-center uk-margin-medium-top">
                 <p class="uk-text-center uk-text-uppercase uk-text-bold st-color-red">
                     <a id="st-update-trick" class="uk-display-inline-block uk-button uk-button-secondary uk-border-rounded uk-box-shadow-hover-medium"
                        href="{{ path('update_trick', { 'mainRoleLabel': app.user.mainRoleLabel|lower, 'slug': trick.slug, 'encodedUuid': trick.uuid|uuid_encode }) }}" title="Update this trick">
-                        Update this trick&nbsp;&nbsp;<span uk-icon="refresh"></span>
+                        Update this trick&nbsp;&nbsp;<span uk-icon="icon: refresh; ratio: 1"></span>
+                    </a>
+                    {# TODO: need to review this link (use it in modal) by creation a confirmation modal! #}
+                    <a id="st-delete-trick" class="uk-display-inline-block uk-button uk-button-secondary uk-border-rounded uk-box-shadow-hover-medium st-svg-icon-delete"
+                       href="{#{{ path('delete_trick', { 'mainRoleLabel': app.user.mainRoleLabel|lower, 'slug': trick.slug, 'encodedUuid': trick.uuid|uuid_encode }) }}#}#" title="Delete this trick">
+                        Delete this trick&nbsp;&nbsp;<span uk-icon="icon: trash; ratio: 1"></span>
                     </a>
                 </p>
             </div>

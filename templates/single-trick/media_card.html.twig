@@ -21,7 +21,15 @@ inside included template when a loop is used! #}
             <!-- Trick image -->
             {# Thumb image #}
             {% set thumbImageName = mediaForSlide|e('html_attr') %}
-            <div id="st-card-image-{{ index }}" class="uk-position-relative uk-background-cover uk-background-blend-darken uk-invisible st-card-image st-background-image-header" data-src="{{ asset(globalTrickUploadDirectory~thumbImageName) }}" style="background-position: 50% 50%; width: 100%; height: 150px" uk-img></div>
+            <div id="st-card-image-{{ index }}" class="uk-position-relative uk-background-cover uk-background-blend-darken uk-invisible st-card-image st-background-image-header" data-src="{{ asset(globalTrickUploadDirectory~thumbImageName) }}" style="background-position: 50% 50%; width: 100%; height: 150px" uk-img>
+            {% if mediaIsMain == 1 %}
+                {# Main image indicator #}
+                <span id="st-main-image-thumb-indicator"
+                      class="uk-position-top-right uk-text-center uk-text-small uk-text-uppercase uk-text-bold uk-padding-small uk-padding-remove-top uk-padding-remove-bottom st-background-blue st-main-image-indicator">
+                    <span class="st-color-yellow st-svg-icon-padding">Main image</span>
+                </span>
+            {% endif %}
+            </div>
             {# Modal for image #}
             <div id="st-modal-media-image-{{ index }}" class="uk-flex-top st-modal" uk-modal>
                 <div class="uk-modal-dialog uk-width-auto uk-margin-auto-vertical uk-padding-small" style="max-width: {{ normalImageMediaType.width }}px !important">
@@ -127,11 +135,14 @@ inside included template when a loop is used! #}
                     <span uk-icon="icon: expand; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-other"><span uk-icon="icon: {{ custom.icon|e('html_attr') }}; ratio: 1" class="uk-icon"></span>&nbsp;</span>&nbsp;
                 </a>
             </div>
+            {# Trick media update or delete actions #}
             {% if is_granted('AUTHOR_OR_ADMIN_CAN_UPDATE_OR_DELETE_TRICKS', trick) %}
                 <div class="uk-text-right">
+                    {# TODO: need to review this link with media block smoothscroll on trick update form! #}
                     <a href="{#{{ path('update_media', { 'encodedUuid': media.uuid|uuid_encode }) }}#}#" class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove" title="Update">
                         <span uk-icon="icon: pencil; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-update"></span>
                     </a>
+                    {# TODO: need to review this link (use it in modal) by creating a confirmation modal! #}
                     <a href="{#{{ path('delete_media', { 'encodedUuid': media.uuid|uuid_encode }) }}#}#" class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove" title="Delete">
                         <span uk-icon="icon: trash; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-delete"></span>
                     </a>

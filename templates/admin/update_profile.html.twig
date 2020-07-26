@@ -279,7 +279,7 @@
                     Your available actions<br>
                     <!-- Create trick -->
                     <a id="st-create-trick" class="uk-display-inline-block uk-button uk-button-secondary uk-border-rounded uk-box-shadow-hover-medium uk-margin-medium-top"
-                       href="{{ path('create_trick', {'mainRoleLabel': app.user.mainRoleLabel|lower}) }}" title="Create a trick">
+                       href="{{ path('create_trick', { 'mainRoleLabel': app.user.mainRoleLabel|lower }) }}" title="Create a trick">
                         Create a trick&nbsp;&nbsp;<span uk-icon="plus-circle"></span>
                     </a><br>
                     {% if userCreatedTricks|length > 0 %}
@@ -293,11 +293,11 @@
                         </button>
                         <div uk-dropdown="mode: click; pos: top-center; boundary: .boundary-align; boundary-align: true"
                              class="uk-overflow-auto uk-height-small">
-                            <ul class="uk-nav uk-dropdown-nav uk-text-truncate">
+                            <ul class="uk-nav uk-dropdown-nav">
                                 <li class="uk-nav-header"><span class="st-color-blue">- You are author for this list -</span></li>
                                 {% for i in 0..(userCreatedTricks|length - 1) %}
-                                    {% set trickData = userCreatedTricks[i] %}
-                                <li>
+                                {% set trickData = userCreatedTricks[i] %}
+                                <li class="uk-text-capitalize">
                                     <a href="{{ path('update_trick', { 'mainRoleLabel': app.user.mainRoleLabel|lower, 'slug': trickData.slug, 'encodedUuid': trickData.uuid|uuid_encode }) }}"
                                        title="Update">
                                         {{ trickData.name }} <span uk-icon="chevron-right"></span>
