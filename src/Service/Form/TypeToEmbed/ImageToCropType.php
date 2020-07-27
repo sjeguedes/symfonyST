@@ -106,7 +106,7 @@ class ImageToCropType extends AbstractTrickCollectionEntryType
                 'empty_data'     => false,
                 'false_values'   => [false]
             ])
-            // Please "isPublished" property (set to true by default) because it is not managed in project at this level!
+            // "isPublished" property is set to true by default because it is not managed in project at this level!
             ->add('showListRank', HiddenType::class, [
                 // Maintain validation state at the child form level, to be able to show errors near field
                 'error_bubbling' => false
@@ -187,8 +187,7 @@ class ImageToCropType extends AbstractTrickCollectionEntryType
     {
         // Apply this only for trick creation or update forms!
         switch ($rootFormType) {
-            // Create a Trick image with the highest expected format
-            // TODO: here, declare also the same case for future trick update form => OK DONE!
+            // Create a Trick image with the highest expected format for both cases
             case $rootFormType instanceof CreateTrickType:
             case $rootFormType instanceof UpdateTrickType:
                 // At this level, Trick slug can't be used due to not validated Trick name,
@@ -249,9 +248,10 @@ class ImageToCropType extends AbstractTrickCollectionEntryType
      */
     private function prepareAndCheckDataModelForDirectUpload(FormInterface $imageToCropForm, array $formData, object $rootFormHandler) : ?ImageToCropDTO
     {
-        // Turn show list rank string into a real int, or if it the value is not an int define the value to 0 to be checked in validator!
+        // Avoid issue with DTOMapper: turn show list rank string into a real int, or if it the value is not an int,
+        // define the value to 0 to be checked in validator!
         $formData['showListRank'] = ctype_digit((string) $formData['showListRank']) ? (int) $formData['showListRank'] : 0;
-        // Get into account checkbox case which has no value when unchecked!
+        // Avoid issue with DTOMapper: get into account checkbox case which has no value when unchecked!
         $formData['isMain'] = isset($formData['isMain']) ? (bool) $formData['isMain'] : false;
         // Get current feed imageToCropDTO instance with custom data mapper
         /** @var ImageToCropDTO|AbstractReadableDTO $imageToCropDataModel */

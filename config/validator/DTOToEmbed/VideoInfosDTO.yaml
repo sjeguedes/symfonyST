@@ -13,8 +13,16 @@ App\Domain\DTOToEmbed\VideoInfosDTO:
                 max: 255
                 maxMessage: "This description should contain\na maximum of {{ limit }} characters or less."
 
+        savedVideoName:
+            - Regex:
+                  # This name is partially based on "hash('crc32', uniqid())" functions in order to
+                  # generate a unique identifier with 8 alphanumeric characters.
+                  pattern: '/^video-[a-z0-9]{8}-youtube|vimeo|dailymotion$/'
+                  message: You are not allowed to tamper saved video name!
+
     constraints:
         # Custom validator for:
-        # - "url" field: check video URL format (equals "Regex validation constraint"), and existing content with VideoURLProxyChecker service
+        # - "url" field: check video URL format (equals "Regex validation constraint"),
+        #   and existing content with VideoURLProxyChecker service
         # - "showListRank" field: check coherent sortable order for each video
         - App\Service\Form\Validator\Constraint\VideoInfosConstraint: ~

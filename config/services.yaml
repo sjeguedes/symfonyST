@@ -136,8 +136,13 @@ services:
     # add custom DTO mapper
     App\Service\Form\DataMapper\DTOMapper:
 
-    # add (trick) image to crop creation type
+    # add (trick) image to crop creation/update type
     App\Service\Form\TypeToEmbed\ImageToCropType:
+        arguments:
+            $dataMapper: '@App\Service\Form\DataMapper\DTOMapper'
+
+    # add (trick) video infos creation/update type
+    App\Service\Form\TypeToEmbed\VideoInfosType:
         arguments:
             $dataMapper: '@App\Service\Form\DataMapper\DTOMapper'
 

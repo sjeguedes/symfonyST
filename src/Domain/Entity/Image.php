@@ -97,9 +97,9 @@ class Image
         int $size,
         \DateTimeInterface $creationDate = null
     ) {
-        \assert(!empty($name), 'Image name can not be empty!');
+        \assert(!empty($name), 'Image name can not be empty!'); // This can be improved with regex check!
         \assert(!empty($description), 'Image description can not be empty!');
-        \assert(!empty($format), 'Image format can not be empty!');
+        \assert(!empty($format), 'Image format can not be empty!'); // This can be improved with regex check!
         \assert($size > 0, 'Image size must be greater than 0!');
         $this->uuid = Uuid::uuid4();
         $this->name = $name;
@@ -134,6 +134,7 @@ class Image
      */
     public function modifyName(string $name) : self
     {
+        // This can be improved with regex check!
         if (empty($name)) {
             throw new \InvalidArgumentException('Image name can not be empty!');
         }

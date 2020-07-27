@@ -32,6 +32,13 @@ class Video
     /**
      * @var string
      *
+     * @ORM\Column(type="string", unique=true)
+     */
+    private $name;
+
+    /**
+     * @var string
+     *
      * @ORM\Column(type="string")
      */
     private $url;
@@ -67,6 +74,7 @@ class Video
     /**
      * Image constructor.
      *
+     * @param string                  $name
      * @param string                  $url
      * @param string                  $description
      * @param \DateTimeInterface|null $creationDate
@@ -74,13 +82,16 @@ class Video
      * @throws \Exception
      */
     public function __construct(
+        string $name,
         string $url,
         string $description,
         \DateTimeInterface $creationDate = null
     ) {
-        \assert(!empty($url), 'Video URL can not be empty!');
+        \assert(!empty($name), 'Video name can not be empty!'); // This can be improved with regex check!
+        \assert(!empty($url), 'Video URL can not be empty!'); // This can be improved with regex check!
         \assert(!empty($description), 'Video description can not be empty!');
         $this->uuid = Uuid::uuid4();
+        $this->name = $name;
         $this->url = $url;
         $this->description = $description;
         $this->creationDate = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
@@ -101,6 +112,25 @@ class Video
     }
 
     /**
+     * Change name after creation.
+     *
+     * @param string $name
+     *
+     * @return Video
+     *
+     * @throws \Exception
+     */
+    public function modifyName(string $name) : self
+    {
+        // This can be improved with regex check!
+        if (empty($name)) {
+            throw new \InvalidArgumentException('Video name can not be empty!');
+        }
+        $this->name = $name;
+        return $this;
+    }
+
+    /**
     * Change URL after creation.
     *
     * @param string $url
@@ -111,6 +141,7 @@ class Video
     */
     public function modifyUrl(string $url) : self
     {
+        // This can be improved with regex check!
         if (empty($url)) {
             throw new \InvalidArgumentException('Video URL can not be empty!');
         }
@@ -160,6 +191,14 @@ class Video
     public function getUuid() : UuidInterface
     {
         return $this->uuid;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName() : string
+    {
+        return $this->name;
     }
 
     /**

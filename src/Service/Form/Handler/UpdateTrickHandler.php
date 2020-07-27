@@ -105,7 +105,8 @@ final class UpdateTrickHandler extends AbstractUploadFormHandler implements Init
         /** @var TrickManager $trickService */
         $trickService = $actionData['trickService'];
         // DTO is in valid state but filled in trick name (title) already exist in database: it must be unique!
-        $isTrickNameUnique = \is_null($trickService->findSingleByName($this->form->getData()->getName())) ? true : false; // or $this->form->get('name')->getData()
+        $trickWithSameName = $trickService->findSingleByName($this->form->getData()->getName()); // or $this->form->get('name')->getData()
+        $isTrickNameUnique = \is_null($trickWithSameName) ? true : false;
         if (!$isTrickNameUnique) {
             $trickNameError = nl2br('Please check chosen title!' . "\n" .
                 'A trick with the same name already exists.'
@@ -138,6 +139,14 @@ final class UpdateTrickHandler extends AbstractUploadFormHandler implements Init
         // Check Managers instances in passed data
         $this->checkNecessaryData($actionData);
         // TODO: start trick update process here with other methods!
+        // Start process by simply retrieving trick to update in data (This method is not necessary!)
+        $trickToUpdate = $this->startTrickUpdateProcess($actionData);
+        // Get data model collections
+        $updateTrickDTO = $this->form->getData();
+        $imagesDTOCollection = $updateTrickDTO->getImages();
+        $videosDTOCollection = $updateTrickDTO->getVideos();
+        // Add collections items corresponding Media entities to Trick entity
+        $this->updateTrickMediasFromCollections($trickToUpdate, $imagesDTOCollection, $videosDTOCollection, $actionData);
     }
 
     /**
@@ -194,6 +203,7 @@ final class UpdateTrickHandler extends AbstractUploadFormHandler implements Init
                         $dtoArray[] = new VideoInfosDTO(
                             $video->getUrl(),
                             $video->getDescription(),
+                            $video->getName(),
                             $media->getShowListRank()
                         );
                         break;
@@ -224,5 +234,75 @@ final class UpdateTrickHandler extends AbstractUploadFormHandler implements Init
             $this->initTrickMediasDataBySourceType($trick, 'video'),
             $trick->getIsPublished()
         );
+    }
+
+    /**
+     * Start trick update process by retrieving Trick entity to update.
+     *
+     * Please note this method is not necessary but is convenient
+     * to follow the same process as trick creation.
+     *
+     * @param array $actionData
+     *
+     * @return Trick
+     *
+     * @throws \Exception
+     */
+    private function startTrickUpdateProcess(array $actionData) : Trick
+    {
+        // Get Trick entity to update
+        $trickToUpdate = $actionData['trickToUpdate'];
+        // Nothing to process here!
+        return $trickToUpdate;
+    }
+
+    /**
+     * Update Media collections to Trick with loop.
+     *
+     * Please note Trick update stop process "rollback" can be called if an issue occurred on item.
+     * Medias can be added, updated or removed from trick image/videos collections.
+     *
+     * @param Trick         $trickToUpdate
+     * @param DTOCollection $imagesDTOCollection
+     * @param DTOCollection $videosDTOCollection
+     * @param array         $actionData
+     *
+     * @return void
+     *
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws \Exception
+     */
+    private function updateTrickMediasFromCollections(
+        Trick $trickToUpdate,
+        DTOCollection $imagesDTOCollection,
+        DTOCollection $videosDTOCollection,
+        array $actionData
+    ) : void
+    {
+        // TODO: continue trick update process here step by step!
+        // Loop on existing form images collection to create images and merge corresponding medias with trick to update
+        /** @var ImageToCropDTO $imageToCropDTO */
+        /*foreach ($imagesDTOCollection as $imageToCropDTO) {
+            // Create image with corresponding Image and Media entities
+            $isImageAdded = $this->addTrickImageFromCollection($trickToUpdate, $imageToCropDTO, $actionData);
+            if (!$isImageAdded) {
+                // Call a "rollback" to cancel Trick update process.
+                // CAUTION! Here a exception will be thrown!
+                $this->cancelTrickUpdateProcess($imageToCropDTO, $trickToUpdate, $actionData);
+                break;
+            }
+        }*/
+        // Loop on existing form videos collection to create videos and merge corresponding medias with trick to update
+        /** @var VideoInfosDTO $videoInfosDTO */
+        /*foreach ($videosDTOCollection as $videoInfosDTO) {
+            // Create video with corresponding Video and Media entities
+            $isVideoAdded = $this->addTrickVideoFromCollection($trickToUpdate, $videoInfosDTO, $actionData);
+            if (!$isVideoAdded) {
+                // Call a "rollback" to cancel Trick update process.
+                // CAUTION! Here a exception will be thrown!
+                $this->cancelTrickUpdateProcess($videoInfosDTO, $trickToUpdate, $actionData);
+                break;
+            }
+        }*/
     }
 }

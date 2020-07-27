@@ -106,7 +106,8 @@ final class CreateTrickHandler extends AbstractUploadFormHandler
         /** @var TrickManager $trickService */
         $trickService = $actionData['trickService'];
         // DTO is in valid state but filled in trick name (title) already exist in database: it must be unique!
-        $isTrickNameUnique = \is_null($trickService->findSingleByName($this->form->getData()->getName())) ? true : false; // or $this->form->get('name')->getData()
+        $trickWithSameName = $trickService->findSingleByName($this->form->getData()->getName()); // or $this->form->get('name')->getData()
+        $isTrickNameUnique = \is_null($trickWithSameName) ? true : false;
         if (!$isTrickNameUnique) {
             $trickNameError = nl2br('Please check chosen title!' . "\n" .
                 'A trick with the same name already exists.'
@@ -173,7 +174,7 @@ final class CreateTrickHandler extends AbstractUploadFormHandler
         array $actionData
     ) : void
     {
-        // Loop on existing form images collection to create images and merge corresponding medias with the new trick
+        // Loop on existing form images collection to create images and add corresponding medias to new trick
         /** @var ImageToCropDTO $imageToCropDTO */
         foreach ($imagesDTOCollection as $imageToCropDTO) {
             // Create image with corresponding Image and Media entities
@@ -185,7 +186,7 @@ final class CreateTrickHandler extends AbstractUploadFormHandler
                 break;
             }
         }
-        // Loop on existing form videos collection to create videos and merge corresponding medias with the new trick
+        // Loop on existing form videos collection to create videos and add corresponding medias to new trick
         /** @var VideoInfosDTO $videoInfosDTO */
         foreach ($videosDTOCollection as $videoInfosDTO) {
             // Create video with corresponding Video and Media entities
@@ -660,7 +661,7 @@ final class CreateTrickHandler extends AbstractUploadFormHandler
     /**
      * Start trick creation process by generating a new Trick entity.
      *
-     * Please not choice was made to flush entity here to perform removal easily later!
+     * Please note choice was made not to flush (only persist) entity here!
      *
      * @param array $actionData
      *

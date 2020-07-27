@@ -28,6 +28,11 @@ final class VideoInfosDTO extends AbstractReadableDTO
     private $description;
 
     /**
+     * @var string|null
+     */
+    private $savedVideoName;
+
+    /**
      * @var int
      */
     private $showListRank;
@@ -37,15 +42,18 @@ final class VideoInfosDTO extends AbstractReadableDTO
      *
      * @param string|null $url
      * @param string|null $description
+     * @param string|null $savedVideoName
      * @param int         $showListRank
      */
     public function __construct(
         ?string $url,
         ?string $description,
+        ?string $savedVideoName,
         int $showListRank
     ) {
         $this->url = $url;
         $this->description = $description;
+        $this->savedVideoName = $savedVideoName;
         $this->showListRank = $showListRank;
     }
 
@@ -63,6 +71,14 @@ final class VideoInfosDTO extends AbstractReadableDTO
     public function getDescription() : ?string
     {
         return $this->description;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getSavedVideoName() : ?string
+    {
+        return $this->savedVideoName;
     }
 
     /**
@@ -92,6 +108,17 @@ final class VideoInfosDTO extends AbstractReadableDTO
     public function setDescription(?string $description) : self
     {
         $this->description = $description;
+        return $this;
+    }
+
+    /**
+     * @param string|null $savedVideoName
+     *
+     * @return VideoInfosDTO
+     */
+    public function setSavedVideoName(?string $savedVideoName) : self
+    {
+        $this->savedVideoName = $savedVideoName;
         return $this;
     }
 

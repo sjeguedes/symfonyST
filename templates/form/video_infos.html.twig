@@ -46,6 +46,16 @@
             </div>
         </div>
         {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+        {# Saved video name (must correspond to a valid video) #}
+        <div id="st-save-video-name-{{ videoIndex }}">
+            {# Hidden field used to store saved video name during validation:
+                Please note this field is used to distinct videos for update process #}
+            {{ form_row(rootForm.videos.vars.prototype.savedVideoName, {
+                'attr': {'class': 'st-saved-video-name'},
+                'value': rootForm.videos.vars.prototype.savedVideoName.vars.value})
+            }}
+        </div>
+        {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
         {# Show list rank (sortable order) #}
         <div id="st-show-list-rank-{{ videoIndex }}">
             {# Please note this can be changed via JavaScript to update this and all other "video infos" boxes order when sortable/remove action is made! #}

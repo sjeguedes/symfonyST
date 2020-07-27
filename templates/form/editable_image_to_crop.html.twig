@@ -1,6 +1,6 @@
 {# rootForm var is provided by form template which calls this template #}
 {% set rootFormName = rootForm.vars.name %}
-
+{# Get image media owner type #}
 {% set imageOwnerType = mediaOwnerType %}
 {# Get form view for an existing image which exists, or (partially/completely) filled in, furthermore validated or not #}
 {% set imageToCropForm = editableImageToCropForm %}
@@ -8,12 +8,10 @@
 {% set imageIndex = editableImageIndexName %}
 <div id="st-image-to-crop-wrapper-{{ imageIndex }}" class="st-image-to-crop-wrapper">
     <div id="{{ rootFormName }}_images_{{ imageIndex }}" class="uk-position-relative uk-border-rounded uk-padding-small uk-margin-small-bottom st-image-to-crop st-background-blue st-box-shadow-full-small">
-        {% set isSavedImageNameNotEmpty = imageToCropForm.savedImageName.vars.value != '' %}
-        {% set isImageUploadedanValid = isSavedImageNameNotEmpty and (imageToCropForm.savedImageName.vars.valid == 1) and (imageToCropForm.vars.bigImageUuid is defined) %}
-        {% set isImageToUpdate = isSavedImageNameNotEmpty and (imageToCropForm.vars.submitted == 0) %}
         {# Saved (uploaded) image block removal: look at AbstractTrickType::finishView() #}
-        {# Prepare vars image removal modal by testing a valid and uploaded image #}
-        {% if isImageUploadedanValid or isImageToUpdate %}
+        {# Prepare vars for image removal modal by testing a valid and uploaded image #}
+        {% set isImageAlreadyAEntity = imageToCropForm.vars.bigImageUuid is defined %}
+        {% if isImageAlreadyAEntity %}
             {% set removeImageLink = 'id="st-image-remove-button-'~imageIndex~'" href="#st-modal-delete-image"' %}
             {% set removalIcon = 'trash' %}
             {% set imageDataAttributes = 'data-uuid="'~imageToCropForm.vars.bigImageUuid~'" data-name="'~imageToCropForm.savedImageName.vars.value~'" data-type="'~imageOwnerType~'"' %}

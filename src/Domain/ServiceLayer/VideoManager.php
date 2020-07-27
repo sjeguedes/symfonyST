@@ -114,10 +114,27 @@ class VideoManager extends AbstractServiceLayer
     ) : ?Video
     {
         // Get new trick Video entity
-        $newTrickVideo = new Video($dataModel->getUrl(), $dataModel->getDescription());
+        $newTrickVideo = new Video($dataModel->getSavedVideoName(), $dataModel->getUrl(), $dataModel->getDescription());
         // Return Video entity
         // Maybe persist and possibly save data in database
         return $this->addAndSaveVideo($newTrickVideo, null, $isPersisted, $isFlushed); // null or the entity
+    }
+
+    /**
+     * Generate a unique video name based on its URL with a particular hash.
+     *
+     * Please note video provider name is extracted.
+     *
+     * @param string $videoURL a video url (e.g. provided by Youtube, Vimeo, Dailymotion, ...)
+     *
+     * @return string
+     */
+    public function generateUniqueVideoNameWithURL(string $videoURL) : string
+    {
+        // Get video provider name with single word
+        preg_match('/(youtube|vimeo|dailymotion)/', $videoURL, $matches);
+        $videoProviderType = $matches[1];
+        return $videoUniqueName = 'video-' . hash('crc32', uniqid()) . '-' . $videoProviderType;
     }
 
     /**

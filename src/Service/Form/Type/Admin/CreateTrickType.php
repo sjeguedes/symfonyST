@@ -163,7 +163,9 @@ class CreateTrickType extends AbstractTrickType
                     $form->get('description')->getData(),
                     $form->get('images')->getData(),
                     $form->get('videos')->getData(),
-                    $form->get('isPublished')->getData() // "false" by default for members which are not administrator
+                    // "false" by default for members which are not administrator (Select field is not available!)
+                    $form->offsetExists('isPublished')
+                        ? $form->get('isPublished')->getData() : false
                 );
             },
             'required'        => false,

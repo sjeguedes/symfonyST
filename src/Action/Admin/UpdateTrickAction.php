@@ -123,13 +123,13 @@ class UpdateTrickAction
     public function __invoke(RedirectionResponder $redirectionResponder, UpdateTrickResponder $responder, Request $request) : Response
     {
         // Check access to update form page
-        $trick = $this->checkAccessToUpdateAction($request);
+        $trickToUpdate = $this->checkAccessToUpdateAction($request);
         // Get authenticated user
         $authenticatedUser = $this->userService->getAuthenticatedMember();
         // Use form handler as form type option
         $options = ['formHandler' => $this->formHandlers[0], 'userRoles' => $authenticatedUser->getRoles()];
         // Set form with initial model data and set the request by binding it
-        $updateTrickForm = $this->formHandlers[0]->initForm(['trickToUpdate' => $trick], null, $options)->bindRequest($request);
+        $updateTrickForm = $this->formHandlers[0]->initForm(['trickToUpdate' => $trickToUpdate], null, $options)->bindRequest($request);
         // Use router and user main role label as form type options
         $options = ['router' => $this->router, 'userMainRoleLabel' => $authenticatedUser->getMainRoleLabel()];
         // Init ajax delete image form (used to delete temporary saved images) to pass it to trick update view
@@ -138,14 +138,15 @@ class UpdateTrickAction
         if ($updateTrickForm->isSubmitted()) {
             // Constraints and custom validation: call actions to perform if necessary on success
             $isFormRequestValid = $this->formHandlers[0]->processFormRequest([
-                'trickService' => $this->trickService,
-                'imageService' => $this->imageService,
-                'videoService' => $this->videoService,
-                'mediaService' => $this->mediaService
+                'trickService'  => $this->trickService,
+                'trickToUpdate' => $trickToUpdate,
+                'imageService'  => $this->imageService,
+                'videoService'  => $this->videoService,
+                'mediaService'  => $this->mediaService
             ]);
             if ($isFormRequestValid) {
                 // Get redirection routing parameters which depend on trick update result
-                $routingParameters = $this->manageTrickUpdateResultRouting($authenticatedUser, $trick);
+                $routingParameters = $this->manageTrickUpdateResultRouting($authenticatedUser, $trickToUpdate);
                 return $redirectionResponder($routingParameters['routeName'], $routingParameters['routeParameters']);
             }
         }

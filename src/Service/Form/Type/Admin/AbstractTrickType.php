@@ -85,7 +85,7 @@ abstract class AbstractTrickType extends AbstractType
     {
         // Reorder "image to crop" boxes data in images collection and redefine rank if necessary
         $this->updateCollectionOrderAndRanks('images', $view, $form);
-
+        // Get images entities which correspond to existing (temporary or not) image files on server
         $this->retrieveMediasSourcesEntities('images', $view, $form);
     }
 
@@ -105,7 +105,8 @@ abstract class AbstractTrickType extends AbstractType
         $this->updateCollectionOrderAndRanks('videos', $view, $form);
         // TODO: add logic for video trick update
         // TODO: make changes in Video, VideoRepository, VideoInfosType, VideoInfosDTO, VideoInfosDTO.yaml to add logic for "name" / "savedVideoName"
-        //$this->retrieveMediasSourcesEntities('videos', $view, $form);
+        // Get videos entities which obviously already exists!
+        $this->retrieveMediasSourcesEntities('videos', $view, $form);
     }
 
     /**
@@ -154,7 +155,6 @@ abstract class AbstractTrickType extends AbstractType
             if (0 !== \count($results)) {
                 // Pass new custom form view data to template
                 $this->transmitMediasSourcesDataToTemplate($results, $formViewsCollection, $childFormName);
-
             }
         }
     }
@@ -235,9 +235,11 @@ abstract class AbstractTrickType extends AbstractType
             // Pass collection item entity uuid to corresponding form view to use it in template
             if (isset($results[$childFormViewValue]) && !empty($results[$childFormViewValue])) {
                 // Add entity uuid for both image and video
-                $formView->vars['bigImageUuid'] = $results[$childFormViewValue]['uuid'];
+                // No need to pass media name ("savedImageName" or "savedVideoName")
+                // since it is already available in form and its validity can be checked directly!
                 switch ($results[$childFormViewValue]['sourceType']) {
                     case 'image':
+                        $formView->vars['bigImageUuid'] = $results[$childFormViewValue]['uuid'];
                         // Get dataURI for both temporary image or image to update, to use it for image preview
                         $this->setImageDataURIForTemplate(
                             $thumbnailTypeEntity,
@@ -247,7 +249,7 @@ abstract class AbstractTrickType extends AbstractType
                         );
                         break;
                     case 'video':
-                        // TODO: add logic to transmit videos uuid and name to template!
+                        $formView->vars['videoUuid'] = $results[$childFormViewValue]['uuid'];
                         break;
                 }
             }

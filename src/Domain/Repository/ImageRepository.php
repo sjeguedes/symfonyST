@@ -48,7 +48,7 @@ class ImageRepository extends ServiceEntityRepository
 
     /**
      * Find many Image entities uuid, source type (image or video at this time) and format (extension)
-     * with one query based on their name.
+     * with one query based on their names.
      *
      * @link https://stackoverflow.com/questions/5929036/how-to-use-where-in-with-doctrine-2
      *

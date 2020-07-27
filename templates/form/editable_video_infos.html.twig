@@ -1,17 +1,31 @@
 {# rootForm var is provided by form template which calls this template #}
 {% set rootFormName = rootForm.vars.name %}
+{# Get video media owner type #}
+{% set videoOwnerType = mediaOwnerType %}
 {# Get form view for an existing image which exists, or (partially/completely) filled in, furthermore validated or not #}
 {% set videoInfosForm = editableVideoInfosForm %}
 {# Get existing index value for editable video box, provided by form template which calls this template #}
 {% set videoIndex = editableVideoIndexName %}
 <div id="st-video-infos-wrapper-{{ videoIndex }}" class="st-video-infos-wrapper">
     <div id="{{ rootFormName }}_videos_{{ videoIndex }}" class="uk-position-relative uk-border-rounded uk-padding-small uk-margin-small-bottom st-video-infos st-background-blue st-box-shadow-full-small">
-        {# Video block removal #}
-        {# TODO: complete var setting with a test which checks video existence by looping on trick videos here, and add removal confirmation modal for update form! #}
-        {% set removalIcon = (videoInfosForm.vars.entityUuid is defined) ? 'trash' : 'close' %}
-        <a id="st-video-remove-button-{{ videoIndex }}" href="#" class="uk-position-top-right uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-margin-small-top uk-margin-small-right st-video-remove-button" title="Cancel">
+        {# Saved (already saved) video block removal: look at AbstractTrickType::finishView() #}
+        {# Prepare vars for video removal modal by testing a valid existing saved video #}
+        {% set isVideoAlreadyAEntity = videoInfosForm.vars.videoUuid is defined %}
+        {% if isVideoAlreadyAEntity %}
+            {% set removeVideoLink = 'id="st-video-remove-button-'~videoIndex~'" href="#st-modal-delete-video"' %}
+            {% set removalIcon = 'trash' %}
+            {% set videoDataAttributes = 'data-uuid="'~videoInfosForm.vars.videoUuid~'" data-name="'~videoInfosForm.savedVideoName.vars.value~'" data-type="'~videoOwnerType~'"' %}
+        {% else %}
+            {% set removeVideoLink = 'href="#"' %}
+            {% set removalIcon = 'close' %}
+            {% set videoDataAttributes = '' %}
+        {% endif %}
+        {# These vars are checked to be safe with condition above! #}
+        <a {{ removeVideoLink|raw }} title="Cancel" {{ videoDataAttributes|raw }}
+                                     class="uk-position-top-right uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-margin-small-top uk-margin-small-right st-video-remove-button" uk-toggle>
             <span uk-icon="icon: {{ removalIcon }}; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-delete st-svg-icon-actions"></span>
         </a>
+        {# ----------------------------------------------------------------------------------------------------------------------------------------------------------------#}
         {# Video block sortable #}
         <a href="#" class="uk-position-bottom-right uk-sortable-handle uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-margin-small-bottom uk-margin-small-right" title="Sort vertically">
             <span uk-icon="icon: list; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-actions"></span>
@@ -68,6 +82,16 @@
                         <span class="uk-form-icon uk-form-icon-flip {{ class }}" uk-icon="icon: {{ icon }}"></span>
                     {% endif %}
                 </div>
+            </div>
+            {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+            {# Saved video name (must correspond to a valid video) #}
+            <div id="st-save-video-name-{{ videoIndex }}">
+                {# Hidden field used to store saved video name during validation:
+                    Please note this field is used to distinct videos for update process #}
+                {{ form_row(videoInfosForm.savedVideoName, {
+                    'attr': {'class': 'st-saved-video-name'},
+                    'value': videoInfosForm.savedVideoName.vars.value})
+                }}
             </div>
             {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
             {# Show list rank (sortable order) #}
