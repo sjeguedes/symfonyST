@@ -32,7 +32,7 @@ class Media
     /**
      * @var MediaSource (owning side of entity relation)
      *
-     * @ORM\OneToOne(targetEntity=MediaSource::class, inversedBy="media")
+     * @ORM\OneToOne(targetEntity=MediaSource::class, inversedBy="media", cascade={"persist", "remove"})
      * @ORM\JoinColumn(name="media_source_uuid", referencedColumnName="uuid", nullable=false)
      */
     private $mediaSource;

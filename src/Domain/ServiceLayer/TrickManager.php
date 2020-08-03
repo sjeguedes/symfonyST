@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace App\Domain\ServiceLayer;
 
 use App\Domain\DTO\CreateTrickDTO;
+use App\Domain\DTO\UpdateTrickDTO;
 use App\Domain\Entity\Trick;
 use App\Domain\Entity\User;
 use App\Domain\Repository\TrickRepository;
@@ -122,7 +123,7 @@ class TrickManager extends AbstractServiceLayer
     }
 
     /**
-     * Add (persist) and save Trick entity in database.
+     * Add (persist if necessary) and save (flush if necessary) a (new) Trick entity in database.
      *
      * Please note combinations:
      * - $isPersisted = false, bool $isFlushed = false means Trick entity must be instantiated only.
@@ -130,7 +131,7 @@ class TrickManager extends AbstractServiceLayer
      * - $isPersisted = true, bool $isFlushed = false means Trick entity is added to unit of work only.
      * - $isPersisted = false, bool $isFlushed = true means Trick entity is saved in database only with possible change(s) in unit of work.
      *
-     * @param Trick $newTrick
+     * @param Trick $trick
      * @param bool  $isPersisted
      * @param bool  $isFlushed
      *
@@ -138,10 +139,10 @@ class TrickManager extends AbstractServiceLayer
      *
      * @throws \Exception
      */
-    public function addAndSaveTrick(Trick $newTrick, bool $isPersisted = false, bool $isFlushed = false) : ?Trick
+    public function addAndSaveTrick(Trick $trick, bool $isPersisted = false, bool $isFlushed = false) : ?Trick
     {
-        $object = $this->addAndSaveNewEntity($newTrick, $isPersisted, $isFlushed);
-        return \is_null($object) ? null : $newTrick;
+        $object = $this->addAndSaveNewEntity($trick, $isPersisted, $isFlushed);
+        return \is_null($object) ? null : $trick;
     }
 
     /**
@@ -194,7 +195,48 @@ class TrickManager extends AbstractServiceLayer
     }
 
     /**
-     * Find all created tricks necessary data associated to a particular user author.
+     * Check if a form submitted trick name is the same or seems to be similar when compared.
+     *
+     * Please note this submitted name can be compared to all existing tricks names excepted current trick name,
+     * or in the other hand to current trick (to update) name only.
+     *
+     * @param string $submittedName
+     * @param Trick  $trick|null       a trick to update or null if it is a creation
+     * @param bool   $isTrickChecked
+     *
+     * @return bool
+     */
+    public function checkSameOrSimilarTrickName(
+        string $submittedName,
+        Trick $trick = null,
+        bool $isTrickChecked = false
+    ) : bool
+    {
+        // Prepare data to filter for trick creation by getting all tricks
+        if (\is_null($trick)) {
+            $dataToFilter = $this->getRepository()->findAll();
+        // Prepare data to filter for trick update by excluding trick to update or checking it only
+        } else {
+            $dataToFilter = !$isTrickChecked
+                ? $this->findOthersByExcludedUuid($trick->getUuid())
+                : [$trick];
+        }
+        $cleanSubmittedName = preg_replace('/[\s_-]+/', '', $submittedName);
+        // Filter comparison results with data
+        $results = array_filter($dataToFilter, function ($item) use ($cleanSubmittedName) {
+            /** @var Trick $item */
+            $cleanExistingName = preg_replace('/[\s_-]+/', '', $item->getName());
+            // Compare both cleaned names on each side with insensitive case
+            if (strtolower($cleanExistingName) === strtolower($cleanSubmittedName)) {
+                return true;
+            }
+            return false;
+        });
+        return empty($results) ? false : true;
+    }
+
+    /**
+     * Find all created tricks necessary data associated to a particular user author based on his uuid.
      *
      * Please note this is used to generate links to tricks update form.
      *
@@ -205,6 +247,18 @@ class TrickManager extends AbstractServiceLayer
     public function findOnesByAuthor(UuidInterface $userUuid) : array
     {
         return $this->repository->findAllByAuthor($userUuid);
+    }
+
+    /**
+     * Find all other tricks necessary data by excluding a particular trick based on its uuid.
+     *
+     * @param UuidInterface $uuid
+     *
+     * @return mixed
+     */
+    public function findOthersByExcludedUuid(UuidInterface $uuid)
+    {
+        return $this->repository->findOthersByExcludedUuid($uuid);
     }
 
     /**
@@ -552,5 +606,43 @@ class TrickManager extends AbstractServiceLayer
     {
         // Proceed to removal in database
         return $this->removeAndSaveNoMoreEntity($trick, $isFlushed);
+    }
+
+    /**
+     * Update a Trick entity with necessary data.
+     *
+     * @param UpdateTrickDTO      $updateTrickDTO
+     * @param Trick               $trickToUpdate
+     * @param User|UserInterface  $authenticatedUser
+     * @param bool                $mustAuthorBeReplaced
+     * @param bool                $isFlushed
+     *
+     * @return Trick
+     *
+     * @throws \Exception
+     */
+    public function updateTrick(
+        UpdateTrickDTO $updateTrickDTO,
+        Trick $trickToUpdate,
+        UserInterface $authenticatedUser,
+        bool $mustAuthorBeReplaced = false,
+        bool $isFlushed = false
+    ) : Trick
+    {
+        // Must author be replaced (updated)?
+        // CAUTION! This is the case when an author account is deleted, then a particular anonymous becomes trick author.
+        // At this time user author is not changed on update to keep the original author.
+        !$mustAuthorBeReplaced ?: $trickToUpdate->modifyUser($authenticatedUser);
+        // Update trick simple data
+        $trickToUpdate
+            ->modifyTrickGroup($updateTrickDTO->getGroup()) // At this time only one TrickGroup is returned.
+            ->modifyName($updateTrickDTO->getName())
+            ->modifyDescription($updateTrickDTO->getDescription())
+            ->customizeSlug($this->makeSlug($updateTrickDTO->getName())) // At this time slug is not customized in form, so create it with trick name.
+            ->modifyUpdateDate(new \DateTime('now'))
+            ->modifyIsPublished($updateTrickDTO->getIsPublished()); // This can change with administrator account!
+        // Save data in database if expected
+        $trickToUpdate = $this->addAndSaveTrick($trickToUpdate, false, $isFlushed);
+        return $trickToUpdate;
     }
 }

@@ -15,6 +15,7 @@ use App\Domain\Repository\ImageRepository;
 use App\Service\Medias\Upload\ImageUploader;
 use App\Utils\Traits\StringHelperTrait;
 use App\Utils\Traits\UserHandlingHelperTrait;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
@@ -252,35 +253,40 @@ class ImageManager extends AbstractServiceLayer
      }
 
     /**
-     * Delete physically all images already associated to a Trick entity.
+     * Delete physically all images already associated to a Trick entity
+     * or a particular list if it is specified in parameters thanks to corresponding Media entities.
      *
      * Please note, Image and Media entities corresponding to deleted image still exist after!
-     * Thanks to possibly defined cascade operations, Trick entity removal will also remove corresponding Image and Media entities for each image.
+     * Thanks to possibly defined cascade operations, Trick entity removal will also remove
+     * corresponding Image and Media entities for each image.
      *
-     * @param Trick $newTrick
+     * @param Trick              $trick
+     * @param Collection|Media[]|null $mediasList
      *
      * @return void
      *
      * @throws \Exception
      * @see TrickManager::removeTrick()
-     *
      */
-    public function deleteAllTrickImagesFiles(Trick $newTrick) : void
+    public function deleteAllTrickImagesFiles(Trick $trick, Collection $mediasList = null) : void
     {
-        foreach ($newTrick->getMediaOwner()->getMedias() as $media) {
+        // Take into account all trick medias if specified media list is empty!
+        $mediasList = $mediasList ?? $trick->getMediaOwner()->getMedias();
+        // Filter with Media entity which must correspond to an Image entity
+        foreach ($mediasList as $media) {
             /** @var Image|null $imageEntity */
             $imageEntity = $media->getMediaSource()->getImage();
             // Media must reference a Image entity!
             if (\is_null($imageEntity)) {
                 continue;
             }
-            // Remove image physically
-            $this->removeOneImageFile($imageEntity, ImageUploader::TRICK_IMAGE_DIRECTORY_KEY);
+            // Delete image physically
+            $this->deleteOneImageFile($imageEntity, ImageUploader::TRICK_IMAGE_DIRECTORY_KEY);
         }
     }
 
     /**
-     * Remove physically a particular image.
+     * Delete physically a particular image.
      *
      * @param Image|null  $imageEntity
      * @param string|null $uploadDirectoryKey
@@ -292,7 +298,7 @@ class ImageManager extends AbstractServiceLayer
      *
      * @see TrickManager::removeTrick()
      */
-    public function removeOneImageFile(?Image $imageEntity, string $uploadDirectoryKey, string $imageFullName = null) : bool
+    public function deleteOneImageFile(?Image $imageEntity, string $uploadDirectoryKey, string $imageFullName = null) : bool
     {
         if (\is_null($imageEntity) && \is_null($imageFullName)) {
             throw new \RuntimeException('A instance of Image, or a full image name must be defined!');
@@ -304,7 +310,11 @@ class ImageManager extends AbstractServiceLayer
         if (preg_match('/' . ImageManager::DEFAULT_IMAGE_IDENTIFIER_NAME . '/', $imageNameWithExtension)) {
             $uploadDirectory = $uploadDirectory . '/' .ImageUploader::TEMPORARY_DIRECTORY_NAME;
         }
-        return unlink($uploadDirectory . '/' . $imageNameWithExtension);
+        $isDeleted = false;
+        if (file_exists($uploadDirectory . '/' . $imageNameWithExtension)) {
+            $isDeleted = unlink($uploadDirectory . '/' . $imageNameWithExtension);
+        }
+        return $isDeleted;
     }
 
     /**
@@ -424,19 +434,24 @@ class ImageManager extends AbstractServiceLayer
             $cropJSONData = $dataModel->getCropJSONData();
             // Sanitize identifier name (if null, a fallback with image original name is used!)
             $trickImageIdentifierName = $this->getTrickImageSanitizedIdentifierName($identifierName, $trickSourceImage);
-        // CAUTION: this case is used to create other image files based on big image or particular image, with different formats and the same ratio!
+        // CAUTION: this case is used to create other image files based on big image or particular image,
+        // with different formats and the same ratio!
         } else {
+            $uploadDirectory = $this->imageUploader->getUploadDirectory(ImageUploader::TRICK_IMAGE_DIRECTORY_KEY);
             if (\is_null($identifierName)) {
                 // Get the highest image file format which already exists thanks to "savedImageName" property
                 $imageEntity = $this->findSingleByName($dataModel->getSavedImageName());
                 $fileName = $imageEntity->getName() . '.' . $imageEntity->getFormat();
                 // Get File instance based on "savedImageName" property
-                $trickSourceImage = new File($this->imageUploader->getUploadDirectory(ImageUploader::TRICK_IMAGE_DIRECTORY_KEY) . '/' . $fileName, true);
+                $trickSourceImage = new File($uploadDirectory . '/' . $fileName, true);
                 $trickImageIdentifierName = $imageEntity->getName();
             } else {
                 // Get File instance based on identifier name parameter (used here as image name with its extension)
-                $trickSourceImage = new File($this->imageUploader->getUploadDirectory(ImageUploader::TRICK_IMAGE_DIRECTORY_KEY) . '/' . $identifierName, true);
-                $trickImageIdentifierName = str_replace('.' . $trickSourceImage->getExtension(), '', $trickSourceImage->getFileName());
+                $trickSourceImage = new File($uploadDirectory . '/' . $identifierName, true);
+                $trickImageIdentifierName = str_replace(
+                    '.' . $trickSourceImage->getExtension(),
+                    '', $trickSourceImage->getFileName()
+                );
             }
             $cropJSONData = null;
         }
@@ -659,7 +674,7 @@ class ImageManager extends AbstractServiceLayer
                 $newImageName = preg_replace('/' . $matches[1] . '/', $newSlug, $currentImageName);
                 break;
             case self::TRICK_IMAGE_TYPE_KEY:
-                preg_match('/^(.*)-[a-z0-9]*-\d{2,}x\d{2,}(\.[a-z]{3,4})?$/', $currentImageName, $matches, PREG_UNMATCHED_AS_NULL);
+                preg_match('/^(.*)-[a-z0-9]*-\d+x\d+(\.[a-z]{3,4})?$/', $currentImageName, $matches, PREG_UNMATCHED_AS_NULL);
                 // Replace group 1 in front of string by slug
                 $newImageName = preg_replace('/' . $matches[1] . '/', $newSlug, $currentImageName);
                 break;
@@ -668,6 +683,67 @@ class ImageManager extends AbstractServiceLayer
                 $newImageName = $currentImageName;
         }
         return $newImageName;
+    }
+
+    /**
+     * Purge orphaned images files which are not associated to Image entities.
+     *
+     * @param string $uploadDirectoryKey
+     * @param array  $imagesEntities
+     *
+     * @return void
+     *
+     * @throws \Exception
+     */
+    public function purgeOrphanedImagesFiles(string $uploadDirectoryKey, array $imagesEntities) : void
+    {
+        // Restrict search in an upload directory or sub directory to avoid unexpected file deletion
+        $imagesDirectory = $this->getImageUploader()->getUploadDirectory($uploadDirectoryKey);
+        // Loop on existing files path in this particular directory
+        foreach (glob($imagesDirectory . "/*") as $imagePath) {
+            if (is_dir($imagePath)) continue;
+            $pattern = preg_quote($imagesDirectory . '/', '/');
+            $listedImageName = preg_replace('/' . $pattern . '/', '', $imagePath);
+            $isImageOrphaned = true;
+            foreach ($imagesEntities as $imageEntity) {
+                $existingImageName = $imageEntity->getName() . '.' . $imageEntity->getFormat();
+                if ($existingImageName === $listedImageName) {
+                    $isImageOrphaned = false;
+                    break;
+                }
+            }
+            // Delete file only if it is orphaned!
+            !$isImageOrphaned ?: unlink($imagePath);
+        }
+    }
+
+    /**
+     * Remove each empty temporary sub directory, each time one is found.
+     *
+     * Please note this searches in a particular upload directory to avoid issue.
+     *
+     * @param string $uploadDirectoryKey
+     *
+     * @return void
+     *
+     * @throws \Exception
+     */
+    public function removeEmptyTemporaryDirectory(string $uploadDirectoryKey) : void
+    {
+        // Restrict search in an upload directory or sub directory to avoid unexpected file deletion
+        $imagesDirectory = $this->getImageUploader()->getUploadDirectory($uploadDirectoryKey);
+        // Used to match a temporary directory
+        $pattern = preg_quote(ImageUploader::TEMPORARY_DIRECTORY_NAME, '/');
+        // Remove each empty temporary sub directory.
+        foreach (glob($imagesDirectory . "/*") as $imagePath) {
+            if (!is_dir($imagePath)) continue;
+            $directoryPath = $imagePath;
+            $isTemporaryPath = preg_match("/{$pattern}$/", $directoryPath);
+            // Remove each found temporary directory if it (still) exists and is empty.
+            if ($isTemporaryPath && is_dir($directoryPath) && !$files = glob($directoryPath . "/*")) {
+                rmdir($directoryPath);
+            }
+        }
     }
 
     /**
@@ -793,7 +869,7 @@ class ImageManager extends AbstractServiceLayer
     }
 
     /**
-     * Remove an image and all associated entities depending on cascade operations.
+     * Remove an Image entity and all associated entities depending on cascade operations.
      *
      * @param Image $image
      * @param bool  $isFlushed

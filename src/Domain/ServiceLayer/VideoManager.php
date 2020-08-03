@@ -156,4 +156,18 @@ class VideoManager extends AbstractServiceLayer
     {
         return $this->repository;
     }
+
+    /**
+     * Remove a Video entity and all associated entities depending on cascade operations.
+     *
+     * @param Video $video
+     * @param bool  $isFlushed
+     *
+     * @return bool
+     */
+    public function removeVideo(Video $video, bool $isFlushed = true) : bool
+    {
+        // Proceed to removal in database
+        return $this->removeAndSaveNoMoreEntity($video, $isFlushed);
+    }
 }

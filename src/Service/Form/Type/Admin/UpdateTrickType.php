@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace App\Service\Form\Type\Admin;
 
 use App\Domain\DTO\UpdateTrickDTO;
+use App\Domain\Entity\Trick;
 use App\Domain\Entity\TrickGroup;
 use App\Domain\Entity\User;
 use App\Domain\ServiceLayer\ImageManager;
@@ -35,6 +36,16 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class UpdateTrickType extends AbstractTrickType
 {
     use UuidHelperTrait;
+
+    /**
+     * Define collection item addition configuration
+     */
+    const COLLECTION_ALLOW_ADD = true;
+
+    /**
+     * Define collection item deletion configuration to change behaviour (If false AJAX deletion modal will be proposed!)
+     */
+    const COLLECTION_ALLOW_DELETE = true;
 
     /**
      * @var Request
@@ -91,8 +102,8 @@ class UpdateTrickType extends AbstractTrickType
                 // Order group names when feeding select
                 'query_builder' => function () use ($trickGroupService) {
                     return $trickGroupService->getRepository()
-                        ->createQueryBuilder('tr')
-                        ->orderBy('tr.name', 'ASC');
+                        ->createQueryBuilder('tg')
+                        ->orderBy('tg.name', 'ASC');
                 },
                 // Show group names in select
                 'choice_label'  => 'name',
@@ -109,27 +120,32 @@ class UpdateTrickType extends AbstractTrickType
             ])
             ->add('images', CollectionType::class, [
                 'entry_type'     => ImageToCropType::class,
-                'allow_add'      => true,
+                // Option "allow_add" enables "prototype" form variable in template
+                'allow_add'      => self::COLLECTION_ALLOW_ADD,
+                // "allow_delete" set to true is useless with direct video entity deletion in form!
+                'allow_delete'   => self::COLLECTION_ALLOW_DELETE,
                 'prototype_name' => '__imageIndex__',
                 // Used here to access fields in templates and customize a particular prototype
                 'prototype'      => true, // This is he default value but more explicit due to customization.
                 // Custom root form options passed to entry type form
                 'entry_options'  => [
-                    'rootFormHandler' =>  $options['formHandler']
+                    'rootFormHandler' => $options['formHandler'],
+                    'trickToUpdate'   => $options['trickToUpdate']
                 ],
                 // Maintain validation state at the collection form level, to be able to show errors near field
                 'error_bubbling' => false,
-                //'by_reference'   => false
             ])
             ->add('videos', CollectionType::class, [
                 'entry_type'     => VideoInfosType::class,
-                'allow_add'      => true,
+                // Option "allow_add" enables "prototype" form variable in template
+                'allow_add'      => self::COLLECTION_ALLOW_ADD,
+                // Option "allow_delete" set to true is useless with direct video entity deletion in form!
+                'allow_delete'   => self::COLLECTION_ALLOW_DELETE,
                 'prototype_name' => '__videoIndex__',
                 // Used here to access fields in templates and customize a particular prototype
                 'prototype'      => true, // This is he default value but more explicit due to customization.
                 // Maintain validation state at the collection form level, to be able to show errors near field
                 'error_bubbling' => false,
-                //'by_reference'   => false
             ])
             ->add('token', HiddenType::class, [
                 'inherit_data' => true
@@ -138,13 +154,18 @@ class UpdateTrickType extends AbstractTrickType
         if (\in_array(User::ADMIN_ROLE, $options['userRoles'])) {
             $builder->add('isPublished', ChoiceType::class, [
                 'choices'    => [
-                    // Replace the need to use a setter for "isPublished" corresponding UpdateTrickDTO property due to null default value
+                    // Replace the need to use a setter for "isPublished" corresponding UpdateTrickDTO property
+                    // due to null default value
                     'Choose a moderation state'           => null, // default value
                     'Make this trick publicly accessible' => true,
                     'Keep this trick unpublished'         => false
                 ],
             ]);
         }
+        // Add data transformer to "images" and "videos" data.
+        // Transform directly an array of DTO instances into a DTOCollection instance
+        $this->addArrayToDTOCollectionCustomDataTransformer($builder, 'images');
+        $this->addArrayToDTOCollectionCustomDataTransformer($builder, 'videos');
     }
 
     /**
@@ -180,6 +201,14 @@ class UpdateTrickType extends AbstractTrickType
         $resolver->setRequired('formHandler');
         $resolver->setAllowedValues('formHandler', function ($value) {
             if (!$value instanceof UpdateTrickHandler) {
+                return false;
+            }
+            return true;
+        });
+        // Check "trickToUpdate" option
+        $resolver->setRequired('trickToUpdate');
+        $resolver->setAllowedValues('trickToUpdate', function ($value) {
+            if (!$value instanceof Trick) {
                 return false;
             }
             return true;

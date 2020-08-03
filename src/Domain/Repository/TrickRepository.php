@@ -172,7 +172,7 @@ class TrickRepository extends ServiceEntityRepository
     public function findAllByAuthor(UuidInterface $userUuid) : array
     {
         $queryBuilder = $this->createQueryBuilder('t');
-        $result = $queryBuilder
+        return $queryBuilder
             // IMPORTANT! This retrieves expected data correctly!
             ->select('u.uuid, t.uuid, t.name, t.slug')
             ->join('t.user', 'u', 'WITH', 't.user = u.uuid')
@@ -181,7 +181,6 @@ class TrickRepository extends ServiceEntityRepository
             ->setParameter(1, $userUuid->getBytes())
             ->getQuery()
             ->getResult();
-        return $result;
     }
 
     /**
@@ -390,6 +389,23 @@ class TrickRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult();
         return $result;
+    }
+
+    /**
+     * Find other tricks expected data with query based on an excluded trick uuid.
+     *
+     * @param UuidInterface $uuid
+     *
+     * @return mixed
+     */
+    public function findOthersByExcludedUuid(UuidInterface $uuid)
+    {
+        $queryBuilder = $this->createQueryBuilder('t');
+        return $queryBuilder
+            ->where('t.uuid != ?1')
+            ->setParameter(1, $uuid->getBytes())
+            ->getQuery()
+            ->getResult();
     }
 
     /**

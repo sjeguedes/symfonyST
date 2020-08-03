@@ -27,15 +27,22 @@ abstract class AbstractTrickCollectionConstraintValidator extends ConstraintVali
         // Get current validated object (ImageToCropDTO or VideoInfosDTO)
         $object = $context->getObject();
         /** @var Form|FormInterface $collectionForm */
-        $collectionForm = $context->getRoot()->get($collectionName);
-        $countedCollectionFormItems = $collectionForm->count();
+        // Avoid issue with context if a validator is called in collection forms directly!
+        if (!\is_null($context->getRoot()) && $context->getRoot() !== $object) {
+            $objectHasRoot = true;
+            $collectionForm = $context->getRoot()->get($collectionName);
+            $countedCollectionFormItems = $collectionForm->count();
+        } else {
+            $objectHasRoot = false;
+            $countedCollectionFormItems = 1;
+        }
         $isRankTampered = false;
         // Data was tampered by malicious user! Current sortable order is not an int, or rank equals 0, or is not a positive integer, or greater than items boxes length.
-        if (!ctype_digit(trim((string) $object->getShowListRank())) || 0 >= $object->getShowListRank() || $countedCollectionFormItems < $object->getShowListRank()) {
+        if (!ctype_digit(trim((string) $object->getShowListRank())) || 0 >= $object->getShowListRank() || ($objectHasRoot && $countedCollectionFormItems < $object->getShowListRank())) {
             $isRankTampered = true;
         } else {
             // Loop on all existing collection items boxes
-            if (1 != $countedCollectionFormItems) {
+            if (1 !== $countedCollectionFormItems) {
                 $result = [];
                 foreach ($collectionForm as $key => $form) {
                     $rank = $form->getData()->getShowListRank();
@@ -54,7 +61,8 @@ abstract class AbstractTrickCollectionConstraintValidator extends ConstraintVali
             }
         }
         if (true === $isRankTampered) {
-            $context->buildViolation('You are not allowed to tamper show list rank!' . "\n" . ucfirst($collectionName) . ' list was reordered by default.')
+            $text = $objectHasRoot ? "\n" . ucfirst($collectionName) . ' list was reordered by default.' : '';
+            $context->buildViolation('You are not allowed to tamper show list rank!' . $text)
                 ->atPath('showListRank')
                 ->addViolation();
         }

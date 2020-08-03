@@ -117,7 +117,10 @@
                 {% endfor %}
                 {# Slide length number is between 1 and 5 included! #}
                 {% if itemCounter < 6 %}
-                    {% set sliderDynamicCenterClass = (itemCounter == 1) ? 'uk-flex-center'~mediaQueryLabels[0]~' ' : 'uk-flex-center'~mediaQueryLabels[itemCounter - 1]~' ' %}
+                    {# Adjust media query label index not to be out of range #}
+                    {% set mediaQueryIndex = itemCounter >= 4 ? 4 : itemCounter %}
+                    {#{% set sliderDynamicCenterClass = (itemCounter == 1) ? 'uk-flex-center'~mediaQueryLabels[0]~' ' : 'uk-flex-center'~mediaQueryLabels[mediaQueryIndex - 1]~' ' %}#}
+                    {% set sliderDynamicCenterClass = 'uk-flex-center'~mediaQueryLabels[mediaQueryIndex - 1]~' ' %}
                 {# If slide length number is greater than 5, do nothing! #}
                 {% endif %}
                 {# ---------------------------------------------------------------------------- #}

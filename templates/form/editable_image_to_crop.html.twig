@@ -11,17 +11,21 @@
         {# Saved (uploaded) image block removal: look at AbstractTrickType::finishView() #}
         {# Prepare vars for image removal modal by testing a valid and uploaded image #}
         {% set isImageAlreadyAEntity = imageToCropForm.vars.bigImageUuid is defined %}
-        {% if isImageAlreadyAEntity %}
+        {# Synchronize also "allow_delete" option #}
+        {% set allowDeleteConfig = rootForm.images.vars.allow_delete %}
+        {% if isImageAlreadyAEntity and allowDeleteConfig == 0 %}
             {% set removeImageLink = 'id="st-image-remove-button-'~imageIndex~'" href="#st-modal-delete-image"' %}
+            {% set actionTitle = 'Delete' %}
             {% set removalIcon = 'trash' %}
             {% set imageDataAttributes = 'data-uuid="'~imageToCropForm.vars.bigImageUuid~'" data-name="'~imageToCropForm.savedImageName.vars.value~'" data-type="'~imageOwnerType~'"' %}
         {% else %}
             {% set removeImageLink = 'href="#"' %}
-            {% set removalIcon = 'close' %}
+            {% set actionTitle = isImageAlreadyAEntity ? 'Delete' : 'Cancel' %}
+            {% set removalIcon = isImageAlreadyAEntity ? 'trash' : 'close' %}
             {% set imageDataAttributes = '' %}
         {% endif %}
         {# These vars are checked to be safe with condition above! #}
-        <a {{ removeImageLink|raw }} title="Cancel" {{ imageDataAttributes|raw }}
+        <a {{ removeImageLink|raw }} title="{{ actionTitle }}" {{ imageDataAttributes|raw }}
            class="uk-position-top-right uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-margin-small-top uk-margin-small-right st-image-remove-button" uk-toggle>
             <span uk-icon="icon: {{ removalIcon }}; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-delete st-svg-icon-actions"></span>
         </a>

@@ -28,17 +28,17 @@ class DTOCollection implements \IteratorAggregate, \Countable, \ArrayAccess
     /**
      * DTOCollection constructor.
      *
-     * @param array|AbstractReadableDTO[]|null $collection
+     * @param array|AbstractReadableDTO[] $collection
      *
      * @throws \Exception
      */
-    public function __construct(?array $collection)
+    public function __construct(array $collection = [])
     {
         // Check validity of initialized collection!
         if (0 !== count($collection)) {
             array_filter($collection, function ($value, $key) {
                 if (!is_int($key)) {
-                    throw new \RuntimeException("Item key $key must always be an integer!");
+                    throw new \RuntimeException('Item key $key must always be an integer!');
                 }
                 if (!$value instanceof AbstractReadableDTO) {
                     throw new \RuntimeException("Item value $value must always be an instance of \"AbstractReadableDTO\"!");
@@ -94,16 +94,17 @@ class DTOCollection implements \IteratorAggregate, \Countable, \ArrayAccess
     /**
      * Delete an existing item in collection.
      *
-     * @param int                      $key
      * @param AbstractReadableDTO|null $object
+     *
+     * @return void
+     *
+     * @throws \Exception
      */
-    public function delete($key, AbstractReadableDTO $object = null) : void
+    public function delete(AbstractReadableDTO $object) : void
     {
-        if (\is_null($key) && \is_null($object)) {
-            throw new \InvalidArgumentException("At least, item key $key must be defined!");
-        }
-        if (!isset($this->items[$key])) {
-            throw new \InvalidArgumentException("Item key $key is not valid!");
+        $key = array_search($object, $this->items, true);
+        if ($key === false) {
+            throw new \OutOfRangeException("Item key $key is not valid!");
         }
         unset($this->items[$key]);
     }
@@ -188,10 +189,15 @@ class DTOCollection implements \IteratorAggregate, \Countable, \ArrayAccess
 
     /**
      * {@inheritDoc}
+     *
+     * @throws \Exception
      */
     public function offsetUnset($offset) : void
     {
         $offset = (int) $offset;
-        $this->delete($offset);
+        if ($this->contains($offset)) {
+            $item = $this->get($offset);
+            $this->delete($item);
+        }
     }
 }

@@ -84,6 +84,7 @@ abstract class AbstractServiceLayer
                 $this->entityManager->flush();
             }
         } catch (\Exception $exception) {
+            $exception->getMessage();
             // $exception->getMessage() can be used here to debug exception!
             return null;
         }
@@ -93,7 +94,7 @@ abstract class AbstractServiceLayer
     /**
      * Delete (remove) and possible save (flush) removal on selected entity in database.
      *
-     * * Please note combination:
+     * * Please note case:
      * - $isFlushed = true means selected entity is saved in database only with possible change(s) in unit of work.
      *
      * @param object $entity

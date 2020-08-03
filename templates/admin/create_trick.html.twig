@@ -123,6 +123,7 @@
                                                 </small>
                                                 <small>
                                                     Trick name defines a title which must be unique.
+                                                    <strong>Letters, numbers, space, underscore "_" and top dash "-" characters are allowed.</strong>
                                                     It will be used to create url to access trick dedicated page.
                                                     For instance "<strong>My title name</strong>" will be formatted like this: "<strong>my-title-name</strong>".
                                                 </small>
@@ -391,6 +392,19 @@
                             </div>
                         {{ form_end(createTrickForm) }}
                         <p class="uk-margin-small-top uk-text-center"><small>All fields are mandatory.</small></p>
+                        {# simple member trick moderation text info #}
+                        {% if not is_granted('ROLE_ADMIN') %}
+                        <p id="st-temp-upload-text-info" class="uk-margin-small-top">
+                            <small class="uk-text-bold st-color-yellow">
+                                <span class="uk-icon" uk-icon="icon: info"></span>
+                                <span class="st-temp-upload-text-info-content">
+                                    This trick will be unpublished by default.
+                                    Only an administrator is allowed to change its moderation state!
+                                </span>
+                            </small>
+                        </p>
+                        {% endif %}
+                        {# ------------------------------------------------------------------------- #}
                         {# Get image removal ajax form in modal #}
                         {% include 'form/delete_image.html.twig' with {
                             removalText: 'This action is required since your image is temporarily saved on server.',

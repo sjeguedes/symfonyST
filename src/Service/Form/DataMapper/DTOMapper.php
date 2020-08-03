@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace App\Service\Form\DataMapper;
 
 use App\Domain\DTO\AbstractReadableDTO;
+use App\Domain\DTOToEmbed\VideoInfosDTO;
 use ArrayAccess;
 use IteratorAggregate;
 use Symfony\Component\Form\DataMapperInterface;
@@ -85,6 +86,7 @@ class DTOMapper implements DataMapperInterface
         $data = array_map(function ($item) use ($data) {
             return $data[$item];
         }, $dtoProperties);
+        // Combine DTO properties as keys with corresponding form values
         $data = array_combine(array_values($dtoProperties), array_values($data));
         // Loop on properties
         $dtoPropertyValues = [];

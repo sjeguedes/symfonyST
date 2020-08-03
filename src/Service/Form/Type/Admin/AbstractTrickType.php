@@ -8,8 +8,11 @@ use App\Domain\Entity\MediaType;
 use App\Domain\ServiceLayer\ImageManager;
 use App\Domain\ServiceLayer\MediaTypeManager;
 use App\Domain\ServiceLayer\VideoManager;
+use App\Service\Form\Collection\DTOCollection;
 use App\Service\Medias\Upload\ImageUploader;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
@@ -47,6 +50,38 @@ abstract class AbstractTrickType extends AbstractType
         $this->mediaTypeService = $mediaTypeService;
         $this->imageService = $imageService;
         $this->videoService = $videoService;
+    }
+
+    /**
+     * Add array to DTOCollection model transformer to a form data.
+     *
+     * This transformer aims at using a DTOCollection instead of array in a DTO property which is a set of DTO instances.
+     *
+     * Please not value 0 is returned if the string does not contain a "valid" int.
+     *
+     * @param FormBuilderInterface $formBuilder
+     * @param string               $formName    a Form instance name
+     *
+     * @return void
+     */
+    protected function addArrayToDTOCollectionCustomDataTransformer(FormBuilderInterface $formBuilder, string $formName) : void
+    {
+        /** @var FormBuilderInterface $form */
+        $form = $formBuilder->get($formName);
+        $form->addModelTransformer(
+            new CallbackTransformer(
+                // Normalized data (transform)
+                function ($value) {
+                    // Transform the DTOCollection or null value into a array
+                    return !\is_null($value) && $value instanceof DTOCollection ? iterator_to_array($value) : [];
+                },
+                // Model data (reverse transform)
+                function ($value) {
+                    // Transform the array into a DTOCollection
+                    return new DTOCollection($value);
+                }
+            )
+        );
     }
 
     /**
@@ -103,8 +138,6 @@ abstract class AbstractTrickType extends AbstractType
     {
         // Reorder "video infos" boxes data in videos collection and redefine rank if necessary
         $this->updateCollectionOrderAndRanks('videos', $view, $form);
-        // TODO: add logic for video trick update
-        // TODO: make changes in Video, VideoRepository, VideoInfosType, VideoInfosDTO, VideoInfosDTO.yaml to add logic for "name" / "savedVideoName"
         // Get videos entities which obviously already exists!
         $this->retrieveMediasSourcesEntities('videos', $view, $form);
     }
@@ -184,7 +217,7 @@ abstract class AbstractTrickType extends AbstractType
         // Image exists thanks and can be updated: encode it to use dataURI.
         if (!$isTemporaryImage) {
             // Get thumbnail image name
-            $pattern = '/^.*-(\d{2,}x\d{2,})(\.[a-z]{3,4})?$/';
+            $pattern = '/^.*-(\d+x\d+)(\.[a-z]{3,4})?$/';
             $bigImageName = $savedImageName;
             preg_match($pattern, $bigImageName, $matches, PREG_UNMATCHED_AS_NULL);
             // Replace big image dimensions ("with"x"height") in group 1 by thumbnail corresponding dimensions

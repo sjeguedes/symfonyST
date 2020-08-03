@@ -9,6 +9,11 @@ App\Domain\DTO\UpdateTrickDTO:
         name:
             - NotBlank:
                 message: Please fill in a name which is a title.
+            - Regex:
+                # Expected format: alphanumeric characters with included underscore, space and top dash
+                # with unicode flag u
+                pattern: '/^[\w\s-]*$/u'
+                message: Please use a valid name format.
             - Length:
                 max: 255
                 maxMessage: "This name should contain\na maximum of {{ limit }} characters or less."
@@ -25,14 +30,14 @@ App\Domain\DTO\UpdateTrickDTO:
             # Image collection must contain at least one item.
             - Count:
                 min: 1
-                minMessage: A new trick must contain at least one image.
+                minMessage: A trick must contain at least one image.
 
         videos:
             - Valid: ~
             # Video collection must contain at least one item.
             - Count:
                 min: 1
-                minMessage: A new trick must contain at least one video.
+                minMessage: A trick must contain at least one video.
 
         isPublished:
             - NotNull:

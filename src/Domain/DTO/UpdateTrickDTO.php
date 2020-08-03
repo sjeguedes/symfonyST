@@ -38,29 +38,30 @@ final class UpdateTrickDTO
     private $description;
 
     /**
-     * @var DTOCollection|ImageToCropDTO[]|null
+     * @var DTOCollection|ImageToCropDTO[]
      */
     private $images;
 
     /**
-     * @var DTOCollection|VideoInfosDTO[]|null
+     * @var DTOCollection|VideoInfosDTO[]
      */
     private $videos;
 
     /**
-     * @var bool|null
+     * @var bool
      */
     private $isPublished;
 
     /**
      * UpdateTrickDTO constructor.
      *
-     * @param TrickGroup|null             $group       a trick group which is a kind of category
-     * @param string|null                 $name        a unique trick title
-     * @param string|null                 $description a text which describes the trick
-     * @param array|ImageToCropDTO[]|null $images      a collection of image data (crop JSON data, preview data URI, identifier reference...)
-     * @param array|VideoInfosDTO[]|null  $videos      a collection of video URL strings to be used in iframe HTML element based on video type (Youtube, DailyMotion, Vimeo...)
-     * @param bool|null                   $isPublished a publication state which an administrator can change
+     * @param TrickGroup|null                $group       a trick group which is a kind of category
+     * @param string|null                    $name        a unique trick title
+     * @param string|null                    $description a text which describes the trick
+     * @param DTOCollection|ImageToCropDTO[] $images      a collection of image data (crop JSON data, preview data URI, identifier reference...)
+     * @param DTOCollection|VideoInfosDTO[]  $videos      a collection of video URL strings to be used in iframe HTML element
+     *                                                    based on video type (Youtube, DailyMotion, Vimeo...)
+     * @param bool                           $isPublished a publication state which an administrator can change
      *
      * @throws \Exception
      */
@@ -68,15 +69,15 @@ final class UpdateTrickDTO
         ?TrickGroup $group,
         ?string $name,
         ?string $description,
-        ?array $images,
-        ?array $videos,
-        ?bool $isPublished = false
+        DTOCollection $images,
+        DTOCollection $videos,
+        bool $isPublished = false
     ) {
         $this->group = $group;
         $this->name = $name;
         $this->description = $description;
-        $this->images = new DTOCollection($images);
-        $this->videos = new DTOCollection($videos);
+        $this->images = $images;
+        $this->videos = $videos;
         $this->isPublished = $isPublished;
     }
 
@@ -105,25 +106,25 @@ final class UpdateTrickDTO
     }
 
     /**
-     * @return DTOCollection|ImageToCropDTO[]|null
+     * @return DTOCollection|ImageToCropDTO[]
      */
-    public function getImages() : ?DTOCollection
+    public function getImages() : DTOCollection
     {
         return $this->images;
     }
 
     /**
-     * @return DTOCollection|VideoInfosDTO[]|null
+     * @return DTOCollection|VideoInfosDTO[]
      */
-    public function getVideos() : ?DTOCollection
+    public function getVideos() : DTOCollection
     {
         return $this->videos;
     }
 
     /**
-     * @return bool|null
+     * @return bool
      */
-    public function getIsPublished() : ?bool
+    public function getIsPublished() : bool
     {
         return $this->isPublished;
     }
@@ -162,37 +163,37 @@ final class UpdateTrickDTO
     }
 
     /**
-     * @param array|null $images
+     * @param DTOCollection|ImageToCropDTO[] $images
      *
      * @return UpdateTrickDTO
      *
      * @throws \Exception
      */
-    public function setImages(?array $images) : self
+    public function setImages(DTOCollection $images) : self
     {
-        $this->images = new DTOCollection($images);
+        $this->images = $images;
         return $this;
     }
 
     /**
-     * @param array|null $videos
+     * @param DTOCollection|VideoInfosDTO[] $videos
      *
      * @return UpdateTrickDTO
      *
      * @throws \Exception
      */
-    public function setVideos(?array $videos) : self
+    public function setVideos(DTOCollection $videos) : self
     {
-        $this->videos = new DTOCollection($videos);
+        $this->videos = $videos;
         return $this;
     }
 
     /**
-     * @param bool $isPublished|null
+     * @param bool $isPublished
      *
      * @return UpdateTrickDTO
      */
-    public function setIsPublished(?bool $isPublished) : self
+    public function setIsPublished(bool $isPublished) : self
     {
         $this->isPublished = $isPublished;
         return $this;

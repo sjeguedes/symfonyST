@@ -126,8 +126,8 @@ class UpdateTrickAction
         $trickToUpdate = $this->checkAccessToUpdateAction($request);
         // Get authenticated user
         $authenticatedUser = $this->userService->getAuthenticatedMember();
-        // Use form handler as form type option
-        $options = ['formHandler' => $this->formHandlers[0], 'userRoles' => $authenticatedUser->getRoles()];
+        // Use form handler, trick to update and user roles as form type options
+        $options = ['formHandler' => $this->formHandlers[0], 'trickToUpdate' => $trickToUpdate, 'userRoles' => $authenticatedUser->getRoles()];
         // Set form with initial model data and set the request by binding it
         $updateTrickForm = $this->formHandlers[0]->initForm(['trickToUpdate' => $trickToUpdate], null, $options)->bindRequest($request);
         // Use router and user main role label as form type options
@@ -144,6 +144,7 @@ class UpdateTrickAction
                 'videoService'  => $this->videoService,
                 'mediaService'  => $this->mediaService
             ]);
+
             if ($isFormRequestValid) {
                 // Get redirection routing parameters which depend on trick update result
                 $routingParameters = $this->manageTrickUpdateResultRouting($authenticatedUser, $trickToUpdate);
@@ -151,6 +152,7 @@ class UpdateTrickAction
             }
         }
         $data = [
+            'trickModerationState'  => $trickToUpdate->getIsPublished(),
             'trickUpdateError' => $this->formHandlers[0]->getTrickUpdateError() ?? null,
             'updateTrickForm'  => $updateTrickForm->createView(),
             'deleteImageForm'  => $deleteImageForm->createView() // Used to delete images with direct upload
@@ -195,9 +197,11 @@ class UpdateTrickAction
      */
     private function manageTrickUpdateResultRouting(UserInterface $authenticatedUser, Trick $trick) : array
     {
-        $trickUpdateError = $this->formHandlers[0]->getTrickUpdateError();
+        // Get updated trick, or null if an issue occurred!
+        /** @var Trick $updatedTrick */
+        $updatedTrick = $this->formHandlers[0]->getUpdatedTrick();
         // Failure (redirect to reinitialized trick update form page)
-        if (!\is_null($trickUpdateError)) {
+        if (\is_null($updatedTrick)) {
             $routeName = 'update_trick';
             $routeParameters = [
                 'mainRoleLabel' => lcfirst($authenticatedUser->getMainRoleLabel()),
@@ -207,7 +211,7 @@ class UpdateTrickAction
         // Success (redirect to new trick page)
         } else {
             $routeName = 'show_single_trick';
-            $routeParameters = ['slug' => $trick->getSlug(), 'encodedUuid' => $this->encode($trick->getUuid())];
+            $routeParameters = ['slug' => $updatedTrick->getSlug(), 'encodedUuid' => $this->encode($updatedTrick->getUuid())];
         }
         return ['routeName' => $routeName, 'routeParameters' => $routeParameters];
     }

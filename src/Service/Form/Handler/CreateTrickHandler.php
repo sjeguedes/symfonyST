@@ -6,22 +6,15 @@ namespace App\Service\Form\Handler;
 
 use App\Domain\DTOToEmbed\ImageToCropDTO;
 use App\Domain\DTOToEmbed\VideoInfosDTO;
-use App\Domain\Entity\Image;
-use App\Domain\Entity\MediaOwner;
-use App\Domain\Entity\MediaSource;
-use App\Domain\Entity\MediaType;
 use App\Domain\Entity\Trick;
 use App\Domain\Entity\User;
 use App\Domain\ServiceLayer\ImageManager;
 use App\Domain\ServiceLayer\MediaManager;
 use App\Domain\ServiceLayer\TrickManager;
-use App\Domain\ServiceLayer\VideoManager;
 use App\Service\Form\Collection\DTOCollection;
 use App\Service\Form\Type\Admin\CreateTrickType;
 use App\Service\Medias\Upload\ImageUploader;
 use App\Utils\Traits\CSRFTokenHelperTrait;
-use App\Utils\Traits\StringHelperTrait;
-use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -36,11 +29,9 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
  * Handle the form request when a member tries to create a new trick.
  * Call any additional validations and actions.
  */
-final class CreateTrickHandler extends AbstractUploadFormHandler
+final class CreateTrickHandler extends AbstractTrickFormHandler
 {
     use CSRFTokenHelperTrait;
-    use LoggerAwareTrait;
-    use StringHelperTrait;
 
     /**
      * @var csrfTokenManagerInterface
@@ -48,14 +39,9 @@ final class CreateTrickHandler extends AbstractUploadFormHandler
     private $csrfTokenManager;
 
     /*
-     * @var Trick
+     * @var Trick|null
      */
     private $newTrick;
-
-    /**
-     * @var Security
-     */
-    private $security;
 
     /**
      * CreateTrickHandler constructor.
@@ -75,12 +61,17 @@ final class CreateTrickHandler extends AbstractUploadFormHandler
         LoggerInterface $logger,
         Security $security
     ) {
-        parent::__construct($flashBag, $formFactory, CreateTrickType::class, $requestStack);
+        parent::__construct(
+            $flashBag,
+            $formFactory,
+            CreateTrickType::class,
+            $requestStack,
+            $logger,
+            $security
+        );
         $this->csrfTokenManager = $csrfTokenManager;
         $this->customError = null;
         $this->newTrick = null;
-        $this->setLogger($logger);
-        $this->security = $security;
     }
 
     /**
@@ -106,11 +97,12 @@ final class CreateTrickHandler extends AbstractUploadFormHandler
         /** @var TrickManager $trickService */
         $trickService = $actionData['trickService'];
         // DTO is in valid state but filled in trick name (title) already exist in database: it must be unique!
-        $trickWithSameName = $trickService->findSingleByName($this->form->getData()->getName()); // or $this->form->get('name')->getData()
-        $isTrickNameUnique = \is_null($trickWithSameName) ? true : false;
-        if (!$isTrickNameUnique) {
+        $submittedName = $this->form->getData()->getName(); // or $this->form->get('name')->getData()
+        // Is submitted trick name (or similar name) not used by existing ones?
+        if ($isSubmittedNameNotUnique = $trickService->checkSameOrSimilarTrickName($submittedName)) {
             $trickNameError = nl2br('Please check chosen title!' . "\n" .
-                'A trick with the same name already exists.'
+                'Another trick with the same name' . "\n" .
+                '(or similar name) already exists.'
             );
             $this->customError = $trickNameError;
             $this->flashBag->add(
@@ -146,7 +138,7 @@ final class CreateTrickHandler extends AbstractUploadFormHandler
         $createTrickDTO = $this->form->getData();
         $imagesDTOCollection = $createTrickDTO->getImages();
         $videosDTOCollection = $createTrickDTO->getVideos();
-        // Add collections items corresponding Media entities to Trick entity
+        // Add collections items corresponding Media (images or videos) entities to Trick entity
         $this->addTrickMediasFromCollections($newTrick, $imagesDTOCollection, $videosDTOCollection, $actionData);
         // Finish process by trying to save trick and inform about state (success or error notification message)
         $this->terminateTrickCreationProcess($newTrick, $actionData);
@@ -164,7 +156,6 @@ final class CreateTrickHandler extends AbstractUploadFormHandler
      *
      * @return void
      *
-     * @throws \Doctrine\ORM\NonUniqueResultException
      * @throws \Exception
      */
     private function addTrickMediasFromCollections(
@@ -174,6 +165,8 @@ final class CreateTrickHandler extends AbstractUploadFormHandler
         array $actionData
     ) : void
     {
+        /** @var ImageManager $imageService */
+        $imageService = $actionData['imageService'];
         // Loop on existing form images collection to create images and add corresponding medias to new trick
         /** @var ImageToCropDTO $imageToCropDTO */
         foreach ($imagesDTOCollection as $imageToCropDTO) {
@@ -186,6 +179,8 @@ final class CreateTrickHandler extends AbstractUploadFormHandler
                 break;
             }
         }
+        // Remove any empty temporary directory
+        $imageService->removeEmptyTemporaryDirectory(ImageUploader::TRICK_IMAGE_DIRECTORY_KEY);
         // Loop on existing form videos collection to create videos and add corresponding medias to new trick
         /** @var VideoInfosDTO $videoInfosDTO */
         foreach ($videosDTOCollection as $videoInfosDTO) {
@@ -198,151 +193,6 @@ final class CreateTrickHandler extends AbstractUploadFormHandler
                 break;
             }
         }
-    }
-
-    /**
-     * Add the three expected images (for one uploaded image)
-     * and create/update Image/Media entities from trick image collection.
-     *
-     * Please note this information:
-     * - 3 formats are finally generated after handling: 1600x900, 880x495, 400x225.
-     * - The identifier name used corresponds to a slug based on trick name which will be created with the root form.
-     * - A hash is automatically added to make image name unique
-     * - Images names respects this principle: identifierName-hash-format.extension (e.g. mctwist-b1853337-880x495.jpeg)
-     *
-     * @param Trick          $newTrick
-     * @param ImageToCropDTO $imageToCropDTO
-     * @param array          $actionData
-     *
-     * @return bool
-     *
-     * @throws \Doctrine\ORM\NonUniqueResultException
-     * @throws \Exception
-     */
-    private function addTrickImageFromCollection(
-        Trick $newTrick,
-        ImageToCropDTO $imageToCropDTO,
-        array $actionData
-    ) : bool
-    {
-        /** @var ImageManager $imageService */
-        $imageService = $actionData['imageService'];
-        // Get trick media owner
-        $newTrickMediaOwner = $newTrick->getMediaOwner();
-        // Retrieve big image Image and Media entities thanks to saved image name with loop
-        // which was already uploaded on server during form validation thanks to corresponding DTO with its "savedImageName" property.
-        // 1. Update base big image
-        $bigImageEntity = $imageService->findSingleByName($imageToCropDTO->getSavedImageName());
-        // Rename (with trick name slug) big image which is used in corresponding Image entity
-        $newImageName = $this->renameTrickBigImage($bigImageEntity, $newTrick, $actionData);
-        if (\is_null($newImageName)) {
-            return false;
-        }
-        // Add Media entity in trick medias Collection (which can be removed in case of failure!)
-        $bigImageMediaEntity = $bigImageEntity->getMediaSource()->getMedia();
-        // Modify MediaOwner entity: "direct upload" forced media owner to be null before and must be updated here!
-        $bigImageMediaEntity->modifyMediaOwner($newTrickMediaOwner);
-        $newTrickMediaOwner->addMedia($bigImageMediaEntity);
-        // Update big image corresponding Image and Media entities with validated form data
-        // Update will be flushed at the end of process!
-        $isBigImageUpdated = $imageService->updateTrickBigImage($bigImageEntity, $imageToCropDTO, $newImageName, false);
-        if (!$isBigImageUpdated) {
-            return false; // Big image update failed!
-        }
-        // Create physically small and medium ("normal") images files,
-        // and then, add also corresponding Image and Media entities
-        // 2. Small image (thumbnail)
-        $thumbImageEntity = $this->createTrickImageWithMandatoryFormat(
-            $newTrick,
-            $imageToCropDTO,
-            $bigImageEntity,
-            'trickThumbnail',
-            $actionData
-        );
-        if (\is_null($thumbImageEntity)) {
-            return false;
-        }
-        // Add Media entity in trick medias Collection (which can be removed in case of failure!)
-        $thumbImageMediaEntity = $thumbImageEntity->getMediaSource()->getMedia();
-        $newTrickMediaOwner->addMedia($thumbImageMediaEntity);
-        // 3. Normal image (intermediate format)
-        $normalImageEntity = $this->createTrickImageWithMandatoryFormat(
-            $newTrick,
-            $imageToCropDTO,
-            $bigImageEntity,
-            'trickNormal',
-            $actionData
-        );
-        if (\is_null($normalImageEntity)) {
-            return false;
-        }
-        // Add Media and MediaOwner entities from trick media Collection (which can be removed in case of failure!)
-        $normalImageMediaEntity = $normalImageEntity->getMediaSource()->getMedia();
-        $newTrickMediaOwner->addMedia($normalImageMediaEntity);
-        return true;
-    }
-
-    /**
-     * Add a Video entity from trick video collection.
-     *
-     * @param Trick         $newTrick
-     * @param VideoInfosDTO $videoInfosDTO
-     * @param array         $actionData
-     *
-     * @return bool
-     *
-     * @throws \Exception
-     */
-    private function addTrickVideoFromCollection(
-        Trick $newTrick,
-        VideoInfosDTO $videoInfosDTO,
-        array $actionData
-    ) : bool
-    {
-        /** @var VideoManager $videoService */
-        $videoService = $actionData['videoService'];
-        /** @var MediaManager $mediaService */
-        $mediaService = $actionData['mediaService'];
-        // Get trick media owner
-        $newTrickMediaOwner = $newTrick->getMediaOwner();
-        // Prepare a dynamic pattern "youtube|vimeo|dailymotion|..."
-        $allowedVideoTypes = MediaType::ALLOWED_VIDEO_TYPES;
-        $pattern = str_replace('_', '|', preg_quote(implode('_', $allowedVideoTypes)));
-        // Determine video media type thanks to allowed video URL
-        preg_match("/{$pattern}/", $videoInfosDTO->getUrl(), $matches, PREG_UNMATCHED_AS_NULL);
-        $mediaTypeKey = 'trick' . ucfirst($matches[0]); // e.g. "trickYoutube"
-        // Create Video entity
-        $newVideoEntity = $videoService->createTrickVideo($videoInfosDTO);
-        if (\is_null($newVideoEntity)) {
-            return false;
-        }
-        // Create mandatory Media entity which references corresponding entities:
-        // MediaOwner is the attachment (it is a trick here), MediaSource is a video.
-        /** @var MediaOwner|null $newMediaOwner */
-        $newMediaOwnerEntity = $newTrickMediaOwner;
-        /** @var MediaSource|null $newMediaSource */
-        $newMediaSourceEntity = $mediaService->getMediaSourceManager()->createMediaSource($newVideoEntity);
-        if (\is_null($newMediaSourceEntity)) {
-            return false;
-        }
-        // Create mandatory Media entity which references corresponding Video entity
-        $newVideoMediaEntity = $mediaService->createTrickMedia(
-            $newMediaOwnerEntity,
-            $newMediaSourceEntity,
-            $videoInfosDTO,
-            $mediaTypeKey
-        );
-        if (\is_null($newVideoMediaEntity)) {
-            return false;
-        }
-        // Save video data
-        $newVideoEntity = $videoService->addAndSaveVideo($newVideoEntity, $newVideoMediaEntity, true);
-        if (\is_null($newVideoEntity)) {
-            return false;
-        }
-        // Add Media and MediaOwner entities from trick media Collection (which can be removed in case of failure!)
-        $newTrickMediaOwner->addMedia($newVideoMediaEntity);
-        return true;
     }
 
     /**
@@ -364,17 +214,8 @@ final class CreateTrickHandler extends AbstractUploadFormHandler
         bool $isExceptionThrown = true
     ) : bool
     {
-        $condition = !\is_null($collectionItemDataModel) &&
-                     !$collectionItemDataModel instanceof ImageToCropDTO &&
-                     !$collectionItemDataModel instanceof VideoInfosDTO;
-        if ($condition) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    '"%s" data model must be an ImageToCropDTO or VideoInfosDTO instance!',
-                    $collectionItemDataModel
-                )
-            );
-        }
+        // Control expected collection instance type
+        $this->checkCollectionInstanceType($collectionItemDataModel);
         /** @var TrickManager $trickService */
         $trickService = $actionData['trickService'];
         /** @var ImageManager $imageService */
@@ -405,104 +246,16 @@ final class CreateTrickHandler extends AbstractUploadFormHandler
         if (!$isTrickRemoved = $trickService->removeTrick($newTrick)) {
             $isProcessCorrectlyCanceled = false;
         }
-        // Choice is made to create a exception!
+        // Choice is made to create an exception!
         if ($isExceptionThrown) {
             // Throw an exception if at least one collection item failed to be created!
-            $exceptionMessage = !\is_null($collectionItemDataModel)
-                ? $this->manageTrickMediaCreationError($collectionItemDataModel) : null;
-            // Add trick removal issue to exception
-            if (!$isTrickRemoved) {
-                $exceptionMessage = $this->manageTrickRemovalError($newTrick, $exceptionMessage);
-            }
-            throw new \Exception($exceptionMessage);
+            $this->throwTrickProcessException(
+                $collectionItemDataModel,
+                AbstractTrickFormHandler::TRICK_CREATION_LABEL,
+                $imageService
+            );
         }
         return $isProcessCorrectlyCanceled;
-    }
-
-    /**
-     * Create 2 other formats based on a saved image (direct upload) during root form validation.
-     *
-     * Please note base (big) image is the highest available format, so the two others are created with resize operation.
-     *
-     * @param Trick          $newTrick
-     * @param ImageToCropDTO $imageToCropDTO
-     * @param Image          $baseImageEntity
-     * @param string         $mediaTypeKey
-     * @param array          $actionData
-     *
-     * @return Image|null
-     *
-     * @throws \Exception
-     */
-    private function createTrickImageWithMandatoryFormat(
-        Trick $newTrick,
-        ImageToCropDTO $imageToCropDTO,
-        Image $baseImageEntity,
-        string $mediaTypeKey,
-        array $actionData
-    ) : ?Image
-    {
-        /** @var ImageManager $imageService */
-        $imageService = $actionData['imageService'];
-        /** @var MediaManager $mediaService */
-        $mediaService = $actionData['mediaService'];
-        // Get trick media owner
-        $newTrickMediaOwner = $newTrick->getMediaOwner();
-        // Get identifier name (included format will be replaced depending on new format to generate)
-        $baseImageNameWithExtension = $baseImageEntity->getName() . '.' . $baseImageEntity->getFormat();
-        // Create image file
-        // IMPORTANT! Here, identifier name option is used to pass new name directly,
-        // so thanks to this option, there is no need to update Image entity name
-        // and rename physical image after ImageManager::createTrickImage() method call!
-        $newTrickImageFile = $imageService->generateTrickImageFile(
-            $imageToCropDTO,
-            $mediaTypeKey,
-            false,
-            $baseImageNameWithExtension // identifier name
-        );
-        if (\is_null($newTrickImageFile)) {
-            return null;
-        }
-        // Create mandatory Image entity
-        $newImageEntity = $imageService->createTrickImage(
-            $imageToCropDTO,
-            $newTrickImageFile,
-            false
-        );
-        if (\is_null($newImageEntity)) {
-            // Remove physically image which was previously created due to this failure!
-            $imageService->removeOneImageFile(
-                null,
-                ImageUploader::TRICK_IMAGE_DIRECTORY_KEY,
-                $newTrickImageFile->getFilename()
-            );
-            return null;
-        }
-        // Create mandatory Media entity which references corresponding entities:
-        // MediaOwner is the attachment (it is a trick here), MediaSource is a image.
-        /** @var MediaOwner|null $newMediaOwnerEntity */
-        $newMediaOwnerEntity = $newTrickMediaOwner;
-        /** @var MediaSource|null $newMediaSourceEntity */
-        $newMediaSourceEntity = $mediaService->getMediaSourceManager()->createMediaSource($newImageEntity);
-        if (\is_null($newMediaSourceEntity)) {
-            return null;
-        }
-        // Create mandatory Media entity which references corresponding Image entity
-        $newImageMediaEntity = $mediaService->createTrickMedia(
-            $newMediaOwnerEntity,
-            $newMediaSourceEntity,
-            $imageToCropDTO,
-            $mediaTypeKey
-        );
-        if (\is_null($newImageMediaEntity)) {
-            return null;
-        }
-        // Save image data and corresponding media
-        $newImageEntity = $imageService->addAndSaveImage($newImageEntity, $newImageMediaEntity, true);
-        if (\is_null($newImageEntity)) {
-            return null;
-        }
-        return $newImageEntity;
     }
 
     /**
@@ -523,63 +276,6 @@ final class CreateTrickHandler extends AbstractUploadFormHandler
     public function getTrickCreationError() : ?string
     {
         return $this->customError;
-    }
-
-    /**
-     * Manage media collection item creation error context.
-     *
-     * Please note this method adds a user notification message, logs error and prepares exception message.
-     *
-     * @param object $collectionItemDataModel
-     *
-     * @return string
-     *
-     * @throws \Exception
-     */
-    private function manageTrickMediaCreationError(object $collectionItemDataModel) : string
-    {
-        switch ($collectionItemDataModel) {
-            // Image messages
-            case $collectionItemDataModel instanceof ImageToCropDTO:
-                $imageIdentifierName = $collectionItemDataModel->getSavedImageName();
-                $errorMessage = nl2br('Sorry, expected trick was not created!' . "\n" .
-                    'An error occurred during image(s) medias handling.'
-                );
-                $loggerMessage = sprintf(
-                    "[trace app snowTricks] CreateTrickHandler/cancelTrickCreationProcess => " .
-                    "Trick image issue with identifier: %s",
-                    $imageIdentifierName
-                );
-                $exceptionMessage = sprintf(
-                    'An error occurred due to an image with identifier name "%s" which was not created from collection!',
-                    $imageIdentifierName
-                );
-                break;
-            //Video messages
-            case $collectionItemDataModel instanceof VideoInfosDTO:
-                $videoURL = $collectionItemDataModel->getUrl();
-                $errorMessage = nl2br(
-                    'Sorry, expected trick was not created!' . "\n" .
-                    'An error occurred during' . "\n" . 'video(s) medias management.'
-                );
-                $loggerMessage = sprintf(
-                    "[trace app snowTricks] CreateTrickHandler/cancelTrickCreationProcess => " .
-                    "Trick video issue with: %s",
-                    $videoURL
-                );
-                $exceptionMessage = sprintf(
-                    'An error occurred due to a video with URL "%s" which was not created from collection!',
-                    $videoURL
-                );
-                break;
-            default:
-                $errorMessage = null;
-                $loggerMessage = null;
-                $exceptionMessage = "An error occurred due to unknown collection item data model!";
-        }
-        \is_null($errorMessage) ?: $this->flashBag->add('error', $errorMessage);
-        \is_null($loggerMessage) ?: $this->logger->error($loggerMessage);
-        return $exceptionMessage;
     }
 
     /**
@@ -611,51 +307,6 @@ final class CreateTrickHandler extends AbstractUploadFormHandler
             $exceptionMessage = 'An error happened! Trick was not correctly removed.';
         }
         return $exceptionMessage;
-    }
-
-    /**
-     * Rename a collection item which corresponds to trick big image with validated root form and update necessary data.
-     *
-     * Please not image is also physically renamed.
-     *
-     * @param Image $bigImageEntity
-     * @param Trick $newTrick
-     * @param array $actionData
-     *
-     * @return string|null
-     *
-     * @throws \Exception
-     */
-    private function renameTrickBigImage(
-        Image $bigImageEntity,
-        Trick $newTrick,
-        array $actionData
-    ) : ?string
-    {
-        /** @var ImageManager $imageService */
-        $imageService = $actionData['imageService'];
-        // Update big image Image entity (image name corresponds to "saveImageName" ImageToCropDTO property)
-        // which was already uploaded without form validation
-        $imageName = $bigImageEntity->getName();
-        // Rename image name with trick slug (by preserving hash and dimensions infos):
-        // the new name will be used for the 3 image formats (thumb , normal, big).
-        $newImageName = $imageService->prepareImageName(
-            $imageName, $newTrick->getSlug(),
-            ImageManager::TRICK_IMAGE_TYPE_KEY
-        );
-        // Rename image physically in directory
-        $imageNameWithExtension =  $bigImageEntity->getName() . '.' . $bigImageEntity->getFormat();
-        $newImageNameWithExtension = $newImageName . '.' . $bigImageEntity->getFormat();
-        $isImageRenamed = $imageService->renameImage(
-            $imageNameWithExtension,
-            $newImageNameWithExtension,
-            ImageManager::TRICK_IMAGE_TYPE_KEY,
-            true
-        );
-        if (!$isImageRenamed) {
-            return null;
-        }
-        return $newImageName;
     }
 
     /**

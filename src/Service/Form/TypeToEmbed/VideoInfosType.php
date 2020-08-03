@@ -7,6 +7,7 @@ namespace App\Service\Form\TypeToEmbed;
 use App\Domain\DTO\AbstractReadableDTO;
 use App\Domain\DTOToEmbed\VideoInfosDTO;
 use App\Domain\ServiceLayer\VideoManager;
+use App\Service\Medias\VideoURLProxyChecker;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -16,6 +17,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -41,17 +43,29 @@ class VideoInfosType extends AbstractTrickCollectionEntryType
     private $videoService;
 
     /**
+     * @var VideoURLProxyChecker
+     */
+    private $videoURLProxyChecker;
+
+    /**
      * VideoInfosType constructor.
      *
-     * @param DataMapperInterface $dataMapper
-     * @param ValidatorInterface  $validator
-     * @param VideoManager        $videoService
+     * @param DataMapperInterface  $dataMapper
+     * @param ValidatorInterface   $validator
+     * @param VideoManager         $videoService
+     * @param VideoURLProxyChecker $videoURLProxyChecker
      */
-    public function __construct(DataMapperInterface $dataMapper, ValidatorInterface $validator, VideoManager $videoService)
+    public function __construct(
+        DataMapperInterface $dataMapper,
+        ValidatorInterface $validator,
+        VideoManager $videoService,
+        VideoURLProxyChecker $videoURLProxyChecker
+    )
     {
         $this->dataMapper = $dataMapper;
         $this->validator = $validator;
         $this->videoService = $videoService;
+        $this->videoURLProxyChecker = $videoURLProxyChecker;
     }
 
     /**
@@ -70,6 +84,8 @@ class VideoInfosType extends AbstractTrickCollectionEntryType
             ->add('description', TextType::class, [
             ])
             ->add('savedVideoName', HiddenType::class, [
+                // Maintain validation state at the child form level, to be able to show errors near field
+                'error_bubbling' => false
             ])
             // "isPublished" property is set to true by default because it is not managed in project at this level!
             ->add('showListRank', HiddenType::class, [
@@ -125,25 +141,45 @@ class VideoInfosType extends AbstractTrickCollectionEntryType
             // Avoid issue with DTOMapper: Turn show list rank string into a real int, or if it the value is not an int,
             // define the value to 0 to be checked in validator!
             $formData['showListRank'] = ctype_digit((string) $formData['showListRank']) ? (int) $formData['showListRank'] : 0;
-            // Get current feed videoInfosDTO instance with custom data mapper
+            // Get new current feed videoInfosDTO instance with custom data mapper by mapping form changes
             /** @var VideoInfosDTO|AbstractReadableDTO $videoInfosDataModel */
             $videoInfosDataModel = $this->dataMapper->mapFormsToData($currentVideoInfosForm, $formData);
-            $urlViolationsList = $this->validator->validateProperty($videoInfosDataModel, 'url');
-            $urlViolationsLength = $urlViolationsList->count();
-            $isVideoURLViolation = 0 !== $urlViolationsLength ? true : false;
-            // Video URL is valid, so generate a video unique name or keep current name if it is valid!
-            if (!$isVideoURLViolation) {
-                $isVideoNameEmpty = isset($formData['savedVideoName']) && empty($formData['savedVideoName']);
-                $nameViolationsList = $this->validator->validateProperty($videoInfosDataModel, 'savedVideoName');
-                $nameViolationsLength = $nameViolationsList->count();
-                $isVideoNameViolation = 0 !== $nameViolationsLength ? true : false;
-                // Define a video unique name based on URL
-                $videoUniqueName = $this->videoService->generateUniqueVideoNameWithURL($videoInfosDataModel->getUrl());
-                // Generate unique name only it does not exist yet, or it exists and it is not valid!
-                $formData['savedVideoName'] = !$isVideoNameEmpty && !$isVideoNameViolation
-                    ? $formData['savedVideoName'] : $videoUniqueName;
+            // Validate manually "url" and "savedVideoName" with all constraints validation (standard and custom)
+            $contextualValidator = $this->validator->startContext()->validate($videoInfosDataModel);
+            $newMappedDTOViolationList = $contextualValidator->getViolations();
+            // Init states to use them for conditions
+            $isNewVideoURLViolation = false;
+            $isNewVideoSavedNameViolation = false;
+            // Check violation list for the new mapped VideoInfosDTO
+            /** @var ConstraintViolationList $newMappedDTOViolationList */
+            if (0 !== $newMappedDTOViolationList->count()) {
+                foreach ($newMappedDTOViolationList as $key => $value) {
+                    // Each value is a ConstraintViolation instance
+                    switch ($value->getPropertyPath()) {
+                        case 'url':
+                            $isNewVideoURLViolation = true;
+                             break;
+                        case 'savedVideoName':
+                            $isNewVideoSavedNameViolation = true;
+                            break;
+                    }
+                }
+            }
+            // New video URL and name are valid, so generate a video unique name if needed, otherwise keep current name!
+            if (!$isNewVideoURLViolation && !$isNewVideoSavedNameViolation) {
+                // Compare previous and new URL values
+                $isURLChanged = $event->getForm()->get('url')->getData() !== $formData['url'];
+                // Check if previous "savedVideoName" property was empty
+                $isVideoNameEmpty = \is_null($event->getForm()->get('savedVideoName')->getData());
+                // URL data changed or name data is empty, so it is necessary to change "savedVideoName" data
+                if ($isURLChanged || $isVideoNameEmpty) {
+                    // Define a video unique name based on URL
+                    $videoUniqueName = $this->videoService->generateUniqueVideoNameWithURL($videoInfosDataModel->getUrl());
+                    // Set unique name in form data
+                    $formData['savedVideoName'] = $videoUniqueName;
+                }
             } else {
-                // Empty video name
+                // Empty video name in invalid context
                 $formData['savedVideoName'] = '';
             }
             // Update global current "video infos" form data

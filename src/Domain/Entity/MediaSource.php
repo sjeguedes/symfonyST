@@ -42,7 +42,7 @@ class MediaSource
     /**
      * @var Image|null (owning side of entity relation)
      *
-     * @ORM\OneToOne(targetEntity=Image::class, inversedBy="mediaSource")
+     * @ORM\OneToOne(targetEntity=Image::class, inversedBy="mediaSource", cascade={"persist", "remove"}, orphanRemoval=true)
      * @ORM\JoinColumn(name="image_uuid", referencedColumnName="uuid", nullable=true)
      */
     private $image;
@@ -50,7 +50,7 @@ class MediaSource
     /**
      * @var Video|null (owning side of entity relation)
      *
-     * @ORM\OneToOne(targetEntity=Video::class, inversedBy="mediaSource")
+     * @ORM\OneToOne(targetEntity=Video::class, inversedBy="mediaSource", cascade={"persist", "remove"}, orphanRemoval=true)
      * @ORM\JoinColumn(name="video_uuid", referencedColumnName="uuid", nullable=true)
      */
     private $video;

@@ -11,17 +11,22 @@
         {# Saved (already saved) video block removal: look at AbstractTrickType::finishView() #}
         {# Prepare vars for video removal modal by testing a valid existing saved video #}
         {% set isVideoAlreadyAEntity = videoInfosForm.vars.videoUuid is defined %}
-        {% if isVideoAlreadyAEntity %}
+        {# Synchronize also "allow_delete" option #}
+        {% set allowDeleteConfig = rootForm.videos.vars.allow_delete %}
+        {% if isVideoAlreadyAEntity and allowDeleteConfig == 0 %}
             {% set removeVideoLink = 'id="st-video-remove-button-'~videoIndex~'" href="#st-modal-delete-video"' %}
+            {% set actionTitle = isVideoAlreadyAEntity ? 'Delete' : 'Cancel' %}
             {% set removalIcon = 'trash' %}
             {% set videoDataAttributes = 'data-uuid="'~videoInfosForm.vars.videoUuid~'" data-name="'~videoInfosForm.savedVideoName.vars.value~'" data-type="'~videoOwnerType~'"' %}
         {% else %}
             {% set removeVideoLink = 'href="#"' %}
-            {% set removalIcon = 'close' %}
+            {% set actionTitle = 'Cancel' %}
+            {% set removalIcon = isVideoAlreadyAEntity ? 'trash' : 'close' %}
             {% set videoDataAttributes = '' %}
         {% endif %}
         {# These vars are checked to be safe with condition above! #}
-        <a {{ removeVideoLink|raw }} title="Cancel" {{ videoDataAttributes|raw }}
+        {# TODO: this link is deactivated: need to complete video deletion process to make this link functional! #}
+        <a {{ removeVideoLink|raw }} title="{{ actionTitle }}" {{ videoDataAttributes|raw }}
                                      class="uk-position-top-right uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-margin-small-top uk-margin-small-right st-video-remove-button" uk-toggle>
             <span uk-icon="icon: {{ removalIcon }}; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-delete st-svg-icon-actions"></span>
         </a>
@@ -42,6 +47,9 @@
             <div class="uk-width-1-1 uk-margin-small-bottom">
                 {% if (videoInfosForm.url.vars.valid == 0) %}
                     {{ form_errors(videoInfosForm.url) }}
+                {% endif %}
+                {% if (videoInfosForm.savedVideoName.vars.valid == 0) %}
+                    {{ form_errors(videoInfosForm.savedVideoName) }}
                 {% endif %}
                 {% if (videoInfosForm.showListRank.vars.valid == 0) %}
                     {{ form_errors(videoInfosForm.showListRank) }}

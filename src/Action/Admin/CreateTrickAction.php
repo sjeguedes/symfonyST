@@ -114,7 +114,7 @@ class CreateTrickAction
         $this->checkAccessToCreationAction();
         // Get authenticated user
         $authenticatedUser = $this->userService->getAuthenticatedMember();
-        // Use form handler as form type option
+        // Use form handler and user roles as form type options
         $options = ['formHandler' => $this->formHandlers[0], 'userRoles' => $authenticatedUser->getRoles()];
         // Set form without initial model data and set the request by binding it
         $createTrickForm = $this->formHandlers[0]->initForm(null, null, $options)->bindRequest($request);
@@ -171,6 +171,7 @@ class CreateTrickAction
      */
     private function manageTrickCreationResultRouting(UserInterface $authenticatedUser) : array
     {
+        // Get new trick, or null if an issue occurred!
         /** @var Trick $newTrick */
         $newTrick = $this->formHandlers[0]->getNewTrick();
         // Failure (redirect to empty trick creation form page)

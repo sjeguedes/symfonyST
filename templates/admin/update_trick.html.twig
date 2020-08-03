@@ -124,6 +124,7 @@
                                     </small>
                                     <small>
                                         Trick name defines a title which must be unique.
+                                        <strong>Letters, numbers, space, underscore "_" and top dash "-" characters are allowed.</strong>
                                         It will be used to update url to access trick dedicated page.
                                         For instance "<strong>My title name</strong>" will be formatted like this: "<strong>my-title-name</strong>".
                                     </small>
@@ -334,54 +335,54 @@
                     </div>
                 </div>
                 {% if is_granted('ROLE_ADMIN') and (updateTrickForm.isPublished is defined) %}
-                    {# isPublished (trick moderation) #}
-                    <div class="uk-width-1-1 uk-margin-small-bottom">
-                        <hr class="uk-margin-small-top uk-padding-small-bottom">
-                        {% if updateTrickForm.isPublished.vars.valid == 0 %}
-                            {{ form_errors(updateTrickForm.isPublished) }}
-                        {% endif %}
-                        {{ form_label(updateTrickForm.isPublished, 'Moderation', {'label_attr': {'class': 'uk-form-label'}}) }}
-                        {# --- isPublished reminder --- #}
-                        <div class="uk-inline">
-                            <a href="#" class="uk-button-link">
-                                <span class="st-color-yellow" uk-icon="icon: question; ratio: 1.25"></span>
-                            </a>
-                            <div uk-drop="mode: click; pos: top-center; animation: uk-animation-slide-top-small; duration: 500">
-                                <div class="uk-inline uk-position-relative uk-padding-small uk-border-rounded uk-box-shadow-medium st-background-yellow st-color-black">
-                                    <a href="#" class="uk-drop-close uk-position-absolute uk-padding-small">
-                                        <span class="st-color-blue" uk-icon="icon: close"></span>
-                                    </a>
-                                    <p class="uk-margin-remove uk-text-center st-line-height-normal">
-                                        <small class="uk-display-block uk-margin-small-top uk-margin-small-bottom uk-text-bold">
-                                            <span uk-icon="icon: info"></span> Moderation reminder<br>
-                                        </small>
-                                        <small>
-                                            Trick moderation is proposed to <strong><span class="st-color-red">administrators</span></strong> only!
-                                            You can decide to publish (post) it immediately or not!
-                                        </small>
-                                    </p>
-                                </div>
+                {# isPublished (trick moderation) #}
+                <div class="uk-width-1-1 uk-margin-small-bottom">
+                    <hr class="uk-margin-small-top uk-padding-small-bottom">
+                    {% if updateTrickForm.isPublished.vars.valid == 0 %}
+                        {{ form_errors(updateTrickForm.isPublished) }}
+                    {% endif %}
+                    {{ form_label(updateTrickForm.isPublished, 'Moderation', {'label_attr': {'class': 'uk-form-label'}}) }}
+                    {# --- isPublished reminder --- #}
+                    <div class="uk-inline">
+                        <a href="#" class="uk-button-link">
+                            <span class="st-color-yellow" uk-icon="icon: question; ratio: 1.25"></span>
+                        </a>
+                        <div uk-drop="mode: click; pos: top-center; animation: uk-animation-slide-top-small; duration: 500">
+                            <div class="uk-inline uk-position-relative uk-padding-small uk-border-rounded uk-box-shadow-medium st-background-yellow st-color-black">
+                                <a href="#" class="uk-drop-close uk-position-absolute uk-padding-small">
+                                    <span class="st-color-blue" uk-icon="icon: close"></span>
+                                </a>
+                                <p class="uk-margin-remove uk-text-center st-line-height-normal">
+                                    <small class="uk-display-block uk-margin-small-top uk-margin-small-bottom uk-text-bold">
+                                        <span uk-icon="icon: info"></span> Moderation reminder<br>
+                                    </small>
+                                    <small>
+                                        Trick moderation is proposed to <strong><span class="st-color-red">administrators</span></strong> only!
+                                        You can decide to publish (post) it immediately or not!
+                                    </small>
+                                </p>
                             </div>
                         </div>
-                        {# --- end isPublished reminder --- #}
-                        <div class="uk-inline uk-flex">
-                            <span class="uk-form-icon" uk-icon="icon: unlock"></span>
-                            {% if updateTrickForm.isPublished.vars.errors.form.submitted == 1 %}
-                                {% set onValidationClass = updateTrickForm.isPublished.vars.valid == 0 ? ' st-select-error' : ' st-select-success' %}
-                            {% else %}
-                                {% set onValidationClass = '' %}
-                            {% endif %}
-                            {{ form_widget(updateTrickForm.isPublished, {
-                                'attr': {'class': 'uk-select'~onValidationClass },
-                                'value': updateTrickForm.isPublished.vars.value})
-                            }}
-                            {% if updateTrickForm.isPublished.vars.errors.form.submitted == 1 %}
-                                {% set class = updateTrickForm.isPublished.vars.valid == 0 ? 'uk-form-danger' : 'uk-form-success' %}
-                                {% set icon = updateTrickForm.isPublished.vars.valid == 0 ? 'warning' : 'check' %}
-                                <span class="uk-form-icon uk-form-icon-flip {{ class }}" uk-icon="icon: {{ icon }}"></span>
-                            {% endif %}
-                        </div>
                     </div>
+                    {# --- end isPublished reminder --- #}
+                    <div class="uk-inline uk-flex">
+                        <span class="uk-form-icon" uk-icon="icon: unlock"></span>
+                        {% if updateTrickForm.isPublished.vars.errors.form.submitted == 1 %}
+                            {% set onValidationClass = updateTrickForm.isPublished.vars.valid == 0 ? ' st-select-error' : ' st-select-success' %}
+                        {% else %}
+                            {% set onValidationClass = '' %}
+                        {% endif %}
+                        {{ form_widget(updateTrickForm.isPublished, {
+                            'attr': {'class': 'uk-select'~onValidationClass },
+                            'value': updateTrickForm.isPublished.vars.value})
+                        }}
+                        {% if updateTrickForm.isPublished.vars.errors.form.submitted == 1 %}
+                            {% set class = updateTrickForm.isPublished.vars.valid == 0 ? 'uk-form-danger' : 'uk-form-success' %}
+                            {% set icon = updateTrickForm.isPublished.vars.valid == 0 ? 'warning' : 'check' %}
+                            <span class="uk-form-icon uk-form-icon-flip {{ class }}" uk-icon="icon: {{ icon }}"></span>
+                        {% endif %}
+                    </div>
+                </div>
                 {% endif %}
                 {# CSRF token #}
                 {{ form_row(updateTrickForm.token, {'value': csrf_token('update_trick_token')}) }}
@@ -392,6 +393,20 @@
                 </div>
                 {{ form_end(updateTrickForm) }}
                 <p class="uk-margin-small-top uk-text-center"><small>All fields are mandatory.</small></p>
+                {# simple member trick moderation text info #}
+                {% if not is_granted('ROLE_ADMIN') %}
+                    <p id="st-temp-upload-text-info" class="uk-margin-small-top">
+                        <small class="uk-text-bold st-color-yellow">
+                            <span class="uk-icon" uk-icon="icon: info"></span>
+                            <span class="st-temp-upload-text-info-content">
+                            {% set publicationState = trickModerationState == 1 ? 'published' : 'unpublished' %}
+                            This trick is currently {{ publicationState }}.
+                            Only an administrator is allowed to change its moderation state!
+                        </span>
+                        </small>
+                    </p>
+                {% endif %}
+                {# ------------------------------------------------------------------------- #}
                 {# Get image removal ajax form in modal #}
                 {% include 'form/delete_image.html.twig' with {
                     removalText: 'This action is required since your image is saved on server. '~

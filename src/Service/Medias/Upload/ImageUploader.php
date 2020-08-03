@@ -239,9 +239,14 @@ class ImageUploader
      * @param string $imagePath
      *
      * @return string
+     *
+     * @throws \Exception
      */
     public function encodeImageWithBase64(string $imagePath) : string
     {
+        if (!\file_exists($imagePath)) {
+            throw new \RuntimeException("Image to encode with DataURI was not found!");
+        }
         // Read image path, convert it to base64 encoding
         $imageData = base64_encode(file_get_contents($imagePath));
         // Format the image source with the expected format: data:{mime};base64,{data}
@@ -324,14 +329,14 @@ class ImageUploader
         // between uploaded file name and immediately created final image name when they have the same dimensions!
         if ($isImageNameHashChanged) {
             $newHash = hash('crc32', uniqid());
-            preg_match('/^.*-([a-z0-9]*)-\d{2,}x\d{2,}(\.[a-z]{3,4})?$/', $fileName, $matches, PREG_UNMATCHED_AS_NULL);
+            preg_match('/^.*-([a-z0-9]*)-\d+x\d+(\.[a-z]{3,4})?$/', $fileName, $matches, PREG_UNMATCHED_AS_NULL);
             // Replace previous hash in group 1 by new hash
             $newImageName = preg_replace('/' . $matches[1] . '/', $newHash, $fileName);
         }
         // Change included format in name (Initial format is replaced with expected resize format!)
         $width = $parameters['resizeFormat']['width'];
         $height = $parameters['resizeFormat']['height'];
-        preg_match('/^.*-(\d{2,}x\d{2,})(\.[a-z]{3,4})?$/', $newImageName, $matches, PREG_UNMATCHED_AS_NULL);
+        preg_match('/^.*-(\d+x\d+)(\.[a-z]{3,4})?$/', $newImageName, $matches, PREG_UNMATCHED_AS_NULL);
         // Replace previous dimensions ("with"x"height") in group 1 by new corresponding dimensions
         $newImageName = preg_replace('/' . $matches[1] . '/',  $width . 'x' . $height, $newImageName);
         return $newImageName;

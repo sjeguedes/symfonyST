@@ -125,7 +125,7 @@
                         <h2 class="uk-card-title">{{ trick.name }}</h2>
                     </div>
                     <div class="uk-card-footer">
-                        <div class="uk-flex{{ is_granted('AUTHOR_OR_ADMIN_CAN_UPDATE_OR_DELETE_TRICKS', trick) ? ' uk-flex-between' : ' uk-flex-right' }}">
+                        <div class="uk-flex uk-flex-middle{{ is_granted('AUTHOR_OR_ADMIN_CAN_UPDATE_OR_DELETE_TRICKS', trick) ? ' uk-flex-between' : ' uk-flex-right' }} st-card-link-footer">
                             <div class="{{is_granted('AUTHOR_OR_ADMIN_CAN_UPDATE_OR_DELETE_TRICKS', trick) ? 'uk-text-left' : 'uk-text-right' }}">
                                 <a href="{{ path('show_single_trick', { 'slug': trick.slug, 'encodedUuid': trick.uuid|uuid_encode }) }}" class="uk-link-text" title="Read more">
                                     Read <span class="uk-hidden@xl">+</span><span class="uk-visible@xl">more</span>
@@ -137,6 +137,7 @@
                                 <a href="{{ path('update_trick', { 'mainRoleLabel': app.user.mainRoleLabel|lower, 'slug': trick.slug, 'encodedUuid': trick.uuid|uuid_encode }) }}" class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove" title="Update">
                                     <span uk-icon="icon: pencil; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-update"></span>
                                 </a>
+                                {# TODO: complete this link! #}
                                 <a href="{#{{ path('delete_trick', { 'encodedUuid': trick.uuid|uuid_encode }) }}#}#" class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove" title="Delete">
                                     <span uk-icon="icon: trash; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-delete"></span>
                                 </a>

@@ -137,8 +137,8 @@ final class AjaxDeleteImageHandler extends AbstractFormHandler
         // Proceed to image removal
         $imageDirectoryKey = $this->form->getData()->getMediaOwnerType() . 'Images';
         $isImageRemoved = false;
-        // Remove image physically
-        $isImageFileRemoved = $imageService->removeOneImageFile($this->imageToRemove, $imageDirectoryKey);
+        // Delete image physically
+        $isImageFileRemoved = $imageService->deleteOneImageFile($this->imageToRemove, $imageDirectoryKey);
         if ($isImageFileRemoved ) {
             // Remove entity and corresponding entities thanks to cascade option
             $isImageEntityRemoved = $imageService->removeImage($this->imageToRemove);

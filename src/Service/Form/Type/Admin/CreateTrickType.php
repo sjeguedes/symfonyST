@@ -37,6 +37,11 @@ class CreateTrickType extends AbstractTrickType
     use UuidHelperTrait;
 
     /**
+     * Define collection item addition configuration
+     */
+    const COLLECTION_ALLOW_ADD = true;
+
+    /**
      * @var Request
      */
     private $request;
@@ -91,8 +96,8 @@ class CreateTrickType extends AbstractTrickType
                 // Order group names when feeding select
                 'query_builder' => function () use ($trickGroupService) {
                     return $trickGroupService->getRepository()
-                        ->createQueryBuilder('tr')
-                        ->orderBy('tr.name', 'ASC');
+                        ->createQueryBuilder('tg')
+                        ->orderBy('tg.name', 'ASC');
                 },
                 // Show group names in select
                 'choice_label'  => 'name',
@@ -109,20 +114,22 @@ class CreateTrickType extends AbstractTrickType
             ])
             ->add('images', CollectionType::class, [
                 'entry_type'     => ImageToCropType::class,
-                'allow_add'      => true,
+                // Option "allow_add" enables "prototype" form variable in template
+                'allow_add'      => self::COLLECTION_ALLOW_ADD,
                 'prototype_name' => '__imageIndex__',
                 // Used here to access fields in templates and customize a particular prototype
                 'prototype'      => true, // This is he default value but more explicit due to customization.
                 // Custom root form options passed to entry type form
                 'entry_options'  => [
-                    'rootFormHandler' =>  $options['formHandler']
+                    'rootFormHandler' => $options['formHandler']
                 ],
                 // Maintain validation state at the collection form level, to be able to show errors near field
                 'error_bubbling' => false
             ])
             ->add('videos', CollectionType::class, [
                 'entry_type'     => VideoInfosType::class,
-                'allow_add'      => true,
+                // Option "allow_add" enables "prototype" form variable in template
+                'allow_add'      => self::COLLECTION_ALLOW_ADD,
                 'prototype_name' => '__videoIndex__',
                 // Used here to access fields in templates and customize a particular prototype
                 'prototype'      => true, // This is he default value but more explicit due to customization.
@@ -136,13 +143,18 @@ class CreateTrickType extends AbstractTrickType
         if (\in_array(User::ADMIN_ROLE, $options['userRoles'])) {
             $builder->add('isPublished', ChoiceType::class, [
                 'choices'    => [
-                    // Replace the need to use a setter for "isPublished" corresponding CreateTrickDTO property due to null default value
+                    // Replace the need to use a setter for "isPublished" corresponding CreateTrickDTO property
+                    // due to null default value
                     'Choose a moderation state'           => null, // default value
                     'Make this trick publicly accessible' => true,
                     'Keep this trick unpublished'         => false
                 ],
             ]);
         }
+        // Add data transformer to "images" and "videos" data.
+        // Transform directly an array of DTO instances into a DTOCollection instance
+        $this->addArrayToDTOCollectionCustomDataTransformer($builder, 'images');
+        $this->addArrayToDTOCollectionCustomDataTransformer($builder, 'videos');
     }
 
     /**
