@@ -5,7 +5,6 @@ declare(strict_types = 1);
 namespace App\Service\Form\Type\Admin;
 
 use App\Domain\DTO\UpdateProfileInfosDTO;
-use App\Domain\ServiceLayer\UserManager;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -16,9 +15,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
-use Symfony\Component\Routing\RouterInterface;
 
 /**
  * Class UpdateProfileInfosType.
@@ -33,46 +29,13 @@ class UpdateProfileInfosType extends AbstractType
     private $formSubscriber;
 
     /**
-     * @var PropertyAccessorInterface
-     */
-    private $propertyAccessor;
-
-    /**
-     * @var PropertyListExtractorInterface used to list properties
-     */
-    private $propertyListExtractor;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    /**
-     * @var UserManager
-     */
-    private $userService;
-
-    /**
      * UpdateProfileInfosType constructor.
      *
-     * @param EventSubscriberInterface       $formSubscriber
-     * @param PropertyAccessorInterface      $propertyAccessor
-     * @param PropertyListExtractorInterface $propertyListExtractor
-     * @param RouterInterface                $router
-     * @param UserManager                    $userService
+     * @param EventSubscriberInterface $formSubscriber
      */
-    public function __construct(
-        EventSubscriberInterface $formSubscriber,
-        PropertyAccessorInterface $propertyAccessor,
-        PropertyListExtractorInterface $propertyListExtractor,
-        RouterInterface $router,
-        UserManager $userService
-    ) {
+    public function __construct(EventSubscriberInterface $formSubscriber)
+    {
         $this->formSubscriber = $formSubscriber;
-        $this->propertyAccessor = $propertyAccessor;
-        $this->propertyListExtractor = $propertyListExtractor;
-        $this->router = $router;
-        $this->userService = $userService;
     }
 
     /**

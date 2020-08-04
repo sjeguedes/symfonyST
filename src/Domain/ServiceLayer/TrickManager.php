@@ -8,6 +8,7 @@ use App\Domain\DTO\UpdateTrickDTO;
 use App\Domain\Entity\Trick;
 use App\Domain\Entity\User;
 use App\Domain\Repository\TrickRepository;
+use App\Service\Event\CustomEventFactoryInterface;
 use App\Utils\Traits\RouterHelperTrait;
 use App\Utils\Traits\SessionHelperTrait;
 use App\Utils\Traits\StringHelperTrait;
@@ -16,6 +17,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Ramsey\Uuid\UuidInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -35,6 +37,11 @@ class TrickManager extends AbstractServiceLayer
     use UuidHelperTrait;
 
     /**
+     * @var CustomEventFactoryInterface
+     */
+    private $customEventFactory;
+
+    /**
      * @var EntityManagerInterface
      */
     protected $entityManager;
@@ -47,28 +54,31 @@ class TrickManager extends AbstractServiceLayer
     /**
      * TrickManager constructor.
      *
-     * @param EntityManagerInterface $entityManager
-     * @param TrickRepository        $repository
-     * @param LoggerInterface        $logger
-     * @param RouterInterface        $router
-     * @param SessionInterface       $session
+     * @param CustomEventFactoryInterface $customEventFactory
+     * @param EntityManagerInterface      $entityManager
+     * @param TrickRepository             $repository
+     * @param LoggerInterface             $logger
+     * @param RouterInterface             $router
+     * @param SessionInterface            $session
      *
      * @return void
      */
     public function __construct(
+        CustomEventFactoryInterface $customEventFactory,
         EntityManagerInterface $entityManager,
         TrickRepository $repository,
         LoggerInterface $logger,
         RouterInterface $router,
         SessionInterface $session
     ) {
+        $this->customEventFactory = $customEventFactory;
         parent::__construct($entityManager, $logger);
         $this->entityManager = $entityManager;
         $this->repository = $repository;
         $this->setLogger($logger);
         $this->setRouter($router);
         $this->setSession($session);
-    }
+     }
 
     /**
      * Adapt Trick list parameters depending on particular conditions to adjust values for showing process
@@ -146,6 +156,47 @@ class TrickManager extends AbstractServiceLayer
     }
 
     /**
+     * Check if a form submitted trick name is the same or seems to be similar when compared.
+     *
+     * Please note this submitted name can be compared to all existing tricks names excepted current trick name,
+     * or in the other hand to current trick (to update) name only.
+     *
+     * @param string $submittedName
+     * @param Trick  $trick|null       a trick to update or null if it is a creation
+     * @param bool   $isTrickChecked
+     *
+     * @return bool
+     */
+    public function checkSameOrSimilarTrickName(
+        string $submittedName,
+        Trick $trick = null,
+        bool $isTrickChecked = false
+    ) : bool
+    {
+        // Prepare data to filter for trick creation by getting all tricks
+        if (\is_null($trick)) {
+            $dataToFilter = $this->getRepository()->findAll();
+            // Prepare data to filter for trick update by excluding trick to update or checking it only
+        } else {
+            $dataToFilter = !$isTrickChecked
+                ? $this->findOthersByExcludedUuid($trick->getUuid())
+                : [$trick];
+        }
+        $cleanSubmittedName = preg_replace('/[\s_-]+/', '', $submittedName);
+        // Filter comparison results with data
+        $results = array_filter($dataToFilter, function ($item) use ($cleanSubmittedName) {
+            /** @var Trick $item */
+            $cleanExistingName = preg_replace('/[\s_-]+/', '', $item->getName());
+            // Compare both cleaned names on each side with insensitive case
+            if (strtolower($cleanExistingName) === strtolower($cleanSubmittedName)) {
+                return true;
+            }
+            return false;
+        });
+        return empty($results) ? false : true;
+    }
+
+    /**
      * Count all tricks without filter.
      *
      * @return int
@@ -161,6 +212,34 @@ class TrickManager extends AbstractServiceLayer
             throw new \UnexpectedValueException('Trick total count error: list can not be generated!');
         }
         return $result;
+    }
+
+    /**
+     * Create an event related to trick and dispatch it.
+     *
+     * An auto configured User subscriber listens to that kind of event.
+     *
+     * @param string $eventContext
+     * @param Trick  $trick
+     * @param User   $authenticatedUser
+     *
+     * @return void
+     *
+     * @throws \Exception
+     */
+    public function createAndDispatchTrickEvent(string $eventContext, Trick $trick, User $authenticatedUser) : void
+    {
+        $event = $this->customEventFactory->createFromContext(
+            $eventContext,
+            ['user' => $authenticatedUser, 'trick' => $trick]
+        );
+        if (\is_null($event)) {
+            throw new \Exception('Event was not created due to wrong parameters!');
+        }
+        $eventName = $this->customEventFactory->getEventNameByContext($eventContext);
+        /** @var EventDispatcherInterface $eventDispatcher */
+        $eventDispatcher = $this->customEventFactory->getEventDispatcher();
+        $eventDispatcher->dispatch($eventName, $event);
     }
 
     /**
@@ -192,47 +271,6 @@ class TrickManager extends AbstractServiceLayer
         );
         // Save data in database
         return $this->addAndSaveTrick($newTrick, $isPersisted, $isFlushed); // null or the entity
-    }
-
-    /**
-     * Check if a form submitted trick name is the same or seems to be similar when compared.
-     *
-     * Please note this submitted name can be compared to all existing tricks names excepted current trick name,
-     * or in the other hand to current trick (to update) name only.
-     *
-     * @param string $submittedName
-     * @param Trick  $trick|null       a trick to update or null if it is a creation
-     * @param bool   $isTrickChecked
-     *
-     * @return bool
-     */
-    public function checkSameOrSimilarTrickName(
-        string $submittedName,
-        Trick $trick = null,
-        bool $isTrickChecked = false
-    ) : bool
-    {
-        // Prepare data to filter for trick creation by getting all tricks
-        if (\is_null($trick)) {
-            $dataToFilter = $this->getRepository()->findAll();
-        // Prepare data to filter for trick update by excluding trick to update or checking it only
-        } else {
-            $dataToFilter = !$isTrickChecked
-                ? $this->findOthersByExcludedUuid($trick->getUuid())
-                : [$trick];
-        }
-        $cleanSubmittedName = preg_replace('/[\s_-]+/', '', $submittedName);
-        // Filter comparison results with data
-        $results = array_filter($dataToFilter, function ($item) use ($cleanSubmittedName) {
-            /** @var Trick $item */
-            $cleanExistingName = preg_replace('/[\s_-]+/', '', $item->getName());
-            // Compare both cleaned names on each side with insensitive case
-            if (strtolower($cleanExistingName) === strtolower($cleanSubmittedName)) {
-                return true;
-            }
-            return false;
-        });
-        return empty($results) ? false : true;
     }
 
     /**

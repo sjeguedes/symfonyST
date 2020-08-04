@@ -99,8 +99,7 @@ class UserSubscriber implements EventSubscriberInterface
     public function onFormUnchanged(FormUnchangedEvent $event) : void
     {
         // Check if action corresponds to user update profile page
-        $isUpdateProfileAction = UpdateProfileAction::class === $this->request->attributes->get('_controller');
-        if ($isUpdateProfileAction) {
+        if ($isUpdateProfileAction = UpdateProfileAction::class === $this->request->attributes->get('_controller')) {
             $userNickName = $event->getUser()->getNickName();
             $text = !empty($this->request->files->all()) ? 'avatar' : 'infos';
             $this->flashBag->add(
@@ -111,6 +110,8 @@ class UserSubscriber implements EventSubscriberInterface
                     $text
                 )
             );
+            // Avoid other event listeners or subscribers also listen this event!
+            $event->stopPropagation();
         }
     }
 

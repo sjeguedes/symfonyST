@@ -52,7 +52,7 @@ class TrickRepository extends ServiceEntityRepository
     /**
      * @var string
      */
-    private $currentUserAuthenticationState;
+    private $currentUserAuthenticationStatus;
 
     /**
      * TrickRepository constructor.
@@ -77,7 +77,7 @@ class TrickRepository extends ServiceEntityRepository
         // Get authenticated user (can be null)
         $this->currentUser = $this->security->getUser();
         // Store user authentication state as a kind of permissions information
-        $this->currentUserAuthenticationState = $this->userService->getUserAuthenticationState();
+        $this->currentUserAuthenticationStatus = $this->userService->getUserAuthenticationState();
     }
 
     /**
@@ -171,6 +171,10 @@ class TrickRepository extends ServiceEntityRepository
      */
     public function findAllByAuthor(UuidInterface $userUuid) : array
     {
+        // Administrator has access to all tricks!
+        if ($this->currentUser && $this->security->isGranted(User::ADMIN_ROLE)) {
+            return $this->findAll();
+        }
         $queryBuilder = $this->createQueryBuilder('t');
         return $queryBuilder
             // IMPORTANT! This retrieves expected data correctly!
@@ -215,11 +219,11 @@ class TrickRepository extends ServiceEntityRepository
         $customSQL = $this->getTrickListCustomSQL();
         // Get a native query thanks to a ResultSetMappingBuilder instance
         $customQuery = $this->getTrickListCustomNativeQuery($customSQL, $this->resultSetMapping);
-        // Get this state to adapt query depending on user permissions
-        $currentUserAuthenticationState = $this->currentUserAuthenticationState;
+        // Get this status to adapt query depending on user permissions
+        $currentUserAuthenticationStatus = $this->currentUserAuthenticationStatus;
         // Use parameters to prepare the query and get result(s)
         $customQuery
-            ->setParameter('userAuthenticationState', $currentUserAuthenticationState)
+            ->setParameter('userAuthenticationState', $currentUserAuthenticationStatus)
             ->setParameter('initRank', $init)
             ->setParameter('sortDirection', $order)
             ->setParameter('mediaType', MediaType::TYPE_CHOICES['trickThumbnail'])

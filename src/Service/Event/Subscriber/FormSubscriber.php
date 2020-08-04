@@ -5,19 +5,22 @@ declare(strict_types = 1);
 namespace App\Service\Event\Subscriber;
 
 use App\Domain\Entity\User;
+use App\Domain\ServiceLayer\TrickManager;
 use App\Domain\ServiceLayer\UserManager;
 use App\Service\Event\CustomEventFactory;
 use App\Service\Form\Type\Admin\UpdateProfileAvatarType;
 use App\Service\Form\Type\Admin\UpdateProfileInfosType;
+use App\Service\Form\Type\Admin\UpdateTrickType;
 use ArrayAccess;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
@@ -43,18 +46,14 @@ class FormSubscriber implements EventSubscriberInterface
      */
     const UPDATE_FORMS_LIST = [
         UpdateProfileAvatarType::class,
-        UpdateProfileInfosType::class
+        UpdateProfileInfosType::class,
+        UpdateTrickType::class
     ];
 
     /**
      * @var FormInterface|null
      */
     private $currentForm;
-
-    /**
-     * @var DataMapperInterface
-     */
-    private $dataMapper;
 
     /**
      * @var bool
@@ -81,15 +80,20 @@ class FormSubscriber implements EventSubscriberInterface
      */
     private $propertyListExtractor;
 
-    /*
-     * @var AbstractReadableDTO
+    /**
+     * @var RequestStack
      */
-    private $nextFormData;
+    private $requestStack;
 
     /**
      * @var RouterInterface
      */
     private $router;
+
+    /**
+     * @var TrickManager
+     */
+    private $trickService;
 
     /**
      * @var UserManager
@@ -101,15 +105,17 @@ class FormSubscriber implements EventSubscriberInterface
      *
      * @param PropertyAccessorInterface      $propertyAccessor
      * @param PropertyListExtractorInterface $propertyListExtractor
-     * @param DataMapperInterface            $dataMapper            an expected custom DTOMapper instance
+     * @param RequestStack                   $requestStack
      * @param RouterInterface                $router
+     * @param TrickManager                   $trickService
      * @param UserManager                    $userService
      */
     public function __construct(
         PropertyAccessorInterface $propertyAccessor,
         PropertyListExtractorInterface $propertyListExtractor,
-        DataMapperInterface $dataMapper,
+        RequestStack $requestStack,
         RouterInterface $router,
+        TrickManager $trickService,
         UserManager $userService
     ) {
         $this->currentForm = null;
@@ -118,24 +124,30 @@ class FormSubscriber implements EventSubscriberInterface
         $this->previousDataModel = null;
         $this->propertyAccessor = $propertyAccessor;
         $this->propertyListExtractor = $propertyListExtractor;
-        $this->nextFormData = null;
-        $this->dataMapper = $dataMapper;
+        $this->requestStack = $requestStack;
         $this->router = $router;
+        $this->trickService = $trickService;
         $this->userService = $userService;
     }
 
     /**
      * Compare properties values from two instances of the same class.
      *
-     * @param string|null $className   the common class shared between the two instances to compare
-     * @param object      $firstModel  a first $className instance
-     * @param object      $secondModel a second $className instance
+     * @param string|null $className          the common class shared between the two instances to compare
+     * @param object      $firstModel         a first $className instance
+     * @param object      $secondModel        a second $className instance
+     * @param bool        $isComparedStrictly a strict comparison mode for objects
      *
      * @return bool
      *
      * @throws \Exception
      */
-    private function compareObjectsPropertiesValues(?string $className, object $firstModel, object $secondModel) : bool
+    private function compareObjectsPropertiesValues(
+        ?string $className,
+        object $firstModel,
+        object $secondModel,
+        bool $isComparedStrictly = true
+    ) : bool
     {
         $modelDataClassName = !\is_null($className) ? $className : $this->currentForm->getConfig()->getDataClass();
         if (!$firstModel instanceof $modelDataClassName || !$firstModel instanceof $modelDataClassName) {
@@ -148,25 +160,67 @@ class FormSubscriber implements EventSubscriberInterface
             $firstModelPropertyValue = $this->propertyAccessor->getValue($firstModel, $value);
             $secondModelPropertyValue = $this->propertyAccessor->getValue($secondModel, $value);
             // At least one value is not the same.
-            if ($firstModelPropertyValue !== $secondModelPropertyValue) {
-                $isIdentical = false;
-                break;
+            if (!$isComparedStrictly && \is_object($firstModelPropertyValue) && \is_object($secondModelPropertyValue)) {
+                // Avoid issue with objects identifiers when comparison is strict!
+                if ($firstModelPropertyValue != $secondModelPropertyValue) {
+                    $isIdentical = false;
+                    break;
+                }
+            } else {
+                // Compare properties strictly
+                if ($firstModelPropertyValue !== $secondModelPropertyValue) {
+                    $isIdentical = false;
+                    break;
+                }
             }
+
         }
         return $isIdentical;
     }
 
     /**
-     * Create and dispatch an event when a user submits an unchanged updated profile.
+     * Create and dispatch an event when a user submits an unchanged updated profile form.
+     *
+     * @param FormEvent $event
      *
      * @return void
+     *
+     * @throws \Exception
      */
-    private function createAndDispatchUnchangedUserProfileEvent() : void
+    private function createAndDispatchUnchangedUserProfileEvent(FormEvent $event) : void
     {
         /** @var User $authenticatedUser */
         $authenticatedUser = $this->userService->getAuthenticatedMember();
-        $this->userService->createAndDispatchUserEvent(CustomEventFactory::USER_WITH_UNCHANGED_UPDATED_PROFILE, $authenticatedUser);
+        $this->userService->createAndDispatchUserEvent(
+            CustomEventFactory::USER_WITH_UNCHANGED_UPDATED_PROFILE,
+            $authenticatedUser
+        );
     }
+
+    /**
+     * Create and dispatch an event when a user submits an unchanged updated trick form.
+     *
+     * @param FormEvent $event
+     *
+     * @return void
+     *
+     * @throws \Exception
+     */
+    private function createAndDispatchUnchangedTrickContentEvent(FormEvent $event) : void
+    {
+        $form = $event->getForm();
+        $formOptions = $form->getConfig()->getOptions();
+        $updatedTrick = isset($formOptions['trickToUpdate']) ? $formOptions['trickToUpdate'] : null;
+        /** @var User $authenticatedUser */
+        $authenticatedUser = $this->userService->getAuthenticatedMember();
+        /** @var User $authenticatedUser */
+        $authenticatedUser = $this->userService->getAuthenticatedMember();
+        $this->trickService->createAndDispatchTrickEvent(
+            CustomEventFactory::TRICK_WITH_UNCHANGED_UPDATED_CONTENT,
+            $updatedTrick,
+            $authenticatedUser
+        );
+     }
 
     /**
      * {@inheritdoc}
@@ -177,6 +231,7 @@ class FormSubscriber implements EventSubscriberInterface
             FormEvents::PRE_SET_DATA => 'onPreSetData',
             FormEvents::PRE_SUBMIT   => 'onPreSubmit',
             FormEvents::POST_SUBMIT  => 'onPostSubmit',
+            KernelEvents::EXCEPTION  => 'onKernelException',
             KernelEvents::RESPONSE   => 'onKernelResponse',
         ];
     }
@@ -205,16 +260,27 @@ class FormSubscriber implements EventSubscriberInterface
      * @param FormInterface $form
      * @param ArrayAccess   $modelDataBefore
      * @param ArrayAccess   $modelDataAfter
+     * @param bool          $isComparedStrictly a strict comparison mode for objects
      *
      * @return bool
      *
      * @throws \Exception
      */
-    private function isUnchangedForm(FormInterface $form, ArrayAccess $modelDataBefore, ArrayAccess $modelDataAfter) : bool
+    private function isUnchangedForm(
+        FormInterface $form,
+        ArrayAccess $modelDataBefore,
+        ArrayAccess $modelDataAfter,
+        bool  $isComparedStrictly = true
+    ) : bool
     {
         $modelDataClassName = $form->getConfig()->getDataClass();
         // Check if form is unchanged or not
-        $isUnChangedForm = $this->compareObjectsPropertiesValues($modelDataClassName, $modelDataBefore, $modelDataAfter);
+        $isUnChangedForm = $this->compareObjectsPropertiesValues(
+            $modelDataClassName,
+            $modelDataBefore,
+            $modelDataAfter,
+            $isComparedStrictly
+        );
         // Feed form subscriber property, and possibly set a redirect response thanks to kernel response event
         $this->isUnChangedForm = $isUnChangedForm;
         return $isUnChangedForm;
@@ -233,6 +299,20 @@ class FormSubscriber implements EventSubscriberInterface
     {
         // Store current form to share it in methods where it is not possible to get this data.
         $this->currentForm = $event->getForm();
+    }
+
+    /**
+     * Define a callback when user submitted a form which generated an exception.
+     *
+     * @param GetResponseForExceptionEvent $event
+     *
+     * @return void
+     *
+     * @throws \Exception
+     */
+    public function onKernelException(GetResponseForExceptionEvent $event) : void
+    {
+        throw new \Exception($event->getException()->getMessage());
     }
 
     /**
@@ -261,7 +341,7 @@ class FormSubscriber implements EventSubscriberInterface
         if ($this->isUpdateFormAction && $this->isUnChangedForm) {
             // Check form type to set the proper redirection
             $formType = $this->currentForm->getConfig()->getType()->getInnerType();
-            $response = $this->setUnchangedFormActionResponse($formType);
+            $response = $this->setUnchangedFormActionResponse($formType, $event);
         }
         // Use redirection or not
         return \is_null($response) ? $response : $event->setResponse($response);
@@ -285,14 +365,15 @@ class FormSubscriber implements EventSubscriberInterface
         $formType = $form->getConfig()->getType()->getInnerType();
         // Check if an update form action matched
         if ($this->isUpdateFormAction($formType)) {
-            // Get request data (form fields data)
-            $formDataWithPossibleChange = $event->getData();
-            // Get last initialized data model (if value is null when submitted first, instantiate manually a default empty data object)
-            $previousDataModel = $event->getForm()->getData() ?? call_user_func($form->getConfig()->getOption('empty_data'), $form); // $form->getData()
-            // Previous data model instance provided by $event->getForm()->getData() can not be set directly, because it is the same object (reference).
+            // CAUTION! new form fields data (array) are set in "$event->getData();"
+            // Get last initialized data model (if value is null when submitted first,
+            // instantiate manually a default empty data object)
+            $emptyDataOption = $form->getConfig()->getOption('empty_data');
+            $previousDataModel = $event->getForm()->getData() ?? call_user_func($emptyDataOption, $form); // $form->getData()
+            // Previous data model instance provided by $event->getForm()->getData() can not be set directly,
+            // because it is the same object (reference).
             // Its properties will change (it will become the new updated model) once the next events happen.
             $this->previousDataModel = clone $previousDataModel;
-            $this->nextFormData = $formDataWithPossibleChange;
         }
     }
 
@@ -313,18 +394,30 @@ class FormSubscriber implements EventSubscriberInterface
      */
     public function onPostSubmit(FormEvent $event) : void
     {
+        // Get the form with potential changes (CAUTION! During pre submit event, it was the previous submitted form!)
         $form = $event->getForm();
+        $formType = $form->getConfig()->getType()->getInnerType();
+        $formTypeClassName = \get_class($formType);
         // Check previous data model is correctly set submitted and valid form context
         if ($this->isUpdateFormAction && $form->isValid()) {
-            // Get the corresponding DTO based on possibly updated form data, to compare state before and after possible update
-            $formDataWithPossibleChange = $this->nextFormData;
+            // Get the previous corresponding DTO before potential form changes
             $previousDataModel = $this->previousDataModel;
             // Get new form data model with possible change thanks to pre-submit event
-            // This mapping is not really necessary because $form->getData() can be used instead without data model modification.
-            $nextDataModel = $this->dataMapper->mapFormsToData($form, $formDataWithPossibleChange); // $form->getData()
-            if ($this->isUnchangedForm($form, $previousDataModel, $nextDataModel)) {
-                // A user subscriber listens to this event.
-                $this->createAndDispatchUnchangedUserProfileEvent();
+            $nextDataModel = $form->getData();
+            // Check with no strict comparison (set to false) due to previous data model cloning
+            if ($this->isUnchangedForm($form, $previousDataModel, $nextDataModel, false)) {
+                // Check called form type to create and dispatch new custom events from here!
+                switch ($formTypeClassName) {
+                    case UpdateProfileAvatarType::class:
+                    case UpdateProfileInfosType::class:
+                        // A user subscriber listens to this event.
+                        $this->createAndDispatchUnchangedUserProfileEvent($event);
+                        break;
+                    case UpdateTrickType::class:
+                        // A trick subscriber listens to this event.
+                        $this->createAndDispatchUnchangedTrickContentEvent($event);
+                        break;
+                }
             }
         }
     }
@@ -332,21 +425,39 @@ class FormSubscriber implements EventSubscriberInterface
     /**
      * Redirect to current form page after submit, if form is valid and unchanged.
      *
-     * @param FormTypeInterface $formType
+     * @param FormTypeInterface   $formType
+     * @param FilterResponseEvent $event
      *
      * @return RedirectResponse|null
      */
-    private function setUnchangedFormActionResponse(FormTypeInterface $formType) : ?RedirectResponse
+    private function setUnchangedFormActionResponse(FormTypeInterface $formType, FilterResponseEvent $event) : ?RedirectResponse
     {
         // Redirect to the correct url
         $formTypeClassName = \get_class($formType);
+        // Master request is used to get initial attributes parameters
+        $request = $this->requestStack->getMasterRequest();
+        // Check called form type
         switch ($formTypeClassName) {
             case UpdateProfileAvatarType::class:
             case UpdateProfileInfosType::class:
-                /** @var User $authenticatedUser */
-                $authenticatedUser = $this->userService->getAuthenticatedMember();
-                $mainRoleLabel = lcfirst($authenticatedUser->getMainRoleLabel());
-                $response = new RedirectResponse($this->router->generate('update_profile', ['mainRoleLabel' => $mainRoleLabel]));
+                $response = new RedirectResponse(
+                    $event->getRequest()->getPathInfo()
+                );
+                break;
+            case UpdateTrickType::class:
+                $response = new RedirectResponse(
+                    // Here, "$event->getRequest()->getPathInfo()" is also more pragmatic instead of router,
+                    // if the same URL is kept, but use of router (demo) can be very useful
+                    // in certain cases with master request!
+                    $this->router->generate(
+                        'update_trick',
+                        [
+                            'mainRoleLabel' => $request->attributes->get('mainRoleLabel'),
+                            'slug'          => $request->attributes->get('slug'),
+                            'encodedUuid'   => $request->attributes->get('encodedUuid')
+                        ]
+                    )
+                );
                 break;
             default:
                 $response = null;

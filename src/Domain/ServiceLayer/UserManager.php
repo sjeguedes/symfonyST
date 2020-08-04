@@ -90,11 +90,8 @@ class UserManager
      * @param EntityManagerInterface       $entityManager
      * @param UserRepository               $repository
      * @param RequestStack                 $requestStack
-     * @param SessionInterface             $session
      * @param Security                     $security
      * @param LoggerInterface              $logger
-     *
-     * // TODO: reduce dependencies if it's possible
      */
     public function __construct(
         CustomEventFactoryInterface $customEventFactory,
@@ -103,14 +100,13 @@ class UserManager
         UserRepository $repository,
         LoggerInterface $logger,
         RequestStack $requestStack,
-        SessionInterface $session,
         Security $security
     ) {
         $this->customEventFactory = $customEventFactory;
         $this->entityManager = $entityManager;
         $this->repository = $repository;
-        $this->request = $requestStack->getCurrentRequest();
-        $this->session = $session; //$this->request->getSession();
+        $this->request = $requestStack->getMasterRequest();
+        $this->session = $this->request->getSession();
         $this->userPasswordEncoder = $encoderFactory->getEncoder(User::class);
         $this->security = $security;
         $this->setLogger($logger);
@@ -168,7 +164,7 @@ class UserManager
     }
 
     /**
-     * Create a event related to user and dispatch it.
+     * Create an event related to user and dispatch it.
      *
      * An auto configured User subscriber listens to that kind of event.
      *
@@ -176,10 +172,15 @@ class UserManager
      * @param User   $user
      *
      * @return void
+     *
+     * @throws \Exception
      */
     public function createAndDispatchUserEvent(string $eventContext, User $user) : void
     {
         $event = $this->customEventFactory->createFromContext($eventContext, ['user' => $user]);
+        if (\is_null($event)) {
+            throw new \Exception('Event was not created due to wrong parameters!');
+        }
         $eventName = $this->customEventFactory->getEventNameByContext($eventContext);
         /** @var EventDispatcherInterface $eventDispatcher */
         $eventDispatcher = $this->customEventFactory->getEventDispatcher();
@@ -317,13 +318,12 @@ class UserManager
     {
         /** @var User|UserInterface $user */
         if ($user = $this->security->getUser()) {
-            $roles = $user->getRoles();
-            switch ($roles) {
+            switch ($this->security) {
                 // Current user is authenticated and is a simple member ("ROLE_ADMIN").
-                case  \in_array(User::ADMIN_ROLE, $user->getRoles()):
+                case  $this->security->isGranted(User::ADMIN_ROLE):
                     return User::ADMIN_ROLE;
                 // Current user is authenticated and is a simple member ("ROLE_USER").
-                case !\in_array(User::ADMIN_ROLE, $user->getRoles()):
+                case $this->security->isGranted(User::DEFAULT_ROLE):
                     return User::DEFAULT_ROLE;
             }
         }

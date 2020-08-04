@@ -108,12 +108,12 @@ class UpdateProfileAction
     public function __invoke(RedirectionResponder $redirectionResponder, UpdateProfileResponder $responder, Request $request) : ?Response
     {
         // Get user from symfony security context: access is controlled by ACL.
-        /** @var UserInterface|User $identifiedUser */
-        $identifiedUser = $this->userService->getAuthenticatedMember();
+        /** @var UserInterface|User $authenticatedUser */
+        $authenticatedUser = $this->userService->getAuthenticatedMember();
         // Set form without initial model data or data, and set the request by binding it
         $updateProfileAvatarForm = $this->formHandlers[0]->initForm()->bindRequest($request);
         // Set form without initial model data and set the request by binding it
-        $updateProfileInfosForm = $this->formHandlers[1]->initForm(['userToUpdate' => $identifiedUser])->bindRequest($request);
+        $updateProfileInfosForm = $this->formHandlers[1]->initForm(['userToUpdate' => $authenticatedUser])->bindRequest($request);
         // Process only on submit with POST request for both forms
         if ('POST' === $request->getMethod()) {
             // Return the appropriate response by handling the forms
@@ -122,7 +122,7 @@ class UpdateProfileAction
                 $request,
                 $updateProfileAvatarForm,
                 $updateProfileInfosForm,
-                $identifiedUser
+                $authenticatedUser
             );
             if (!\is_null($redirectionResponse)) {
                 return $redirectionResponse;
@@ -134,8 +134,8 @@ class UpdateProfileAction
             'uniqueUserError'         => $this->formHandlers[1]->getUniqueUserError() ?? null,
             'updateProfileAvatarForm' => $updateProfileAvatarForm->createView(),
             'updateProfileInfosForm'  => $updateProfileInfosForm->createView(),
-            'userAvatarImage'         => $this->imageService->getUserAvatarImage($identifiedUser),
-            'userCreatedTricks'       => $this->trickService->findOnesByAuthor($identifiedUser->getUuid())
+            'userAvatarImage'         => $this->imageService->getUserAvatarImage($authenticatedUser),
+            'userCreatedTricks'       => $this->trickService->findOnesByAuthor($authenticatedUser->getUuid())
         ];
         return $responder($data);
     }

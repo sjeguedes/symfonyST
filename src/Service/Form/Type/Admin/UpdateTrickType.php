@@ -17,6 +17,7 @@ use App\Service\Form\TypeToEmbed\ImageToCropType;
 use App\Service\Form\TypeToEmbed\VideoInfosType;
 use App\Utils\Traits\UuidHelperTrait;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -48,6 +49,11 @@ class UpdateTrickType extends AbstractTrickType
     const COLLECTION_ALLOW_DELETE = true;
 
     /**
+     * @var EventSubscriberInterface
+     */
+    private $formSubscriber;
+
+    /**
      * @var Request
      */
     private $request;
@@ -60,13 +66,15 @@ class UpdateTrickType extends AbstractTrickType
     /**
      * UpdateTrickType constructor.
      *
-     * @param MediaTypeManager  $mediaTypeService,
-     * @param ImageManager      $imageService
-     * @param VideoManager      $videoService
-     * @param RequestStack      $requestStack
-     * @param TrickGroupManager $trickGroupService the trick group entity service layer
+     * @param EventSubscriberInterface $formSubscriber
+     * @param MediaTypeManager         $mediaTypeService,
+     * @param ImageManager             $imageService
+     * @param VideoManager             $videoService
+     * @param RequestStack             $requestStack
+     * @param TrickGroupManager        $trickGroupService the trick group entity service layer
      */
     public function __construct(
+        EventSubscriberInterface $formSubscriber,
         MediaTypeManager $mediaTypeService,
         ImageManager $imageService,
         VideoManager $videoService,
@@ -75,6 +83,7 @@ class UpdateTrickType extends AbstractTrickType
     )
     {
         parent::__construct($mediaTypeService, $imageService, $videoService);
+        $this->formSubscriber = $formSubscriber;
         $this->request = $requestStack->getCurrentRequest();
         $this->trickGroupService = $trickGroupService;
     }
@@ -166,6 +175,8 @@ class UpdateTrickType extends AbstractTrickType
         // Transform directly an array of DTO instances into a DTOCollection instance
         $this->addArrayToDTOCollectionCustomDataTransformer($builder, 'images');
         $this->addArrayToDTOCollectionCustomDataTransformer($builder, 'videos');
+        // Add custom form subscriber to this form events with dependencies
+        $builder->addEventSubscriber($this->formSubscriber);
     }
 
     /**

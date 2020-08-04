@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace App\Service\Event;
 
+use App\Domain\Entity\Trick;
 use App\Domain\Entity\User;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -15,12 +16,17 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class CustomEventFactory implements CustomEventFactoryInterface
 {
     /**
+     * Define a context label each time a user submits an unchanged updated trick.
+     */
+    const TRICK_WITH_UNCHANGED_UPDATED_CONTENT = 'trick.with.unchanged.updated.content';
+
+    /**
      * Define a context label each time a user is allowed to renew his password.
      */
     const USER_ALLOWED_TO_RENEW_PASSWORD = 'user.allowed.to.renew.password';
 
     /**
-     * Define a context label each time a user submit an unchanged updated profile.
+     * Define a context label each time a user submits an unchanged updated profile.
      */
     const USER_WITH_UNCHANGED_UPDATED_PROFILE = 'user.with.unchanged.updated.profile';
 
@@ -28,6 +34,15 @@ class CustomEventFactory implements CustomEventFactoryInterface
      * Define all the custom events configuration.
      */
     private const CUSTOM_EVENT_LIST = [
+        self::TRICK_WITH_UNCHANGED_UPDATED_CONTENT => [
+            'event'        => FormUnchangedEvent::class,
+            'eventName'    => FormUnchangedEvent::NAME,
+            'data'         => [ // Key order and value type must be checked for each entry.
+                'user'   => ['type'  => User::class, 'value' => null],
+                'trick'  => ['type'  => Trick::class, 'value' => null]
+
+            ]
+        ],
         self::USER_ALLOWED_TO_RENEW_PASSWORD => [
             'event'        => UserRetrievedEvent::class,
             'eventName'    => UserRetrievedEvent::NAME,
@@ -71,7 +86,7 @@ class CustomEventFactory implements CustomEventFactoryInterface
      *
      * @throws \Exception
      */
-     public function createFromContext(string $eventContext, array $eventParameters) : CustomEventInterface
+     public function createFromContext(string $eventContext, array $eventParameters) : ?CustomEventInterface
      {
         // Event context is unknown.
         if (!\array_key_exists($eventContext, self::CUSTOM_EVENT_LIST)) {
@@ -80,16 +95,18 @@ class CustomEventFactory implements CustomEventFactoryInterface
         $event = self::CUSTOM_EVENT_LIST[$eventContext]['event'];
         if (isset(self::CUSTOM_EVENT_LIST[$eventContext]['data'])) {
             // Prepare data to be injected as arguments with splat operator
-            $eventData = $this->buildEventDataConfiguration($eventContext, $eventParameters);
+            try {
+                $eventData = $this->buildEventDataConfiguration($eventContext, $eventParameters);
+            } catch (\Exception $e) {
+                return null;
+            }
             // Add event context as the first argument in parameters array.
             array_unshift($eventData, $eventContext);
             // Return an expected instance
             return new $event(...$eventData);
-        } else {
-            // Return an expected instance without added data
-            return new $event($eventContext);
         }
-
+        // Return an expected instance without added data
+        return new $event($eventContext);
      }
 
     /**
@@ -122,7 +139,6 @@ class CustomEventFactory implements CustomEventFactoryInterface
         // Keep only a simple array with event parameters values: the next step will use this array with "splat operator".
         return array_values($eventParameters);
     }
-
 
     /**
      * Get a EventDispatcherInterface instance.

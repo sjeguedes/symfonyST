@@ -294,7 +294,10 @@
                         <div uk-dropdown="mode: click; pos: top-center; boundary: .boundary-align; boundary-align: true"
                              class="uk-overflow-auto uk-height-small">
                             <ul class="uk-nav uk-dropdown-nav">
-                                <li class="uk-nav-header"><span class="st-color-blue">- You are author for this list -</span></li>
+                                <li class="uk-nav-header">
+                                    {% set listHeader = is_granted('ROLE_ADMIN') ? 'You can modify all the list' : 'You are author for this list' %}
+                                    <span class="st-color-blue">- {{ listHeader }} -</span>
+                                </li>
                                 {% for i in 0..(userCreatedTricks|length - 1) %}
                                 {% set trickData = userCreatedTricks[i] %}
                                 <li class="uk-text-capitalize">

@@ -31,15 +31,22 @@ class FormUnchangedEvent extends Event implements CustomEventInterface
     protected $user;
 
     /**
+     * @var object|null
+     */
+    private $entityToUpdate;
+
+    /**
      * UserEvent constructor.
      *
-     * @param string $eventContext
-     * @param User   $user
+     * @param string     $eventContext
+     * @param User       $user
+     * @param object|null $entityToUpdate
      */
-    public function __construct(string $eventContext, User $user)
+    public function __construct(string $eventContext, User $user, object $entityToUpdate = null)
     {
         $this->eventContext = $eventContext;
         $this->user = $user;
+        $this->entityToUpdate = $entityToUpdate;
     }
 
     /**
@@ -56,5 +63,13 @@ class FormUnchangedEvent extends Event implements CustomEventInterface
     public function getUser() : User
     {
         return $this->user;
+    }
+
+    /**
+     * @return object|null
+     */
+    public function getEntityToUpdate() : ?object
+    {
+        return $this->entityToUpdate;
     }
 }

@@ -110,8 +110,8 @@ class RegisterAction
         } else {
             $this->flashBag->add(
                 'success',
-                'Good job!' . "\n" .
-                nl2br('Your account was successfully activated.' . "\n" .
+                nl2br('Good job!' . "\n" .
+                'Your account was successfully activated.' . "\n" .
                 'Please login to access member area.')
             );
         }

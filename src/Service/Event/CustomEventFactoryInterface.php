@@ -20,7 +20,7 @@ interface CustomEventFactoryInterface
      * @param string $eventContext
      * @param array  $eventParameters
      *
-     * @return CustomEventInterface|Event the event instance
+     * @return CustomEventInterface|Event|null the event instance
      */
-    public function createFromContext(string $eventContext, array $eventParameters) : CustomEventInterface;
+    public function createFromContext(string $eventContext, array $eventParameters) : ?CustomEventInterface;
 }

@@ -20,7 +20,7 @@ use App\Service\Form\Collection\DTOCollection;
  * @see Possible custom collection usage instead of array: https://dev.to/drearytown/collection-objects-in-php-1cbk
  * @see Another collection class example : https://www.sitepoint.com/collection-classes-in-php/
  */
-final class UpdateTrickDTO
+final class UpdateTrickDTO extends AbstractReadableDTO
 {
     /**
      * @var TrickGroup|null

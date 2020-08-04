@@ -96,14 +96,16 @@ services:
         arguments:
             $formHandlers: ['@App\Service\Form\Handler\UpdateTrickHandler', '@App\Service\Form\Handler\AjaxDeleteImageHandler']
 
+    # add custom unchanged (not updated) trick listener
+    App\Service\Event\Listener\UnchangedTrickListener:
+        tags:
+            - { name: kernel.event_listener, event: form.unchanged }
+
     # add custom form subscriber
     App\Service\Event\Subscriber\FormSubscriber:
-        arguments:
-            $dataMapper: '@App\Service\Form\DataMapper\DTOMapper'
-            $userService: '@App\Domain\ServiceLayer\UserManager'
 
-    # add logout handler
-    #App\Service\Event\Handler\LogoutHandler:
+    # add custom DTO mapper
+    App\Service\Form\DataMapper\DTOMapper:
 
     # add login handler
     App\Service\Form\Handler\LoginHandler:
@@ -133,9 +135,6 @@ services:
     # add update profile infos handler
     App\Service\Form\Handler\UpdateProfileInfosHandler:
 
-    # add custom DTO mapper
-    App\Service\Form\DataMapper\DTOMapper:
-
     # add (trick) image to crop creation/update type
     App\Service\Form\TypeToEmbed\ImageToCropType:
         arguments:
@@ -156,37 +155,19 @@ services:
         arguments:
             $formSubscriber: '@App\Service\Event\Subscriber\FormSubscriber'
 
-    # add custom constraint validator as concerns ImageToCropDTO class
-    #App\Service\Form\Validator\ImageToCropConstraintValidator:
-
-    # add SwiftMailer manager
-    #App\Service\Mailer\SwiftMailerManager:
-
-    # add image uploader
-    #App\Service\Medias\Upload\ImageUploader:
-
-    # add trick video URL "proxy" checker
-    #App\Service\Medias\VideoURLProxyChecker:
+    # add trick update type
+    App\Service\Form\Type\Admin\UpdateTrickType:
+        arguments:
+            $formSubscriber: '@App\Service\Event\Subscriber\FormSubscriber'
 
     # add EmailConfigFactory
-    #App\Service\Mailer\Email\EmailConfigFactory: ~
     App\Service\Mailer\Email\EmailConfigFactoryInterface: '@App\Service\Mailer\Email\EmailConfigFactory'
 
-    # add authentication checker
-    #App\Service\Security\AuthenticationUserChecker:
-
-    # add login form guard authenticator
-    #App\Service\Security\LoginFormAuthenticationManager:
-
-    # add Trick voter
-    #App\Service\Security\Voter\TrickVoter:
-        #tags: ['security.voter']
-
-    # add Twig template engine renderer default service when calling interface:
-    #App\Service\Templating\TwigTemplateRenderer: ~
+    # add Twig custom template renderer
     App\Service\Templating\TemplateRendererInterface: '@App\Service\Templating\TwigTemplateRenderer'
     App\Service\Templating\TemplateBlockRendererInterface: '@App\Service\Templating\TwigTemplateRenderer'
 
+    # add unused images deletion command which can be combined with cron job
     App\Utils\Command\DeleteUnusedImageCommand:
         public: false
         tags: ['console.command']
@@ -210,11 +191,3 @@ services:
 
     # add options resolver
     Symfony\Component\OptionsResolver\OptionsResolver:
-
-    # Activate StringLoader Twig extension
-    # enable the use of template_string() function
-    # https://stackoverflow.com/questions/19478219/activate-stringloader-twig-extension-in-symfony
-    # https://twig.symfony.com/doc/2.x/functions/template_from_string.html
-    #Twig\Extension\StringLoaderExtension:
-        #public: false
-        #tags: ['twig.extension']
