@@ -89,6 +89,9 @@ class AbstractTrickFormHandler extends AbstractUploadFormHandler
      * Add the three expected images (for one uploaded image)
      * and create/update Image/Media entities from trick image collection.
      *
+     * IMPORTANT! This method is publicly accessible due to its possible use in "ImageToCropType" class
+     * for direct upload in case of trick update.
+     *
      * Please note this information:
      * - 3 formats are finally generated after handling: 1600x900, 880x495, 400x225.
      * - The identifier name used corresponds to a slug based on trick name which will be created with the root form.
@@ -103,7 +106,7 @@ class AbstractTrickFormHandler extends AbstractUploadFormHandler
      *
      * @throws \Exception
      */
-    protected function addTrickImageFromCollection(
+    public function addTrickImageFromCollection(
         Trick $trick,
         ImageToCropDTO $imageToCropDTO,
         array $actionData
@@ -445,9 +448,11 @@ class AbstractTrickFormHandler extends AbstractUploadFormHandler
     /**
      * Throw an exception during trick process handling canceling.
      *
-     * @param object|null  $collectionItemDataModel
-     * @param string       $contextKey
-     * @param ImageManager $imageService
+     * @param object|null   $collectionItemDataModel
+     * @param string        $contextKey
+     * @param ImageManager  $imageService
+     * @param array|null    $callable                a callable method from a class which extends this abstract class
+     * @param array|null    $args                    some arguments to pass to callable method
      *
      * @return void
      *
@@ -456,7 +461,9 @@ class AbstractTrickFormHandler extends AbstractUploadFormHandler
     protected function throwTrickProcessException(
         ?object $collectionItemDataModel,
         string $contextKey,
-        ImageManager $imageService
+        ImageManager $imageService,
+        array $callable = null,
+        array $args = null
     ) : void
     {
         // Control expected collection instance type
@@ -468,6 +475,11 @@ class AbstractTrickFormHandler extends AbstractUploadFormHandler
         );
         $exceptionMessage = !\is_null($collectionItemDataModel)
             ? $this->manageTrickMediaCreationError($collectionItemDataModel, $contextKey) : null;
+        // Add possibly some text to exception message with a callable
+        if (!\is_null($callable) && !\is_null($args)) {
+            array_push($args, $exceptionMessage);
+            $exceptionMessage = $callable(...$args);
+        }
         throw new \Exception($exceptionMessage);
     }
 }

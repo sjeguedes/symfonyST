@@ -252,7 +252,9 @@ final class CreateTrickHandler extends AbstractTrickFormHandler
             $this->throwTrickProcessException(
                 $collectionItemDataModel,
                 AbstractTrickFormHandler::TRICK_CREATION_LABEL,
-                $imageService
+                $imageService,
+                !$isTrickRemoved ? [$this, 'manageTrickRemovalError'] : null,
+                !$isTrickRemoved ? [$newTrick] : null
             );
         }
         return $isProcessCorrectlyCanceled;
@@ -279,7 +281,7 @@ final class CreateTrickHandler extends AbstractTrickFormHandler
     }
 
     /**
-     * Manage trick removal error context.
+     * Manage trick removal error context as a callable public method.
      *
      * Please note this method logs error and update final exception message.
      *
@@ -290,7 +292,7 @@ final class CreateTrickHandler extends AbstractTrickFormHandler
      *
      * @see manageTrickMediaCreationError() method
      */
-    private function manageTrickRemovalError(Trick $newTrick, ?string $exceptionMessage) : string
+    public function manageTrickRemovalError(Trick $newTrick, ?string $exceptionMessage) : string
     {
         $trickUuid = $newTrick->getUuid()->toString();
         $trickName = addslashes($newTrick->getName());

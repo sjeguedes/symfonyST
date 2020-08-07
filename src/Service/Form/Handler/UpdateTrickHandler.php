@@ -422,12 +422,10 @@ final class UpdateTrickHandler extends AbstractTrickFormHandler implements InitM
                         $image = $media->getMediaSource()->getImage();
                         $DTOCollection->add(
                             new ImageToCropDTO(
-                                null, // No uploaded file exists for image to crop initial data model!
+                                null, // No uploaded file exists for "image to crop" initial data model!
                                 $image->getDescription(),
-                                // TODO: need to change JSON data structure in JS and PHP methods to avoid XSSI issue!
-                                // TODO: need to change -> '[{}]' to simple '{}'
-                                '[{}]', // An empty JSON is set (feed with JS only) to avoid validation issue.
-                                null, // This is set to null (feed with JS only)
+                                null, // This is null (feed with JS only) to avoid validation issue.
+                                null, // This is null (feed with JS only) to avoid validation issue.
                                 $image->getName(),
                                 $media->getShowListRank(),
                                 $media->getIsMain()

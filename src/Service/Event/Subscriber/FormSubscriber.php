@@ -4,14 +4,16 @@ declare(strict_types = 1);
 
 namespace App\Service\Event\Subscriber;
 
+use App\Domain\DTO\AbstractReadableDTO;
+use App\Domain\DTO\UpdateTrickDTO;
 use App\Domain\Entity\User;
 use App\Domain\ServiceLayer\TrickManager;
 use App\Domain\ServiceLayer\UserManager;
 use App\Service\Event\CustomEventFactory;
+use App\Service\Form\Collection\DTOCollection;
 use App\Service\Form\Type\Admin\UpdateProfileAvatarType;
 use App\Service\Form\Type\Admin\UpdateProfileInfosType;
 use App\Service\Form\Type\Admin\UpdateTrickType;
-use ArrayAccess;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -131,12 +133,42 @@ class FormSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * Clone particular children objects in a cloned previous DTO model dedicated to update process.
+     *
+     * @param object $previousDataModel
+     *
+     * @return void
+     *
+     * @throws \Exception
+     */
+    private function cloneChildrenObjectsForUpdateContext(object $previousDataModel) : void
+    {
+        // Switch previous DTO which corresponds to an update process
+        switch ($previousDataModel) {
+            // Clone for trick update
+            case $previousDataModel instanceof UpdateTrickDTO:
+                $previousDataModel->setGroup(clone $previousDataModel->getGroup());
+                $imagesDTOCollection = new DTOCollection();
+                foreach ($previousDataModel->getImages() as $key => $imageToCropDTO) {
+                    $imagesDTOCollection[$key] = clone $imageToCropDTO;
+                }
+                $previousDataModel->setImages($imagesDTOCollection);
+                $videosDTOCollection = new DTOCollection();
+                foreach ($previousDataModel->getVideos() as $key => $videoInfosDTO) {
+                    $videosDTOCollection[$key] = clone $videoInfosDTO;
+                }
+                $previousDataModel->setVideos($videosDTOCollection);
+                break;
+        }
+    }
+
+    /**
      * Compare properties values from two instances of the same class.
      *
-     * @param string|null $className          the common class shared between the two instances to compare
-     * @param object      $firstModel         a first $className instance
-     * @param object      $secondModel        a second $className instance
-     * @param bool        $isComparedStrictly a strict comparison mode for objects
+     * @param string|null $className                          the common class shared between the two instances to compare
+     * @param AbstractReadableDTO|null    $firstModel         a first $className instance
+     * @param AbstractReadableDTO|null    $secondModel        a second $className instance
+     * @param bool                        $isComparedStrictly a strict comparison mode for objects
      *
      * @return bool
      *
@@ -144,38 +176,61 @@ class FormSubscriber implements EventSubscriberInterface
      */
     private function compareObjectsPropertiesValues(
         ?string $className,
-        object $firstModel,
-        object $secondModel,
+        ?AbstractReadableDTO $firstModel,
+        ?AbstractReadableDTO $secondModel,
         bool $isComparedStrictly = true
     ) : bool
     {
         $modelDataClassName = !\is_null($className) ? $className : $this->currentForm->getConfig()->getDataClass();
-        if (!$firstModel instanceof $modelDataClassName || !$firstModel instanceof $modelDataClassName) {
-            throw new \InvalidArgumentException('The two objects must be instances of the same class!');
+        $isSameInstance = $firstModel instanceof $modelDataClassName && $secondModel instanceof $modelDataClassName;
+        if (!\is_null($firstModel) && !\is_null($secondModel) && !$isSameInstance) {
+            throw new \InvalidArgumentException('Both objects must be instances of the same class!');
         }
-        $isIdentical = true;
-        $propertiesList = $this->propertyListExtractor->getProperties($modelDataClassName);
-        for ($i = 0; $i < \count($propertiesList); $i ++) {
-            $value = $propertiesList[$i];
-            $firstModelPropertyValue = $this->propertyAccessor->getValue($firstModel, $value);
-            $secondModelPropertyValue = $this->propertyAccessor->getValue($secondModel, $value);
-            // At least one value is not the same.
-            if (!$isComparedStrictly && \is_object($firstModelPropertyValue) && \is_object($secondModelPropertyValue)) {
-                // Avoid issue with objects identifiers when comparison is strict!
-                if ($firstModelPropertyValue != $secondModelPropertyValue) {
-                    $isIdentical = false;
-                    break;
+        // Check "null" values length to process correctly
+        $result = array_filter([$firstModel, $secondModel], function ($item) {
+            return null === $item;
+        });
+        switch (\count($result)) {
+            case 1:
+                return false;
+            case 2:
+                return true;
+            default:
+                $isIdentical = true;
+                $propertiesList = $this->propertyListExtractor->getProperties($modelDataClassName);
+                $propertiesListLength = \count($propertiesList);
+                for ($i = 0; $i < $propertiesListLength; $i++) {
+                    $value = $propertiesList[$i];
+                    $firstModelPropertyValue = $this->propertyAccessor->getValue($firstModel, $value);
+                    $secondModelPropertyValue = $this->propertyAccessor->getValue($secondModel, $value);
+                    // Avoid issue with objects identifiers when comparison is strict!
+                    if (!$isComparedStrictly && \is_object($firstModelPropertyValue)) {
+                        if ($firstModelPropertyValue instanceof DTOCollection) {
+                            foreach ($firstModelPropertyValue as $key => $DTO) {
+                                $className = \get_class($firstModelPropertyValue[$key]);
+                                $isIdentical = $this->compareObjectsPropertiesValues(
+                                    $className,
+                                    $firstModelPropertyValue[$key],
+                                    $secondModelPropertyValue[$key],
+                                    $isComparedStrictly
+                                );
+                                if (false === $isIdentical) break;
+                            }
+                        }
+                        if ($firstModelPropertyValue != $secondModelPropertyValue) {
+                            $isIdentical = false;
+                            break;
+                        }
+                     // Compare properties strictly
+                    } else {
+                        if ($firstModelPropertyValue !== $secondModelPropertyValue) {
+                            $isIdentical = false;
+                            break;
+                        }
+                    }
                 }
-            } else {
-                // Compare properties strictly
-                if ($firstModelPropertyValue !== $secondModelPropertyValue) {
-                    $isIdentical = false;
-                    break;
-                }
-            }
-
+                return $isIdentical;
         }
-        return $isIdentical;
     }
 
     /**
@@ -211,8 +266,6 @@ class FormSubscriber implements EventSubscriberInterface
         $form = $event->getForm();
         $formOptions = $form->getConfig()->getOptions();
         $updatedTrick = isset($formOptions['trickToUpdate']) ? $formOptions['trickToUpdate'] : null;
-        /** @var User $authenticatedUser */
-        $authenticatedUser = $this->userService->getAuthenticatedMember();
         /** @var User $authenticatedUser */
         $authenticatedUser = $this->userService->getAuthenticatedMember();
         $this->trickService->createAndDispatchTrickEvent(
@@ -257,19 +310,19 @@ class FormSubscriber implements EventSubscriberInterface
      * Please note ArrayAccess implementation (which exists thanks to AbstractReadableDTO) combined to array_diff() function
      * can be used to compare possible change instead of use of property list extractor and accessor.
      *
-     * @param FormInterface $form
-     * @param ArrayAccess   $modelDataBefore
-     * @param ArrayAccess   $modelDataAfter
-     * @param bool          $isComparedStrictly a strict comparison mode for objects
+     * @param FormInterface         $form
+     * @param AbstractReadableDTO   $modelDataBefore
+     * @param AbstractReadableDTO   $modelDataAfter
+     * @param bool                  $isComparedStrictly a strict comparison mode for objects
      *
      * @return bool
      *
      * @throws \Exception
      */
-    private function isUnchangedForm(
+    public function isUnchangedForm(
         FormInterface $form,
-        ArrayAccess $modelDataBefore,
-        ArrayAccess $modelDataAfter,
+        AbstractReadableDTO $modelDataBefore,
+        AbstractReadableDTO $modelDataAfter,
         bool  $isComparedStrictly = true
     ) : bool
     {
@@ -308,11 +361,22 @@ class FormSubscriber implements EventSubscriberInterface
      *
      * @return void
      *
-     * @throws \Exception
+     * @throws /Exception
      */
     public function onKernelException(GetResponseForExceptionEvent $event) : void
     {
-        throw new \Exception($event->getException()->getMessage());
+        // Catch exception thrown by updated forms and throw a new custom exception
+        // To avoid response management with "onKernelResponse" callback!
+        $actionClassName = $event->getRequest()->attributes->get('_controller');
+        if (preg_match('/Update/', $actionClassName)) {
+                $exception = $event->getException();
+                throw new \Exception(
+                    sprintf(
+                        "A technical issue happened during update form handling! %s",
+                        $exception->getMessage()
+                    )
+                );
+        }
     }
 
     /**
@@ -358,6 +422,8 @@ class FormSubscriber implements EventSubscriberInterface
      * @param FormEvent $event
      *
      * @return void
+     *
+     * @throws \Exception
      */
     public function onPreSubmit(FormEvent $event) : void
     {
@@ -374,6 +440,7 @@ class FormSubscriber implements EventSubscriberInterface
             // because it is the same object (reference).
             // Its properties will change (it will become the new updated model) once the next events happen.
             $this->previousDataModel = clone $previousDataModel;
+            $this->cloneChildrenObjectsForUpdateContext($this->previousDataModel);
         }
     }
 

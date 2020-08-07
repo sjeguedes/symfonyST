@@ -107,12 +107,12 @@ class UpdateProfileAction
      */
     public function __invoke(RedirectionResponder $redirectionResponder, UpdateProfileResponder $responder, Request $request) : ?Response
     {
-        // Get user from symfony security context: access is controlled by ACL.
+        // Get user from Symfony security context: access is controlled by ACL.
         /** @var UserInterface|User $authenticatedUser */
         $authenticatedUser = $this->userService->getAuthenticatedMember();
-        // Set form without initial model data or data, and set the request by binding it
+        // Set form without initial model data (unnecessary), and set the request by binding it
         $updateProfileAvatarForm = $this->formHandlers[0]->initForm()->bindRequest($request);
-        // Set form without initial model data and set the request by binding it
+        // Set form with authenticated user initial model data and set the request by binding it
         $updateProfileInfosForm = $this->formHandlers[1]->initForm(['userToUpdate' => $authenticatedUser])->bindRequest($request);
         // Process only on submit with POST request for both forms
         if ('POST' === $request->getMethod()) {

@@ -149,7 +149,10 @@ class ImageUploader
             } catch (\Throwable $exception) {
                 // Store process error
                 $this->logger->error(
-                    sprintf("[trace app snowTricks] ImageUploader/checkFileUploadOnServer => exception: %s", $exception->getMessage())
+                    sprintf(
+                        "[trace app snowTricks] ImageUploader/checkFileUploadOnServer => exception: %s",
+                        $exception->getMessage()
+                    )
                 );
                 continue;
             }
@@ -178,7 +181,10 @@ class ImageUploader
             throw new \RuntimeException('Image can not be handled: "gd" extension is not installed on server!');
         }
         // Decode crop data to get a stdClass instance
-        $cropDataObject = json_decode($parameters['cropJSONData'])[0];
+        // IMPORTANT! At this time, JSON data contains only one crop result,
+        // but this "results" array could be useful for multiple uploads later!
+        $cropData = json_decode($parameters['cropJSONData']);
+        $cropDataObject = $cropData->results[0];
         // Get a resource based on uploaded image extension with particular "jpg" case
         $imageType = 'jpg' === $parameters['extension'] ? 'jpeg' : $parameters['extension'];
         $function = "imagecreatefrom{$imageType}";

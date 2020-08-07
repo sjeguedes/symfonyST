@@ -609,6 +609,10 @@ class ImageManager extends AbstractServiceLayer
     public function getUserAvatarImage(UserInterface $user) : ?Image
     {
         $image = null;
+        // Corresponding media owner can be null, if authenticated user just created his account!
+        if (\is_null($user->getMediaOwner())) {
+            return null;
+        }
         $medias = $user->getMediaOwner()->getMedias();
         foreach ($medias as $media) {
             if ($this->mediaTypeManager->getType('userAvatar') === $media->getMediaType()->getType()) {

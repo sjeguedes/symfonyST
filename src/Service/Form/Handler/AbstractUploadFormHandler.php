@@ -56,6 +56,15 @@ class AbstractUploadFormHandler extends AbstractFormHandler
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new \InvalidArgumentException('Crop data is an invalid JSON string!');
         }
+        // IMPORTANT! At this time, JSON data contains only one crop result,
+        // but this "results" array could be useful for multiple uploads later!
+        $isExpectedJSON = property_exists($cropData, 'results') &&
+                          \is_array($cropData->results) &&
+                          \is_object($cropData->results[0]);
+        if (!$isExpectedJSON) {
+            throw new \RuntimeException('Crop data are not structured as expected!');
+        }
+        $cropData = $cropData->results;
         // Use urldecode function (filename in formatted JSON is also "URI" encoded by Javascript) to make a correct comparison
         $isFileMatched = urldecode($image->getClientOriginalName()) === urldecode($cropData[0]->imageName);
         $areCropAreaDataWithIntegerType = \is_int($cropData[0]->x) && \is_int($cropData[0]->y) && \is_int($cropData[0]->width) && \is_int($cropData[0]->height);

@@ -40,7 +40,6 @@ class UnchangedTrickListener
     {
         $this->flashBag = $flashBag;
         $this->request = $requestStack->getCurrentRequest();
-
     }
 
     /**

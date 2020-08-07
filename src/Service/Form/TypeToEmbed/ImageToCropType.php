@@ -13,6 +13,7 @@ use App\Domain\Entity\MediaSource;
 use App\Domain\Entity\Trick;
 use App\Domain\ServiceLayer\ImageManager;
 use App\Domain\ServiceLayer\MediaManager;
+use App\Domain\ServiceLayer\TrickManager;
 use App\Service\Form\Handler\FormHandlerInterface;
 use App\Service\Form\Type\Admin\CreateTrickType;
 use App\Service\Form\Type\Admin\UpdateTrickType;
@@ -50,7 +51,12 @@ class ImageToCropType extends AbstractTrickCollectionEntryType
     /**
      * @var MediaManager
      */
-    private $mediaManager;
+    private $mediaService;
+
+    /**
+     * @var TrickManager
+     */
+    private $trickService;
 
     /**
      * @var ValidatorInterface
@@ -62,18 +68,21 @@ class ImageToCropType extends AbstractTrickCollectionEntryType
      *
      * @param DataMapperInterface $dataMapper
      * @param ImageManager        $imageService
-     * @param MediaManager        $mediaManager
+     * @param MediaManager        $mediaService
+     * @param TrickManager        $trickService
      * @param ValidatorInterface  $validator
      */
     public function __construct(
         DataMapperInterface $dataMapper,
         ImageManager $imageService,
-        MediaManager $mediaManager,
+        MediaManager $mediaService,
+        TrickManager $trickService,
         ValidatorInterface $validator
     ) {
         $this->dataMapper = $dataMapper;
         $this->imageService = $imageService;
-        $this->mediaManager = $mediaManager;
+        $this->mediaService = $mediaService;
+        $this->trickService = $trickService;
         $this->validator = $validator;
     }
 
@@ -252,7 +261,7 @@ class ImageToCropType extends AbstractTrickCollectionEntryType
         /** @var MediaOwner|null $newMediaOwner */
         $newMediaOwner = null;
         /** @var MediaSource|null $newMediaSource */
-        $newMediaSource = $this->mediaManager->getMediaSourceManager()->createMediaSource($createdImageOnServer);
+        $newMediaSource = $this->mediaService->getMediaSourceManager()->createMediaSource($createdImageOnServer);
         if (\is_null($newMediaSource)) {
             return null;
         }
@@ -268,7 +277,7 @@ class ImageToCropType extends AbstractTrickCollectionEntryType
                 $mediaOwner = null;
         }
         // Create temporary Media instance
-        $createdMedia = $this->mediaManager->createTrickMedia(
+        $createdMedia = $this->mediaService->createTrickMedia(
             $mediaOwner,
             $newMediaSource,
             $imageToCropDataModel,
@@ -290,6 +299,10 @@ class ImageToCropType extends AbstractTrickCollectionEntryType
      */
     private function prepareAndCheckDataModelForDirectUpload(FormInterface $imageToCropForm, array $formData, object $rootFormHandler) : ?ImageToCropDTO
     {
+        // No image file was uploaded, then stop process!
+        if (\is_null($formData['image'])) {
+            return null;
+        }
         // Avoid issue with DTOMapper: turn show list rank string into a real int, or if it the value is not an int,
         // define the value to 0 to be checked in validator!
         $formData['showListRank'] = ctype_digit((string) $formData['showListRank']) ? (int) $formData['showListRank'] : 0;
@@ -320,6 +333,50 @@ class ImageToCropType extends AbstractTrickCollectionEntryType
     }
 
     /**
+     * Update an image in the same time than direct upload by associating it with entity owner.
+     *
+     * @param FormTypeInterface           $rootFormType
+     * @param object                      $entity
+     * @param ImageToCropDTO              $imageToCropDataModel
+     * @param Image                       $createdImageOnServer
+     * @param object|FormHandlerInterface $rootFormHandler
+     *
+     * @return void
+     *
+     * @throws \Exception
+     */
+    private function updateImageDirectly(
+        FormTypeInterface $rootFormType,
+        object $entity,
+        ImageToCropDTO $imageToCropDataModel,
+        Image $createdImageOnServer,
+        FormHandlerInterface $rootFormHandler
+    ) : void
+    {
+        // Apply this only for update process cases
+        switch ($rootFormType) {
+            // Generate directly the two other image formats associated to an existing updated trick
+            case $rootFormType instanceof UpdateTrickType:
+                /** @var Trick $updatedTrick */
+                $updatedTrick = $entity;
+                // At this level, DTO "SavedImageName" property is not already feed and description must be adjusted,
+                // so add it thanks to image name!
+                $imageToCropDataModel->setSavedImageName($createdImageOnServer->getName());
+                $description = $imageToCropDataModel->getDescription() ?? ImageManager::DEFAULT_IMAGE_DESCRIPTION_TEXT;
+                $imageToCropDataModel->setDescription($description);
+                // Create the mandatory (3) image formats directly with corresponding entities.
+                $rootFormHandler->addTrickImageFromCollection(
+                    $updatedTrick,
+                    $imageToCropDataModel,
+                    ['imageService' => $this->imageService, 'mediaService' => $this->mediaService]
+                );
+                // Flush persisted data thanks to updated trick
+                $this->trickService->addAndSaveTrick($updatedTrick, false, true);
+                break;
+        }
+    }
+
+    /**
      * Update all mandatory data associated to uploaded image to persist a reference until complete form validation.
      *
      * Please note UploadedFile instance must be reset to avoid an incoherent upload violation error in form!
@@ -336,15 +393,17 @@ class ImageToCropType extends AbstractTrickCollectionEntryType
         // WARNING! Delete corresponding "UploadedFile" instance to avoid a "The file could not be uploaded." violation
         // due to temporary file which does not exist on server after direct upload anymore!
         $formData['image'] = null;
-        // Add uploaded image filename (as a kind of "identifier") into "savedImageName" form data, to keep a reference later
+        // Add uploaded image filename (as a kind of "identifier")
+        // into "savedImageName" form data, to keep a reference later
         $formData['savedImageName'] = $createdImageOnServer->getName();
-        // Add also uploaded image filename into "cropJSONData" form data provided by JavaScript, to keep a reference later
-        $cropData = json_decode($formData['cropJSONData'], true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \RuntimeException("Image crop JSON form data are invalid!");
-        }
+        // Add also uploaded image filename into "cropJSONData" form data
+        // provided by JavaScript, to keep a reference later
+        $cropData = json_decode($formData['cropJSONData'], true); // get JSON as associative array
+        // IMPORTANT! At this time, JSON data contains only one crop result,
+        // but this "results" array could be useful for multiple uploads later!
+        $cropData = $cropData['results'];
         $cropData[0]['identifier'] = $createdImageOnServer->getName();
-        $cropData = json_encode([$cropData[0]]);
+        $cropData = json_encode(['results' => [$cropData[0]]]);
         $formData['cropJSONData'] = $cropData;
         return $formData;
     }
@@ -366,17 +425,23 @@ class ImageToCropType extends AbstractTrickCollectionEntryType
             // Get current image form data
             $formData = $event->getData();
             // Get the data model based on form data
-            $imageToCropDataModel = $this->prepareAndCheckDataModelForDirectUpload($currentImageToCropForm, $formData, $rootFormHandler);
+            $imageToCropDataModel = $this->prepareAndCheckDataModelForDirectUpload(
+                $currentImageToCropForm,
+                $formData,
+                $rootFormHandler
+            );
             // Image or/and cropJSON Data are not valid, so direct upload must no be enabled!
             if (\is_null($imageToCropDataModel)) {
                 return null;
             }
-            // if no expected violation is found, save directly the uploaded file as a standalone media without complete root form validation
+            // if no expected violation is found, save directly the uploaded file
+            // as a standalone media without complete root form validation
             $rootFormType = $currentImageToCropForm->getRoot()->getConfig()->getType()->getInnerType();
             // Perform directUpload
             /** @var Image|null $createdImageOnServer */
             $createdImageOnServer =$this->generateImageWithDirectUpload($rootFormType, $imageToCropDataModel);
-            // Upload is a success: update mandatory form data associated to image to make a persistence until complete form validation
+            // Upload is a success: update mandatory form data associated to image
+            // to make a persistence until complete form validation
             if (\is_null($createdImageOnServer)) {
                 return null;
             }
@@ -385,23 +450,41 @@ class ImageToCropType extends AbstractTrickCollectionEntryType
                 // Create an trick image media based on direct upload
                 case $rootFormType instanceof CreateTrickType:
                 case $rootFormType instanceof UpdateTrickType:
+                    // "$entity" object is null in cas of trick creation!
+                    $entity = \is_object($entity) && $entity instanceof Trick ? $entity : null;
                     /** @var Media|null $createdMedia */
                     $createdMedia = $this->generateTrickImageMediaAfterDirectUpload(
                         $createdImageOnServer,
                         $imageToCropDataModel,
                         $rootFormType,
-                        \is_object($entity) && $entity instanceof Trick ? $entity : null
+                        $entity
                     );
                     break;
                 default:
                     $createdMedia = null;
             }
-            // Persist and flush big image Image and Media entities
+            // Persist and flush big image Image (or possibly the 3 image formats in case of update) and Media entities
             if (\is_null($createdMedia)) {
                 return null;
             }
             // Save entities for corresponding image
-            $savedImage = $this->imageService->addAndSaveImage($createdImageOnServer, $createdMedia, true, true);
+            $savedImage = $this->imageService->addAndSaveImage(
+                $createdImageOnServer,
+                $createdMedia,
+                true,
+                true
+            );
+            // Update an image in the same time than direct upload by associating it to an existing entity owner
+            if (!\is_null($entity)) {
+                $this->updateImageDirectly(
+                    $rootFormType,
+                    $entity,
+                    $imageToCropDataModel,
+                    $createdImageOnServer,
+                    $rootFormHandler
+                );
+             }
+            // Update form with new data when pre-submitting
             $formData = $this->updateMandatoryPersistentImageData($savedImage, $formData);
             // Update global current "image to crop" form data
             $event->setData($formData);

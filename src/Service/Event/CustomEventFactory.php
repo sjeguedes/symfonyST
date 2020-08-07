@@ -40,7 +40,6 @@ class CustomEventFactory implements CustomEventFactoryInterface
             'data'         => [ // Key order and value type must be checked for each entry.
                 'user'   => ['type'  => User::class, 'value' => null],
                 'trick'  => ['type'  => Trick::class, 'value' => null]
-
             ]
         ],
         self::USER_ALLOWED_TO_RENEW_PASSWORD => [

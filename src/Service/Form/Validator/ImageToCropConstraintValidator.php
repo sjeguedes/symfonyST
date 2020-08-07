@@ -286,6 +286,7 @@ final class ImageToCropConstraintValidator extends AbstractTrickCollectionConstr
             $imageUploader = $this->imageService->getImageUploader();
             // Adapt search depending on temporary image or not
             $isTemporaryImage = preg_match('/'. $temporaryIdentifierPattern . '/', $object->getSavedImageName());
+            // Check if image file exists!
             $imageFiles[0] = $imageUploader->checkFileUploadOnServer(
                 $object->getSavedImageName(),
                 null,
@@ -297,12 +298,22 @@ final class ImageToCropConstraintValidator extends AbstractTrickCollectionConstr
                 $isImageFileValid = true;
                 // so we check if "cropJSONData" identifier is the same as "savedImageName" value!
                 if (!\is_null($object->getCropJSONData())) {
-                    $dataObjectFromJSONData = json_decode($object->getCropJSONData());
-                    if (json_last_error() === JSON_ERROR_NONE && property_exists($dataObjectFromJSONData[0], 'identifier')) {
-                        $imageJSONIdentifier = $dataObjectFromJSONData[0]->identifier;
+                    // Decode crop data to get a stdClass instance
+                    $cropData = json_decode($object->getCropJSONData());
+                    $isExpectedJSON = property_exists($cropData, 'results') &&
+                                      \is_array($cropData->results) &&
+                                      \is_object($cropData->results[0]) &&
+                                      property_exists($cropData->results[0], 'identifier');
+                    if (json_last_error() === JSON_ERROR_NONE && $isExpectedJSON && $isExpectedJSON) {
+                        // IMPORTANT! At this time, JSON data contains only one crop result,
+                        // but this "results" array could be useful for multiple uploads later!
+                        $dataObjectFromJSONData = $cropData->results[0];
+                        $imageJSONIdentifier = $dataObjectFromJSONData->identifier;
                         // Re-evaluate image validity: we presume image file will be created on server
                         // as a result of direct upload action!
                         $isImageFileValid = $imageJSONIdentifier === $object->getSavedImageName();
+                    } else {
+                        $isImageFileValid = false;
                     }
                 }
             }

@@ -20,7 +20,7 @@
             {% set videoDataAttributes = 'data-uuid="'~videoInfosForm.vars.videoUuid~'" data-name="'~videoInfosForm.savedVideoName.vars.value~'" data-type="'~videoOwnerType~'"' %}
         {% else %}
             {% set removeVideoLink = 'href="#"' %}
-            {% set actionTitle = 'Cancel' %}
+            {% set actionTitle = isVideoAlreadyAEntity ? 'Delete' : 'Cancel' %}
             {% set removalIcon = isVideoAlreadyAEntity ? 'trash' : 'close' %}
             {% set videoDataAttributes = '' %}
         {% endif %}

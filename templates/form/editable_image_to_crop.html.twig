@@ -69,16 +69,11 @@
                 {{ form_label(imageToCropForm.image, 'Image file', {'label_attr': {'class': 'uk-form-label'}}) }}
                 <div class="uk-inline uk-flex uk-flex-middle">
                     <div class="uk-flex-column uk-position-relative uk-box-shadow-small uk-border-rounded uk-padding-small uk-margin-small-right st-background-white">
-                        {# image name path: determine which kind of image source has to be shown in image preview #}
-                        {% set isImagePreviewNotEmpty = imageToCropForm.imagePreviewDataURI.vars.value != '' %}
-                        {% set isImageToUpdate = (isImagePreviewNotEmpty == 0) and (imageToCropForm.vars.thumbnailImageDataURI is defined) %}
-                        {% set isImagePreview = (isImagePreviewNotEmpty == 1) and (imageToCropForm.imagePreviewDataURI.vars.valid == 1) %}
-                        {% if isImageToUpdate %}
-                            {# Used for trick update: look at AbstractTrickType::finishView(): this is used to ensure data persitence for img tag #}
+                        {# Determine which kind of image source has to be shown in image preview #}
+                        {% if imageToCropForm.vars.thumbnailImageDataURI is defined %}
+                            {# Used for trick temporary or definitive image preview: look at AbstractTrickType::finishView()
+                            This is used to ensure data persitence for img tag #}
                             {% set imageNamePath = imageToCropForm.vars.thumbnailImageDataURI %}
-                        {% elseif isImagePreview %}
-                            {# Used when an image is cropped ans set with Javascript #}
-                            {% set imageNamePath = imageToCropForm.imagePreviewDataURI.vars.value %}
                         {% else %}
                             {# Used by default #}
                             {% set imageNamePath = asset(globalImageDirectory~'image-crop-box-default-thumb.png') %}
@@ -130,9 +125,19 @@
                             {# Image already uploaded text info #}
                             {% if isDisabled == 1 %}
                             <p id="st-temp-upload-text-info" class="uk-margin-small-top">
-                                <small class="uk-text-bold st-color-yellow">
-                                    <span class="uk-icon" uk-icon="icon: info"></span>
-                                    <span class="st-temp-upload-text-info-content">This image is saved on server.</span>
+                                <small class="uk-text-bold">
+                                    {% set temporaryImageIdentifier = constant('App\\Domain\\ServiceLayer\\ImageManager::DEFAULT_IMAGE_IDENTIFIER_NAME') %}
+                                    {% if imageToCropForm.savedImageName.vars.value matches '/'~temporaryImageIdentifier~'/' %}
+                                     <span class="uk-icon st-color-orange" uk-icon="icon: warning"></span>
+                                     <span class="st-temp-upload-text-info-content st-color-orange">
+                                     This image is temporarily saved on server.
+                                    </span>
+                                    {% else %}
+                                     <span class="uk-icon st-color-yellow" uk-icon="icon: info"></span>
+                                     <span class="st-temp-upload-text-info-content st-color-yellow">
+                                         This image is saved on server.
+                                     </span>
+                                    {% endif %}
                                 </small>
                             </p>
                             {% endif %}
