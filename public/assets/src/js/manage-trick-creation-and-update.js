@@ -1,6 +1,7 @@
-import htmlStringHelper from './all/encode-decode-string';
 import cropper from './all/cropper';
 import deleteMedia from './medias/delete-media';
+import htmlStringHelper from './all/encode-decode-string';
+import loadVideoIframePreview from './medias/load-video-iframe';
 import removeImageBox from "./medias/remove-image-box";
 import Sortable from 'sortablejs';
 export default () => {
@@ -152,12 +153,15 @@ export default () => {
                                 return cropParams.cropJSONData !== undefined ? cropParams.cropJSONData : null;
                             },
                             setCropDataImagesArray: (imageOriginalName, data) => {
-                                // Variable as property name can also be used with ES6 dynamic property [imageOriginalName] notation!
-                                data['imageName'] = imageOriginalName;
+                                // Variable as property name can also be used with
+                                // ES6 dynamic property [imageOriginalName] notation!
+                                data['imageName'] = imageOriginalName; // Add original image name to object
                                 let objectToStringify = data;
+                                // Avoid XSSI vulnerability with array of potential multiple results in object property
+                                // https://cheatsheetseries.owasp.org/cheatsheets/AJAX_Security_Cheat_Sheet.html#always-return-json-with-an-object-on-the-outside
                                 cropParams.cropDataImagesArray !== undefined
-                                    ? cropParams.cropDataImagesArray.concat(objectToStringify)
-                                    : cropParams.cropDataImagesArray = [objectToStringify];
+                                    ? cropParams.cropDataImagesArray.results.concat(objectToStringify)
+                                    : cropParams.cropDataImagesArray = { results: [objectToStringify] };
                             },
                             setCropJSONData: (cropDataImagesArray) => {
                                 cropParams.cropJSONData = JSON.stringify(cropDataImagesArray);
@@ -411,6 +415,11 @@ export default () => {
                     mediaSortableButton.addEventListener('click', event => {
                         event.preventDefault();
                     });
+
+                    // ------------------------------------------------------------------------------------------------------------
+
+                    // Load valid video in mini-iframe in video box
+                    loadVideoIframePreview(videoBox);
 
                     // ------------------------------------------------------------------------------------------------------------
 

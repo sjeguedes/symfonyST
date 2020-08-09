@@ -9,6 +9,7 @@
 export default (configObject) => {
     // Promise basics: https://javascript.info/promise-basics
     // Abort multiple AJAX calls: https://stackoverflow.com/questions/40936321/aborting-multiple-xhr-requests
+    //                            https://medium.com/@alperen.talaslioglu/handling-multiple-ajax-calls-for-same-service-646a4c7e5fe7
     // Add abort to AJAX promise: https://stackoverflow.com/questions/32497035/abort-ajax-request-in-a-promise
     // Promise based xhr: http://ccoenraets.github.io/es6-tutorial-data/promisify/
     //                    https://gomakethings.com/promise-based-xhr/
@@ -87,7 +88,7 @@ export class AjaxPromiseLoader {
                 xhr.abort();
             }
         } catch (e) {
-            console.error('Exception thrown: ', e);
+            console.warn('Exception thrown: ', e);
         }
     }
 }

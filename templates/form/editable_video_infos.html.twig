@@ -8,28 +8,35 @@
 {% set videoIndex = editableVideoIndexName %}
 <div id="st-video-infos-wrapper-{{ videoIndex }}" class="st-video-infos-wrapper">
     <div id="{{ rootFormName }}_videos_{{ videoIndex }}" class="uk-position-relative uk-border-rounded uk-padding-small uk-margin-small-bottom st-video-infos st-background-blue st-box-shadow-full-small">
-        {# Saved (already saved) video block removal: look at AbstractTrickType::finishView() #}
-        {# Prepare vars for video removal modal by testing a valid existing saved video #}
-        {% set isVideoAlreadyAEntity = videoInfosForm.vars.videoUuid is defined %}
-        {# Synchronize also "allow_delete" option #}
-        {% set allowDeleteConfig = rootForm.videos.vars.allow_delete %}
-        {% if isVideoAlreadyAEntity and allowDeleteConfig == 0 %}
-            {% set removeVideoLink = 'id="st-video-remove-button-'~videoIndex~'" href="#st-modal-delete-video"' %}
-            {% set actionTitle = isVideoAlreadyAEntity ? 'Delete' : 'Cancel' %}
-            {% set removalIcon = 'trash' %}
-            {% set videoDataAttributes = 'data-uuid="'~videoInfosForm.vars.videoUuid~'" data-name="'~videoInfosForm.savedVideoName.vars.value~'" data-type="'~videoOwnerType~'"' %}
-        {% else %}
-            {% set removeVideoLink = 'href="#"' %}
-            {% set actionTitle = isVideoAlreadyAEntity ? 'Delete' : 'Cancel' %}
-            {% set removalIcon = isVideoAlreadyAEntity ? 'trash' : 'close' %}
-            {% set videoDataAttributes = '' %}
-        {% endif %}
-        {# These vars are checked to be safe with condition above! #}
-        {# TODO: this link is deactivated: need to complete video deletion process to make this link functional! #}
-        <a {{ removeVideoLink|raw }} title="{{ actionTitle }}" {{ videoDataAttributes|raw }}
-                                     class="uk-position-top-right uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-margin-small-top uk-margin-small-right st-video-remove-button" uk-toggle>
-            <span uk-icon="icon: {{ removalIcon }}; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-delete st-svg-icon-actions"></span>
-        </a>
+        <div class="uk-position-top-right uk-flex uk-flex-middle uk-margin-small-top uk-margin-small-right">
+            {# Video loading spinner #}
+            <span id="{{ 'st-video-spinner-'~videoIndex }}" class="uk-hidden uk-display-inline-block uk-margin-small-right st-video-spinner">
+                <span uk-spinner="ratio: 0.4"></span>
+                <small>&nbsp;Loading</small>
+            </span>
+            {# Saved (already saved) video block removal: look at AbstractTrickType::finishView() #}
+            {# Prepare vars for video removal modal by testing a valid existing saved video #}
+            {% set isVideoAlreadyAEntity = videoInfosForm.vars.videoUuid is defined %}
+            {# Synchronize also "allow_delete" option #}
+            {% set allowDeleteConfig = rootForm.videos.vars.allow_delete %}
+            {% if isVideoAlreadyAEntity and allowDeleteConfig == 0 %}
+                {% set removeVideoLink = 'id="st-video-remove-button-'~videoIndex~'" href="#st-modal-delete-video"' %}
+                {% set actionTitle = isVideoAlreadyAEntity ? 'Delete' : 'Cancel' %}
+                {% set removalIcon = 'trash' %}
+                {% set videoDataAttributes = 'data-uuid="'~videoInfosForm.vars.videoUuid~'" data-name="'~videoInfosForm.savedVideoName.vars.value~'" data-type="'~videoOwnerType~'"' %}
+            {% else %}
+                {% set removeVideoLink = 'href="#"' %}
+                {% set actionTitle = isVideoAlreadyAEntity ? 'Delete' : 'Cancel' %}
+                {% set removalIcon = isVideoAlreadyAEntity ? 'trash' : 'close' %}
+                {% set videoDataAttributes = '' %}
+            {% endif %}
+            {# These vars are checked to be safe with condition above! #}
+            {# TODO: this link is deactivated: need to complete video deletion process to make this link functional! #}
+            <a {{ removeVideoLink|raw }} title="{{ actionTitle }}" {{ videoDataAttributes|raw }}
+                                         class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove st-video-remove-button" uk-toggle>
+                <span uk-icon="icon: {{ removalIcon }}; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-delete st-svg-icon-actions"></span>
+            </a>
+        </div>
         {# ----------------------------------------------------------------------------------------------------------------------------------------------------------------#}
         {# Video block sortable #}
         <a href="#" class="uk-position-bottom-right uk-sortable-handle uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-margin-small-bottom uk-margin-small-right" title="Sort vertically">
@@ -55,11 +62,68 @@
                     {{ form_errors(videoInfosForm.showListRank) }}
                 {% endif %}
                 {# Video URL #}
-                {{ form_label(videoInfosForm.url, 'Video URL (iframe "src" attribute)', {'label_attr': {'class': 'uk-form-label'}}) }}
-                <div class="uk-inline uk-position-relative uk-flex">
+                {{ form_label(videoInfosForm.url, 'Video URL (iframe "src" attribute or page link)', {'label_attr': {'class': 'uk-form-label'}}) }}
+                {# Video preview: show iframe or image, text info and possibly a link to watch it #}
+                <div class="uk-flex uk-margin-small-right uk-margin-small-bottom">
+                    {# Check if a valid video is set #}
+                    {% set isVideoNotEmptyAndValid = videoInfosForm.vars.videoUuid is defined or (videoInfosForm.savedVideoName.vars.value != '' and videoInfosForm.savedVideoName.vars.valid == 1) %}
+                    {# Image for video mini-iframe replacement #}
+                    <div id="st-video-iframe-replacement-{{ videoIndex }}"
+                         class="{{ isVideoNotEmptyAndValid == 1 ? 'uk-hidden ' : '' }}uk-box-shadow-small uk-border-rounded uk-padding-small st-background-white st-video-iframe-replacement">
+                        {% set isVideoDescription = videoInfosForm.description.vars.value != '' %}
+                        {% set videoDescription = isVideoDescription ? 'Description will be: '~videoInfosForm.description.vars.value : 'Video description must be filled in!' %}
+                        <img width="142" src="{{ asset(globalImageDirectory~'video-infos-default-thumb.png') }}" alt="{{ videoDescription|e('html_attr') }}" >
+                    </div>
+                    {# Video iframe preview #}
+                    <div id="st-video-iframe-{{ videoIndex }}" class="{{ isVideoNotEmptyAndValid == 1 ? '' : 'uk-hidden ' }}uk-flex uk-flex-middle">
+                        <iframe class="uk-box-shadow-small uk-border-rounded st-border-white-small st-background-black"
+                                width="172" height="110" src="{{ videoInfosForm.url.vars.value }}" allowfullscreen>
+                        </iframe>
+                        {# video infos #}
+                        <div id="st-video-success-infos-{{ videoIndex }}" class="uk-margin-small-left">
+                            {# Link to watch video on provider website #}
+                            {% if videoInfosForm.savedVideoName.vars.value matches '/youtube/' %}
+                                {% set linkClass = '' %}
+                                {% set link = preg_replace('#youtube\.com/embed/#', 'youtube.com/watch?v=', videoInfosForm.url.vars.value) %}
+                            {% elseif videoInfosForm.savedVideoName.vars.value matches '/vimeo/' %}
+                                {% set linkClass = '' %}
+                                {% set link = preg_replace('#player.vimeo\.com/video/#', 'vimeo.com/', videoInfosForm.url.vars.value) %}
+                            {% elseif videoInfosForm.savedVideoName.vars.value matches '/dailymotion/' %}
+                                {% set linkClass = '' %}
+                                {% set link = preg_replace('#dailymotion\.com/embed/video/#', 'dailymotion.com/video/', videoInfosForm.url.vars.value) %}
+                            {% else  %}
+                                {% set linkClass = ' uk-hidden' %}
+                                {% set link = '#' %}
+                            {% endif %}
+                             <a id="st-video-watch-link-{{ videoIndex }}" class="uk-button uk-button-default uk-padding-remove-left st-video-watch-link{{ linkClass }}"
+                                href="{{ link }}" target="_blank" rel="noopener" title="Watch">
+                                <span class="uk-display-inline-block uk-margin-small-left" uk-icon="icon: desktop"></span>
+                                <span id="{{ 'st-video-watch-link-label-'~videoIndex }}"
+                                      class="uk-display-inline-block uk-padding-small uk-padding-remove-top uk-padding-remove-bottom st-video-watch-link-label">Watch</span>
+                            </a>
+                            {# Saved video text info #}
+                            <p id="st-video-text-info-{{ videoIndex }}" class="{{ videoInfosForm.vars.videoUuid is defined ? '' : 'uk-hidden ' }}uk-margin-small-top">
+                                <small class="uk-text-bold">
+                                    <span class="uk-icon st-color-yellow" uk-icon="icon: info"></span>
+                                    <span class="st-temp-definition-text-info-content st-color-yellow">
+                                         This video is saved on server.
+                                    </span>
+                                </small>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div id="st-video-url-{{ videoIndex }}" class="uk-flex uk-position-relative st-video-url">
                     <span class="uk-form-icon st-textarea-icon" uk-icon="icon: link"></span>
                     {{ form_widget(videoInfosForm.url, {
-                        'attr': {'class': 'uk-textarea', 'rows': 2},
+                        'attr': {
+                            'class': 'uk-textarea',
+                            'rows': 2,
+                            'data-replaced-url-info' : 'Please note\nyour URL was simply replaced\nto be compatible with\n the expected format!',
+                            'data-url-error': 'Please note\nyour URL is not valid!\nand must be changed to be accepted.',
+                            'data-url-success': 'Please note\nyour URL is valid\nand can be submitted to be accepted.',
+                            'data-saved-url': videoInfosForm.vars.videoUuid is defined ? videoInfosForm.url.vars.value : ''
+                        },
                         'value': videoInfosForm.url.vars.value})
                     }}
                     {# Video URL input icon errors #}

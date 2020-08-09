@@ -22,6 +22,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -155,8 +156,12 @@ class UpdateTrickAction
             'trickModerationState'  => $trickToUpdate->getIsPublished(),
             'trickUpdateError' => $this->formHandlers[0]->getTrickUpdateError() ?? null,
             'updateTrickForm'  => $updateTrickForm->createView(),
-            'deleteImageForm'  => $deleteImageForm->createView() // Used to delete images with direct upload
+            'deleteImageForm'  => $deleteImageForm->createView(), // Used to delete images with direct upload
             // TODO: need to add 'deleteVideoForm' here!
+            'videoURLProxyPath'    => $this->trickService->generateURLFromRoute(
+                'load_trick_video_url_check', ['url' => ''],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            )
         ];
         return $responder($data);
     }

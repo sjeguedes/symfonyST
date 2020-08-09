@@ -52,7 +52,7 @@ inside included template when a loop is used! #}
         {% elseif mediaType.type == mediaTypesValues['trickYoutube'] %}
             <!-- Trick Youtube video -->
             {# Iframe for video #}
-            {% set youtubeVideoURL = mediaForSlide|e('html_attr') %}
+            {% set youtubeVideoURL = mediaForSlide %}
             {% set youtubeVideoDesc = mediaDescription|e('html_attr') %}
             <iframe id="st-card-iframe-{{ index }}" class="uk-invisible st-card-iframe st-yt-iframe" width="100%" height="100%" src="{{ youtubeVideoURL }}?enablejsapi=1&amp;origin={{ app.request.getSchemeAndHttpHost() }}" title="{{ youtubeVideoDesc }}"
                     allowfullscreen allow="autoplay; encrypted-media" uk-responsive></iframe>
@@ -76,7 +76,7 @@ inside included template when a loop is used! #}
         {% elseif mediaType.type == mediaTypesValues['trickVimeo'] %}
             <!-- Trick Vimeo video -->
             {# Iframe for video #}
-            {% set vimeoVideoURL = mediaForSlide|e('html_attr') %}
+            {% set vimeoVideoURL = mediaForSlide %}
             {% set vimeoVideoDesc = mediaDescription|e('html_attr') %}
             <iframe id="st-card-iframe-{{ index }}" class="uk-invisible st-card-iframe st-vm-iframe" width="100%" height="100%" src="{{ vimeoVideoURL }}?api=1&amp;origin={{ app.request.getSchemeAndHttpHost() }}" title="{{ vimeoVideoDesc }}"
                     allowfullscreen allow="autoplay" uk-responsive></iframe>
@@ -100,7 +100,7 @@ inside included template when a loop is used! #}
         {% elseif mediaType.type == mediaTypesValues['trickDailymotion'] %}
             <!-- Trick Dailymotion video -->
             {# Iframe for video #}
-            {% set dailymotionVideoURL = mediaForSlide|e('html_attr') %}
+            {% set dailymotionVideoURL = mediaForSlide %}
             {% set dailymotionVideoDesc = mediaDescription|e('html_attr') %}
             <iframe id="st-card-iframe-{{ index }}" class="uk-invisible st-card-iframe st-dm-iframe" width="100%" height="100%" src="{{ dailymotionVideoURL }}?api=1&amp;origin={{ app.request.getSchemeAndHttpHost() }}" title="{{ dailymotionVideoDesc }}"
                     allowfullscreen allow="autoplay" uk-responsive></iframe>

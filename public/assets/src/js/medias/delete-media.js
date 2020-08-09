@@ -1,13 +1,19 @@
 import {AjaxPromiseLoader} from '../all/ajax-request';
-import UIkit from '../../../uikit/dist/js/uikit.min';
+import createNotification from "../all/create-notification";
 import removeImageBox from './remove-image-box';
 import smoothScroll from '../all/smooth-vertical-scroll';
 import stringHelper from '../all/encode-decode-string';
-import createNotification from "../all/create-notification";
+import UIkit from '../../../uikit/dist/js/uikit.min';
 export default (removeMediaButtonElement, referenceElementToScroll, mediaBoxElements) => {
     // Ajax with xhr: https://dev.to/nikola/making-ajax-calls-in-pure-javascript-the-old-way-ed5
     // Handling multiple ajax calls: https://medium.com/@alperen.talaslioglu/handling-multiple-ajax-calls-for-same-service-646a4c7e5fe7
     // xhr ready state: https://developer.mozilla.org/fr/docs/Web/API/XMLHttpRequest/readyState
+    // Event listeners: https://medium.com/beginners-guide-to-mobile-web-development/one-off-event-listeners-in-javascript-92e19c4c0336
+    // Event propagation: https://javascript.info/bubbling-and-capturing
+    // Event: https://www.quirksmode.org/js/events_order.html
+
+    // ------------------------------------------------------------------------------------------------------------
+
     // Get media types
     let allowedMediaTypes = ['image', 'video'];
     let linkToModalElement = removeMediaButtonElement;

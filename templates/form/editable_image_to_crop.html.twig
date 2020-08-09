@@ -122,9 +122,9 @@
                                     {% endif %}
                                 </button>
                             </div>
-                            {# Image already uploaded text info #}
-                            {% if isDisabled == 1 %}
-                            <p id="st-temp-upload-text-info" class="uk-margin-small-top">
+                            {# Image is already uploaded, valid and saved: then show text info #}
+                            {% if imageToCropForm.vars.bigImageUuid is defined %}
+                            <p id="st-image-text-info-{{ imageIndex }}" class="uk-margin-small-top">
                                 <small class="uk-text-bold">
                                     {% set temporaryImageIdentifier = constant('App\\Domain\\ServiceLayer\\ImageManager::DEFAULT_IMAGE_IDENTIFIER_NAME') %}
                                     {% if imageToCropForm.savedImageName.vars.value matches '/'~temporaryImageIdentifier~'/' %}

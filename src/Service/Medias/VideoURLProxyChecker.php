@@ -17,9 +17,9 @@ class VideoURLProxyChecker
     // CAUTION: these iframe URL patterns should certainly be improved and are very important for a quite "secure" use!
     // Even more, they can evolve, so it is preferable to use providers APIs!
     const ALLOWED_URL_PATTERNS = [
-        '/^https?:\/\/www\.youtube\.com\/embed\/.+$/', // Video ID can also be [a-zA-Z0-9_]+ or [\w-]+, but it is more risky!
-        '/^https?:\/\/player\.vimeo\.com\/video\/.+$/', // Video ID can also be [0-9]+, but it is more risky!
-        '/^https?:\/\/www\.dailymotion\.com\/embed\/video\/.+$/' // Video ID can also be [a-zA-Z0-9]+, but it is more risky!
+        '/^https?:\/\/www\.youtube\.com\/embed\/[a-zA-Z0-9_-]+$/', // [\w-]+
+        '/^https?:\/\/player\.vimeo\.com\/video\/[0-9]+$/',
+        '/^https?:\/\/www\.dailymotion\.com\/embed\/video\/[a-zA-Z0-9]+$/'
     ];
 
     /**

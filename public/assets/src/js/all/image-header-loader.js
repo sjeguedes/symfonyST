@@ -4,8 +4,8 @@ export default () => {
     const headerElement = document.getElementById('header');
     if (headerElement) {
         // Load each big image which exists in header
-     let image = null;
-     const images = headerElement.querySelectorAll('.st-background-image-header');
+        let image = null;
+        const images = headerElement.querySelectorAll('.st-background-image-header');
         for (let i = 0; i < images.length; i ++) {
             // Prepare fade in effect for image
             images[i].style.opacity = '0';

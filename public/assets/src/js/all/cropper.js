@@ -1,9 +1,9 @@
+//import canvasToBlob from './polyfill-canvas-to-blob';
 import createNotification from './create-notification';
 import Cropper from 'cropperjs/dist/cropper.min';
-//import canvasToBlob from './polyfill-canvas-to-blob';
+import smoothScroll from "./smooth-vertical-scroll";
 import URIHelper from './encode-decode-uri';
 import UIkit from "../../../uikit/dist/js/uikit.min";
-import smoothScroll from "./smooth-vertical-scroll";
 export default (cropParams) =>  {
     // Resources:
     // https://github.com/fengyuanchen/cropperjs/blob/master/README.md

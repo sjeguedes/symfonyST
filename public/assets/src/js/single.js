@@ -19,11 +19,15 @@ export default () => {
     // JavaScript cross domain proxy: https://www.youtube.com/watch?v=o8puzjzpjqo
     // https://stackoverflow.com/questions/1973140/parsing-json-from-xmlhttprequest-responsejson
     // https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent
+
+    // Guide to iframe security and event: https://blog.logrocket.com/the-ultimate-guide-to-iframes/
+
+    // ------------------------------------------------------------------------------------------------------------
+
     // Script for APIs
     const singleSliderElement = document.getElementById('st-single-slider');
     if (singleSliderElement) {
 
-        // ------------------------------------------------------------------------------------------------------------
         // ------------------------------------------------------------------------------------------------------------
 
         // String helper to decode string

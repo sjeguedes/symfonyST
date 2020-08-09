@@ -289,14 +289,15 @@
                                         Each video is expected to come from <span class="uk-text-bold">Youtube, Vimeo, or Dailymotion</span> providers.<br>
                                         Iframe Integration source URL must use one of these:<br>
                                         <span class="uk-text-bold uk-text-break">
-                                                        https://www.youtube.com/embed/<em><span class="st-color-blue">videoId</span></em>
-                                                    </span><br>
+                                            https://www.youtube.com/embed/<em><span class="st-color-blue">videoId</span></em>
+                                        </span><br>
                                         <span class="uk-text-bold uk-text-break">
-                                                        https://player.vimeo.com/video/<em><span class="st-color-blue">videoId</span></em>
-                                                    </span><br>
+                                            https://player.vimeo.com/video/<em><span class="st-color-blue">videoId</span></em>
+                                        </span><br>
                                         <span class="uk-text-bold uk-text-break">
-                                                        https://www.dailymotion.com/embed/video/<em><span class="st-color-blue">videoId</span></em>
-                                                    </span>
+                                            https://www.dailymotion.com/embed/video/<em><span class="st-color-blue">videoId</span></em>
+                                        </span><br>
+                                        <strong><span class="st-color-orange">Please note web browser link can be used directly for easier integration!</span></strong>
                                     </small>
                                 </p>
                             </div>
@@ -308,7 +309,8 @@
                         {% set videoInfosTemplate = include('form/video_infos.html.twig', { rootForm: updateTrickForm })|e('html_attr') %}
                         {# Get "prototype_name" option value from videos Collection #}
                         {% set videoIndex = updateTrickForm.videos.vars.prototype.vars.name %}
-                        <div id="st-videos-collection" class="st-images-collection" data-prototype="{{ videoInfosTemplate }}" data-prototype-name="{{ videoIndex }}">
+                        <div id="st-videos-collection" class="st-images-collection" data-prototype="{{ videoInfosTemplate }}" data-prototype-name="{{ videoIndex }}"
+                             data-video-proxy="{{ videoURLProxyPath }}">
                             <div id="st-videos-collection-sortable-wrapper">
                                 {% if updateTrickForm.videos.children is not empty %}
                                     {# Loop on children to retrieve all associated videos (with corresponding box) on the way to be possibly updated #}

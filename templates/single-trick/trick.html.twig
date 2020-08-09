@@ -103,7 +103,7 @@
             {# Create a slider only if it is necessary #}
             {% if trick.mediaOwner.medias|length != 0 %}
             <div id="st-single-slider" class="uk-slider-container uk-position-relative st-card-container" data-current-path="{{ path(app.request.attributes.get('_route'),
-                    app.request.attributes.get('_route_params'))|e('html_attr') }}" data-video-proxy="{{ videoURLProxyPath|e('html_attr') }}" data-media-error="{{ mediaError|e('html_attr') }}">
+                    app.request.attributes.get('_route_params')) }}" data-video-proxy="{{ videoURLProxyPath }}" data-media-error="{{ mediaError }}">
                 {# ---------------------------------------------------------------------------- #}
                 {# Create slider items grid dynamic centering based on a maximum of 5 items #}
                 {% set mediaQueryLabels = ['@s', '@m', '@l', '@xl'] %}

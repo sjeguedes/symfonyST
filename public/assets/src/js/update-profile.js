@@ -77,10 +77,15 @@ export default () => {
                     return cropParams.cropJSONData !== undefined ? cropParams.cropJSONData : null;
                 },
                 setCropDataImagesArray: (imageOriginalName, data) => {
-                    // Variable as property name can also be used with ES6 dynamic property [imageOriginalName] notation!
-                    data['imageName'] = imageOriginalName;
+                    // Variable as property name can also be used with
+                    // ES6 dynamic property [imageOriginalName] notation!
+                    data['imageName'] = imageOriginalName; // Add original image name to object
                     let objectToStringify = data;
-                    cropParams.cropDataImagesArray !== undefined ? cropParams.cropDataImagesArray.concat(objectToStringify) : cropParams.cropDataImagesArray = [objectToStringify];
+                    // Avoid XSSI vulnerability with array of potential multiple results in object property
+                    // https://cheatsheetseries.owasp.org/cheatsheets/AJAX_Security_Cheat_Sheet.html#always-return-json-with-an-object-on-the-outside
+                    cropParams.cropDataImagesArray !== undefined
+                        ? cropParams.cropDataImagesArray.results.concat(objectToStringify)
+                        : cropParams.cropDataImagesArray = { results: [objectToStringify] };
                 },
                 setCropJSONData: (cropDataImagesArray) => {
                     cropParams.cropJSONData = JSON.stringify(cropDataImagesArray);
