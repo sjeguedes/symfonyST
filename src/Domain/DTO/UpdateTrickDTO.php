@@ -48,7 +48,7 @@ final class UpdateTrickDTO extends AbstractReadableDTO
     private $videos;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $isPublished;
 
@@ -61,7 +61,7 @@ final class UpdateTrickDTO extends AbstractReadableDTO
      * @param DTOCollection|ImageToCropDTO[] $images      a collection of image data (crop JSON data, preview data URI, identifier reference...)
      * @param DTOCollection|VideoInfosDTO[]  $videos      a collection of video URL strings to be used in iframe HTML element
      *                                                    based on video type (Youtube, DailyMotion, Vimeo...)
-     * @param bool                           $isPublished a publication state which an administrator can change
+     * @param bool|null                      $isPublished a publication state which an administrator can change
      *
      * @throws \Exception
      */
@@ -71,7 +71,7 @@ final class UpdateTrickDTO extends AbstractReadableDTO
         ?string $description,
         DTOCollection $images,
         DTOCollection $videos,
-        bool $isPublished = false
+        ?bool $isPublished
     ) {
         $this->group = $group;
         $this->name = $name;
@@ -122,9 +122,9 @@ final class UpdateTrickDTO extends AbstractReadableDTO
     }
 
     /**
-     * @return bool
+     * @return bool|null
      */
-    public function getIsPublished() : bool
+    public function getIsPublished() : ?bool
     {
         return $this->isPublished;
     }
@@ -189,11 +189,11 @@ final class UpdateTrickDTO extends AbstractReadableDTO
     }
 
     /**
-     * @param bool $isPublished
+     * @param bool|null $isPublished
      *
      * @return UpdateTrickDTO
      */
-    public function setIsPublished(bool $isPublished) : self
+    public function setIsPublished(?bool $isPublished) : self
     {
         $this->isPublished = $isPublished;
         return $this;
