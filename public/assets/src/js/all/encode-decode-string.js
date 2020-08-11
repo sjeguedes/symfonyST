@@ -228,7 +228,11 @@ export default () => {
                 return '';
             }
             let breakTag = (isXhtml) ? '<br />' : '<br>';
-            return (string + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + breakTag + '$2');
+            // String was created manually, partially or entirely!
+            if (/\\n/g.test(string)) {
+                string = string.replace(/\\r\\n|\\n\\r|\\r|\\n/gi, breakTag);
+            }
+            return (string + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/gi, '$1' + breakTag + '$2');
         }
     };
     return {

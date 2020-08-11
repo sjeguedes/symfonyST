@@ -1,0 +1,31 @@
+{# Existing trick modal removal #}
+<div id="st-modal-delete-trick" class="uk-flex-top" uk-modal="esc-close: false; bg-close: false"
+     data-error="Requested trick was found\nbut its deletion failed!\nPlease try again later,\nor contact us if necessary."
+     data-success="Requested trick was found\nand successfully deleted!\nPlease also note\nall its associated data do not exist anymore."
+     data-technical-error="Sorry, a technical error happened!\nPlease try again later,\nor contact us if necessary.">
+    <div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical">
+        <button class="uk-modal-close-outside" type="button" uk-close></button>
+        <h3 class="uk-modal-title uk-text-lead uk-text-center uk-text-bold uk-text-uppercase st-color-black">Please confirm trick removal</h3>
+        {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+        <div class="uk-flex uk-flex-center uk-margin-top">
+            <button id="st-cancel-delete-trick-button" type="button" tabindex="-1"
+                    class="uk-button uk-button-secondary uk-border-rounded uk-box-shadow-hover-medium uk-margin-small-right uk-text-bold uk-modal-close st-cancel-delete-trick-button st-svg-icon-button-default st-svg-icon-cancel" title="Cancel">
+                Cancel <span uk-icon="icon: close; ratio: 1"></span>
+            </button>
+            <button id="st-confirm-delete-trick-button" type="button" tabindex="-1"
+                    class="uk-button uk-button-secondary uk-border-rounded uk-box-shadow-hover-medium uk-text-bold st-confirm-delete-trick-button st-svg-icon-button-default st-svg-icon-delete" title="Delete">
+                <span class="st-delete-trick-spinner st-color-yellow uk-hidden" uk-spinner="ratio: 0.8"></span>
+                Delete <span uk-icon="icon: trash; ratio: 1"></span>
+            </button>
+        </div>
+        {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+        {# This removal can be part of trick update form page action, or used directly on trick list / paginated list and trick single page! #}
+        <p class="uk-margin-small-top">
+            <span class="uk-label uk-display-inline uk-text-small st-color-orange st-background-black">CAUTION!</span>
+            <span class="uk-label uk-display-inline uk-padding-remove-left uk-padding-remove-right uk-text-lowercase uk-text-small st-color-black">
+                <span class="uk-text-capitalize">This</span> trick removal will delete also all its associated images and videos medias
+                and this action will take effect immediately.
+            </span>
+        </p>
+    </div>
+</div>

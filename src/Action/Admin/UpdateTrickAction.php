@@ -154,11 +154,12 @@ class UpdateTrickAction
         }
         $data = [
             'trickModerationState'  => $trickToUpdate->getIsPublished(),
-            'trickUpdateError' => $this->formHandlers[0]->getTrickUpdateError() ?? null,
-            'updateTrickForm'  => $updateTrickForm->createView(),
-            'deleteImageForm'  => $deleteImageForm->createView(), // Used to delete images with direct upload
+            'trickToUpdate'         => $trickToUpdate,
+            'trickUpdateError'      => $this->formHandlers[0]->getTrickUpdateError() ?? null,
+            'updateTrickForm'       => $updateTrickForm->createView(),
+            'deleteImageForm'       => $deleteImageForm->createView(), // Used to delete images with direct upload
             // TODO: need to add 'deleteVideoForm' here!
-            'videoURLProxyPath'    => $this->trickService->generateURLFromRoute(
+            'videoURLProxyPath'     => $this->trickService->generateURLFromRoute(
                 'load_trick_video_url_check', ['url' => ''],
                 UrlGeneratorInterface::ABSOLUTE_URL
             )

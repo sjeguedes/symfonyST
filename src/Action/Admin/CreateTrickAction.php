@@ -144,7 +144,7 @@ class CreateTrickAction
             'deleteImageForm'    => $deleteImageForm->createView(), // Used to delete temporary images with direct upload
             // No need to add a video deletion form since videos are not temporarily saved!
             // Empty declared url is more explicit!
-            'videoURLProxyPath'    => $this->trickService->generateURLFromRoute(
+            'videoURLProxyPath'  => $this->trickService->generateURLFromRoute(
                 'load_trick_video_url_check', ['url' => ''],
                 UrlGeneratorInterface::ABSOLUTE_URL
             )

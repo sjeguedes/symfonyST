@@ -1,8 +1,8 @@
+import deleteTrick from './trick/removal/delete-trick';
 import imageListLoader from './all/image-list-loader';
 import request from './all/ajax-request';
 import URIHelper from './all/encode-decode-uri';
 import UIkit from '../../uikit/dist/js/uikit.min';
-
 export default () => {
     // ------------------- Home page -------------------
     let element = document.getElementById('st-trick-list');
@@ -181,6 +181,11 @@ export default () => {
                                     // Enable button
                                     document.querySelector('#st-home-load-more').classList.remove('uk-disabled');
                                     toTop();
+
+                                    // ------------------------------------------------------------------------------------------------------------
+
+                                    // Manage trick deletion also here to update removal links list after AJAX request success
+                                    deleteTrick();
                                 }
                                 clearTimeout(to);
 
@@ -204,9 +209,14 @@ export default () => {
                             pos: 'top-center',
                             timeout: 0
                         });
-                    })
+                    });
                 }
             });
         }
+
+        // ------------------------------------------------------------------------------------------------------------
+
+        // Manage trick deletion
+        deleteTrick();
     }
 };

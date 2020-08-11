@@ -1,6 +1,7 @@
 import createNotification from "../all/create-notification";
 import request from '../all/ajax-request';
 export default (videoBox) => {
+    // Resources:
     // Manage video iframe with JS: http://jsfiddle.net/onigetoc/quBD4/
     // Manage video iframe on server side with PHP: https://artisansweb.net/get-thumbnail-youtube-vimeo-dailymotion-videos/
 

@@ -30,7 +30,7 @@ import single from './single';
 import updateProfile from './update-profile';
 
 // Trick creation and update page scripts
-import manageTrickCreationAndUpdate from './manage-trick-creation-and-update';
+import createOrUpdateTrick from './create-or-update-trick';
 
 // Init necessary scripts when DOM is ready
 window.addEventListener('DOMContentLoaded', function() {
@@ -43,6 +43,6 @@ window.addEventListener('DOMContentLoaded', function() {
     paginatedList();
     single();
     updateProfile();
-    manageTrickCreationAndUpdate();
+    createOrUpdateTrick();
 });
 

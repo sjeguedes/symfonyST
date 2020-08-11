@@ -1,6 +1,7 @@
+import deleteTrick from './trick/removal/delete-trick';
 import request from './all/ajax-request';
+import stringHelper from './all/encode-decode-string';
 import UIkit from '../../uikit/dist/js/uikit.min';
-import stringHelper from "./all/encode-decode-string";
 export default () => {
     // Resources:
     // https://varvy.com/pagespeed/defer-videos.html
@@ -27,12 +28,10 @@ export default () => {
     // Script for APIs
     const singleSliderElement = document.getElementById('st-single-slider');
     if (singleSliderElement) {
-
-        // ------------------------------------------------------------------------------------------------------------
-
         // String helper to decode string
         const stringHandler = stringHelper();
-        const videoProxyPath = stringHandler.htmlAttributeOnString.unescape(singleSliderElement.getAttribute('data-video-proxy'));
+        const videoProxyPath = stringHandler.htmlAttributeOnString
+                                            .unescape(singleSliderElement.getAttribute('data-video-proxy'));
 
         // CUSTOM FUNCTIONS TO IMPROVE SCRIPT \\
 
@@ -585,5 +584,10 @@ export default () => {
                 }
             }, [{/*add object properties if necessary*/}]); // args must be a array containing a unique object!
         }
+
+        // ------------------------------------------------------------------------------------------------------------
+
+        // Manage trick deletion
+        deleteTrick();
     }
-}
+};

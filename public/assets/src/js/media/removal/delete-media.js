@@ -1,9 +1,9 @@
-import {AjaxPromiseLoader} from '../all/ajax-request';
-import createNotification from "../all/create-notification";
+import {AjaxPromiseLoader} from '../../all/ajax-request';
+import createNotification from "../../all/create-notification";
 import removeImageBox from './remove-image-box';
-import smoothScroll from '../all/smooth-vertical-scroll';
-import stringHelper from '../all/encode-decode-string';
-import UIkit from '../../../uikit/dist/js/uikit.min';
+import smoothScroll from '../../all/smooth-vertical-scroll';
+import stringHelper from '../../all/encode-decode-string';
+import UIkit from '../../../../uikit/dist/js/uikit.min';
 export default (removeMediaButtonElement, referenceElementToScroll, mediaBoxElements) => {
     // Ajax with xhr: https://dev.to/nikola/making-ajax-calls-in-pure-javascript-the-old-way-ed5
     // Handling multiple ajax calls: https://medium.com/@alperen.talaslioglu/handling-multiple-ajax-calls-for-same-service-646a4c7e5fe7

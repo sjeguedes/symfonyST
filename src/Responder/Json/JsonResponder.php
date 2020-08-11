@@ -16,13 +16,16 @@ final class JsonResponder
     /**
      * Invokable Responder with Magic method.
      *
-     * @param array $data
+     * @param array|null $data
+     * @param int        $status
+     * @param array      $headers
+     * @param bool       $json
      *
      * @return JsonResponse
      */
-    public function __invoke(array $data) : JsonResponse
+    public function __invoke(array $data = null, int $status = 200, array $headers = [], bool $json = false) : JsonResponse
     {
         // Encode data with JSON string with serializer
-        return new JsonResponse($data);
+        return new JsonResponse($data, $status, $headers, $json);
     }
 }

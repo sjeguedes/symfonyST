@@ -1,8 +1,9 @@
 import cropper from './all/cropper';
-import deleteMedia from './medias/delete-media';
+import deleteMedia from './media/removal/delete-media';
+import deleteTrick from './trick/removal/delete-trick';
 import htmlStringHelper from './all/encode-decode-string';
-import loadVideoIframePreview from './medias/load-video-iframe';
-import removeImageBox from "./medias/remove-image-box";
+import loadVideoIframePreview from './media/load-video-iframe';
+import removeImageBox from './media/removal/remove-image-box';
 import Sortable from 'sortablejs';
 export default () => {
     // Resources:
@@ -62,7 +63,6 @@ export default () => {
         // ------------------------------------------------------------------------------------------------------------
 
         // Implement logic for images collection
-
         imagesCollectionContainer.addEventListener('click', event => {
             // Initialize event target element for bubbling up
             let targetElement = event.target;
@@ -521,5 +521,17 @@ export default () => {
             // Update box label text
             collectionBoxLabel.textContent = collectionBoxLabel.innerText.replace(new RegExp(/\d+$/, 'g'), collectionBoxRank.toString());
         };
+
+        // ------------------------------------------------------------------------------------------------------------
+
+        // Manage trick deletion
+        const trickUpdateFormElement = document.getElementById('st-update-trick-form');
+        if (trickUpdateFormElement) {
+            // Prepare element to which window will scroll after deletion
+            // Here it is the same principle as in form.js!
+            let referenceElementToScroll = document.getElementById('st-form');
+            referenceElementToScroll = referenceElementToScroll.parentElement.parentElement.parentElement;
+            deleteTrick(referenceElementToScroll);
+        }
     }
 };

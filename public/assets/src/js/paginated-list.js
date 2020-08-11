@@ -1,3 +1,4 @@
+import deleteTrick from './trick/removal/delete-trick';
 import imageListLoader from './all/image-list-loader';
 export default () => {
     // ------------------- Paginated page (trick list) -------------------
@@ -12,5 +13,10 @@ export default () => {
         nodes.forEach(card => {
             imageListLoader(document.getElementById('st-card-image-' + card.parentElement.getAttribute('data-offset')));
         });
+
+        // ------------------------------------------------------------------------------------------------------------
+
+        // Manage trick deletion
+        deleteTrick();
     }
 };

@@ -18,9 +18,11 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Security;
 
 /**
- * Class DeleteImageAction.
+ * Class AjaxDeleteImageAction.
  *
  * Manage image deletion form.
+ *
+ * TODO: review possibly this process without form!
  */
 class AjaxDeleteImageAction
 {
@@ -56,9 +58,8 @@ class AjaxDeleteImageAction
      */
     private $security;
 
-
     /**
-     * CreateTrickAction constructor.
+     * AjaxDeleteImageAction constructor.
      *
      * @param ImageManager         $imageService
      * @param MediaManager         $mediaService

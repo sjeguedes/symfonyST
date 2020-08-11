@@ -60,6 +60,10 @@ services:
         arguments:
             $formHandler: '@App\Service\Form\Handler\AjaxDeleteImageHandler'
 
+    # add trick deletion without form and form handler
+    App\Action\Admin\AjaxDeleteTrickAction:
+        tags: ['controller.service_arguments']
+
     # add form handler when calling login
     App\Action\Admin\LoginAction:
         tags: ['controller.service_arguments']

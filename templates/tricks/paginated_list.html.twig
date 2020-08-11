@@ -52,7 +52,9 @@
                     </div>
                     <div class="uk-card-media-top uk-position-relative st-background-black">
                         {% include 'all/trick_media_loader.html.twig' with {'spinnerRatio': '1.5'} %}
-                        <img id="st-card-image-{{ trick.rank }}" class="uk-invisible" src="{{ asset(globalTrickUploadDirectory~trick.mediaOwner.medias[0].mediaSource.image.name~'.'~trick.mediaOwner.medias[0].mediaSource.image.format) }}" alt="{{ trick.mediaOwner.medias[0].mediaSource.image.description|e('html_attr') }}">
+                        <img id="st-card-image-{{ trick.rank }}" class="uk-invisible" data-default-image="{{ asset(globalImageDirectory~'trick-default-image-400x225.png') }}"
+                             src="{{ asset(globalTrickUploadDirectory~trick.mediaOwner.medias[0].mediaSource.image.name~'.'~trick.mediaOwner.medias[0].mediaSource.image.format) }}"
+                             alt="{{ trick.mediaOwner.medias[0].mediaSource.image.description|e('html_attr') }}">
                         {# Unpublished trick indicator can be viewed only with permission #}
                         {% if trick.isPublished == 0 and is_granted('AUTHOR_OR_ADMIN_CAN_VIEW_UNPUBLISHED_TRICKS', trick) %}
                             <div id="st-unpublished-indicator-{{ trick.rank }}" class="uk-position-bottom uk-flex uk-flex-center uk-text-center st-background-red st-unpublished-indicator">
@@ -76,13 +78,20 @@
                             </div>
                             {% if is_granted('AUTHOR_OR_ADMIN_CAN_UPDATE_OR_DELETE_TRICKS', trick) %}
                             <div class="uk-text-right">
-                                <a href="{{ path('update_trick', { 'mainRoleLabel': app.user.mainRoleLabel|lower, 'slug': trick.slug, 'encodedUuid': trick.uuid|uuid_encode }) }}" class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove" title="Update">
+                                {# Update trick #}
+                                <a href="{{ path('update_trick', { 'mainRoleLabel': app.user.mainRoleLabel|lower, 'slug': trick.slug, 'encodedUuid': trick.uuid|uuid_encode }) }}"
+                                   class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove" title="Update">
                                     <span uk-icon="icon: pencil; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-update"></span>
                                 </a>
-                                {# TODO: complete this link! #}
-                                <a href="{#{{{ path('delete_trick', { 'encodedUuid': trick.uuid|uuid_encode }) }}#}#" class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove" title="Delete">
+                                {# Delete trick #}
+                                <a id="st-delete-trick-{{ trick.rank }}" data-action="{{ path('delete_trick', { 'mainRoleLabel': app.user.mainRoleLabel|lower, 'encodedUuid': trick.uuid|uuid_encode, 'csrfToken': csrf_token('delete_trick') }) }}"
+                                   class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove st-delete-trick"
+                                   href="#st-modal-delete-trick"  title="Delete" uk-toggle>
                                     <span uk-icon="icon: trash; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-delete"></span>
                                 </a>
+                                {# ------------------------------------------------------------------------- #}
+                                {# Get trick removal ajax action in modal #}
+                                {% include 'admin/removal/delete_trick.html.twig' only %}
                             </div>
                             {% endif %}
                         </div>

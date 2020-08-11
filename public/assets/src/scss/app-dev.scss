@@ -48,7 +48,8 @@ $global-small-font-size: 0.875rem !default; // 14px
 $site-white-color: rgba(255, 255, 255, 1); //#FFF
 $site-black-color: rgba(51, 51, 51, 1); //#333
 $site-yellow-color: rgba(236, 221, 19, 1); //#ECDD13
-$site-red-color: rgba(159, 6, 2, 1); //9F0602
+$site-orange-color: rgba(252, 157, 55, 1); //#FC9D37
+$site-red-color: rgba(159, 6, 2, 1); //#9F0602
 $site-red-color1: rgba(239, 43, 43, 1); //#EF2B2B
 $site-red-color2: rgba(172, 15, 15, 1); //#AC0F0F
 $site-blue-color: rgba(74, 134, 232, 1); //#4A86E8
@@ -262,8 +263,10 @@ $navbar-background: rgba(172, 15, 15, 1); //#AC0F0F
                         width: 20px;
                         height: 20px;
                         //padding: 2px;
+                        padding: 0;
                         background-color: $site-red-color;
                         //border: 1px solid transparent;
+                        border: none;
                     }
                 }
                 .uk-form-success, .uk-form-success:focus {
@@ -517,6 +520,9 @@ main {
 .st-background-yellow {
     background-color: $site-yellow-color;
 }
+.st-background-orange {
+    background-color: $site-orange-color;
+}
 .st-background-red {
     background-color: $site-red-color;
 }
@@ -553,6 +559,9 @@ main {
 }
 .st-color-yellow {
     color: $site-yellow-color;
+}
+.st-color-orange {
+    color: $site-orange-color;
 }
 .st-color-red {
     color: $site-red-color;
@@ -711,9 +720,10 @@ footer.st-footer {
 }
 
 /************************** Home **************************/
-
 /************************** Tricks **************************/
-
+.st-card-link-footer {
+    min-height: 42px;
+}
 /************************** Single trick **************************/
 // Fix bug on safari for slider controls "prev" and "next"
 .st-single-slider-container {
