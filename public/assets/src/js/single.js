@@ -1,7 +1,9 @@
+import deleteMedia from './media/removal/delete-media';
 import deleteTrick from './trick/removal/delete-trick';
 import request from './all/ajax-request';
 import stringHelper from './all/encode-decode-string';
 import UIkit from '../../uikit/dist/js/uikit.min';
+import warnBeforeMediaRemoval from './media/removal/warn-before-media-removal';
 export default () => {
     // Resources:
     // https://varvy.com/pagespeed/defer-videos.html
@@ -26,8 +28,9 @@ export default () => {
     // ------------------------------------------------------------------------------------------------------------
 
     // Script for APIs
+    const element = document.getElementById('st-single-trick');
     const singleSliderElement = document.getElementById('st-single-slider');
-    if (singleSliderElement) {
+    if (element && singleSliderElement) {
         // String helper to decode string
         const stringHandler = stringHelper();
         const videoProxyPath = stringHandler.htmlAttributeOnString
@@ -268,6 +271,50 @@ export default () => {
 
         // ------------------------------------------------------------------------------------------------------------
 
+        // Get slide to remove (".uk-card" parent)
+        const removeSlide = (mediaRemovalLink, mandatorySlideId = null) => {
+            // Get media slider
+            let mediaSlider = document.getElementById('st-single-trick-slider');
+            // Get current card in slide
+            let mediaRemovalLinkId = mandatorySlideId !== null ? mandatorySlideId : mediaRemovalLink.getAttribute('id');
+            let matches = mediaRemovalLinkId.match(/^st-delete-(image|video)-(\d+)$/);
+            // Stop process without found index!
+            try {
+                let currentSlideCard = document.getElementById(`st-card-${matches[2]}`);
+                // Check if main image is being removed in order to update single trick header
+                if (currentSlideCard.querySelector('.st-main-image-indicator') !== null) {
+                    // Replace previous header main image with header default image
+                    let headerMainImage = document.getElementById('st-trick-main-image');
+                    let headerDefaultImage = headerMainImage.getAttribute('data-default-img');
+                    headerMainImage.setAttribute('data-src', headerDefaultImage);
+                    // Show main image unavailable message information
+                    document.getElementById('st-main-image-unavailable-info').classList.remove('uk-hidden');
+                    // Hide main image update and deletion links
+                    document.getElementById('st-single-trick-update-delete-main-image').classList.add('uk-hidden');
+                }
+                // Remove slide "li" tag which corresponds to removed media!
+                currentSlideCard.parentElement.remove();
+                // IMPORTANT! Change slider grid after removal as expected
+                let mediaQueryLabels = ['@s', '@m', '@l', '@xl'];
+                let mediaSlidesAfterRemoval = mediaSlider.querySelectorAll('li');
+                let slidesLength = mediaSlidesAfterRemoval.length;
+                let mediaQuerySuffix = slidesLength >= 4
+                    ? mediaQueryLabels[4] : mediaQueryLabels[slidesLength - 1];
+                // Adjust centering class
+                Array.from(mediaSlider.classList).forEach((cssClass) => {
+                    // Remove previous centering css class and add new one
+                    if (/^uk-flex-center@[a-z]{1,2}$/.test(cssClass)) {
+                        mediaSlider.classList.remove(cssClass);
+                        mediaSlider.classList.add(`uk-flex-center${mediaQuerySuffix}`);
+                    }
+                });
+            } catch (e) {
+                console.warn('Exception thrown: ', e);
+            }
+        };
+
+        // ------------------------------------------------------------------------------------------------------------
+
         // Show/hide medias with toggle button only for mobile devices
         const mediasToggleButton = document.getElementById('st-single-toggle-media'),
             mediasToggleButtonLoader = mediasToggleButton.querySelector('.single-toggle-media-spinner'),
@@ -367,7 +414,6 @@ export default () => {
         });
 
         // ------------------------------------------------------------------------------------------------------------
-        // ------------------------------------------------------------------------------------------------------------
 
         // Call image loading rendering behavior (both thumbnail and modal image)
         let img = null;
@@ -386,14 +432,104 @@ export default () => {
             img.addEventListener("error", () => {
                 whenMediaError(images[i]);
             });
+
+            // ------------------------------------------------------------------------------------------------------------
+
+            // "click" event listener when image removal link is clicked.
+            let imageId = images[i].getAttribute('id');
+            let matches = imageId.match(/^st-card-image-(\d+)$/);
+            let imageCard = document.getElementById(`st-card-${matches[1]}`);
+            let mediaRemovalLink = imageCard.querySelector('.st-delete-image');
+            if (mediaRemovalLink !== null) {
+                mediaRemovalLink.addEventListener('click', () => {
+                    // Warn about not recommended actions
+                    let containerElement = document.getElementById('st-single-trick-slider');
+                    warnBeforeMediaRemoval(mediaRemovalLink, imageCard, containerElement, 'image');
+
+                    // ------------------------------------------------------------------------------------------------------------
+
+                    // Manage image deletion
+                    deleteMedia(
+                        mediaRemovalLink,
+                        'image',
+                        singleSliderElement,
+                        0,
+                        removeSlide,
+                        [mediaRemovalLink]
+                    );
+                });
+            }
+        }
+
+        // ------------------------------------------------------------------------------------------------------------
+
+        // Particular case: header main image removal link "click" event listener
+        const headerActionsParentElement = document.getElementById('st-single-trick-update-delete-main-image');
+        const mainImageContainerElement = document.getElementById('st-trick-main-image');
+        if (headerActionsParentElement !== null) {
+            const headerMainImageRemovalLink = headerActionsParentElement.querySelector('#st-delete-image');
+            headerMainImageRemovalLink.addEventListener('click', () => {
+                let containerElement = document.getElementById('st-single-trick-slider');
+                warnBeforeMediaRemoval(
+                    headerMainImageRemovalLink,
+                    headerActionsParentElement,
+                    containerElement,
+                    'image'
+                );
+            });
+            // Manage main image deletion in slider with "removeSlide" callback to update also header image
+            const mainImageSliderCard = singleSliderElement.querySelector('.st-main-image-indicator').parentElement;
+            if (mainImageSliderCard !== null) {
+                let index = mainImageSliderCard.getAttribute('id').replace('st-card-image-', '');
+                let mandatorySlideId = `st-delete-image-${index}`;
+                deleteMedia(
+                    headerMainImageRemovalLink,
+                    'image',
+                    mainImageContainerElement,
+                    0,
+                    removeSlide,
+                    [headerMainImageRemovalLink, mandatorySlideId]
+                );
+            }
+        }
+
+        // ------------------------------------------------------------------------------------------------------------
+
+        // Call video loading rendering behavior
+        const videos = singleSliderElement.querySelectorAll('.st-card-iframe');
+        for (let i = 0; i < videos.length; i ++) {
+            // "click" event listener when video removal link is clicked.
+            let videoId = videos[i].getAttribute('id');
+            let matches = videoId.match(/^st-card-iframe-(\d+)$/);
+            let videoCard = document.getElementById(`st-card-${matches[1]}`);
+            let mediaRemovalLink = videoCard.querySelector('.st-delete-video');
+            if (mediaRemovalLink !== null) {
+                mediaRemovalLink.addEventListener('click', () => {
+                    // Warn about not recommended actions
+                    let containerElement = document.getElementById('st-single-trick-slider');
+                    warnBeforeMediaRemoval(mediaRemovalLink, videoCard, containerElement, 'video');
+
+                    // ------------------------------------------------------------------------------------------------------------
+
+                    // Manage video deletion
+                    deleteMedia(
+                        mediaRemovalLink,
+                        'video',
+                        singleSliderElement,
+                        0,
+                        removeSlide,
+                        [mediaRemovalLink]
+                    );
+                });
+            }
         }
 
         // ------------------------------------------------------------------------------------------------------------
 
         // Convert NodeLists to arrays
         const youtubeIframes = Array.from(singleSliderElement.querySelectorAll('.st-card-iframe.st-yt-iframe')),
-            vimeoIframes = Array.from(singleSliderElement.querySelectorAll('.st-card-iframe.st-vm-iframe')),
-            dailymotionIframes = Array.from(singleSliderElement.querySelectorAll('.st-card-iframe.st-dm-iframe'));
+              vimeoIframes = Array.from(singleSliderElement.querySelectorAll('.st-card-iframe.st-vm-iframe')),
+              dailymotionIframes = Array.from(singleSliderElement.querySelectorAll('.st-card-iframe.st-dm-iframe'));
         // Arrays to store multiple players
         let youtubePlayers = [], vimeoPlayers = [], dailymotionPlayers = [];
         // Objects to store current players which are playing a video or not
@@ -588,6 +724,9 @@ export default () => {
         // ------------------------------------------------------------------------------------------------------------
 
         // Manage trick deletion
-        deleteTrick();
+        const trickRemovalLink = document.getElementById('st-delete-trick');
+        if (trickRemovalLink) {
+            deleteTrick(trickRemovalLink);
+        }
     }
 };

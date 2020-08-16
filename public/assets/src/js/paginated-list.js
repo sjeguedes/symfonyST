@@ -5,18 +5,22 @@ export default () => {
     const element = document.getElementById('st-paginated-trick-list');
     if (element) {
         // No trick was found! So this will stop all the script.
-        if (0 === element.querySelectorAll('.uk-card').length) {
+        const nodes = element.querySelectorAll('.uk-card');
+        if (0 === nodes.length) {
             return;
         }
-        const nodes = element.querySelectorAll('.uk-card');
-        // Trick list image loader behavior when page is loaded.
+        // Manage list actions
         nodes.forEach(card => {
+            // Trick list image loader behavior when page is loaded.
             imageListLoader(document.getElementById('st-card-image-' + card.parentElement.getAttribute('data-offset')));
+
+            // ------------------------------------------------------------------------------------------------------------
+
+            // Manage trick deletion
+            let trickRemovalLink = card.querySelector('.st-delete-trick');
+            if (trickRemovalLink) {
+                deleteTrick(card.querySelector('.st-delete-trick'));
+            }
         });
-
-        // ------------------------------------------------------------------------------------------------------------
-
-        // Manage trick deletion
-        deleteTrick();
     }
 };

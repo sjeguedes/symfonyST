@@ -239,10 +239,10 @@
                                                     {% include 'form/editable_image_to_crop.html.twig' with {
                                                             rootForm: createTrickForm,
                                                             mediaOwnerType: 'trick',
-                                                            deleteImageForm: deleteImageForm,
                                                             rank: loop.index,
                                                             editableImageToCropForm: formView,
-                                                            editableImageIndexName: imageIndex
+                                                            editableImageIndexName: imageIndex,
+                                                            imageChildrenLength: createTrickForm.images.children|length
                                                     } only %}
                                                 {% endfor %}
                                             {% endif %}
@@ -320,7 +320,8 @@
                                                         mediaOwnerType: 'trick',
                                                         rank: loop.index,
                                                         editableVideoInfosForm: formView,
-                                                        editableVideoIndexName: videoIndex
+                                                        editableVideoIndexName: videoIndex,
+                                                        videoChildrenLength: createTrickForm.videos.children|length
                                                     } only %}
                                                 {% endfor %}
                                             {% endif %}
@@ -408,9 +409,14 @@
                         {% endif %}
                         {# ------------------------------------------------------------------------- #}
                         {# Get image removal ajax form in modal #}
-                        {% include 'form/delete_image.html.twig' with {
-                            removalText: 'This action is required since your image is temporarily saved on server.',
-                            deleteImageForm: deleteImageForm
+                        {% include 'admin/removal/delete_media.html.twig' with {
+                            mediaType: 'image'
+                        } only %}
+                        {# ------------------------------------------------------------------------- #}
+                        {# CAUTION: unnecessary for trick creation at this time, since videos are not temporary saved! #}
+                        {# Get video removal ajax form in modal #}
+                        {% include 'admin/removal/delete_media.html.twig' with {
+                            mediaType: 'video'
                         } only %}
                     </div>
                 </div>

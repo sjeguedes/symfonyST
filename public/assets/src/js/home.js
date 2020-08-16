@@ -27,6 +27,14 @@ export default () => {
         // Trick list image loader behavior when page is loaded.
         nodes.forEach(card => {
             imageListLoader(document.getElementById('st-card-image-' + card.parentElement.getAttribute('data-offset')));
+
+            // ------------------------------------------------------------------------------------------------------------
+
+            // Manage trick deletion
+            let trickRemovalLink = card.querySelector('.st-delete-trick');
+            if (trickRemovalLink) {
+                deleteTrick(card.querySelector('.st-delete-trick'));
+            }
         });
         // Prevent AJAX request from being called if all cards are already loaded.
         if ((loadingMode === 'DESC' && lastOffset === 0) ||
@@ -185,7 +193,7 @@ export default () => {
                                     // ------------------------------------------------------------------------------------------------------------
 
                                     // Manage trick deletion also here to update removal links list after AJAX request success
-                                    deleteTrick();
+                                    deleteTrick(card.querySelector('.st-delete-trick'));
                                 }
                                 clearTimeout(to);
 
@@ -213,10 +221,5 @@ export default () => {
                 }
             });
         }
-
-        // ------------------------------------------------------------------------------------------------------------
-
-        // Manage trick deletion
-        deleteTrick();
     }
 };

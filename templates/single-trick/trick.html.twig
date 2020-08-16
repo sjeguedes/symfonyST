@@ -3,7 +3,8 @@
 {% block title %}SnowTricks - {{ trick.name }} Trick detail{% endblock %}
 
 {# Initialize needed variables #}
-{% set mainImage = asset(globalImageDirectory~'trick-default-image-880x495.png') %}
+{% set mainImage = asset(globalImageDirectory~'trick-default-image-1600x900.png') %}
+{% set mainImageUuid = null %}
 {% set isMainAvailable = 0 %}
 {% set mainImageDesc = 'No description is available.' %}
 {% set mediaToExpandDimensions = '' %}
@@ -13,8 +14,8 @@
     {# Media must be published to be shown. #}
     {% if media.isPublished == 1 %}
         {# Extract main image to show #}
-        {% if media.isMain == 1 and media.mediaType.type == mediaTypesValues['trickNormal'] %}
-            {% set mainImageUuid = media.uuid %}
+        {% if media.isMain == 1 and media.mediaType.type == mediaTypesValues['trickBig'] %}
+            {% set mainImageUuid = media.mediaSource.image.uuid %}
             {% set mainImage = asset(globalTrickUploadDirectory~media.mediasource.image.name~'.'~media.mediasource.image.format) %}
             {% set isMainAvailable = 1 %}
             {% set mainImageDesc = media.mediasource.image.description %}
@@ -25,52 +26,54 @@
 
 {% block header %}
     {% include 'all/image_header_loader.html.twig' with {'spinnerRatio': '2.5'} %}
-    <div class="uk-position-relative uk-background-cover uk-background-blend-darken uk-invisible st-background-image-header" data-src="{{ asset(globalImageDirectory~'snowboard-6.jpg') }}" style="background-position: 50% 50%; height: 600px" uk-img>
+    <div id="st-trick-main-image" class="uk-position-relative uk-background-cover uk-background-blend-darken uk-invisible st-background-image-header"
+         data-src="{{ mainImage }}" data-default-img="{{ asset(globalImageDirectory~'trick-default-image-1600x900.png') }}" style="background-position: 50% 50%; height: 600px" uk-img>
         <div id="st-trick-main-image-box" class="uk-padding">
-            <div class="uk-position-center uk-card uk-card-default uk-card-body uk-box-shadow-large uk-padding-remove st-overlay-main-image-header-container st-background-black st-border-white-small">
-                {% include 'all/image_header_loader.html.twig' with {'spinnerRatio': '2.5'} %}
-                <div class="uk-background-blend-darken st-background-image-header" data-src="{{ mainImage }}" style="background-position: 50% 50%; display: table-cell; width: 100%; height: 100%" uk-img>
-                    {# Trick main image update or delete actions #}
-                    {% if (isMainAvailable is defined) and (isMainAvailable == 1) and is_granted('AUTHOR_OR_ADMIN_CAN_UPDATE_OR_DELETE_TRICKS', trick) %}
-                        <div class="uk-position-top-right uk-text-right st-background-blue">
-                            <div class="uk-padding-small">
-                                {# TODO: need to review this link with media block smoothscroll on trick update form! #}
-                                <a href="{#{{ path('update_media', { 'encodedUuid': media.uuid|uuid_encode }) }}#}#" class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove" title="Update">
-                                    <span uk-icon="icon: pencil; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-update st-svg-icon-actions"></span>
-                                </a>
-                                {# TODO: need to review this link (use it in modal) by creating a confirmation modal! #}
-                                <a href="{#{{ path('delete_media', { 'encodedUuid': media.uuid|uuid_encode }) }}#}#" class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove" title="Delete">
-                                    <span uk-icon="icon: trash; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-delete st-svg-icon-actions"></span>
-                                </a>
-                            </div>
-                            {# Main image indicator #}
-                            <div id="st-main-image-header-indicator" class="uk-text-center uk-text-small uk-text-uppercase uk-text-bold st-background-yellow st-main-image-indicator">
-                                <span class="st-color-blue st-svg-icon-padding">Main image</span>
-                            </div>
+            <div class="uk-position-center" style="width: 100%; height: 100%">
+                {# Trick main image update or delete actions #}
+                {% if (isMainAvailable is defined) and (isMainAvailable == 1) and (mainImageUuid is not null) and is_granted('AUTHOR_OR_ADMIN_CAN_UPDATE_OR_DELETE_TRICKS', trick) %}
+                    <div id="st-single-trick-update-delete-main-image"
+                         class="uk-position-top-right uk-text-right uk-box-shadow-small uk-box-shadow-hover-medium st-background-blue st-border-white-small">
+                        <div class="uk-padding-small">
+                            {# TODO: need to review this link with media block smoothscroll on trick update form! #}
+                            <a href="{#{{ path('update_media', { 'encodedUuid': media.uuid|uuid_encode }) }}#}#" class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove" title="Update">
+                                <span uk-icon="icon: pencil; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-update st-svg-icon-actions"></span>
+                            </a>
+                            {# Delete main image from trick header #}
+                            <a id="st-delete-image"  href="#st-modal-delete-image"
+                               data-action="{{ path('delete_media', { 'mainRoleLabel': app.user.mainRoleLabel|lower, 'mediaType': 'image', 'encodedUuid': mainImageUuid|uuid_encode, 'csrfToken': csrf_token('delete_image') }) }}"
+                               class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove st-delete-image" title="Delete" uk-toggle>
+                                <span uk-icon="icon: trash; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-delete st-svg-icon-actions"></span>
+                            </a>
                         </div>
-                    {% endif %}
-                    {# Trick header texts #}
-                    <div class="uk-position-center uk-text-center">
-                        {# Trick name and group name #}
-                        <p class="st-color-white st-text-shadow-dark uk-text-large">
-                            {{ trick.name }}
-                        </p>
-                        <p class="uk-text-medium uk-visible@m st-color-white st-text-shadow-dark">
-                            Snowboard trick referenced in {{ trick.trickGroup.name }}
-                        </p>
-                        {# Unpublished trick indicator #}
-                        {% if trick.isPublished == 0 %}
-                        <p class="uk-padding-small uk-text-small uk-text-bold uk-text-uppercase st-background-red st-color-white">
-                            <span uk-icon="icon: warning; ratio: 1.5"></span> This trick is unpublished! <br class="uk-hidden@m">It is Waiting for moderation.
-                        </p>
-                        {% endif %}
-                        {# This can be a technical issue! Normally one image is saved as main! #}
-                        {% if isMainAvailable == 0 %}
-                        <p class="uk-padding-small uk-text-small uk-text-bold uk-text-uppercase st-background-red st-color-white">
-                            <span uk-icon="icon: warning; ratio: 1.5"></span> Main image for this trick is unavailable!
-                        </p>
-                        {% endif %}
+                        {# Main image indicator #}
+                        <div id="st-main-image-header-indicator" class="uk-text-center uk-text-small uk-text-uppercase uk-text-bold st-background-yellow st-main-image-indicator">
+                            <span class="st-color-blue st-svg-icon-padding">Main image</span>
+                        </div>
                     </div>
+                {% endif %}
+                {# Trick header texts #}
+                <div class="uk-position-center uk-text-center">
+                    {# Trick name and group name #}
+                    <p class="st-color-white st-text-shadow-dark uk-text-large">
+                        {{ trick.name }}
+                    </p>
+                    <p class="uk-text-medium uk-visible@m st-color-white st-text-shadow-dark">
+                        Snowboard trick referenced in {{ trick.trickGroup.name }}
+                    </p>
+                    {# Unpublished trick infos #}
+                    {% if trick.isPublished == 0 %}
+                    {# Unpublished trick indicator #}
+                    <p class="uk-padding-small uk-text-small uk-text-bold uk-text-uppercase st-background-red st-color-white">
+                        <span uk-icon="icon: warning; ratio: 1.5"></span> This trick is unpublished! <br class="uk-hidden@m">It is Waiting for moderation.
+                    </p>
+                    {% endif %}
+                    {# This can be a technical issue or a main image deletion! Normally one image is saved as main on creation! #}
+                    {% set hiddenCssClass = isMainAvailable == 0 and is_granted('AUTHOR_OR_ADMIN_CAN_UPDATE_OR_DELETE_TRICKS', trick) ? '' : 'uk-hidden ' %}
+                    <p id="st-main-image-unavailable-info"
+                       class="{{ hiddenCssClass }}uk-padding-small uk-text-small uk-text-bold uk-text-uppercase st-background-red st-color-white">
+                        <span uk-icon="icon: warning; ratio: 1.5"></span> Main image for this trick is unavailable!
+                    </p>
                 </div>
             </div>
         </div>
@@ -119,12 +122,11 @@
                 {% if itemCounter < 6 %}
                     {# Adjust media query label index not to be out of range #}
                     {% set mediaQueryIndex = itemCounter >= 4 ? 4 : itemCounter %}
-                    {#{% set sliderDynamicCenterClass = (itemCounter == 1) ? 'uk-flex-center'~mediaQueryLabels[0]~' ' : 'uk-flex-center'~mediaQueryLabels[mediaQueryIndex - 1]~' ' %}#}
                     {% set sliderDynamicCenterClass = 'uk-flex-center'~mediaQueryLabels[mediaQueryIndex - 1]~' ' %}
                 {# If slide length number is greater than 5, do nothing! #}
                 {% endif %}
                 {# ---------------------------------------------------------------------------- #}
-                <ul class="{{ sliderDynamicCenterClass }}uk-slider-items uk-child-width-1-1 uk-child-width-1-2@s uk-child-width-1-3@m uk-child-width-1-4@l uk-child-width-1-5@xl uk-grid uk-grid-small">
+                <ul id="st-single-trick-slider" class="{{ sliderDynamicCenterClass }}uk-slider-items uk-child-width-1-1 uk-child-width-1-2@s uk-child-width-1-3@m uk-child-width-1-4@l uk-child-width-1-5@xl uk-grid uk-grid-small">
                 {# ---------------------------------------------------------------------------- #}
                 {# Loop on trick medias to feed the slider #}
                 {% for media in trick.mediaOwner.medias %}
@@ -143,6 +145,7 @@
                             'trick': trick,
                             'mediaTypesValues': mediaTypesValues,
                             'mediaType': media.mediaType,
+                            'mediaUuid': media.mediaSource.image.uuid,
                             'mediaCreationDate': media.mediasource.image.creationDate,
                             'mediaDescription': media.mediasource.image.description,
                             'mediaRank': media.showListRank,
@@ -168,6 +171,7 @@
                             'mediaTypesValues': mediaTypesValues,
                             'mediaType': media.mediaType,
                             'mediaTypesValues': mediaTypesValues,
+                            'mediaUuid': media.mediaSource.video.uuid,
                             'mediaCreationDate': media.mediaSource.video.creationDate,
                             'mediaDescription': media.mediaSource.video.description,
                             'mediaRank': media.showListRank,
@@ -184,6 +188,19 @@
             </div>
             <a class="uk-position-center-left uk-slidenav-large" href="#" uk-slidenav-previous uk-slider-item="previous"></a>
             <a class="uk-position-center-right uk-slidenav-large" href="#" uk-slidenav-next uk-slider-item="next"></a>
+            <!-- Trick update medias deletion links -->
+            {% if is_granted('AUTHOR_OR_ADMIN_CAN_UPDATE_OR_DELETE_TRICKS', trick) %}
+                {# ------------------------------------------------------------------------- #}
+                {# Get image removal ajax form in modal #}
+                {% include 'admin/removal/delete_media.html.twig' with {
+                    mediaType: 'image'
+                } only %}
+                {# ------------------------------------------------------------------------- #}
+                {# Get video removal ajax form in modal #}
+                {% include 'admin/removal/delete_media.html.twig' with {
+                    mediaType: 'video'
+                } only %}
+            {% endif %}
             {% endif %}
         </div>
         <!-- End trick medias slider -->

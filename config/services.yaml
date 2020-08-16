@@ -52,13 +52,11 @@ services:
     App\Action\Admin\CreateTrickAction:
         tags: ['controller.service_arguments']
         arguments:
-            $formHandlers: ['@App\Service\Form\Handler\CreateTrickHandler', '@App\Service\Form\Handler\AjaxDeleteImageHandler']
+            $formHandler: '@App\Service\Form\Handler\CreateTrickHandler'
 
-    # add form handler when deleting a particular image
-    App\Action\Admin\AjaxDeleteImageAction:
+    # add media deletion without form and form handler
+    App\Action\Admin\AjaxDeleteMediaAction:
         tags: ['controller.service_arguments']
-        arguments:
-            $formHandler: '@App\Service\Form\Handler\AjaxDeleteImageHandler'
 
     # add trick deletion without form and form handler
     App\Action\Admin\AjaxDeleteTrickAction:
@@ -98,7 +96,7 @@ services:
     App\Action\Admin\UpdateTrickAction:
         tags: ['controller.service_arguments']
         arguments:
-            $formHandlers: ['@App\Service\Form\Handler\UpdateTrickHandler', '@App\Service\Form\Handler\AjaxDeleteImageHandler']
+            $formHandler: '@App\Service\Form\Handler\UpdateTrickHandler'
 
     # add custom unchanged (not updated) trick listener
     App\Service\Event\Listener\UnchangedTrickListener:
@@ -116,9 +114,6 @@ services:
 
     # add trick creation handler
     App\Service\Form\Handler\CreateTrickHandler:
-
-    # add image deletion handler
-    App\Service\Form\Handler\AjaxDeleteImageHandler:
 
     # add register handler
     App\Service\Form\Handler\RegisterHandler:

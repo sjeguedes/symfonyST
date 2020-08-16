@@ -4,7 +4,9 @@ import deleteTrick from './trick/removal/delete-trick';
 import htmlStringHelper from './all/encode-decode-string';
 import loadVideoIframePreview from './media/load-video-iframe';
 import removeImageBox from './media/removal/remove-image-box';
+import removeVideoBox from './media/removal/remove-video-box';
 import Sortable from 'sortablejs';
+import warnBeforeMediaRemoval from './media/removal/warn-before-media-removal';
 export default () => {
     // Resources:
     // substring(): https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/String/substring
@@ -101,7 +103,7 @@ export default () => {
                     // Crop data hidden input
                     cropJSONDataInputElement = imageBox.querySelector('.st-crop-data');
                     // Image box removal button
-                    removeImageButtonElement = imageBox.querySelector('.st-image-remove-button');
+                    removeImageButtonElement = imageBox.querySelector('.st-delete-image');
                     // Main image checkbox input
                     isMainCheckBoxElement = imageBox.querySelector('.st-is-main-image');
 
@@ -183,22 +185,28 @@ export default () => {
                         let removeImageButtonElement = event.currentTarget; // item
                         // Delete existing image on server with AJAX if necessary
                         // If deletion failed, image to crop box will not be removed.
-                        if (removeImageButtonElement.hasAttribute('data-uuid')) {
+                        if (removeImageButtonElement.hasAttribute('data-action')) {
+                            // Warn about not recommended actions
+                            let containerElement = document.getElementById('st-form');
+                            warnBeforeMediaRemoval(removeImageButtonElement, imageBox, containerElement, 'image');
                             // Prepare element to which window will scroll after deletion
                             // Here it is the same principle as in form.js!
-                            let referenceElementToScroll = document.getElementById('st-form');
+                            let referenceElementToScroll = containerElement;
                             referenceElementToScroll = referenceElementToScroll.parentElement.parentElement.parentElement;
                             // Image box element removal will be called internally if it is ok!
                             deleteMedia(
                                 removeImageButtonElement,
+                                'image',
                                 referenceElementToScroll,
-                                imageToCropBoxElements
+                                0,
+                                removeImageBox,
+                                [removeImageButtonElement, null]
                             );
                         // Remove image to crop box directly
                         } else {
                             // Remove corresponding "image to crop" box by using its wrapper which was created dynamically.
                             // Look at "addImageButton" click event listener!
-                            removeImageBox(removeImageButtonElement, imageToCropBoxElements);
+                            removeImageBox(removeImageButtonElement, null);
                         }
                         removeImageButtonElement.removeEventListener('click', clickRemoveImageButtonHandler);
                     };
@@ -271,7 +279,7 @@ export default () => {
             let usedIndexNames = [];
             let imageBoxLabel = null;
             let mustSetMainImage = false;
-            // Are there already existing image blocks to define last index
+            // Are there already existing image blocks to define last index?
             imageToCropBoxElements = document.querySelectorAll('.st-image-to-crop');
             if (imageToCropBoxElements.length >= 1) {
                 imageToCropBoxElements.forEach((imageBox, index) => {
@@ -313,6 +321,22 @@ export default () => {
             // Add new box to DOM
             //addImageButton.insertAdjacentElement('beforebegin', newImageBox);
             document.getElementById('st-images-collection-sortable-wrapper').insertAdjacentElement('beforeend', newImageBox);
+
+            // ------------------------------------------------------------------------------------------------------------
+
+            // Update sortable handles visibility
+            imageToCropBoxElements = document.querySelectorAll('.st-image-to-crop');
+            let imageElementsLength = imageToCropBoxElements.length;
+            if (imageElementsLength >= 1) {
+                imageToCropBoxElements.forEach((imageBox, index) => {
+                    // Activate or de-activate sortable handle action
+                    if (imageElementsLength > 1) {
+                        imageBox.querySelector('.uk-sortable-handle').classList.remove('uk-hidden');
+                    } else {
+                        imageBox.querySelector('.uk-sortable-handle').classList.add('uk-hidden');
+                    }
+                });
+            }
 
             // ------------------------------------------------------------------------------------------------------------
 
@@ -371,7 +395,7 @@ export default () => {
                     videoBoxLabel = videoBox.querySelector('.st-video-infos-label');
                     videoBoxIndexName = videoBoxLabel.getAttribute('data-video-index-name');
                     // Video box removal button
-                    removeVideoButtonElement = videoBox.querySelector('.st-video-remove-button');
+                    removeVideoButtonElement = videoBox.querySelector('.st-delete-video');
 
                     // ------------------------------------------------------------------------------------------------------------
 
@@ -380,28 +404,32 @@ export default () => {
                     const clickRemoveVideoButtonHandler = event => {
                         // Prevent link anchor to scroll up the window
                         event.preventDefault();
-                        let targetedElement = event.currentTarget; // item
-                        // Remove corresponding "video infos" box by using its wrapper which was created dynamically.
-                        // Look at "addVideoButton" click event listener!
-                        if (targetedElement.parentElement.parentElement.classList.contains('st-video-infos-wrapper')) {
-                            targetedElement.parentElement.parentElement.remove();
-                            // Remove directly "video infos" box (.st-video-infos) if no wrapper exists.
+                        // Get current image removal button which is clicked
+                        let removeVideoButtonElement = event.currentTarget; // item
+                        // Delete existing video on server with AJAX if necessary
+                        // If deletion failed, video infos box will not be removed.
+                        if (removeVideoButtonElement.hasAttribute('data-action')) {
+                            // Warn about not recommended actions
+                            let containerElement = document.getElementById('st-form');
+                            warnBeforeMediaRemoval(removeVideoButtonElement, videoBox, containerElement, 'video');
+                            // Prepare element to which window will scroll after deletion
+                            // Here it is the same principle as in form.js!
+                            let referenceElementToScroll = containerElement;
+                            referenceElementToScroll = referenceElementToScroll.parentElement.parentElement.parentElement;
+                            // Video box element removal will be called internally if it is ok!
+                            deleteMedia(
+                                removeVideoButtonElement,
+                                'video',
+                                referenceElementToScroll,
+                                0,
+                                removeVideoBox,
+                                [removeVideoButtonElement, null]
+                            );
+                            // Remove image to crop box directly
                         } else {
-                            targetedElement.parentElement.remove();
-                        }
-                        // Loop on existing "video infos" boxes to update video box index name
-                        videoInfosBoxElements = document.querySelectorAll('.st-video-infos');
-                        if (videoInfosBoxElements.length !== 0) {
-                            videoInfosBoxElements.forEach((videoBox, index) => {
-                                // Prepare rank to show in video box label
-                                let rank = index + 1;
-                                // Update only video box number in label as regards video box visual rank!
-                                let videoBoxLabel = videoBox.querySelector('.st-video-infos-label');
-                                // Update video box label text
-                                videoBoxLabel.textContent = videoBoxLabel.innerText.replace(new RegExp(/\d+$/, 'g'), rank.toString());
-                                // Update show list rank to avoid constraint violation issue on remove
-                                videoBox.querySelector('.st-show-list-rank').value = rank;
-                            });
+                            // Remove corresponding "video infos" box by using its wrapper which was created dynamically.
+                            // Look at "addVideoButton" click event listener!
+                            removeVideoBox(removeVideoButtonElement, null);
                         }
                         removeVideoButtonElement.removeEventListener('click', clickRemoveVideoButtonHandler);
                     };
@@ -444,7 +472,7 @@ export default () => {
             let lastVideoBoxFormIndexName = 0;
             let usedIndexNames = [];
             let videoBoxLabel = null;
-            // Are there already existing video blocks to define last index
+            // Are there already existing video blocks to define last index?
             videoInfosBoxElements = document.querySelectorAll('.st-video-infos');
             if (videoInfosBoxElements.length >= 1) {
                 videoInfosBoxElements.forEach((videoBox, index) => {
@@ -475,6 +503,32 @@ export default () => {
             newVideoBox.querySelector('.st-show-list-rank').value = rank;
             // Add new box to DOM
             document.getElementById('st-videos-collection-sortable-wrapper').insertAdjacentElement('beforeend', newVideoBox);
+
+            // ------------------------------------------------------------------------------------------------------------
+
+            // Update sortable handles visibility
+            videoInfosBoxElements = document.querySelectorAll('.st-video-infos');
+            let videoElementsLength = videoInfosBoxElements.length;
+            if (videoElementsLength !== 0) {
+                videoInfosBoxElements.forEach((videoBox, index) => {
+                    // Activate or de-activate sortable handle action
+                    if (videoElementsLength > 1) {
+                        videoBox.querySelector('.uk-sortable-handle').classList.remove('uk-hidden');
+                    } else {
+                        videoBox.querySelector('.uk-sortable-handle').classList.add('uk-hidden');
+                    }
+                });
+            }
+
+            // ------------------------------------------------------------------------------------------------------------
+
+            // Add media box sortable button element action
+            let mediaSortableButton = newVideoBox.querySelector('.uk-sortable-handle');
+            // Prevent window to scroll to top when sortable handler link is clicked (no id is defined on anchor!).
+            mediaSortableButton.addEventListener('click', event => {
+                event.preventDefault();
+            });
+
         });
 
         // ------------------------------------------------------------------------------------------------------------
@@ -526,12 +580,15 @@ export default () => {
 
         // Manage trick deletion
         const trickUpdateFormElement = document.getElementById('st-update-trick-form');
-        if (trickUpdateFormElement) {
+        const trickRemovalLink = document.getElementById('st-delete-trick');
+        if (trickUpdateFormElement !==null && trickRemovalLink !==null) {
             // Prepare element to which window will scroll after deletion
             // Here it is the same principle as in form.js!
             let referenceElementToScroll = document.getElementById('st-form');
             referenceElementToScroll = referenceElementToScroll.parentElement.parentElement.parentElement;
-            deleteTrick(referenceElementToScroll);
+            if (trickRemovalLink) {
+                deleteTrick(trickRemovalLink, referenceElementToScroll);
+            }
         }
     }
 };

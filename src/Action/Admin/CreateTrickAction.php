@@ -60,20 +60,20 @@ class CreateTrickAction
     private $mediaService;
 
     /**
-     * @var array|FormHandlerInterface[]
+     * @var FormHandlerInterface
      */
-    private $formHandlers;
+    private $formHandler;
 
     /**
      * CreateTrickAction constructor.
      *
-     * @param UserManager       $userService
-     * @param TrickManager      $trickService
-     * @param ImageManager      $imageService
-     * @param VideoManager      $videoService
-     * @param MediaManager      $mediaService
-     * @param RouterInterface   $router
-     * @param array             $formHandlers
+     * @param UserManager          $userService
+     * @param TrickManager         $trickService
+     * @param ImageManager         $imageService
+     * @param VideoManager         $videoService
+     * @param MediaManager         $mediaService
+     * @param RouterInterface      $router
+     * @param FormHandlerInterface $formHandler
      */
     public function __construct(
         UserManager  $userService,
@@ -81,7 +81,7 @@ class CreateTrickAction
         ImageManager $imageService,
         VideoManager $videoService,
         MediaManager $mediaService,
-        array $formHandlers,
+        FormHandlerInterface $formHandler,
         RouterInterface $router
     ) {
         $this->userService = $userService;
@@ -89,7 +89,7 @@ class CreateTrickAction
         $this->imageService = $imageService;
         $this->videoService = $videoService;
         $this->mediaService = $mediaService;
-        $this->formHandlers = $formHandlers;
+        $this->formHandler = $formHandler;
         $this->setRouter($router);
     }
 
@@ -116,17 +116,13 @@ class CreateTrickAction
         // Get authenticated user
         $authenticatedUser = $this->userService->getAuthenticatedMember();
         // Use form handler and user roles as form type options
-        $options = ['formHandler' => $this->formHandlers[0], 'userRoles' => $authenticatedUser->getRoles()];
+        $options = ['formHandler' => $this->formHandler, 'userRoles' => $authenticatedUser->getRoles()];
         // Set form without initial model data and set the request by binding it
-        $createTrickForm = $this->formHandlers[0]->initForm(null, null, $options)->bindRequest($request);
-        // Use router and user main role label as form type options
-        $options = ['router' => $this->router, 'userMainRoleLabel' => $authenticatedUser->getMainRoleLabel()];
-        // Init ajax delete image form (used to delete temporary saved images) to pass it to trick creation view
-        $deleteImageForm = $this->formHandlers[1]->initForm(null, null, $options)->getForm();
+        $createTrickForm = $this->formHandler->initForm(null, null, $options)->bindRequest($request);
         // Process only on submit
         if ($createTrickForm->isSubmitted()) {
             // Constraints and custom validation: call actions to perform if necessary on success
-            $isFormRequestValid = $this->formHandlers[0]->processFormRequest([
+            $isFormRequestValid = $this->formHandler->processFormRequest([
                 'trickService' => $this->trickService,
                 'imageService' => $this->imageService,
                 'videoService' => $this->videoService,
@@ -139,11 +135,8 @@ class CreateTrickAction
             }
         }
         $data = [
-            'trickCreationError' => $this->formHandlers[0]->getTrickCreationError() ?? null,
+            'trickCreationError' => $this->formHandler->getTrickCreationError() ?? null,
             'createTrickForm'    => $createTrickForm->createView(),
-            'deleteImageForm'    => $deleteImageForm->createView(), // Used to delete temporary images with direct upload
-            // No need to add a video deletion form since videos are not temporarily saved!
-            // Empty declared url is more explicit!
             'videoURLProxyPath'  => $this->trickService->generateURLFromRoute(
                 'load_trick_video_url_check', ['url' => ''],
                 UrlGeneratorInterface::ABSOLUTE_URL
@@ -179,7 +172,7 @@ class CreateTrickAction
     {
         // Get new trick, or null if an issue occurred!
         /** @var Trick $newTrick */
-        $newTrick = $this->formHandlers[0]->getNewTrick();
+        $newTrick = $this->formHandler->getNewTrick();
         // Failure (redirect to empty trick creation form page)
         if (\is_null($newTrick)) {
             $routeName = 'create_trick';

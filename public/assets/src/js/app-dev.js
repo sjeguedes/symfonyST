@@ -32,8 +32,8 @@ import updateProfile from './update-profile';
 // Trick creation and update page scripts
 import createOrUpdateTrick from './create-or-update-trick';
 
-// Init necessary scripts when DOM is ready
-window.addEventListener('DOMContentLoaded', function() {
+// Init necessary scripts when DOM is ready (avoid issue with unloaded script in browser)
+const setUp = () => {
     // Common elements
     imageHeaderLoader();
     flashMessage();
@@ -44,5 +44,8 @@ window.addEventListener('DOMContentLoaded', function() {
     single();
     updateProfile();
     createOrUpdateTrick();
-});
+};
+// Add our event listeners
+window.addEventListener('DOMContentLoaded', setUp, false);
+window.addEventListener('unload', setUp, false);
 

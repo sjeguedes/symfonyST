@@ -4,10 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Domain\Repository;
 
-use App\Domain\Entity\Image;
-use App\Domain\Entity\Media;
 use App\Domain\Entity\MediaOwner;
-use App\Domain\Entity\MediaSource;
 use App\Domain\Entity\MediaType;
 use App\Domain\Entity\Trick;
 use App\Domain\Entity\TrickGroup;
@@ -94,14 +91,12 @@ class TrickRepository extends ServiceEntityRepository
         // Count all tricks when current user is authenticated
         /** @var User|UserInterface $user */
         if ($this->currentUser) {
-            $user = $this->currentUser;
-            $roles = $user->getRoles();
-            switch ($roles) {
+            switch ($this->security->isGranted(User::ADMIN_ROLE)) {
                 // Current user is authenticated and is a simple member ("ROLE_ADMIN").
-                case  \in_array(User::ADMIN_ROLE, $user->getRoles()):
+                case true:
                     return $this->countAllForAuthenticatedAdmin($queryBuilder);
                 // Current user is authenticated and is a simple member ("ROLE_USER").
-                case !\in_array(User::ADMIN_ROLE, $user->getRoles()):
+                case false:
                     return $this->countAllForAuthenticatedMember($queryBuilder);
             }
         }
@@ -214,7 +209,8 @@ class TrickRepository extends ServiceEntityRepository
         int $init,
         int $start,
         int $end
-    ) : ?array {
+    ) : ?array
+    {
         // Get custom SQL query string to use it as native query with ResultSetMapping instance
         $customSQL = $this->getTrickListCustomSQL();
         // Get a native query thanks to a ResultSetMappingBuilder instance
@@ -226,7 +222,6 @@ class TrickRepository extends ServiceEntityRepository
             ->setParameter('userAuthenticationState', $currentUserAuthenticationStatus)
             ->setParameter('initRank', $init)
             ->setParameter('sortDirection', $order)
-            ->setParameter('mediaType', MediaType::TYPE_CHOICES['trickThumbnail'])
             ->setParameter('startRank', $start)
             ->setParameter('endRank', $end);
         // Set current user uuid parameter if he is authenticated!
@@ -433,11 +428,7 @@ class TrickRepository extends ServiceEntityRepository
                     SELECT t.uuid, t.name AS t_name, t.slug, t.is_published, t.creation_date,
                            u.uuid AS u_uuid,
                            tg.uuid AS tg_uuid, tg.name AS tg_name,
-                           mo.uuid AS mo_uuid,
-                           m.uuid AS m_uuid,
-                           mt.uuid AS mt_uuid, mt.type,
-                           ms.uuid AS ms_uuid,
-                           i.uuid AS i_uuid, i.name AS i_name, i.description, i.format
+                           mo.uuid AS mo_uuid
                     FROM
                     (
                         -- Init current user authentication state to adapt filters
@@ -446,28 +437,19 @@ class TrickRepository extends ServiceEntityRepository
                         SELECT @userAuthenticationState := :userAuthenticationState,
                                @curRank := :initRank, 
                                @sortDirection := :sortDirection
-                    ) AS s, 
+                    ) AS s,
                     tricks t
-                    INNER JOIN users u ON t.user_uuid = u.uuid
-                    INNER JOIN trick_groups tg ON t.trick_group_uuid = tg.uuid
-                    INNER JOIN media_owners mo ON mo.trick_uuid = t.uuid 
-                    INNER JOIN medias m ON m.media_owner_uuid = mo.uuid    
-                    INNER JOIN media_types mt ON m.media_type_uuid = mt.uuid
-                    INNER JOIN media_sources ms ON m.media_source_uuid = ms.uuid
-                    INNER JOIN images i ON ms.image_uuid = i.uuid
-                    -- Filter with media type
-                    WHERE mt.type = :mediaType
-                    -- Filter with image main status 
-                    -- IMPORTANT: avoid issue by selecting, for each trick, only 1 one thumb image which is the main one 
-                    AND m.is_main = 1
+                    LEFT JOIN users u ON t.user_uuid = u.uuid
+                    LEFT JOIN trick_groups tg ON t.trick_group_uuid = tg.uuid
+                    LEFT JOIN media_owners mo ON mo.trick_uuid = t.uuid
                     -- Filter with current user authentication state
-                    AND
+                      WHERE
                     CASE WHEN @userAuthenticationState = '" . User::UNAUTHENTICATED_STATE . "' -- ANONYMOUS
                          THEN t.is_published = 1
                          WHEN @userAuthenticationState = '" . User::DEFAULT_ROLE . "' -- SIMPLE MEMBER
                          THEN t.is_published = 1 OR (t.user_uuid = :userUuid AND t.is_published = 0) 
                          WHEN @userAuthenticationState = '" . User::ADMIN_ROLE . "' -- ADMINISTRATOR 
-                         THEN t.is_published = 1 OR t.is_published = 0 END   
+                         THEN t.is_published = 1 OR t.is_published = 0 END 
                     ORDER BY
                     CASE WHEN @sortDirection = 'DESC' THEN t.creation_date END DESC,
                     CASE WHEN @sortDirection = 'ASC' THEN t.creation_date END
@@ -500,20 +482,8 @@ class TrickRepository extends ServiceEntityRepository
         $resultSetMapping->addJoinedEntityResult(TrickGroup::class , 'tg', 't', 'trickGroup')
             ->addFieldResult('tg', 'tg_uuid', 'uuid')
             ->addFieldResult('tg', 'tg_name', 'name');
-       $resultSetMapping->addJoinedEntityResult(MediaOwner::class , 'mo', 't', 'mediaOwner')
+        $resultSetMapping->addJoinedEntityResult(MediaOwner::class , 'mo', 't', 'mediaOwner')
             ->addFieldResult('mo', 'mo_uuid', 'uuid');
-        $resultSetMapping->addJoinedEntityResult(Media::class , 'm', 'mo', 'medias')
-            ->addFieldResult('m', 'm_uuid', 'uuid');
-        $resultSetMapping->addJoinedEntityResult(MediaType::class , 'mt', 'm', 'mediaType')
-            ->addFieldResult('mt', 'mt_uuid', 'uuid')
-            ->addFieldResult('mt', 'mt_type', 'type');
-        $resultSetMapping->addJoinedEntityResult(MediaSource::class , 'ms', 'm', 'mediaSource')
-            ->addFieldResult('ms', 'ms_uuid', 'uuid');
-        $resultSetMapping->addJoinedEntityResult(Image::class , 'i', 'ms', 'image')
-            ->addFieldResult('i', 'i_uuid', 'uuid')
-            ->addFieldResult('i', 'i_name', 'name')
-            ->addFieldResult('i', 'description', 'description')
-            ->addFieldResult('i', 'format', 'format');
         $query = $this->_em->createNativeQuery($customSQL, $this->resultSetMapping);
         return $query;
     }

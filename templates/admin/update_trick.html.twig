@@ -239,10 +239,10 @@
                                                     {% include 'form/editable_image_to_crop.html.twig' with {
                                                         rootForm: updateTrickForm,
                                                         mediaOwnerType: 'trick',
-                                                        deleteImageForm: deleteImageForm,
                                                         rank: loop.index,
                                                         editableImageToCropForm: formView,
-                                                        editableImageIndexName: imageIndex
+                                                        editableImageIndexName: imageIndex,
+                                                        imageChildrenLength: updateTrickForm.images.children|length
                                                     } only %}
                                                 {% endfor %}
                                             {% endif %}
@@ -320,7 +320,8 @@
                                                         mediaOwnerType: 'trick',
                                                         rank: loop.index,
                                                         editableVideoInfosForm: formView,
-                                                        editableVideoIndexName: videoIndex
+                                                        editableVideoIndexName: videoIndex,
+                                                        videoChildrenLength: updateTrickForm.videos.children|length
                                                     } only %}
                                                 {% endfor %}
                                             {% endif %}
@@ -408,12 +409,27 @@
                     <a id="st-delete-trick" data-action="{{ path('delete_trick', { 'mainRoleLabel': app.user.mainRoleLabel|lower, 'encodedUuid': trick.uuid|uuid_encode, 'csrfToken': csrf_token('delete_trick') }) }}"
                        class="uk-display-inline-block uk-button uk-button-secondary uk-border-rounded uk-box-shadow-hover-medium uk-margin-medium-top st-svg-icon-delete st-delete-trick"
                        href="#st-modal-delete-trick" title="Delete this trick" uk-toggle>
-                        Delete this trick&nbsp;&nbsp;<span uk-icon="icon: trash; ratio: 1"></span>
+                        Delete this trick <span uk-icon="icon: trash; ratio: 1"></span>
                     </a>
                     <hr>
+                    {# View trick single page #}
+                    <a id="st-view-trick" class="uk-display-inline-block uk-button uk-button-secondary uk-border-rounded uk-box-shadow-hover-medium"
+                       href="{{ path('show_single_trick', { 'slug': trick.slug, 'encodedUuid': trick.uuid|uuid_encode }) }}" title="View trick page">
+                        View trick&nbsp;page <span uk-icon="icon: arrow-right; ratio: 1.3"></span>
+                    </a>
                     {# ------------------------------------------------------------------------- #}
                     {# Get trick removal ajax action in modal #}
                     {% include 'admin/removal/delete_trick.html.twig' only %}
+                    {# ------------------------------------------------------------------------- #}
+                    {# Get image removal ajax form in modal #}
+                    {% include 'admin/removal/delete_media.html.twig' with {
+                        mediaType: 'image'
+                    } only %}
+                    {# ------------------------------------------------------------------------- #}
+                    {# Get video removal ajax form in modal #}
+                    {% include 'admin/removal/delete_media.html.twig' with {
+                        mediaType: 'video'
+                    } only %}
                 </div>
             </div>
         </div>

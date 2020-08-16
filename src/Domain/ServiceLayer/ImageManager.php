@@ -598,6 +598,34 @@ class ImageManager extends AbstractServiceLayer
     }
 
     /**
+     * Get all existing Image entities instances with the same name (identifier) based on Image entity instance.
+     *
+     * @param Image $imageEntityToFind
+     *
+     * @return array|Image[]|null
+     */
+    public function getImageWithIdenticalName(Image $imageEntityToFind) : ?array
+    {
+        $foundEntities = [];
+        // Get image to find name
+        $imageEntityToFindName = $imageEntityToFind->getName();
+        $imageEntityToFindNameWithoutFormat = preg_replace('/(\d+x\d+)$/', '', $imageEntityToFindName);
+        // Get all the images entities with the same name
+        foreach ($this->getRepository()->findAll() as $imageEntity) {
+            /** @var Image $imageEntity */
+            // Take into account the 3 image versions with the same identifier but depending on different formats
+            $imageEntityName = $imageEntity->getName();
+            // preg_match() can be used instead to avoid a second preg_replace()!
+            $imageEntityNameWithoutFormat = preg_replace('/(\d+x\d+)$/', '', $imageEntityName);
+            // Image must be removed and its physical file must be also deleted!
+            if ($imageEntityToFindNameWithoutFormat === $imageEntityNameWithoutFormat) {
+                $foundEntities[] = $imageEntity;
+            }
+        }
+        return !empty($foundEntities) ? $foundEntities : null;
+    }
+
+    /**
      * Get unique user avatar image entity.
      *
      * @param User|UserInterface $user

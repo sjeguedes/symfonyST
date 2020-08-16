@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace App\Utils\Templating;
 
 use App\Utils\Traits\UuidHelperTrait;
+use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
@@ -34,6 +35,11 @@ class UuidTwigExtension extends AbstractExtension
                 [$this, 'encodeUuid'],
                 ['is_safe' => ['html']]
             ),
+            new TwigFilter(
+                'uuid_from_string',
+                [$this, 'getUuidFromString'],
+                ['is_safe' => ['html']]
+            ),
         ];
     }
 
@@ -47,5 +53,17 @@ class UuidTwigExtension extends AbstractExtension
     public function encodeUuid(UuidInterface $uuid) : string
     {
         return $this->encode($uuid);
+    }
+
+    /**
+     * Get a UuidInterface implementation instance from a string representation.
+     *
+     * @param string $uuid
+     *
+     * @return UuidInterface
+     */
+    public function getUuidFromString(string $uuid) : UuidInterface
+    {
+        return Uuid::fromString($uuid);
     }
 }

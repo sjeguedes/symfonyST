@@ -1,4 +1,4 @@
-export default (removeImageButtonElement, imageToCropBoxElements) => {
+export default (removeImageButtonElement, imageToCropBoxElements = null) => {
     let targetedElement = removeImageButtonElement;
     // Remove corresponding "image to crop" box by using its wrapper which was created dynamically.
     // Look at "addImageButton" click event listener!
@@ -8,10 +8,18 @@ export default (removeImageButtonElement, imageToCropBoxElements) => {
     } else {
         targetedElement.parentElement.remove();
     }
+    // Are there existing image blocks?
     // Loop on existing "image to crop" boxes to update image box index name
-    imageToCropBoxElements = document.querySelectorAll('.st-image-to-crop');
-    if (imageToCropBoxElements.length !== 0) {
+    if (imageToCropBoxElements === null) imageToCropBoxElements = document.querySelectorAll('.st-image-to-crop');
+    let imageElementsLength = imageToCropBoxElements.length;
+    if (imageElementsLength >= 1) {
         imageToCropBoxElements.forEach((imageBox, index) => {
+            // Activate or de-activate sortable handle action
+            if (imageElementsLength > 1) {
+                imageBox.querySelector('.uk-sortable-handle').classList.remove('uk-hidden');
+            } else {
+                imageBox.querySelector('.uk-sortable-handle').classList.add('uk-hidden');
+            }
             // Prepare rank to show in image box label
             let rank = index + 1;
             // Update only image box number in label as regards image box visual rank!

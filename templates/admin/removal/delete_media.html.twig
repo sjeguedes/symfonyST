@@ -1,0 +1,51 @@
+{# Existing "mediaType" (image or video at this time) modal removal #}
+<div id="st-modal-delete-{{ mediaType }}" class="uk-flex-top" uk-modal="esc-close: false; bg-close: false"
+     data-error="Requested {{ mediaType}} was found\nbut its deletion failed!\nPlease try again later,\nor contact us if necessary."
+     data-success="Requested {{ mediaType }} was found\nand successfully deleted!\nPlease also note\nall its associated data do not exist anymore."
+     data-technical-error="Sorry, a technical error happened!\nPlease try again later,\nor contact us if necessary."
+     data-nomore-slide=""
+     {{  mediaType == 'image' ? 'data-no-main-image="IMPORTANT: deleting main image is not a recommended way since it visibly degrades trick page design!"' }}>
+    <div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical">
+        <button class="uk-modal-close-outside" type="button" uk-close></button>
+        <h3 class="uk-modal-title uk-text-lead uk-text-center uk-text-bold uk-text-uppercase st-color-black">Please confirm {{ mediaType }} removal</h3>
+        {# Infos for not recommended removals cases #}
+        <p id="st-no-more-info" class="uk-hidden uk-margin-top uk-margin-bottom">
+            <span id="st-media-removal-no-more-label-info" class="uk-hidden uk-label uk-display-inline uk-text-small st-color-yellow st-background-black">NOT RECOMMENDED!</span>
+            <span id="st-media-removal-last-media-info" class="uk-hidden uk-label uk-display-inline uk-padding-remove-left uk-padding-remove-right uk-text-lowercase uk-text-small st-color-black">
+                <span class="uk-text-capitalize">You</span> are about to delete the <strong>last {{ mediaType }}</strong>!
+                <span class="uk-text-capitalize">This</span> action is not pragmatic, since it highly degrades trick page user experience!
+                <br>
+            </span>
+            {% if mediaType == 'image' %}
+            <span id="st-media-main-image-info" class="uk-hidden uk-label uk-display-inline uk-padding-remove-left uk-padding-remove-right uk-text-lowercase uk-text-small st-color-black">
+                <span class="uk-text-capitalize">Deleting</span> defined <strong>main image</strong> is not judicious since it visibly degrades trick page design!
+            </span>
+            {% endif %}
+        </p>
+        <hr>
+        {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+        <div class="uk-flex uk-flex-center uk-margin-top">
+
+            <button id="st-cancel-delete-{{ mediaType }}-button" type="button" tabindex="-1"
+                    class="uk-button uk-button-secondary uk-border-rounded uk-box-shadow-hover-medium uk-margin-small-right uk-text-bold uk-modal-close st-cancel-delete-{{ mediaType }}-button st-svg-icon-button-default st-svg-icon-cancel" title="Cancel">
+                Cancel <span uk-icon="icon: close; ratio: 1"></span>
+            </button>
+            <button id="st-confirm-delete-{{ mediaType }}-button" type="button" tabindex="-1"
+                    class="uk-button uk-button-secondary uk-border-rounded uk-box-shadow-hover-medium uk-text-bold st-confirm-delete-{{ mediaType }}-button st-svg-icon-button-default st-svg-icon-delete" title="Delete">
+                <span class="st-delete-{{ mediaType }}-spinner st-color-yellow uk-hidden" uk-spinner="ratio: 0.8"></span>
+                Delete <span uk-icon="icon: trash; ratio: 1"></span>
+            </button>
+
+        </div>
+        {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
+        <hr>
+        {# This (image or video at this time) removal can be part of trick creation or update form page action, or used directly on trick single page! #}
+        <p class="uk-margin-small-top">
+            <span class="uk-label uk-display-inline uk-text-small st-color-orange st-background-black">CAUTION!</span>
+            <span class="uk-label uk-display-inline uk-padding-remove-left uk-padding-remove-right uk-text-lowercase uk-text-small st-color-black">
+                <span class="uk-text-capitalize">This</span> {{ mediaType }} removal will delete also all its associated data
+                and this action will take effect immediately.
+            </span>
+        </p>
+    </div>
+</div>

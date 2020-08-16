@@ -292,15 +292,15 @@ class ImageToCropType extends AbstractTrickCollectionEntryType
      * Please note image and crop JSON data are controlled only to upload a selected image.
      *
      * @param FormInterface $imageToCropForm
-     * @param array         $formData
+     * @param array|null    $formData
      * @param object        $rootFormHandler
      *
      * @return ImageToCropDTO|null
      */
-    private function prepareAndCheckDataModelForDirectUpload(FormInterface $imageToCropForm, array $formData, object $rootFormHandler) : ?ImageToCropDTO
+    private function prepareAndCheckDataModelForDirectUpload(FormInterface $imageToCropForm, ?array $formData, object $rootFormHandler) : ?ImageToCropDTO
     {
         // No image file was uploaded, then stop process!
-        if (\is_null($formData['image'])) {
+        if (\is_null($formData) || \is_null($formData['image'])) {
             return null;
         }
         // Avoid issue with DTOMapper: turn show list rank string into a real int, or if it the value is not an int,

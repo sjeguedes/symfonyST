@@ -61,7 +61,7 @@ $site-green-color2: rgba(26, 201, 29, 1); //#1AC91D
 $form-radio-checked-icon-color: rgba(0, 0, 0, 1);
 // --- Layout ---
 // Background
-$background-image-header-background: rgba(0, 0, 0, 0.2); // Header
+$background-image-header-background: rgba(0, 0, 0, 0.1); // Header
 // Navbar
 $navbar-nav-item-color: rgba(255, 255, 255, 1);
 $navbar-background: rgba(172, 15, 15, 1); //#AC0F0F
@@ -530,6 +530,11 @@ main {
     background-color: $site-blue-color;
 }
 
+// Background colors with transparency
+.st-background-image-header {
+    background-color: $background-image-header-background;
+}
+
 // Box shadow
 .st-box-shadow-full-small {
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
@@ -642,9 +647,7 @@ main {
 // Header
 header.st-header {
     border-bottom: 4px solid $site-yellow-color;
-    .st-background-image-header {
-        background-color: $background-image-header-background;
-    }
+    @extend .st-background-image-header;
     .st-header-spinner {
         display: block;
         width: 80%;

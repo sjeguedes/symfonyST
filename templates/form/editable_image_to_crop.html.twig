@@ -14,10 +14,19 @@
         {# Synchronize also "allow_delete" option #}
         {% set allowDeleteConfig = rootForm.images.vars.allow_delete %}
         {% if isImageAlreadyAEntity and allowDeleteConfig == 0 %}
-            {% set removeImageLink = 'id="st-image-remove-button-'~imageIndex~'" href="#st-modal-delete-image"' %}
+           {# {% set removeImageLink = 'id="st-image-remove-button-'~imageIndex~'" href="#st-modal-delete-image"' %}#}
+            {% set removeImageLink = 'id="st-delete-image-'~imageIndex~'" href="#st-modal-delete-image"' %}
             {% set actionTitle = 'Delete' %}
             {% set removalIcon = 'trash' %}
-            {% set imageDataAttributes = 'data-uuid="'~imageToCropForm.vars.bigImageUuid~'" data-name="'~imageToCropForm.savedImageName.vars.value~'" data-type="'~imageOwnerType~'"' %}
+            {% set imageDataAttributes = 'data-action="'~path(
+                'delete_media',
+                {
+                    'mainRoleLabel': app.user.mainRoleLabel|lower,
+                    'mediaType': 'image',
+                    'encodedUuid': imageToCropForm.vars.bigImageUuid|uuid_from_string|uuid_encode,
+                    'csrfToken': csrf_token('delete_image')
+                })~'"'
+            %}
         {% else %}
             {% set removeImageLink = 'href="#"' %}
             {% set actionTitle = isImageAlreadyAEntity ? 'Delete' : 'Cancel' %}
@@ -26,13 +35,14 @@
         {% endif %}
         {# These vars are checked to be safe with condition above! #}
         <a {{ removeImageLink|raw }} title="{{ actionTitle }}" {{ imageDataAttributes|raw }}
-           class="uk-position-top-right uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-margin-small-top uk-margin-small-right st-image-remove-button" uk-toggle>
+           class="uk-position-top-right uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-margin-small-top uk-margin-small-right st-delete-image" uk-toggle>
             <span uk-icon="icon: {{ removalIcon }}; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-delete st-svg-icon-actions"></span>
         </a>
         {# ----------------------------------------------------------------------------------------------------------------------------------------------------------------#}
         {# Image block sortable #}
+        {% set hiddenClass = imageChildrenLength > 1 ? '' : 'uk-hidden ' %}
         <a href="#" title="Sort vertically"
-           class="uk-position-bottom-right uk-sortable-handle uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-margin-small-bottom uk-margin-small-right">
+           class="{{ hiddenClass }}uk-position-bottom-right uk-sortable-handle uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-margin-small-bottom uk-margin-small-right">
             <span uk-icon="icon: list; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-actions"></span>
         </a>
         {# form label for imageToCrop form entry type #}

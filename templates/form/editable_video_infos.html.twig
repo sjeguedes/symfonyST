@@ -20,10 +20,18 @@
             {# Synchronize also "allow_delete" option #}
             {% set allowDeleteConfig = rootForm.videos.vars.allow_delete %}
             {% if isVideoAlreadyAEntity and allowDeleteConfig == 0 %}
-                {% set removeVideoLink = 'id="st-video-remove-button-'~videoIndex~'" href="#st-modal-delete-video"' %}
+                {% set removeVideoLink = 'id="st-delete-video-'~videoIndex~'" href="#st-modal-delete-video"' %}
                 {% set actionTitle = isVideoAlreadyAEntity ? 'Delete' : 'Cancel' %}
                 {% set removalIcon = 'trash' %}
-                {% set videoDataAttributes = 'data-uuid="'~videoInfosForm.vars.videoUuid~'" data-name="'~videoInfosForm.savedVideoName.vars.value~'" data-type="'~videoOwnerType~'"' %}
+                {% set videoDataAttributes = 'data-action="'~path(
+                    'delete_media',
+                    {
+                        'mainRoleLabel': app.user.mainRoleLabel|lower,
+                        'mediaType': 'video',
+                        'encodedUuid': videoInfosForm.vars.videoUuid|uuid_from_string|uuid_encode,
+                        'csrfToken': csrf_token('delete_video')
+                    })~'"'
+                %}
             {% else %}
                 {% set removeVideoLink = 'href="#"' %}
                 {% set actionTitle = isVideoAlreadyAEntity ? 'Delete' : 'Cancel' %}
@@ -31,15 +39,15 @@
                 {% set videoDataAttributes = '' %}
             {% endif %}
             {# These vars are checked to be safe with condition above! #}
-            {# TODO: this link is deactivated: need to complete video deletion process to make this link functional! #}
             <a {{ removeVideoLink|raw }} title="{{ actionTitle }}" {{ videoDataAttributes|raw }}
-                                         class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove st-video-remove-button" uk-toggle>
+                                         class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove st-delete-video" uk-toggle>
                 <span uk-icon="icon: {{ removalIcon }}; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-delete st-svg-icon-actions"></span>
             </a>
         </div>
         {# ----------------------------------------------------------------------------------------------------------------------------------------------------------------#}
         {# Video block sortable #}
-        <a href="#" class="uk-position-bottom-right uk-sortable-handle uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-margin-small-bottom uk-margin-small-right" title="Sort vertically">
+        {% set hiddenClass = videoChildrenLength > 1 ? '' : 'uk-hidden ' %}
+        <a href="#" class="{{ hiddenClass }}uk-position-bottom-right uk-sortable-handle uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-margin-small-bottom uk-margin-small-right" title="Sort vertically">
             <span uk-icon="icon: list; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-actions"></span>
         </a>
         {# form label for videoInfos form entry type #}

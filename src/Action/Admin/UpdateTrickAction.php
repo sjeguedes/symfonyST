@@ -68,21 +68,21 @@ class UpdateTrickAction
     private $flashBag;
 
     /**
-     * @var array|FormHandlerInterface[]
+     * @var FormHandlerInterface
      */
-    private $formHandlers;
+    private $formHandler;
 
     /**
      * UpdateTrickAction constructor.
      *
-     * @param UserManager       $userService,
-     * @param TrickManager      $trickService
-     * @param ImageManager      $imageService
-     * @param VideoManager      $videoService
-     * @param MediaManager      $mediaService
-     * @param FlashBagInterface $flashBag
-     * @param RouterInterface   $router
-     * @param array             $formHandlers
+     * @param UserManager          $userService,
+     * @param TrickManager         $trickService
+     * @param ImageManager         $imageService
+     * @param VideoManager         $videoService
+     * @param MediaManager         $mediaService
+     * @param FlashBagInterface    $flashBag
+     * @param RouterInterface      $router
+     * @param FormHandlerInterface $formHandler
      */
     public function __construct(
         UserManager  $userService,
@@ -91,7 +91,7 @@ class UpdateTrickAction
         VideoManager $videoService,
         MediaManager $mediaService,
         FlashBagInterface $flashBag,
-        array $formHandlers,
+        FormHandlerInterface $formHandler,
         RouterInterface $router
     ) {
         $this->userService = $userService;
@@ -100,7 +100,7 @@ class UpdateTrickAction
         $this->videoService = $videoService;
         $this->mediaService = $mediaService;
         $this->flashBag = $flashBag;
-        $this->formHandlers = $formHandlers;
+        $this->formHandler = $formHandler;
         $this->setRouter($router);
     }
 
@@ -128,24 +128,19 @@ class UpdateTrickAction
         // Get authenticated user
         $authenticatedUser = $this->userService->getAuthenticatedMember();
         // Use form handler, trick to update and user roles as form type options
-        $options = ['formHandler' => $this->formHandlers[0], 'trickToUpdate' => $trickToUpdate, 'userRoles' => $authenticatedUser->getRoles()];
+        $options = ['formHandler' => $this->formHandler, 'trickToUpdate' => $trickToUpdate, 'userRoles' => $authenticatedUser->getRoles()];
         // Set form with initial model data and set the request by binding it
-        $updateTrickForm = $this->formHandlers[0]->initForm(['trickToUpdate' => $trickToUpdate], null, $options)->bindRequest($request);
-        // Use router and user main role label as form type options
-        $options = ['router' => $this->router, 'userMainRoleLabel' => $authenticatedUser->getMainRoleLabel()];
-        // Init ajax delete image form (used to delete temporary saved images) to pass it to trick update view
-        $deleteImageForm = $this->formHandlers[1]->initForm(null, null, $options)->getForm();
+        $updateTrickForm = $this->formHandler->initForm(['trickToUpdate' => $trickToUpdate], null, $options)->bindRequest($request);
         // Process only on submit
         if ($updateTrickForm->isSubmitted()) {
             // Constraints and custom validation: call actions to perform if necessary on success
-            $isFormRequestValid = $this->formHandlers[0]->processFormRequest([
+            $isFormRequestValid = $this->formHandler->processFormRequest([
                 'trickService'  => $this->trickService,
                 'trickToUpdate' => $trickToUpdate,
                 'imageService'  => $this->imageService,
                 'videoService'  => $this->videoService,
                 'mediaService'  => $this->mediaService
             ]);
-
             if ($isFormRequestValid) {
                 // Get redirection routing parameters which depend on trick update result
                 $routingParameters = $this->manageTrickUpdateResultRouting($authenticatedUser, $trickToUpdate);
@@ -153,12 +148,9 @@ class UpdateTrickAction
             }
         }
         $data = [
-            'trickModerationState'  => $trickToUpdate->getIsPublished(),
             'trickToUpdate'         => $trickToUpdate,
-            'trickUpdateError'      => $this->formHandlers[0]->getTrickUpdateError() ?? null,
+            'trickUpdateError'      => $this->formHandler->getTrickUpdateError() ?? null,
             'updateTrickForm'       => $updateTrickForm->createView(),
-            'deleteImageForm'       => $deleteImageForm->createView(), // Used to delete images with direct upload
-            // TODO: need to add 'deleteVideoForm' here!
             'videoURLProxyPath'     => $this->trickService->generateURLFromRoute(
                 'load_trick_video_url_check', ['url' => ''],
                 UrlGeneratorInterface::ABSOLUTE_URL
@@ -205,7 +197,7 @@ class UpdateTrickAction
     {
         // Get updated trick, or null if an issue occurred!
         /** @var Trick $updatedTrick */
-        $updatedTrick = $this->formHandlers[0]->getUpdatedTrick();
+        $updatedTrick = $this->formHandler->getUpdatedTrick();
         // Failure (redirect to reinitialized trick update form page)
         if (\is_null($updatedTrick)) {
             $routeName = 'update_trick';

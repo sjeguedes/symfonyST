@@ -102,7 +102,7 @@
             {% for trick in tricks %}
             <div class="st-card-container" data-offset="{{ trick.rank }}"{% if (loop.index == 1) and (listError is defined) and (listError is not null) %} data-error="{{ listError }}"{% endif %}>
                 <div class="uk-card uk-card-primary uk-box-shadow-medium uk-box-shadow-hover-large{{ ajaxMode is defined ? ' uk-animation-slide-left-small' }} st-border-white-small st-translate-effect">
-                    <div class="uk-card-badge uk-label uk-flex uk-flex-center uk-flex-middle uk-text-center">
+                    <div class="uk-card-badge uk-label uk-flex uk-flex-center uk-flex-middle uk-box-shadow-large uk-text-center">
                         <span>
                             <span class="st-color-red">In</span> {{ trick.trickGroup.name }}<br>
                             <span class="st-color-red">Trick #</span> {{ 'DESC' == trickLoadingMode ? trickCount - (- trick.rank - 1 + trickCount) : trickCount + (trick.rank + 1 - trickCount) }} <span class="st-color-red">Added on</span> {{ trick.creationDate|date('d/m/Y') }}
@@ -110,9 +110,20 @@
                     </div>
                     <div class="uk-card-media-top uk-position-relative st-background-black">
                         {% include 'all/trick_media_loader.html.twig' with {'spinnerRatio': '1.5'} %}
+                        {# Get trick main image thumbnail or default thumbnail #}
+                        {% set trickImage = asset(globalImageDirectory~'trick-default-image-400x225.png') %}
+                        {% set trickImageDesc = 'No description is available. A main image must be defined!' %}
+                        {% for media in trick.mediaOwner.medias if not null %}
+                            {% if media.mediaType.type == 't_thumbnail' and media.isMain == 1 %}
+                                {% set trickImage = asset(globalTrickUploadDirectory~media.mediaSource.image.name~'.'~media.mediaSource.image.format) %}
+                                {% set trickImageDesc = media.mediaSource.image.description|e('html_attr') %}
+                            {% endif %}
+                        {% endfor %}
                         <img id="st-card-image-{{ trick.rank }}" class="uk-invisible" data-default-image="{{ asset(globalImageDirectory~'trick-default-image-400x225.png') }}"
-                             src="{{ asset(globalTrickUploadDirectory~trick.mediaOwner.medias[0].mediaSource.image.name~'.'~trick.mediaOwner.medias[0].mediaSource.image.format) }}"
-                             alt="{{ trick.mediaOwner.medias[0].mediaSource.image.description|e('html_attr') }}">
+                             src="{{trickImage }}"
+                             alt="{{ trickImageDesc }}">
+                        {# Add darken mode on thumbnail image #}
+                        <div class="uk-position-cover uk-background-cover st-background-image-header"></div>
                         {# Unpublished trick indicator can be viewed only with permission #}
                         {% if trick.isPublished == 0 and is_granted('AUTHOR_OR_ADMIN_CAN_VIEW_UNPUBLISHED_TRICKS', trick) %}
                         <div id="st-unpublished-indicator-{{ trick.rank }}" class="uk-position-bottom uk-flex uk-flex-center uk-text-center st-background-red st-unpublished-indicator">
