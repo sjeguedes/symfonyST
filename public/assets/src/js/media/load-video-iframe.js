@@ -9,8 +9,8 @@ export default (videoBox) => {
 
     // Get "div" id video index
     let videoBoxIndex = videoBox.querySelector('.st-video-url')
-                                .getAttribute('id')
-                                .match(/^st-video-url-(\d+)$/)[1];
+        .getAttribute('id')
+        .match(/^st-video-url-(\d+)$/)[1];
     let videoURLTextAreaElement = videoBox.querySelector('.st-video-url .uk-textarea');
     // Get existing saved video URL
     let savedVideoURL = videoURLTextAreaElement.getAttribute('data-saved-url');
@@ -74,7 +74,7 @@ export default (videoBox) => {
                         videoBox.url = checkedVideoURL;
                         // Return if proxy URL is not found depending on data attribute
                         let proxyURL = document.getElementById('st-videos-collection')
-                                               .getAttribute('data-video-proxy');
+                            .getAttribute('data-video-proxy');
                         if (proxyURL === null) return;
                         // Check content availability and clear timeout
                         checkLoadingCORSRequest(
@@ -189,7 +189,7 @@ export default (videoBox) => {
                 matches = videoURL.match(/\/video\/(\d+)$/);
                 videoId = matches[1];
                 break;
-            case /vimeo.com\/(\d+)$/.test(videoURL):
+            case /vimeo\.com\/(\d+)$/.test(videoURL):
                 matches = videoURL.match(/vimeo.com\/(\d+)$/);
                 videoId = matches[1];
                 videoURL = `https://player.vimeo.com/video/${videoId}`;
@@ -201,7 +201,7 @@ export default (videoBox) => {
                 videoURL = null;
         }
         // Assign video provider page link value to videoBox object
-        if (videoURL !== null) videoBox.browserLink = `https://www.vimeo.com/video/${videoId}`;
+        if (videoURL !== null) videoBox.browserLink = `https://www.vimeo.com/${videoId}`;
         return videoURL;
     };
 
@@ -212,12 +212,12 @@ export default (videoBox) => {
         let matches;
         let videoId;
         switch (true) {
-            case /\/video\/([a-zA-Z0-9]+)$/.test(videoURL):
+            case /\/embed\/video\/([a-zA-Z0-9]+)$/.test(videoURL):
                 matches = videoURL.match(/\/video\/([a-zA-Z0-9]+)$/);
                 videoId = matches[1];
                 break;
-            case /dailymotion.com\/([a-zA-Z0-9]+)$/.test(videoURL):
-                matches = videoURL.match(/dailymotion.com\/([a-zA-Z0-9]+)$/);
+            case /dailymotion\.com\/video\/([a-zA-Z0-9]+)$/.test(videoURL):
+                matches = videoURL.match(/dailymotion.com\/video\/([a-zA-Z0-9]+)$/);
                 videoId = matches[1];
                 videoURL = `https://www.dailymotion.com/embed/video/${videoId}`;
                 // Show replaced URL info notification message
@@ -306,3 +306,4 @@ export default (videoBox) => {
         }
     };
 };
+
