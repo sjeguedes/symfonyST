@@ -10,7 +10,6 @@ use App\Domain\ServiceLayer\MediaTypeManager;
 use App\Domain\ServiceLayer\VideoManager;
 use App\Service\Form\Collection\DTOCollection;
 use App\Service\Medias\Upload\ImageUploader;
-use Ramsey\Uuid\Uuid;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\FormBuilderInterface;

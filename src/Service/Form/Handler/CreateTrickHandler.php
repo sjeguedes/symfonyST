@@ -96,7 +96,21 @@ final class CreateTrickHandler extends AbstractTrickFormHandler
         $this->checkNecessaryData($actionData);
         /** @var TrickManager $trickService */
         $trickService = $actionData['trickService'];
-        // DTO is in valid state but filled in trick name (title) already exist in database: it must be unique!
+        // DTO is in valid state but:
+        // Each video URL must be unique (This avoids issue with Javascript!).
+        if (!$isEachVideoURLUnique = $this->checkUniqueVideoUrl($this->form->getData()->getVideos())) {
+            $uniqueVideoURLError = nl2br('Please check all videos URL!' . "\n" . 'Each one must be unique!');
+            $this->customError = $uniqueVideoURLError;
+            $this->flashBag->add(
+                'danger',
+                nl2br('Trick creation failed!' . "\n" .
+                    'Try to request again by checking the form fields.'
+                )
+            );
+            return false;
+        }
+        // DTO is in valid state but:
+        // Filled in trick name (title) already exist in database: it must be unique!
         $submittedName = $this->form->getData()->getName(); // or $this->form->get('name')->getData()
         // Is submitted trick name (or similar name) not used by existing ones?
         if ($isSubmittedNameNotUnique = $trickService->checkSameOrSimilarTrickName($submittedName)) {

@@ -19,6 +19,7 @@ use App\Domain\ServiceLayer\TrickManager;
 use App\Domain\ServiceLayer\VideoManager;
 use App\Service\Form\Collection\DTOCollection;
 use App\Service\Form\Type\Admin\UpdateTrickType;
+use App\Service\Form\Validator\VideoInfosConstraintValidator;
 use App\Service\Medias\Upload\ImageUploader;
 use App\Utils\Traits\CSRFTokenHelperTrait;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -31,6 +32,7 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Class UpdateTrickHandler.
@@ -74,6 +76,14 @@ final class UpdateTrickHandler extends AbstractTrickFormHandler implements InitM
      * @var Trick|null
      */
     private $updatedTrick;
+    /**
+     * @var VideoInfosConstraintValidator
+     */
+    private $videoValidator;
+    /**
+     * @var ValidatorInterface
+     */
+    private $validator;
 
     /**
      * RegisterHandler constructor.
@@ -91,7 +101,9 @@ final class UpdateTrickHandler extends AbstractTrickFormHandler implements InitM
         FormFactoryInterface $formFactory,
         RequestStack $requestStack,
         LoggerInterface $logger,
-        Security $security
+        Security $security,
+        ValidatorInterface $validator,
+        VideoInfosConstraintValidator $videoValidator
     ) {
         parent::__construct(
             $flashBag,
@@ -110,6 +122,8 @@ final class UpdateTrickHandler extends AbstractTrickFormHandler implements InitM
         $this->initialTrickMediaList = null;
         $this->initialTrickName = null;
         $this->updatedTrick = null;
+        $this->videoValidator = $videoValidator;
+        $this->validator = $validator;
     }
 
     /**
@@ -136,7 +150,21 @@ final class UpdateTrickHandler extends AbstractTrickFormHandler implements InitM
         $trickService = $actionData['trickService'];
         /** @var Trick $trickToUpdate */
         $trickToUpdate = $actionData['trickToUpdate'];
-        // DTO is in valid state but filled in trick name (title) already exist in database for another trick!
+        // DTO is in valid state but:
+        // Each video URL must be unique (This avoids issue with Javascript!).
+        if (!$isEachVideoURLUnique = $this->checkUniqueVideoUrl($this->form->getData()->getVideos())) {
+            $uniqueVideoURLError = nl2br('Please check all videos URL!' . "\n" . 'Each one must be unique!');
+            $this->customError = $uniqueVideoURLError;
+            $this->flashBag->add(
+                'danger',
+                nl2br('Trick update failed!' . "\n" .
+                    'Try to request again by checking the form fields.'
+                )
+            );
+            return false;
+        }
+        // DTO is in valid state but:
+        // Filled in trick name (title) already exist in database for another trick!
         // It can obviously be the same or similar as previous trick name or must be unique.
         $submittedName = $this->form->getData()->getName(); // or $this->form->get('name')->getData()
         // First, check only current trick to update
@@ -359,6 +387,20 @@ final class UpdateTrickHandler extends AbstractTrickFormHandler implements InitM
     }
 
     /**
+     * Check if an image is temporary depending on its identifier name.
+     *
+     * @param string $savedImageName
+     *
+     * @return bool
+     */
+    private function checkTemporaryImageName(string $savedImageName) : bool
+    {
+        // Get default temporary name as pattern
+        $temporaryIdentifier = ImageManager::DEFAULT_IMAGE_IDENTIFIER_NAME;
+        return $isImageTemporary = (bool) preg_match('/' . $temporaryIdentifier . '/', $savedImageName);
+    }
+
+    /**
      * Get updated trick.
      *
      * @return Trick|null
@@ -376,20 +418,6 @@ final class UpdateTrickHandler extends AbstractTrickFormHandler implements InitM
     public function getTrickUpdateError() : ?string
     {
         return $this->customError;
-    }
-
-    /**
-     * Check if an image is temporary depending on its identifier name.
-     *
-     * @param string $savedImageName
-     *
-     * @return bool
-     */
-    private function checkTemporaryImageName(string $savedImageName) : bool
-    {
-        // Get default temporary name as pattern
-        $temporaryIdentifier = ImageManager::DEFAULT_IMAGE_IDENTIFIER_NAME;
-        return $isImageTemporary = (bool) preg_match('/' . $temporaryIdentifier . '/', $savedImageName);
     }
 
     /**

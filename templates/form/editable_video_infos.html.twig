@@ -79,7 +79,7 @@
                 {# Video preview: show iframe or image, text info and possibly a link to watch it #}
                 <div class="uk-flex uk-margin-small-right uk-margin-small-bottom">
                     {# Check if a valid video is set #}
-                    {% set isVideoNotEmptyAndValid = videoInfosForm.vars.videoUuid is defined or (videoInfosForm.savedVideoName.vars.value != '' and videoInfosForm.savedVideoName.vars.valid == 1) %}
+                    {% set isVideoNotEmptyAndValid = videoInfosForm.url.vars.valid == 1 %}
                     {# Image for video mini-iframe replacement #}
                     <div id="st-video-iframe-replacement-{{ videoIndex }}"
                          class="{{ isVideoNotEmptyAndValid == 1 ? 'uk-hidden ' : '' }}uk-box-shadow-small uk-border-rounded uk-padding-small st-background-white st-video-iframe-replacement">
@@ -95,13 +95,13 @@
                         {# video infos #}
                         <div id="st-video-success-infos-{{ videoIndex }}" class="uk-margin-small-left">
                             {# Link to watch video on provider website #}
-                            {% if videoInfosForm.savedVideoName.vars.value matches '/youtube/' %}
+                            {% if videoInfosForm.url.vars.valid == 1 and (videoInfosForm.url.vars.value matches '/youtube/') %}
                                 {% set linkClass = '' %}
                                 {% set link = preg_replace('#youtube\.com/embed/#', 'youtube.com/watch?v=', videoInfosForm.url.vars.value) %}
-                            {% elseif videoInfosForm.savedVideoName.vars.value matches '/vimeo/' %}
+                            {% elseif videoInfosForm.url.vars.valid == 1 and (videoInfosForm.url.vars.value matches '/vimeo/') %}
                                 {% set linkClass = '' %}
                                 {% set link = preg_replace('#player.vimeo\.com/video/#', 'vimeo.com/', videoInfosForm.url.vars.value) %}
-                            {% elseif videoInfosForm.savedVideoName.vars.value matches '/dailymotion/' %}
+                            {% elseif videoInfosForm.url.vars.valid == 1 and (videoInfosForm.url.vars.value matches '/dailymotion/') %}
                                 {% set linkClass = '' %}
                                 {% set link = preg_replace('#dailymotion\.com/embed/video/#', 'dailymotion.com/video/', videoInfosForm.url.vars.value) %}
                             {% else  %}

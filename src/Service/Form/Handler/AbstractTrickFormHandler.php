@@ -14,6 +14,7 @@ use App\Domain\Entity\Trick;
 use App\Domain\ServiceLayer\ImageManager;
 use App\Domain\ServiceLayer\MediaManager;
 use App\Domain\ServiceLayer\VideoManager;
+use App\Service\Form\Collection\DTOCollection;
 use App\Service\Medias\Upload\ImageUploader;
 use App\Utils\Traits\StringHelperTrait;
 use Psr\Log\LoggerAwareTrait;
@@ -252,6 +253,22 @@ class AbstractTrickFormHandler extends AbstractUploadFormHandler
                 )
             );
         }
+    }
+
+    /**
+     * Check if each video URL is unique for a particular trick to create or update.
+     *
+     * @param DTOCollection|VideoInfosDTO[] $videosCollection
+     *
+     * @return bool
+     */
+    protected function checkUniqueVideoUrl(DTOCollection $videosCollection) : bool
+    {
+        $urls = [];
+        foreach ($videosCollection as $videoInfos) {
+            $urls[] = $videoInfos->getUrl();
+        }
+        return \count(\array_unique($urls)) === $videosCollection->count();
     }
 
     /**

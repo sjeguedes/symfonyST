@@ -108,6 +108,30 @@ class AbstractFormHandler implements FormHandlerInterface
     }
 
     /**
+     * Check validity of all data and their types passed in form request process.
+     *
+     * Please note this method can be improved with use of OptionsResolver.
+     *
+     * @param array $data
+     *
+     * @return void
+     */
+    protected function checkNecessaryData(array $data) : void
+    {
+        $dataConfig = self::DATA_CONFIG_TO_CHECK;
+        array_filter($data, function ($value, $key) use ($dataConfig) {
+            // Check data type name
+            if (\is_object($value) && !isset($dataConfig[$key])) {
+                throw new \InvalidArgumentException('Data type name used in form request process is unknown!');
+            }
+            // Check data type
+            if (\is_object($value) && !$value instanceof $dataConfig[$key]) {
+                throw new \InvalidArgumentException('Data type used in form request process is not valid (does not match with its type)!');
+            }
+        }, ARRAY_FILTER_USE_BOTH);
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function initForm(array $data = null, string $formType = null, array $options = null) : FormHandlerInterface
@@ -143,30 +167,6 @@ class AbstractFormHandler implements FormHandlerInterface
             throw new \RuntimeException('The form must be initialized first with "initForm" method!');
         }
         return $this->form;
-    }
-
-    /**
-     * Check validity of all data and their types passed in form request process.
-     *
-     * Please note this method can be improved with use of OptionsResolver.
-     *
-     * @param array $data
-     *
-     * @return void
-     */
-    protected function checkNecessaryData(array $data) : void
-    {
-        $dataConfig = self::DATA_CONFIG_TO_CHECK;
-        array_filter($data, function ($value, $key) use ($dataConfig) {
-            // Check data type name
-            if (\is_object($value) && !isset($dataConfig[$key])) {
-                throw new \InvalidArgumentException('Data type name used in form request process is unknown!');
-            }
-            // Check data type
-            if (\is_object($value) && !$value instanceof $dataConfig[$key]) {
-                throw new \InvalidArgumentException('Data type used in form request process is not valid (does not match with its type)!');
-            }
-        }, ARRAY_FILTER_USE_BOTH);
     }
 
     /**
