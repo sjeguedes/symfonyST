@@ -5,8 +5,10 @@ import htmlStringHelper from './all/encode-decode-string';
 import loadVideoIframePreview from './media/load-video-iframe';
 import removeImageBox from './media/removal/remove-image-box';
 import removeVideoBox from './media/removal/remove-video-box';
+import smoothScroll from './all/smooth-vertical-scroll';
 import Sortable from 'sortablejs';
 import warnBeforeMediaRemoval from './media/removal/warn-before-media-removal';
+import coords from "./all/element-coords";
 export default () => {
     // Resources:
     // substring(): https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/String/substring
@@ -575,6 +577,23 @@ export default () => {
             // Update box label text
             collectionBoxLabel.textContent = collectionBoxLabel.innerText.replace(new RegExp(/\d+$/, 'g'), collectionBoxRank.toString());
         };
+
+        // ------------------------------------------------------------------------------------------------------------
+
+        // Manage image or video box URI anchor smooth scroll from trick single page
+        if (window.location.hash) {
+            let hashFromURI = window.location.hash;
+            let matches = hashFromURI.match(/^#(image|video)-(\w+)$/i);
+            if (matches !== null) {
+                let elementId = `st-${matches[1]}-box-${matches[2]}`;
+                let referenceElementToScroll = document.getElementById(elementId);
+                // "load" event handler to improve reload smooth scroll unnecessary process
+                const scrollToMediaBox = () => {
+                    smoothScroll(referenceElementToScroll, 0);
+                };
+                window.addEventListener('load', scrollToMediaBox, false);
+            }
+        }
 
         // ------------------------------------------------------------------------------------------------------------
 

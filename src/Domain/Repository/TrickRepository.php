@@ -325,12 +325,10 @@ class TrickRepository extends ServiceEntityRepository
             ->leftJoin('m.mediaSource', 'ms', 'WITH', 'm.mediaSource = ms.uuid')
             ->leftJoin('ms.image', 'i', 'WITH', 'ms.image = i.uuid')
             ->leftJoin('ms.video', 'v', 'WITH', 'ms.video = v.uuid')
-            // Get big image format only for main image
-            ->where('mt.type = ?4')
-            ->andWhere('m.isMain = ' . $queryBuilder->expr()->literal('1'))
-            // Get other desired types in retrieved trick medias
-            ->orWhere('mt.type = ?2')
+            // Get desired types in retrieved trick medias
+            ->where('mt.type = ?2')
             ->orWhere('mt.type = ?3')
+            ->orWhere('mt.type = ?4')
             ->orWhere('mt.type = ?5')
             ->orWhere('mt.type = ?6')
             ->orWhere('mt.type = ?7')

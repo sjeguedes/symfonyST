@@ -26,7 +26,7 @@
 
 {% block header %}
     {% include 'all/image_header_loader.html.twig' with {'spinnerRatio': '2.5'} %}
-    <div id="st-trick-main-image" class="uk-position-relative uk-background-cover uk-background-blend-darken uk-invisible st-background-image-header"
+    <div id="st-trick-main-image" class="uk-position-relative uk-flex uk-flex-center uk-flex-middle uk-background-cover uk-background-blend-darken uk-invisible st-background-image-header"
          data-src="{{ mainImage }}" data-default-img="{{ asset(globalImageDirectory~'trick-default-image-1600x900.png') }}" style="background-position: 50% 50%; height: 600px" uk-img>
         <div id="st-trick-main-image-box" class="uk-padding">
             <div class="uk-position-center" style="width: 100%; height: 100%">
@@ -35,8 +35,9 @@
                     <div id="st-single-trick-update-delete-main-image"
                          class="uk-position-top-right uk-text-right uk-box-shadow-small uk-box-shadow-hover-medium st-background-blue st-border-white-small">
                         <div class="uk-padding-small">
-                            {# TODO: need to review this link with media block smoothscroll on trick update form! #}
-                            <a href="{#{{ path('update_media', { 'encodedUuid': media.uuid|uuid_encode }) }}#}#" class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove" title="Update">
+                            {# Update main image dynamically with custom anchor automatic scroll on trick update form page #}
+                            <a href="{{ path('update_trick', { 'mainRoleLabel': app.user.mainRoleLabel|lower, 'slug': trick.slug, 'encodedUuid': trick.uuid|uuid_encode }) }}/#image-{{ mainImageUuid|uuid_encode }}"
+                               class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove" title="Update">
                                 <span uk-icon="icon: pencil; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-update st-svg-icon-actions"></span>
                             </a>
                             {# Delete main image from trick header #}
@@ -131,13 +132,32 @@
                 {# Loop on trick medias to feed the slider #}
                 {% for media in trick.mediaOwner.medias %}
                     {# ---------------------------------------------------------------------------- #}
-                    {# List trick medias images #}
+                    {# List trick medias thumbnail images #}
                     {% if media.mediaType.type == mediaTypesValues['trickThumbnail'] %}
+                    {# ---------------------------------------------------------------------------- #}
+                    {# Get big image uuid which corresponds! #}
+                    {% set break = false %}
+                    {% set bigImageUuid = null %}
+                    {% for mediaToCompare in trick.mediaOwner.medias if not break %}
+                        {# Compare images names #}
+                        {% if mediaToCompare.mediaType.type == mediaTypesValues['trickBig'] %}
+                        {% set mediaIdentifierName = preg_replace('/\\d{2,}x\\d{2,}/', '', media.mediasource.image.name) %}
+                        {% set mediaToCompareIdentifierName = preg_replace('/\\d{2,}x\\d{2,}/', '', mediaToCompare.mediasource.image.name) %}
+
+                            {% if mediaIdentifierName == mediaToCompareIdentifierName %}
+
+                                {# Get big image uuid in order to use it to create image box update link anchor (hash) for update form  #}
+                                {% set bigImageUuid = mediaToCompare.mediaSource.image.uuid %}
+                                {% set break = true %}
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                    {# ---------------------------------------------------------------------------- #}
                     {# Image to show in slide #}
                     {% set mediaForSlide = media.mediasource.image.name~'.'~media.mediasource.image.format %}
                     {% set mediaToExpandDimensions = normalImageMediaType.width~'x'~normalImageMediaType.height %}
                     {# Image to show in modal: switch to normal image dimensions #}
-                    {% set mediaToExpand = preg_replace('/\\d{3,4}x\\d{3,4}/', mediaToExpandDimensions, mediaForSlide) %}
+                    {% set mediaToExpand = preg_replace('/\\d{2,}x\\d{2,}/', mediaToExpandDimensions, mediaForSlide) %}
                     {% set showListRank = media.showListRank %}
                     <li id="st-single-trick-image-slide-{{ showListRank }}">
                         {# html attribute escaping is used inside when necessary! #}
@@ -145,7 +165,7 @@
                             'trick': trick,
                             'mediaTypesValues': mediaTypesValues,
                             'mediaType': media.mediaType,
-                            'mediaUuid': media.mediaSource.image.uuid,
+                            'mediaUuid': bigImageUuid,
                             'mediaCreationDate': media.mediasource.image.creationDate,
                             'mediaDescription': media.mediasource.image.description,
                             'mediaRank': media.showListRank,

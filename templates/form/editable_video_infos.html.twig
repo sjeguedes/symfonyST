@@ -6,6 +6,11 @@
 {% set videoInfosForm = editableVideoInfosForm %}
 {# Get existing index value for editable video box, provided by form template which calls this template #}
 {% set videoIndex = editableVideoIndexName %}
+{# Video box anchor used to link this box to update #}
+{% if (videoInfosForm.vars.videoUuid is defined) %}
+<span id="st-video-box-{{ videoInfosForm.vars.videoUuid|uuid_from_string|uuid_encode }}"></span>
+{% endif %}
+{# Video Wrapper #}
 <div id="st-video-infos-wrapper-{{ videoIndex }}" class="st-video-infos-wrapper">
     <div id="{{ rootFormName }}_videos_{{ videoIndex }}" class="uk-position-relative uk-border-rounded uk-padding-small uk-margin-small-bottom st-video-infos st-background-blue st-box-shadow-full-small">
         <div class="uk-position-top-right uk-flex uk-flex-middle uk-margin-small-top uk-margin-small-right">
@@ -128,8 +133,8 @@
                             'class': 'uk-textarea',
                             'rows': 2,
                             'data-replaced-url-info' : 'Please note\nyour URL was simply replaced\nto be compatible with\n the expected format!',
-                            'data-url-error': 'Please note\nyour URL is not valid!\nand must be changed to be accepted.',
-                            'data-url-success': 'Please note\nyour URL is valid\nand can be submitted to be accepted.',
+                            'data-url-error': 'Please note\nyour URL is not valid\nand must be changed to be accepted!',
+                            'data-url-success': 'Please note\nyour URL is valid\nand can be submitted to be accepted!',
                             'data-saved-url': videoInfosForm.vars.videoUuid is defined ? videoInfosForm.url.vars.value : ''
                         },
                         'value': videoInfosForm.url.vars.value})

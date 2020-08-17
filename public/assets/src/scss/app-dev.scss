@@ -647,7 +647,7 @@ main {
 // Header
 header.st-header {
     border-bottom: 4px solid $site-yellow-color;
-    @extend .st-background-image-header;
+    @extend .st-background-black;
     .st-header-spinner {
         display: block;
         width: 80%;

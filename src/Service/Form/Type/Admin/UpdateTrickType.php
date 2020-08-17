@@ -105,6 +105,8 @@ class UpdateTrickType extends AbstractTrickType
     public function buildForm(FormBuilderInterface $builder, array $options) : void
     {
         $trickGroupService = $this->trickGroupService;
+        // Remove possible image or video update hash anchor from current action URI
+        $builder->setAction(preg_replace('/#image|video-\w+$/', '', $this->request->getRequestUri()));
         $builder
             ->add('group', EntityType::class, [
                 'class'         => TrickGroup::class,

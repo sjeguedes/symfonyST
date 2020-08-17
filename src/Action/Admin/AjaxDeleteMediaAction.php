@@ -90,7 +90,7 @@ class AjaxDeleteMediaAction
      *  Manage image or video media deletion with CSRF token process validation.
      *
      * @Route({
-     *     "en": "/{_locale<en>}/{mainRoleLabel<admin|member>}/delete-media/{mediaType<image|video>}/{encodedUuid}/{csrfToken}"
+     *     "en": "/{_locale<en>}/{mainRoleLabel<admin|member>}/delete-media/{mediaType<image|video>}/{encodedUuid<\w+>}/{csrfToken<[\w-]+>}"
      * }, name="delete_media", methods={"DELETE"})
      *
      * @param CsrfTokenManagerInterface $csrfTokenManager

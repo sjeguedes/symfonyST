@@ -7,7 +7,7 @@ inside included template when a loop is used! #}
 <div id="st-card-{{ index }}" class="uk-card uk-card-primary uk-box-shadow-small uk-box-shadow-hover-medium st-border-white-small">
     <div class="uk-card-badge uk-label uk-flex uk-flex-center uk-flex-middle uk-box-shadow-large uk-text-center">
         <span class="uk-text-uppercase uk-text-bold">
-            <span class="st-color-red">{{ custom.icon matches '/^image/' ? 'Image' : 'Video' }} #</span>  {{ mediaRank }}<br>
+            <span class="st-color-red">{{ custom.icon matches '/^image/' ? 'Image' : 'Video' }} #</span> {{ mediaRank }}<br>
             <span class="st-color-red">Added on</span> {{ mediaCreationDate|date('d/m/Y') }}
         </span>
     </div>
@@ -138,12 +138,13 @@ inside included template when a loop is used! #}
             {# Trick media update or delete actions #}
             {% if is_granted('AUTHOR_OR_ADMIN_CAN_UPDATE_OR_DELETE_TRICKS', trick) %}
             <div class="uk-text-right">
-                {# TODO: need to review this link with media block smoothscroll on trick update form! #}
-                <a href="{#{{ path('update_media', { 'encodedUuid': media.uuid|uuid_encode }) }}#}#" class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove" title="Update">
+                {% set mediaSourceType = mediaType.sourceType %}
+                {# Update image or video dynamically with custom anchor automatic scroll on trick update form page #}
+                <a href="{{ path('update_trick', { 'mainRoleLabel': app.user.mainRoleLabel|lower, 'slug': trick.slug, 'encodedUuid': trick.uuid|uuid_encode }) }}/#{{ mediaSourceType }}-{{ mediaUuid|uuid_encode }}"
+                   class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove" title="Update">
                     <span uk-icon="icon: pencil; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-update"></span>
                 </a>
                 {# Delete image or video dynamically #}
-                {% set mediaSourceType = mediaType.sourceType %}
                 <a id="st-delete-{{ mediaSourceType }}-{{ index }}" href="#st-modal-delete-{{ mediaSourceType }}"
                    data-action="{{ path('delete_media', { 'mainRoleLabel': app.user.mainRoleLabel|lower, 'mediaType': mediaSourceType, 'encodedUuid': mediaUuid|uuid_encode, 'csrfToken': csrf_token('delete_'~mediaSourceType) }) }}"
                    class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove st-delete-{{ mediaSourceType }}" title="Delete" uk-toggle>

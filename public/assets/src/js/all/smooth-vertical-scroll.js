@@ -16,20 +16,15 @@ export default (element, adjustYPosition = null) => { // HHTMLNodeElement, + or 
     // https://developer.mozilla.org/en-US/docs/Web/API/PerformanceNavigation
     // https://developer.mozilla.org/en-US/docs/Web/API/Navigation_timing_API
     // https://developer.mozilla.org/en-US/docs/Web/API/PerformanceNavigationTiming/type
+    // Get element position relative to the document:
+    // https://plainjs.com/javascript/styles/get-the-position-of-an-element-relative-to-the-document-24
 
     // Close all existing notifications on scroll
     UIkit.notification.closeAll();
-    // Scroll to form automatically when a form is not valid.
-    const targetPosition = coords(element).y + adjustYPosition;
-    let startPosition = window.pageYOffset;
+    window.scrollTo(0, 0);
+    let targetPosition = coords(element).y + adjustYPosition;
+    let startPosition = 0;
     let distance = targetPosition - startPosition;
-    // Avoid inverted scroll behavior in certain browsers if smoothScroll is already done.
-    if (window.performance && (performance.navigation.TYPE_RELOAD || 'reload' === performance.getEntriesByType("navigation")[0].type)) {
-        if (0 > distance) {
-            distance = - distance;
-            startPosition = 0;
-        }
-    }
     const duration = 1000;
     let start = null;
     let args = [startPosition, distance, duration];

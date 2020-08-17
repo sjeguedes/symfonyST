@@ -6,6 +6,11 @@
 {% set imageToCropForm = editableImageToCropForm %}
 {# Get existing index value for editable image box, provided by form template which calls this template #}
 {% set imageIndex = editableImageIndexName %}
+{# Image box anchor used to link this box to update #}
+{% if (imageToCropForm.vars.bigImageUuid is defined) %}
+<span id="st-image-box-{{ imageToCropForm.vars.bigImageUuid|uuid_from_string|uuid_encode }}"></span>
+{% endif %}
+{# Image Wrapper #}
 <div id="st-image-to-crop-wrapper-{{ imageIndex }}" class="st-image-to-crop-wrapper">
     <div id="{{ rootFormName }}_images_{{ imageIndex }}" class="uk-position-relative uk-border-rounded uk-padding-small uk-margin-small-bottom st-image-to-crop st-background-blue st-box-shadow-full-small">
         {# Saved (uploaded) image block removal: look at AbstractTrickType::finishView() #}

@@ -10,6 +10,7 @@ use App\Domain\ServiceLayer\MediaTypeManager;
 use App\Domain\ServiceLayer\VideoManager;
 use App\Service\Form\Collection\DTOCollection;
 use App\Service\Medias\Upload\ImageUploader;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -178,7 +179,7 @@ abstract class AbstractTrickType extends AbstractType
                 $validMediasSourcesNames[] = $form->get($childFormName)->getData();
             }
         }
-        // Query database to get all needed data values (e.g. uuid and saved name for both cases, format for images)
+        // Query database to get all needed data values (e.g. uuid and saved name for both image and video cases, format for images)
         // which corresponds to valid saved names (can be considered as "identifier")
         if (0 !== \count($validMediasSourcesNames)) {
             $serviceLayer = $config[$collectionName]['serviceLayer'];
