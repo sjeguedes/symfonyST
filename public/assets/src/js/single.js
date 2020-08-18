@@ -22,7 +22,7 @@ export default () => {
     // JavaScript cross domain proxy: https://www.youtube.com/watch?v=o8puzjzpjqo
     // https://stackoverflow.com/questions/1973140/parsing-json-from-xmlhttprequest-responsejson
     // https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent
-
+    // Youtube JS player "onStateChange" event: http://jsfiddle.net/jeffposnick/yhWsG/3/
     // Guide to iframe security and event: https://blog.logrocket.com/the-ultimate-guide-to-iframes/
 
     // ------------------------------------------------------------------------------------------------------------
@@ -33,8 +33,8 @@ export default () => {
     if (element && singleSliderElement) {
         // String helper to decode string
         const stringHandler = stringHelper();
-        const videoProxyPath = stringHandler.htmlAttributeOnString
-                                            .unescape(singleSliderElement.getAttribute('data-video-proxy'));
+        const proxyURL = singleSliderElement.getAttribute('data-video-proxy');
+        const videoProxyPath = stringHandler.htmlAttributeOnString.unescape(proxyURL);
 
         // CUSTOM FUNCTIONS TO IMPROVE SCRIPT \\
 
@@ -533,13 +533,10 @@ export default () => {
         // Arrays to store multiple players
         let youtubePlayers = [], vimeoPlayers = [], dailymotionPlayers = [];
         // Objects to store current players which are playing a video or not
-        let youtubeCurrentPlayer = {isPlaying: false, videoID: null, player: null},
-            vimeoCurrentPlayer = {isPlaying: false, videoID: null, player: null},
-            dailymotionCurrentPlayer = {isPlaying: false, videoID: null, player: null},
-            currentPlayers = {
-                youtube: youtubeCurrentPlayer,
-                vimeo: vimeoCurrentPlayer,
-                dailymotion: dailymotionCurrentPlayer
+        let currentPlayers = {
+                youtube: {isPlaying: false, videoID: null, player: null},
+                vimeo: {isPlaying: false, videoID: null, player: null},
+                dailymotion: {isPlaying: false, videoID: null, player: null}
             };
 
         // ------------------------------------------------------------------------------------------------------------
@@ -547,57 +544,55 @@ export default () => {
         // Youtube
         // iframe JavaScript API: https://developers.google.com/youtube/iframe_api_reference
         if (youtubeIframes.length > 0) {
-            let ytTimeOut = [];
+            //let ytTimeOut = [];
             loadAPI('https://www.youtube.com/iframe_api', (args) => {
                 // Script loading error
                 let isScriptLoaded = args.script; // 'args' argument is an object.
-                for (let i = 0; i < youtubeIframes.length; i ++) {
-                    // Unescape path value from HTML attribute
-                    let iframeSrc = stringHandler.htmlAttributeOnString.unescape(youtubeIframes[i].getAttribute('src'));
-                    youtubeIframes[i].setAttribute('src', iframeSrc);
-                    // API error
-                    if (isScriptLoaded === false) {
+                // API error
+                if (isScriptLoaded === false) {
+                    for (let i = 0; i < youtubeIframes.length; i ++) {
                         whenMediaError(youtubeIframes[i]);
-                        if (i === youtubeIframes.length - 1) {
-                            return;
-                        }
-                    // API script is loaded.
-                    } else {
-                        // Prepare fade in effect for iframe
-                        beforeMediaLoaded(youtubeIframes[i]);
-                        // Call iframe loading rendering behavior:
-                        ytTimeOut[i] = setTimeout(() => {
+                    }
+                // API script is loaded.
+                } else {
+                    // API ready
+                    window.onYouTubeIframeAPIReady = () => {
+                        for (let i = 0; i < youtubeIframes.length; i ++) {
+                            // Prepare fade in effect for iframe
+                            beforeMediaLoaded(youtubeIframes[i]);
+                            // Unescape path value from HTML attribute
+                            let iframeSrc = stringHandler.htmlAttributeOnString.unescape(youtubeIframes[i].getAttribute('src'));
+                            youtubeIframes[i].setAttribute('src', iframeSrc);
+                            // Call iframe loading rendering behavior:
                             let proxyURL = videoProxyPath + '/' + iframeSrc;
-                            checkLoadingCORSRequest('GET', proxyURL, afterMediaLoaded, whenMediaError, [youtubeIframes[i]], ytTimeOut[i]);
-                        }, 10);
-                        // API ready
-                        window.onYouTubeIframeAPIReady = () => {
+                            checkLoadingCORSRequest('GET', proxyURL, afterMediaLoaded, whenMediaError, [youtubeIframes[i]], null);
                             // Video checked custom event success with proxy ajax request
                             youtubeIframes[i].addEventListener('checkedVideoSuccess', () => {
-                                    let videoID = /embed\/(.+)\?/gi.exec(iframeSrc)[1];
-                                    youtubePlayers.push({
-                                        type: 'yt',
-                                        videoID: videoID,
-                                        player: new YT.Player(youtubeIframes[i].getAttribute('id'), {
-                                            videoId: videoID
-                                        })
-                                    });
-                                    // Stop any other videos when playing and update Youtube current player
-                                    youtubePlayers[i].player.addEventListener('onStateChange', (event) => {
-                                        if (event.data === YT.PlayerState.PLAYING) {
-                                            stopAnyOtherVideos(currentPlayers, youtubePlayers[i]);
-                                            youtubeCurrentPlayer.isPlaying = true;
-                                            youtubeCurrentPlayer.videoID = youtubePlayers[i].videoID;
-                                            youtubeCurrentPlayer.player = youtubePlayers[i].player;
-                                        }
-                                    });
-                                    // Player error
-                                    youtubePlayers[i].player.addEventListener('onError', () => {
-                                        whenMediaError(youtubeIframes[i]);
-                                    });
-                            }, false);
-                        };
-                    }
+                                let videoID = /embed\/(.+)\?/gi.exec(iframeSrc)[1];
+                                // Store player and its data
+                                youtubePlayers[i] = {
+                                    type: 'yt',
+                                    videoID: videoID,
+                                    player: new YT.Player(youtubeIframes[i].getAttribute('id'), {
+                                        videoId: videoID
+                                    })
+                                };
+                                // Stop any other videos when playing and update Youtube current player
+                                youtubePlayers[i].player.addEventListener('onStateChange', (event) => {
+                                    if (event.data === YT.PlayerState.PLAYING) {
+                                        stopAnyOtherVideos(currentPlayers, youtubePlayers[i]);
+                                        currentPlayers.youtube.isPlaying = true;
+                                        currentPlayers.youtube.videoID = youtubePlayers[i].videoID;
+                                        currentPlayers.youtube.player = youtubePlayers[i].player;
+                                    }
+                                });
+                                // Player error
+                                youtubePlayers[i].player.addEventListener('onError', () => {
+                                    whenMediaError(youtubeIframes[i]);
+                                });
+                            });
+                        }
+                    };
                 }
             }, [{/*add object properties if necessary*/}]); // args must be a array containing a unique object!
         }
@@ -607,49 +602,46 @@ export default () => {
         // Vimeo
         // iframe JavaScript API: https://developer.vimeo.com/player/sdk
         if (vimeoIframes.length > 0) {
-            let vmTimeOut = [];
             loadAPI('https://player.vimeo.com/api/player.js', (args) => {
                 // Script loading error
                 let isScriptLoaded = args.script; // 'args' argument is an object.
-                for (let i = 0; i < vimeoIframes.length; i ++) {
-                    // Unescape path value from HTML attribute
-                    let iframeSrc = stringHandler.htmlAttributeOnString.unescape(vimeoIframes[i].getAttribute('src'));
-                    vimeoIframes[i].setAttribute('src', iframeSrc);
-                    // API error
-                    if (isScriptLoaded === false) {
+                // API error
+                if (isScriptLoaded === false) {
+                    for (let i = 0; i < vimeoIframes.length; i ++) {
                         whenMediaError(vimeoIframes[i]);
-                        if (i === vimeoIframes.length - 1) {
-                            return;
-                        }
-                    // API script is loaded.
-                    } else {
-                        // Prepare fade in effect for iframe
-                        beforeMediaLoaded(vimeoIframes[i]);
-                        // Call iframe loading rendering behavior:
-                        vmTimeOut[i] = setTimeout(() => {
+                    }
+                // API script is loaded.
+                } else {
+                    // API ready
+                    window.dmAsyncInit = () => {
+                        for (let i = 0; i < vimeoIframes.length; i ++) {
+                            // Prepare fade in effect for iframe
+                            beforeMediaLoaded(vimeoIframes[i]);
+                            // Unescape path value from HTML attribute
+                            let iframeSrc = stringHandler.htmlAttributeOnString.unescape(vimeoIframes[i].getAttribute('src'));
+                            vimeoIframes[i].setAttribute('src', iframeSrc);
+                            // Call iframe loading rendering behavior:
                             let proxyURL = videoProxyPath + '/' + iframeSrc;
-                            checkLoadingCORSRequest('GET', proxyURL, afterMediaLoaded, whenMediaError, [vimeoIframes[i]], vmTimeOut[i]);
-                        }, 10);
-                        // API ready
-                        window.dmAsyncInit = () => {
+                            checkLoadingCORSRequest('GET', proxyURL, afterMediaLoaded, whenMediaError, [vimeoIframes[i]], null);
                             // Video checked custom event success with proxy ajax request
                             vimeoIframes[i].addEventListener('checkedVideoSuccess', () => {
                                 let videoID = /video\/(.+)\?/gi.exec(iframeSrc)[1];
-                                vimeoPlayers.push({
+                                // Store player and its data
+                                vimeoPlayers[i] = {
                                     type: 'vm',
                                     videoID: videoID,
                                     player: new Vimeo.Player(vimeoIframes[i], {
                                         id: videoID
                                     })
-                                });
+                                };
                                 // Player with index "i" is ready.
                                 vimeoPlayers[i].player.ready().then(() => {
                                     // Playing event: stop any other videos when playing and update Vimeo current player
                                     vimeoPlayers[i].player.on('play', () => {
                                         stopAnyOtherVideos(currentPlayers, vimeoPlayers[i]);
-                                        vimeoCurrentPlayer.isPlaying = true;
-                                        vimeoCurrentPlayer.videoID = vimeoPlayers[i].videoID;
-                                        vimeoCurrentPlayer.player = vimeoPlayers[i].player;
+                                        currentPlayers.vimeo.isPlaying = true;
+                                        currentPlayers.vimeo.videoID = vimeoPlayers[i].videoID;
+                                        currentPlayers.vimeo.player = vimeoPlayers[i].player;
                                     });
                                     // Player error
                                     vimeoPlayers[i].player.on('error', () => {
@@ -657,8 +649,8 @@ export default () => {
                                     });
                                 });
                             });
-                        };
-                    }
+                        }
+                    };
                 }
             }, [{/*add object properties if necessary*/}]); // args must be a array containing a unique object!
         }
@@ -668,47 +660,44 @@ export default () => {
         // Dailymotion
         // iframe JavaScript API: https://developer.dailymotion.com/player
         if (dailymotionIframes.length > 0) {
-            let dmTimeOut = [];
             loadAPI('https://api.dmcdn.net/all.js', (args) => {
                 // Script loading error
                 let isScriptLoaded = args.script; // 'args' argument is an object.
-                for (let i = 0; i < dailymotionIframes.length; i ++) {
-                    // Unescape path value from HTML attribute
-                    let iframeSrc = stringHandler.htmlAttributeOnString.unescape(dailymotionIframes[i].getAttribute('src'));
-                    dailymotionIframes[i].setAttribute('src', iframeSrc);
-                    // API script error.
-                    if (isScriptLoaded === false) {
+                // API script error.
+                if (isScriptLoaded === false) {
+                    for (let i = 0; i < dailymotionIframes.length; i ++) {
                         whenMediaError(dailymotionIframes[i]);
-                        if (i === dailymotionIframes.length - 1) {
-                            return;
-                        }
-                    // API script is loaded.
-                    } else {
+                    }
+                // API script is loaded.
+                } else {
+                    for (let i = 0; i < dailymotionIframes.length; i ++) {
                         // Prepare fade in effect for iframe
                         beforeMediaLoaded(dailymotionIframes[i]);
+                        // Unescape path value from HTML attribute
+                        let iframeSrc = stringHandler.htmlAttributeOnString.unescape(dailymotionIframes[i].getAttribute('src'));
+                        dailymotionIframes[i].setAttribute('src', iframeSrc);
                         // Call iframe loading rendering behavior:
-                        dmTimeOut[i] = setTimeout(() => {
-                            let proxyURL = videoProxyPath + '/' + iframeSrc;
-                            checkLoadingCORSRequest('GET', proxyURL, afterMediaLoaded, whenMediaError, [dailymotionIframes[i]], dmTimeOut[i]);
-                        }, 10);
+                        let proxyURL = videoProxyPath + '/' + iframeSrc;
+                        checkLoadingCORSRequest('GET', proxyURL, afterMediaLoaded, whenMediaError, [dailymotionIframes[i]],null);
                         // Video checked custom event success with proxy ajax request
                         dailymotionIframes[i].addEventListener('checkedVideoSuccess', () => {
                             let videoID = /video\/(.+)\?/gi.exec(iframeSrc)[1];
-                            dailymotionPlayers.push({
+                            // Store player and its data
+                            dailymotionPlayers[i] = {
                                 type: 'dm',
                                 videoID: videoID,
                                 player: DM.player(dailymotionIframes[i], {
                                     video: videoID
                                 })
-                            });
+                            };
                             // API must be ready to add other player control event listeners
                             dailymotionPlayers[i].player.addEventListener('apiready', () => {
                                 // Playing event: stop any other videos when playing and update Dailymotion current player
                                 dailymotionPlayers[i].player.addEventListener('playing', () => {
                                     stopAnyOtherVideos(currentPlayers, dailymotionPlayers[i]);
-                                    dailymotionCurrentPlayer.isPlaying = true;
-                                    dailymotionCurrentPlayer.videoID = dailymotionPlayers[i].videoID;
-                                    dailymotionCurrentPlayer.player = dailymotionPlayers[i].player;
+                                    currentPlayers.dailymotion.isPlaying = true;
+                                    currentPlayers.dailymotion.videoID = dailymotionPlayers[i].videoID;
+                                    currentPlayers.dailymotion.player = dailymotionPlayers[i].player;
                                 });
                                 // Player error
                                 dailymotionPlayers[i].player.addEventListener('error', () => {
