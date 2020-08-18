@@ -280,7 +280,7 @@
                     <!-- Create trick -->
                     <a id="st-create-trick" class="uk-display-inline-block uk-button uk-button-secondary uk-border-rounded uk-box-shadow-hover-medium uk-margin-medium-top"
                        href="{{ path('create_trick', { 'mainRoleLabel': app.user.mainRoleLabel|lower }) }}" title="Create a trick">
-                        Create a trick&nbsp;&nbsp;<span uk-icon="plus-circle"></span>
+                        Create a trick&nbsp;&nbsp;<span uk-icon="plus-circle; ratio: 1"></span>
                     </a><br>
                     {% if userCreatedTricks|length > 0 %}
                     <hr>
@@ -289,7 +289,7 @@
                         <button id="st-update-tricks"
                                 class="uk-display-inline-block uk-button uk-button-secondary uk-border-rounded uk-box-shadow-hover-medium" type="button"
                                 title="Update created tricks">
-                            Update created tricks <span uk-icon="refresh"></span>
+                            Update created tricks <span uk-icon="icon: pencil; ratio: 1"></span>
                         </button>
                         <div uk-dropdown="mode: click; pos: top-center; boundary: .boundary-align; boundary-align: true"
                              class="uk-overflow-auto uk-height-small">

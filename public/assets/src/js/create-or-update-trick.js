@@ -591,7 +591,7 @@ export default () => {
                 const scrollToMediaBox = () => {
                     smoothScroll(referenceElementToScroll, 0);
                 };
-                window.addEventListener('load', scrollToMediaBox, false);
+                scrollToMediaBox();
             }
         }
 

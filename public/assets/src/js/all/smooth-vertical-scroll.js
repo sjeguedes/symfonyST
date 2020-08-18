@@ -19,34 +19,46 @@ export default (element, adjustYPosition = null) => { // HHTMLNodeElement, + or 
     // Get element position relative to the document:
     // https://plainjs.com/javascript/styles/get-the-position-of-an-element-relative-to-the-document-24
 
-    // Close all existing notifications on scroll
-    UIkit.notification.closeAll();
-    window.scrollTo(0, 0);
-    let targetPosition = coords(element).y + adjustYPosition;
-    let startPosition = 0;
-    let distance = targetPosition - startPosition;
-    const duration = 1000;
-    let start = null;
-    let args = [startPosition, distance, duration];
-    // Easing
-    const easeInOutCubic = function(t, b, c, d) {
-        t /= d/2;
-        if (t < 1) return c/2*t*t*t + b;
-        t -= 2;
-        return c/2*(t*t*t + 2) + b;
-    };
-    // Set a step for requestAnimationFrame
-    const step = function(timestamp) { // DOMHighResTimeStamp object as argument
-        if (!start) start = timestamp;
-        const progress = timestamp - start;
-        // Remove first item from "args"
-        if (4 === args.length) args.shift();
-        // Add "progress" as first item in "args"
-        args.unshift(progress);
-        window.scrollTo(0, easeInOutCubic(...args)); // [progress, startPosition, distance, duration]
-        // Recursive scrolling animation
-        if (progress < duration) window.requestAnimationFrame(step);
-    };
-    // Get scrolling animation
-    window.requestAnimationFrame(step);
+    clearTimeout(element.scrollFinished);
+    // End of "scroll" event
+    element.scrollFinished = setTimeout(() => {
+        // Close all existing notifications on scroll
+        UIkit.notification.closeAll();
+        // Stop process if a scroll is active!
+        if (window.pageYOffset !== 0) return;
+        // Define parameters
+        let startPosition = 0;
+        let targetPosition = coords(element).y + adjustYPosition;
+        let distance = targetPosition - startPosition;
+        const duration = 1000;
+        let start = null;
+        let args = [startPosition, distance, duration];
+        // Easing
+        const easeInOutCubic = function (t, b, c, d) {
+            t /= d / 2;
+            if (t < 1) return c / 2 * t * t * t + b;
+            t -= 2;
+            return c / 2 * (t * t * t + 2) + b;
+        };
+        // Prepare request animation frame
+        let request;
+        // Set a step for requestAnimationFrame
+        const step = function (timestamp) { // DOMHighResTimeStamp object as argument
+            if (!start) start = timestamp;
+            const progress = timestamp - start;
+            // Remove first item from "args"
+            if (4 === args.length) args.shift();
+            // Add "progress" as first item in "args"
+            args.unshift(progress);
+            window.scrollTo(0, easeInOutCubic(...args)); // [progress, startPosition, distance, duration]
+            // Recursive scrolling animation
+            if (progress < duration) {
+                window.requestAnimationFrame(step)
+            } else {
+                cancelAnimationFrame(request);
+            }
+        };
+        // Get scrolling animation
+        request = window.requestAnimationFrame(step);
+    }, 0);
 }

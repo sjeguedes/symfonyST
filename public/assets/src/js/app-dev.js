@@ -45,8 +45,8 @@ const setUp = () => {
     updateProfile();
     createOrUpdateTrick();
 };
+
 // Add our event listeners
 window.addEventListener('DOMContentLoaded', setUp, false);
 window.addEventListener('unload', setUp, false);
 window.addEventListener('popstate', setUp, false);
-

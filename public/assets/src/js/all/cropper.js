@@ -156,14 +156,13 @@ export default (cropParams) =>  {
 
         // ------------------------------------------------------------------------------------------------------------
 
-        // TODO: maybe delete this!
         // Callback before modal is shown, to fix a container generated twice after multiple changes
-        /*UIkit.util.on(modalElementID, 'beforeshow', () => {
+        UIkit.util.on(modalElementID, 'beforeshow', () => {
             let container = cropParams.modalElement.querySelector('.cropper-container');
             if (container !== null) {
                 container.parentElement.removeChild(container);
             }
-        });*/
+        });
 
         // ------------------------------------------------------------------------------------------------------------
 

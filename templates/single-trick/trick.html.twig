@@ -246,7 +246,7 @@
                     {# Update trick #}
                     <a id="st-update-trick" class="uk-display-inline-block uk-button uk-button-secondary uk-border-rounded uk-box-shadow-hover-medium"
                        href="{{ path('update_trick', { 'mainRoleLabel': app.user.mainRoleLabel|lower, 'slug': trick.slug, 'encodedUuid': trick.uuid|uuid_encode }) }}" title="Update this trick">
-                        Update this trick&nbsp;&nbsp;<span uk-icon="icon: refresh; ratio: 1"></span>
+                        Update this trick&nbsp;&nbsp;<span uk-icon="icon: pencil; ratio: 1"></span>
                     </a>
                     {# Delete trick #}
                     <a id="st-delete-trick" data-action="{{ path('delete_trick', { 'mainRoleLabel': app.user.mainRoleLabel|lower, 'encodedUuid': trick.uuid|uuid_encode, 'csrfToken': csrf_token('delete_trick') }) }}"

@@ -96,7 +96,7 @@ final class ImageToCropConstraintValidator extends AbstractTrickCollectionConstr
      * Please note this is considered not valid if value is null when at the same time, image data URI is also not valid!
      *
      * @param ExecutionContextInterface $context
-     * @param mixed|null $payload
+     * @param mixed|null                $payload
      *
      * @return void
      */
@@ -211,7 +211,7 @@ final class ImageToCropConstraintValidator extends AbstractTrickCollectionConstr
      * Apply an intermediate custom validation constraint callback on "cropJSONData" property.
      *
      * @param ExecutionContextInterface $context
-     * @param mixed|null $payload
+     * @param mixed|null                $payload
      *
      * @return void
      */
@@ -231,27 +231,27 @@ final class ImageToCropConstraintValidator extends AbstractTrickCollectionConstr
             }
         // Replace the "NotNull" constraint to group all cases in this method!
         } else {
-            // Validate manually saved image name, to be able to validate image crop JSON data which can not be null if this field is valid!
-            $context->getValidator()->validate($context, [new Callback([$this, 'validateSavedImageName'])]);
+            // Validate manually image preview data URI, to be able to validate image crop JSON data which can not be null if this field is valid!
+            $context->getValidator()->validate($context, [new Callback([$this, 'validateImagePreviewDataURI'])]);
             // Check if there are violations
             $violationsLength = $context->getViolations()->count();
-            $isSavedImageNameViolation = false;
+            $isImagePreviewDataURIViolation = false;
             if (0 !== $violationsLength) {
                 // CAUTION: manual validation above is necessary to add potential violations from image collection to root form violations!
                 $violationsList = $context->getViolations();
                 // Loop on existing violations to find a potential one which corresponds to manual validation
                 foreach ($violationsList as $key => $value) {
                     // Each value is a ConstraintViolation instance
-                    if ($context->getPropertyPath() . '.savedImageName' === $value->getPropertyPath()) {
+                    if ($context->getPropertyPath() . '.imagePreviewDataURI' === $value->getPropertyPath()) {
                         // A constraint violation exists, so "savedImageName" field is not valid.
-                        $isSavedImageNameViolation = true;
+                        $isImagePreviewDataURIViolation = true;
                         // Cancel manual validation by removing corresponding ConstraintViolation instance, not to have violation to be stored twice!
                         $context->getViolations()->remove($key);
                         break;
                     }
                 }
-                // "cropJSONData" field can not be null when an uploaded file is present or when "savedImageName" field is valid or not null!
-                if ($object->getImage() instanceof UploadedFile || (false === $isSavedImageNameViolation && !\is_null($context->getObject()->getSavedImageName()))) {
+                // "cropJSONData" field can not be null when an uploaded file is present or when "imagePreviewDataURI" field is valid and not null!
+                if ($object->getImage() instanceof UploadedFile || (!$isImagePreviewDataURIViolation && !\is_null($context->getObject()->getImagePreviewDataURI()))) {
                     $context->buildViolation('Image crop JSON data can not be null!')
                         ->atPath('cropJSONData')
                         ->addViolation();
