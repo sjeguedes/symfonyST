@@ -62,7 +62,7 @@ final class LoginHandler extends AbstractFormHandler
             $this->customError = $authenticationError->getMessage();
             $this->flashBag->add(
                 'danger',
-                nl2br('Authentication failed!' . "\n" . 'Try to login again by checking the form fields.')
+                'Authentication failed!' . "\n" . 'Try to login again by checking the form fields.'
             );
             return false;
         }

@@ -59,12 +59,12 @@ class UnchangedTrickListener
             $trickToUpdate = $event->getEntityToUpdate();
             $trickName = $trickToUpdate->getName();
             $text = !\is_null($trickToUpdate)
-                ? nl2br('as regards content for this trick called' . "\n" . '"' . $trickName . '"')
-                : nl2br("\n" . 'about this trick content');
+                ? 'as regards content for this trick called' . "\n" . '"' . $trickName . '"'
+                : "\n" . 'about this trick content';
             $this->flashBag->add(
                 'info',
                 sprintf(
-                    nl2br('Hey "%s",' . "\n" . 'please note you changed nothing %s!'),
+                    'Hey "%s",' . "\n" . 'please note you changed nothing %s!',
                     htmlentities($userNickName, ENT_QUOTES | ENT_HTML5, 'UTF-8'),
                     $text
                 )

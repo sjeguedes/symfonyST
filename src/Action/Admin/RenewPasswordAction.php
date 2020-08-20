@@ -73,10 +73,9 @@ class RenewPasswordAction
         if (\is_null($identifiedUser) || !$this->userService->isPasswordRenewalRequestTokenAllowed($identifiedUser)) {
             $this->flashBag->add(
                 'danger',
-                nl2br('You are not allowed to access' . "\n" .
-                    'password renewal process!' . "\n" .
-                    'Please ask for a new request.'
-                )
+                'You are not allowed to access' . "\n" .
+                         'password renewal process!' . "\n" .
+                         'Please ask for a new request.'
             );
             // Redirect to new password request page
             return $redirectionResponder('request_new_password');

@@ -103,16 +103,16 @@ class RegisterAction
         if (!$isActivated) {
             $this->flashBag->add(
                 'danger',
-                nl2br('You are not allowed to access' . "\n" .
-                'account activation process!' . "\n" .
-                'Please contact us if necessary.')
+                'You are not allowed to access' . "\n" .
+                         'account activation process!' . "\n" .
+                         'Please contact us if necessary.'
             );
         } else {
             $this->flashBag->add(
                 'success',
-                nl2br('Good job!' . "\n" .
-                'Your account was successfully activated.' . "\n" .
-                'Please login to access member area.')
+                'Good job!' . "\n" .
+                         'Your account was successfully activated.' . "\n" .
+                         'Please login to access member area.'
             );
         }
         return $redirectionResponder('home');

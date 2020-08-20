@@ -377,9 +377,8 @@ class AbstractTrickFormHandler extends AbstractUploadFormHandler
             // Image messages
             case $collectionItemDataModel instanceof ImageToCropDTO:
                 $imageIdentifierName = $collectionItemDataModel->getSavedImageName();
-                $errorMessage = nl2br('Sorry, expected trick was not ' . $text . '!' . "\n" .
-                    'An error occurred during image(s) medias handling.'
-                );
+                $errorMessage = 'Sorry, expected trick was not ' . $text . '!' . "\n" .
+                                'An error occurred during image(s) medias handling.';
                 $loggerMessage = sprintf(
                     "[trace app snowTricks] ' . $action . ' => " .
                     "Trick image issue with identifier: %s",
@@ -393,10 +392,8 @@ class AbstractTrickFormHandler extends AbstractUploadFormHandler
             // Video messages
             case $collectionItemDataModel instanceof VideoInfosDTO:
                 $videoURL = $collectionItemDataModel->getUrl();
-                $errorMessage = nl2br(
-                    'Sorry, expected trick was not ' . $text . '!' . "\n" .
-                    'An error occurred during' . "\n" . 'video(s) medias management.'
-                );
+                $errorMessage = 'Sorry, expected trick was not ' . $text . '!' . "\n" .
+                                'An error occurred during' . "\n" . 'video(s) medias management.';
                 $loggerMessage = sprintf(
                     "[trace app snowTricks] ' . $action . ' => " .
                     "Trick video issue with: %s",

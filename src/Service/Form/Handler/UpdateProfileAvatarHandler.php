@@ -74,15 +74,15 @@ final class UpdateProfileAvatarHandler extends AbstractUploadFormHandler
             $coherentCropData = $this->checkAvatarCropData($this->form->getData());
             // Avoid user input tampered data or evaluate technical error by checking coherent crop data
             if (!$coherentCropData) {
-                $cropDataError = nl2br('Image upload can not be performed' . "\n" . 'due to incoherent crop data');
+                $cropDataError = 'Image upload can not be performed' . "\n" . 'due to incoherent crop data';
                 // Do not create a flash message in case of ajax form validation
-                $message = nl2br('Form validation failed!' . "\n" . 'A technical error happened.');
+                $message = 'Form validation failed!' . "\n" . 'A technical error happened.';
                 if (!$this->request->isXmlHttpRequest()) {
                     $this->customError = $cropDataError;
                     $this->flashBag->add('danger', $message);
                 } else {
                     $this->customError = [
-                        'formError' => ['notification' => sprintf(nl2br('%s' . "\n" . '%s'), $message, $cropDataError)]
+                        'formError' => ['notification' => sprintf('%s' . "\n" . '%s', $message, $cropDataError)]
                     ];
                 }
             }
@@ -120,25 +120,25 @@ final class UpdateProfileAvatarHandler extends AbstractUploadFormHandler
             $mediaService
         );
         if (!$isAvatarUpdated) {
-            $updateError = nl2br('Your image was not uploaded!' . "\n" . 'Try again later or use another file.');
+            $updateError = 'Your image was not uploaded!' . "\n" . 'Try again later or use another file.';
             // Do not create a flash message in case of ajax form action
-            $message = nl2br('Avatar update failed!' . "\n" . 'A technical error happened.');
+            $message = 'Avatar update failed!' . "\n" . 'A technical error happened.';
             if (!$this->request->isXmlHttpRequest()) {
                 $this->customError = $updateError;
                 $this->flashBag->add('danger', $message);
             } else {
                 $this->customError = [
-                    'formError' => ['notification' => sprintf(nl2br('%s' . "\n" . '%s'), $message, $updateError)]
+                    'formError' => ['notification' => sprintf('%s' . "\n" . '%s', $message, $updateError)]
                 ];
             }
         } else {
             // Adapt message depending on avatar update or removal
             $info = false === $this->form->getData()->getRemoveAvatar()
-                ? nl2br('your avatar was updated successfully!' . "\n" . 'It appears when you post comments on website.')
+                ? 'your avatar was updated successfully!' . "\n" . 'It appears when you post comments on website.'
                 : 'your avatar was removed successfully!';
             $this->flashBag->add(
                 'success',
-                sprintf(nl2br('Action is done "%s",' . "\n" . '%s'), $identifiedUser->getNickName(), $info)
+                sprintf('Action is done "%s",' . "\n" . '%s', $identifiedUser->getNickName(), $info)
             );
         }
     }

@@ -71,7 +71,7 @@ class LoginAction
         if (!\is_null($this->security->getUser())) {
             $this->flashBag->add(
                 'danger',
-                nl2br('A user is already authenticated!' . "\n" . 'Please logout first.')
+                'A user is already authenticated!' . "\n" . 'Please logout first.'
             );
             return $redirectionResponder('home');
         }

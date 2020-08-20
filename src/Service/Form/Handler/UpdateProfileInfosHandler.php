@@ -102,10 +102,10 @@ final class UpdateProfileInfosHandler extends AbstractFormHandler implements Ini
         $this->flashBag->add(
             'success',
             sprintf(
-                nl2br('That\'s Cool "%s",' . "\n" .
-                'Your account was updated successfully!' . "\n" .
-                'Please consider your new credentials' . "\n" .
-                'if you changed them.'),
+                'That\'s Cool "%s",' . "\n" .
+                       'Your account was updated successfully!' . "\n" .
+                       'Please consider your new credentials' . "\n" .
+                       'if you changed them.',
                 $identifiedUser->getNickName()
             )
         );

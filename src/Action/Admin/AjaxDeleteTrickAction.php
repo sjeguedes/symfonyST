@@ -151,7 +151,7 @@ class AjaxDeleteTrickAction
                         'Please also note' . "\n" . 'all its associated data do not exist anymore.',
                         $trickToDelete->getName()
                 );
-                $this->flashBag->add('success', nl2br($message));
+                $this->flashBag->add('success', $message);
                 // Success JSON response with redirection and flash bag notification
                 $redirectionURI = $this->router->generate('home');
                 // Update data

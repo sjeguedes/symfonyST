@@ -105,7 +105,7 @@ class UserSubscriber implements EventSubscriberInterface
             $this->flashBag->add(
                 'info',
                 sprintf(
-                    nl2br('Hey "%s",' . "\n" . 'please note you changed nothing about your profile %s!'),
+                    'Hey "%s",' . "\n" . 'please note you changed nothing about your "profile %s"!',
                     htmlentities($userNickName, ENT_QUOTES | ENT_HTML5, 'UTF-8'),
                     $text
                 )
@@ -149,7 +149,7 @@ class UserSubscriber implements EventSubscriberInterface
         $this->flashBag->add(
             'success',
             sprintf(
-                nl2br('Welcome on board "%s"!' . "\n" . 'You logged in successfully.'),
+                'Welcome on board "%s"!' . "\n" . 'You logged in successfully.',
                 htmlentities($userNickName, ENT_QUOTES | ENT_HTML5, 'UTF-8')
             )
         );
@@ -206,7 +206,7 @@ class UserSubscriber implements EventSubscriberInterface
             $this->flashBag->add(
                 'info',
                 sprintf(
-                    nl2br('Well done "%s"!' . "\n" . 'Please fill in the form below' . "\n" . 'to renew your password!'),
+                    'Well done "%s"!' . "\n" . 'Please fill in the form below' . "\n" . 'to renew your password!',
                     htmlentities($identifiedUser->getUsername(), ENT_QUOTES | ENT_HTML5, 'UTF-8')
                 )
             );

@@ -68,7 +68,7 @@ class HomeTrickListAction
         $data = [
             'listEnded'             => 'No more trick to load!',
             'noList'                => 'Sorry, no trick was found!',
-            'technicalError'        => nl2br('Sorry, something wrong happened' . "\n" . 'during trick list loading!' . "\n" . 'Please contact us or try again later.' . "\n"),
+            'technicalError'        => 'Sorry, something wrong happened' . "\n" . 'during trick list loading!' . "\n" . 'Please contact us or try again later.' . "\n",
             'trickAjaxLoadingPath'  => $this->trickService->generateURLFromRoute('home_load_tricks_offset_limit', [], UrlGeneratorInterface::ABSOLUTE_URL),
             'trickCount'            => $this->trickService->countAll(),
             'trickLoadingMode'      => $this->trickService->getTrickListConfigParameters()['loadingMode'],

@@ -110,7 +110,7 @@ class LoginFormAuthenticationManager extends AbstractFormLoginAuthenticator
         // Authentication failed. User value is null.
         if (!$user) {
             throw new CustomUserMessageAuthenticationException(
-                nl2br('Please check your credentials!' . "\n" . 'User can not be found.')
+                'Please check your credentials!' . "\n" . 'User can not be found.'
             );
         }
         return $user;
@@ -127,7 +127,7 @@ class LoginFormAuthenticationManager extends AbstractFormLoginAuthenticator
         // Authentication failed. Password value does not match user.
         if (!$isPasswordMatching) {
             throw new CustomUserMessageAuthenticationException(
-                nl2br('Please check your credentials!' . "\n" . 'User and password do not match.')
+               'Please check your credentials!' . "\n" . 'User and password do not match.'
             );
         }
         return $isPasswordMatching;

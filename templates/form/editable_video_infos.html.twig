@@ -44,7 +44,7 @@
                 {% set videoDataAttributes = '' %}
             {% endif %}
             {# These vars are checked to be safe with condition above! #}
-            <a {{ removeVideoLink|raw }} title="{{ actionTitle }}" {{ videoDataAttributes|raw }}
+            <a {{ removeVideoLink }} title="{{ actionTitle }}" {{ videoDataAttributes }}
                                          class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove st-delete-video" uk-toggle>
                 <span uk-icon="icon: {{ removalIcon }}; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-delete st-svg-icon-actions"></span>
             </a>
@@ -108,7 +108,7 @@
                                 {% set linkClass = ' uk-hidden' %}
                                 {% set link = '#' %}
                             {% endif %}
-                             <a id="st-video-watch-link-{{ videoIndex }}" class="uk-button uk-button-default uk-padding-remove-left st-video-watch-link{{ linkClass }}"
+                             <a id="st-video-watch-link-{{ videoIndex }}" class="uk-button uk-button-default uk-padding-remove-left st-background-blue st-video-watch-link{{ linkClass }}"
                                 href="{{ link }}" target="_blank" rel="noopener" title="Watch">
                                 <span class="uk-display-inline-block uk-margin-small-left" uk-icon="icon: desktop"></span>
                                 <span id="{{ 'st-video-watch-link-label-'~videoIndex }}"

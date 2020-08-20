@@ -1,8 +1,8 @@
+import createNotification from './all/create-notification';
 import deleteTrick from './trick/removal/delete-trick';
 import imageListLoader from './all/image-list-loader';
 import request from './all/ajax-request';
 import URIHelper from './all/encode-decode-uri';
-import UIkit from '../../uikit/dist/js/uikit.min';
 export default () => {
     // ------------------- Home page -------------------
     let element = document.getElementById('st-trick-list');
@@ -168,23 +168,25 @@ export default () => {
                                     }
                                     // Max offset is reached: show notification
                                     if (!listError && endReached) {
-                                        UIkit.notification({
-                                            message: `<div class="uk-text-center">
-                                                     <span uk-icon='icon: bell'></span>&nbsp;` + listEnded + `</div>`,
-                                            status: 'info',
-                                            pos: 'top-center',
-                                            timeout: 5000
-                                        });
+                                         createNotification(
+                                            listEnded,
+                                            null,
+                                            true,
+                                            'info',
+                                            'info',
+                                            5000
+                                         );
                                     }
                                     // List error is triggered: show notification
                                     if (listError) {
-                                        UIkit.notification({
-                                            message: `<div class="uk-text-center">
-                                                     <span uk-icon='icon: bell'></span>&nbsp;` + cards[0].getAttribute('data-error') + `</div>`,
-                                            status: 'error',
-                                            pos: 'top-center',
-                                            timeout: 5000
-                                        });
+                                        createNotification(
+                                            cards[0].getAttribute('data-error'),
+                                            null,
+                                            true,
+                                            'error',
+                                            'warning',
+                                            5000
+                                        );
                                     }
                                     // Enable button
                                     document.querySelector('#st-home-load-more').classList.remove('uk-disabled');
@@ -209,14 +211,14 @@ export default () => {
                         error = (xhr.status !== undefined && xhr.statusText !== undefined) ? `error: ${xhr.status} - ${xhr.statusText}` : '';
                         // Aborted request
                         error = 0 !== xhr.status ? error : '';
-                        UIkit.notification({
-                            message: `<div class="uk-text-center">
-                                        <span uk-icon='icon: warning'></span>&nbsp;` + technicalError + error +
-                                     `</div>`,
-                            status: 'error',
-                            pos: 'top-center',
-                            timeout: 0
-                        });
+                        createNotification(
+                            technicalError + error,
+                            null,
+                            true,
+                            'error',
+                            'warning',
+                            0
+                        );
                     });
                 }
             });

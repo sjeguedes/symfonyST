@@ -99,11 +99,11 @@ final class RenewPasswordHandler extends AbstractFormHandler implements InitMode
             $isUserInFormMatched = $this->isIdentifiedUserMatchedInForm($identifiedUser);
             // DTO is in valid state but filled in username does not match identified user's username.
             if (!$isUserInFormMatched) {
-                $userNameError = nl2br('Please check your credentials!' . "\n" . 'Your username is not allowed!');
+                $userNameError = 'Please check your credentials!' . "\n" . 'Your username is not allowed!';
                 $this->customError = $userNameError;
                 $this->flashBag->add(
                     'danger',
-                    nl2br('Authentication failed!' . "\n" . 'Try to request again by checking the form fields.')
+                    'Authentication failed!' . "\n" . 'Try to request again by checking the form fields.'
                 );
                 return false;
             }
@@ -147,17 +147,17 @@ final class RenewPasswordHandler extends AbstractFormHandler implements InitMode
         if (!$isEmailSent) {
             $this->flashBag->add(
                 'info',
-                nl2br('Your password renewal is successfully saved!' . "\n" .
-                'However, confirmation email was not sent' . "\n" .
-                'due to technical reasons...' . "\n" .
-                'Please contact us if necessary.')
+                'Your password renewal is successfully saved!' . "\n" .
+                         'However, confirmation email was not sent' . "\n" .
+                         'due to technical reasons...' . "\n" .
+                         'Please contact us if necessary.'
             );
         } else {
             $this->flashBag->add(
                 'success',
-                nl2br('An email was sent successfully!' . "\n" .
-                'Please check your box' . "\n" .
-                'to look at your password renewal confirmation.')
+                'An email was sent successfully!' . "\n" .
+                         'Please check your box' . "\n" .
+                         'to look at your password renewal confirmation.'
             );
         }
     }

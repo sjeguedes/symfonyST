@@ -153,13 +153,12 @@ final class UpdateTrickHandler extends AbstractTrickFormHandler implements InitM
         // DTO is in valid state but:
         // Each video URL must be unique (This avoids issue with Javascript!).
         if (!$isEachVideoURLUnique = $this->checkUniqueVideoUrl($this->form->getData()->getVideos())) {
-            $uniqueVideoURLError = nl2br('Please check all videos URL!' . "\n" . 'Each one must be unique!');
+            $uniqueVideoURLError = 'Please check all videos URL!' . "\n" . 'Each one must be unique!';
             $this->customError = $uniqueVideoURLError;
             $this->flashBag->add(
                 'danger',
-                nl2br('Trick update failed!' . "\n" .
-                    'Try to request again by checking the form fields.'
-                )
+                'Trick update failed!' . "\n" .
+                         'Try to request again by checking the form fields.'
             );
             return false;
         }
@@ -171,16 +170,14 @@ final class UpdateTrickHandler extends AbstractTrickFormHandler implements InitM
         if (!$trickService->checkSameOrSimilarTrickName($submittedName, $trickToUpdate, true)) {
             // Is submitted trick name (or similar name) not used by existing ones? (trick to update is excluded)?
             if ($isSubmittedNameNotUnique = $trickService->checkSameOrSimilarTrickName($submittedName, $trickToUpdate)) {
-                $trickNameError = nl2br('Please check chosen title!' . "\n" .
-                    'Another trick with the same name' . "\n" .
-                    '(or similar name) already exists.'
-                );
+                $trickNameError = 'Please check chosen title!' . "\n" .
+                                  'Another trick with the same name' . "\n" .
+                                  '(or similar name) already exists.';
                 $this->customError = $trickNameError;
                 $this->flashBag->add(
                     'danger',
-                    nl2br('Trick update failed!' . "\n" .
-                        'Try to request again by checking the form fields.'
-                    )
+                    'Trick update failed!' . "\n" .
+                             'Try to request again by checking the form fields.'
                 );
                 return false;
             }
@@ -779,13 +776,12 @@ final class UpdateTrickHandler extends AbstractTrickFormHandler implements InitM
         $updatedTrick = $trickService->addAndSaveTrick($trick, false, true);
         // Create success notification message
         $state = 'success';
-        $message = nl2br(
-            sprintf(
-                'Trick called' . "\n" . '"%s"' . "\n" . 'was updated successfully!' . "\n" .
-                'Please check trick detail below to look at content.',
-                // Can also be escaped with htmlspecialchars()
-                htmlentities($trick->getName(), ENT_QUOTES | ENT_HTML5, 'UTF-8')
-            ));
+        $message = sprintf(
+            'Trick called' . "\n" . '"%s"' . "\n" . 'was updated successfully!' . "\n" .
+            'Please check trick detail below to look at content.',
+            // Can also be escaped with htmlspecialchars()
+            htmlentities($trick->getName(), ENT_QUOTES | ENT_HTML5, 'UTF-8')
+        );
         // Create failure notification message
         if (\is_null($updatedTrick)) {
             // Delete all images physically created during process
@@ -797,12 +793,10 @@ final class UpdateTrickHandler extends AbstractTrickFormHandler implements InitM
                 false
             );
             $state = 'error';
-            $message = nl2br(
-                'Sorry, trick update failed' . "\n" .
-                'due a technical error!' . "\n" .
-                'Please try again with new data' . "\n" .
-                'or contact us if necessary.'
-            );
+            $message = 'Sorry, trick update failed' . "\n" .
+                       'due a technical error!' . "\n" .
+                       'Please try again with new data' . "\n" .
+                       'or contact us if necessary.';
             if (!$isProcessCorrectlyCanceled) {
                 $loggerMessage = sprintf(
                     "[trace app snowTricks] UpdateTrickHandler/terminateTrickUpdateProcess =>" .

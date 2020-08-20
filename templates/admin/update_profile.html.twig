@@ -47,9 +47,9 @@
                                 <p class="uk-margin-remove">
                                     <span uk-icon="icon: warning; ratio: 0.8"></span>
                                     {% if avatarUploadError is not null %}
-                                    {{ avatarUploadError|raw }}
+                                    {{ avatarUploadError|nl2br }}
                                     {% else %}
-                                    {{ uniqueUserError['email'] is defined ? uniqueUserError['email']|raw : uniqueUserError['username']|raw }}
+                                    {{ uniqueUserError['email'] is defined ? uniqueUserError['email']|nl2br : uniqueUserError['username']|nl2br }}
                                     {% endif %}
                                 </p>
                             </div>

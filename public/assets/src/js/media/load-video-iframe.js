@@ -1,4 +1,4 @@
-import createNotification from "../all/create-notification";
+import createNotification from '../all/create-notification';
 import request from '../all/ajax-request';
 export default (videoBox) => {
     // Resources:

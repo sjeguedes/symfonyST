@@ -163,7 +163,7 @@ class AjaxDeleteMediaAction
                 // Media removal success flash notification
                 $message = "Requested $mediaType" . "\n" . 'was successfully deleted!' . "\n" .
                            'Please also note' . "\n" . 'all its associated data do not exist anymore.';
-                $this->flashBag->add('success', nl2br($message));
+                $this->flashBag->add('success', $message);
                 // Update data
                 switch ($httpReferer = $request->server->get('HTTP_REFERER')) {
                     case 1 === preg_match('/update-trick/', $httpReferer):

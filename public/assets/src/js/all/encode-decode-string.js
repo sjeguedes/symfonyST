@@ -1,4 +1,16 @@
 export default () => {
+    // Resources:
+    // Match multiple occurrences:
+    // https://stackoverflow.com/questions/520611/how-can-i-match-multiple-occurrences-with-a-regex-in-javascript-similar-to-phps
+    // Regexp and unicode issues:
+    //https://stackoverflow.com/questions/280712/javascript-unicode-regexes
+    // https://flaviocopes.com/javascript-unicode/
+    // https://dmitripavlutin.com/what-every-javascript-developer-should-know-about-unicode/
+    // List of unicode chars:
+    // https://en.wikipedia.org/wiki/List_of_Unicode_characters
+
+    // ------------------------------------------------------------------------------------------------------------
+
     // Object which Handles "|e('html_attr')" PHP Twig escaping on string
     // https://github.com/twigphp/Twig/blob/3.x/src/Extension/EscaperExtension.php
     const htmlAttributeOnString = {
@@ -130,6 +142,8 @@ export default () => {
                 // Replace all instances of the entity with the special character
                 escapedString = escapedString.replace(new RegExp(subject, 'g'), replacement);
             }
+            // Avoid issue with string escaped twice (e.g. when it was first escaped with PHP)
+            escapedString = escapedString.replace(/&amp;/gi, '&');
             // Return the escaped string.
             return escapedString;
         },
@@ -216,7 +230,11 @@ export default () => {
     // Object which Handles format on string
     const formatOnString = {
         /**
-         * Converts a new line in text format into a <br> html tag.
+         * Converts a new line in text format into a <br> html tag
+         * with unicode support.
+         *
+         * Please note this version also creates <br> after tag:
+         * (string + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/gi, '$1' + breakTag + '$2');
          *
          * @param {String} string which contains new lines
          * @param {Boolean} isXhtml mode or html
@@ -228,11 +246,52 @@ export default () => {
                 return '';
             }
             let breakTag = (isXhtml) ? '<br />' : '<br>';
-            // String was created manually, partially or entirely!
-            if (/\\n/g.test(string)) {
-                string = string.replace(/\\r\\n|\\n\\r|\\r|\\n/gi, breakTag);
+            return  (string + '').replace(/([\r\n]?)/, '').replace(/(\n)/gi, breakTag);
+        },
+        /**
+         * Converts a encapsulating common double quote pair in text format into a <strong> html tag
+         * with unicode support by accepting Latin-1 Supplement (Unicode block).
+         *
+         * @param {String} string which contains quotes
+         *
+         * @see https://stackoverflow.com/questions/7467840/nl2br-equivalent-in-javascript
+         **/
+        quote2strong: (string) => {
+            let p = /(?:"|(?:&quot;))(([&#;<\/>!?\s\u{00A0}-\u{017F}\w-]+)*)(?:"|(?:&quot;))/gu;
+            string = string.replace(p, '<strong>' + '$1' + '</strong>');
+            return string;
+        },
+        /**
+         * Converts a encapsulating common double quote pair in text format into a <strong> html tag
+         * with a primary color for the first matched pair and a secondary color for other pairs.
+         *
+         * @param {String} string which contains quotes
+         *
+         * @see https://stackoverflow.com/questions/7467840/nl2br-equivalent-in-javascript
+         **/
+        quote2strongWith2colors: (string) => {
+            let pattern = /("|(?:&quot;))/;
+            let matches = string.match(new RegExp(pattern, 'gi'));
+            if (matches !== null) {
+                let matchLength = matches.length;
+                let colorClass;
+                // Search for only one occurrence once a time to replace step by step
+                let regex = new RegExp(pattern, 'i');
+                // Match length is not even! So return string without format
+                if (matches.length % 2 !== 0) {
+                    return string;
+                }
+                // Adapt text color with a custom choice between two colors depending on even pairs!
+                for (let i = 0; i < matchLength; i ++) {
+                    if (i % 2 === 0) {
+                        colorClass = matchLength === 2 ? 'st-color-yellow' : i === 0 ? 'st-color-white' : 'st-color-yellow';
+                        string = string.replace(regex, '<strong><span class=\'' + colorClass + '\'>');
+                    } else {
+                        string = string.replace(regex, '</span></strong>');
+                    }
+                }
             }
-            return (string + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/gi, '$1' + breakTag + '$2');
+            return string;
         }
     };
     return {

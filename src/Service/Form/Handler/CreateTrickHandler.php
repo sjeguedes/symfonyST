@@ -99,13 +99,12 @@ final class CreateTrickHandler extends AbstractTrickFormHandler
         // DTO is in valid state but:
         // Each video URL must be unique (This avoids issue with Javascript!).
         if (!$isEachVideoURLUnique = $this->checkUniqueVideoUrl($this->form->getData()->getVideos())) {
-            $uniqueVideoURLError = nl2br('Please check all videos URL!' . "\n" . 'Each one must be unique!');
+            $uniqueVideoURLError = 'Please check all videos URL!' . "\n" . 'Each one must be unique!';
             $this->customError = $uniqueVideoURLError;
             $this->flashBag->add(
                 'danger',
-                nl2br('Trick creation failed!' . "\n" .
-                    'Try to request again by checking the form fields.'
-                )
+                'Trick creation failed!' . "\n" .
+                         'Try to request again by checking the form fields.'
             );
             return false;
         }
@@ -114,16 +113,14 @@ final class CreateTrickHandler extends AbstractTrickFormHandler
         $submittedName = $this->form->getData()->getName(); // or $this->form->get('name')->getData()
         // Is submitted trick name (or similar name) not used by existing ones?
         if ($isSubmittedNameNotUnique = $trickService->checkSameOrSimilarTrickName($submittedName)) {
-            $trickNameError = nl2br('Please check chosen title!' . "\n" .
-                'Another trick with the same name' . "\n" .
-                '(or similar name) already exists.'
-            );
+            $trickNameError = 'Please check chosen title!' . "\n" .
+                              'Another trick with the same name' . "\n" .
+                              '(or similar name) already exists.';
             $this->customError = $trickNameError;
             $this->flashBag->add(
                 'danger',
-                nl2br('Trick creation failed!' . "\n" .
+                'Trick creation failed!' . "\n" .
                 'Try to request again by checking the form fields.'
-                )
             );
             return false;
         }
@@ -381,13 +378,12 @@ final class CreateTrickHandler extends AbstractTrickFormHandler
         $savedTrick = $trickService->addAndSaveTrick($newTrick, false, true);
         // Create success notification message
         $state = 'success';
-        $message = nl2br(
-            sprintf(
+        $message = sprintf(
             'A new trick called' . "\n" . '"%s"' . "\n" . 'was created successfully!' . "\n" .
             'Please check trick detail below to look at content.',
             // Can also be escaped with htmlspecialchars()
             htmlentities($newTrick->getName(), ENT_QUOTES | ENT_HTML5, 'UTF-8')
-        ));
+        );
         // Create failure notification message
         if (\is_null($savedTrick)) {
             // Delete all images physically created during process
@@ -399,12 +395,10 @@ final class CreateTrickHandler extends AbstractTrickFormHandler
                 false
             );
             $state = 'error';
-            $message = nl2br(
-                'Sorry, trick creation failed' . "\n" .
-                'due a technical error!' . "\n" .
-                'Please try again with new data' . "\n" .
-                'or contact us if necessary.'
-            );
+            $message = 'Sorry, trick creation failed' . "\n" .
+                       'due a technical error!' . "\n" .
+                       'Please try again with new data' . "\n" .
+                       'or contact us if necessary.';
             if (!$isProcessCorrectlyCanceled) {
                 $loggerMessage = sprintf(
                     "[trace app snowTricks] CreateTrickHandler/terminateTrickCreationProcess =>" .

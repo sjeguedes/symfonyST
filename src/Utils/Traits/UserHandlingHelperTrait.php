@@ -53,8 +53,8 @@ trait UserHandlingHelperTrait
         if (false === $isEmailUnique || false === $isUsernameUnique) {
             $this->flashBag->add(
                 'danger',
-                nl2br('Form validation failed!' . "\n" .
-                'Try to request again by checking the form fields.')
+                'Form validation failed!' . "\n" .
+                         'Try to request again by checking the form fields.'
             );
             return false;
         }
@@ -82,11 +82,11 @@ trait UserHandlingHelperTrait
         if (false === $isUniqueUser) {
             switch ($type) {
                 case 'email':
-                    $uniqueEmailError = nl2br('Please choose another email address!' . "\n" . 'It is already used!');
+                    $uniqueEmailError = 'Please choose another email address!' . "\n" . 'It is already used!';
                     $this->customError = ['email' => $uniqueEmailError];
                     break;
                 case 'username':
-                    $uniqueUserNameError = nl2br('Please choose another username!' . "\n" . 'Your nickname is already used!');
+                    $uniqueUserNameError = 'Please choose another username!' . "\n" . 'Your nickname is already used!';
                     $this->customError = ['username' => $uniqueUserNameError];
                     break;
             }

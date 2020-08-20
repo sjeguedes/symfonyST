@@ -39,7 +39,7 @@
             {% set imageDataAttributes = '' %}
         {% endif %}
         {# These vars are checked to be safe with condition above! #}
-        <a {{ removeImageLink|raw }} title="{{ actionTitle }}" {{ imageDataAttributes|raw }}
+        <a {{ removeImageLink }} title="{{ actionTitle }}" {{ imageDataAttributes }}
            class="uk-position-top-right uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-margin-small-top uk-margin-small-right st-delete-image" uk-toggle>
             <span uk-icon="icon: {{ removalIcon }}; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-delete st-svg-icon-actions"></span>
         </a>

@@ -97,11 +97,11 @@ final class RequestNewPasswordHandler extends AbstractFormHandler
         $loadedUser = $userService->getRepository()->loadUserByUsername($this->form->getData()->getUserName()); // or $this->form->get('userName')->getData()
         // DTO is in valid state but user can not be found.
         if (\is_null($loadedUser)) {
-            $userError = nl2br('Please check your credentials!' . "\n" . 'User can not be found.');
+            $userError = 'Please check your credentials!' . "\n" . 'User can not be found.';
             $this->customError = $userError;
             $this->flashBag->add(
                 'danger',
-                nl2br('Authentication failed!' . "\n" . 'Try to request again by checking the form fields.')
+                'Authentication failed!' . "\n" . 'Try to request again by checking the form fields.'
             );
             return false;
         }
@@ -153,10 +153,10 @@ final class RequestNewPasswordHandler extends AbstractFormHandler
         }
         $this->flashBag->add(
             'success',
-            nl2br('An email was sent successfully!' . "\n" .
-            'Please check your box and' . "\n" .
-            'use your personalized link' . "\n" .
-            'to renew your password.')
+            'An email was sent successfully!' . "\n" .
+                     'Please check your box and' . "\n" .
+                     'use your personalized link' . "\n" .
+                     'to renew your password.'
         );
     }
 

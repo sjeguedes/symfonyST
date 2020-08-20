@@ -1,8 +1,8 @@
 import cropper from './all/cropper';
 import UIkit from "../../uikit/dist/js/uikit.min";
 import request from './all/ajax-request';
-import stringHelper from "./all/encode-decode-string";
 import URIHelper from './all/encode-decode-uri';
+import createNotification from "./all/create-notification";
 export default () => {
     // Resources:
     // RequestAnimationFrame: https://blog.teamtreehouse.com/efficient-animations-with-requestanimationframe
@@ -20,8 +20,6 @@ export default () => {
 
     const formElement = document.getElementById('st-update-profile-form');
     if (formElement) {
-        // String helper to decode string
-        const htmlStringHandler = stringHelper();
         // Crop data hidden input
         const cropJSONDataInputElement = formElement.querySelector('.st-crop-data');
         // Avatar file input
@@ -206,17 +204,15 @@ export default () => {
                                         UIkit.notification.closeAll();
                                         // Add info to check file type, size and dimensions
                                         let additionalMessage = fileInputElement.getAttribute('data-error-6');
-                                        additionalMessage = htmlStringHandler.htmlSpecialCharsOnString.encode(additionalMessage);
-                                        additionalMessage = htmlStringHandler.formatOnString.nl2br(additionalMessage);
                                         // Error notification
-                                        UIkit.notification({
-                                            message: `<div class="uk-text-center">
-                                    <span uk-icon='icon: warning'></span>&nbsp;` + response.formError.notification + `<br>` + additionalMessage +
-                                                `</div>`,
-                                            status: 'error',
-                                            pos: 'top-center',
-                                            timeout: 5000
-                                        });
+                                        createNotification(
+                                            response.formError.notification + `\n` + additionalMessage,
+                                            null,
+                                            true,
+                                            'error',
+                                            'warning',
+                                            5000
+                                        );
                                         break;
                                     case 'redirectionURL':
                                         // Perform a redirection as expected
@@ -238,16 +234,14 @@ export default () => {
                     error = (xhr.status !== undefined && xhr.statusText !== undefined) ? `error: ${xhr.status} - ${xhr.statusText}` : '';
                     // Aborted request
                     error = 0 !== xhr.status ? error : '';
-                    technicalError = htmlStringHandler.htmlSpecialCharsOnString.encode(technicalError);
-                    technicalError = htmlStringHandler.formatOnString.nl2br(technicalError);
-                    UIkit.notification({
-                        message: `<div class="uk-text-center">
-                                    <span uk-icon='icon: warning'></span>&nbsp;` + technicalError + error +
-                            `</div>`,
-                        status: 'error',
-                        pos: 'top-center',
-                        timeout: 0
-                    });
+                    createNotification(
+                        technicalError + error,
+                        null,
+                        true,
+                        'error',
+                        'warning',
+                        0
+                    );
                 });
             });
         }
