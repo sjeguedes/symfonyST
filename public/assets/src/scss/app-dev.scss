@@ -813,6 +813,11 @@ footer.st-footer {
 .st-image-to-crop-label {
     margin-bottom: 20px !important;
 }
+// Watch video link
+.st-video-watch-link {
+    // Fix bug with disappearing element on Safari (background is also important)
+    -webkit-transform: translate3d(0, 0, 0);
+}
 
 
 

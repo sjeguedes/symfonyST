@@ -20,7 +20,7 @@ export default (message, groupOption = null, mustFormat = false, status = 'error
     UIkit.notification.closeAll(groupOption);
     // Activate new notification
     UIkit.notification({
-        message: `<div class="uk-text-center" style="font-size: 90%">
+        message: `<div class="uk-text-center" style="font-size: 95%">
                  <span uk-icon="icon: ${icon}"></span>&nbsp;` + message + `</div>`,
         status: status,
         pos: 'top-center',

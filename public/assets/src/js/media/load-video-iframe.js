@@ -28,34 +28,50 @@ export default (videoBox) => {
     let groupOption = 'defineVideoURL';
     // Check existing textarea element
     if (videoURLTextAreaElement.length !== 0) {
-        // Get previous defined VIDEO URL
         videoBox.previousURL = videoURLTextAreaElement.value;
+        // Video URL textarea "focus" event handler
+        const videoURLTextAreaFocusHandler = () => {
+            // End of "focus" event
+            clearTimeout(videoURLTextAreaElement.focusFinished);
+                videoURLTextAreaElement.focusFinished = setTimeout(() => {
+                // Get previous defined video URL
+                videoBox.previousURL = videoURLTextAreaElement.value;
+                // Remove event listener
+                videoURLTextAreaElement.removeEventListener('focus', videoURLTextAreaFocusHandler);
+            }, 0);
+        };
+        videoURLTextAreaElement.addEventListener('focus', videoURLTextAreaFocusHandler);
         // Video URL textarea "blur" event handler
         const videoURLTextAreaBlurHandler = () => {
-            // Get new video URL value
-            let videoURL = videoURLTextAreaElement.value;
-            // Will store checked video URL
-            let checkedVideoURL = null;
-            // Will store a timeout
-            let to = undefined;
-            // Stop process immediately if defined URL is empty or if there is no change!
-            if (videoURL === '' || videoBox.previousURL === videoURL) {
-                // Keep and update existing validation icon
-                let textAreaCheck = videoURLTextAreaElement.nextElementSibling;
-                if (textAreaCheck !== null) {
-                    // Insert new error icon
-                    videoURLTextAreaElement.nextElementSibling.insertAdjacentHTML(
-                        'afterend',
-                        '<span class="uk-form-icon uk-form-icon-flip uk-form-danger st-textarea-icon" uk-icon="icon: warning"></span>'
-                    );
-                    // Remove previous success icon
-                    videoURLTextAreaElement.nextElementSibling.remove();
-                }
-                return;
-            }
             // End of "blur" event
             clearTimeout(videoURLTextAreaElement.blurFinished);
             videoURLTextAreaElement.blurFinished = setTimeout(() => {
+                // Get new video URL value
+                let videoURL = videoURLTextAreaElement.value;
+                // Will store checked video URL
+                let checkedVideoURL = null;
+                // Will store a timeout
+                let to = undefined;
+                // Stop process immediately if defined URL is empty, with an existing previous value
+                if (videoBox.previousURL !== '' && videoURL.trim() === '') {
+                    // Keep and update existing validation icon
+                    let textAreaCheck = videoURLTextAreaElement.nextElementSibling;
+                    if (textAreaCheck !== null) {
+                        // Insert new error icon
+                        videoURLTextAreaElement.nextElementSibling.insertAdjacentHTML(
+                            'afterend',
+                            '<span class="uk-form-icon uk-form-icon-flip uk-form-danger st-textarea-icon" uk-icon="icon: warning"></span>'
+                        );
+                        // Remove previous success icon
+                        videoURLTextAreaElement.nextElementSibling.remove();
+                    }
+                    whenVideoError(videoURL);
+                    return;
+                }
+                // Stop process immediately if defined URL did not change in comparison with previous value!
+                if (videoBox.previousURL === videoURL.trim()) {
+                    return;
+                }
                 checkedVideoURL = checkUrl(videoURL.trim());
                 // URL is one among those which are expected!
                 if (checkedVideoURL !== null) {
@@ -88,7 +104,7 @@ export default (videoBox) => {
                     }, 2000);
                 } else {
                     videoURLTextAreaElement.value = videoURL.trim();
-                    whenVideoError(videoBox);
+                    whenVideoError();
                     clearTimeout(to);
                 }
                 // Remove event listener
@@ -235,13 +251,19 @@ export default (videoBox) => {
     // ------------------------------------------------------------------------------------------------------------
 
     // "errorCallback" error callback function
-    const whenVideoError = () => {
+    const whenVideoError = (currentURL = null) => {
         // Hide loading spinner
         loadingSpinner.classList.add('uk-hidden');
         // Re-enable video URL textarea
         videoURLTextAreaElement.classList.remove('uk-disabled');
         // Hide video iframe and success infos (watch link and text info)
         iframeParentPreview.classList.add('uk-hidden');
+        // Reset mini-iframe preview
+        iframePreview.setAttribute('src', '');
+        // Hide watch link
+        watchLink.classList.add('uk-hidden');
+        // reset watch link value
+        watchLink.setAttribute('href', '#');
         // Show default image tag for video iframe replacement
         iframeReplacementPreview.classList.remove('uk-hidden');
         // Hide saved video text info
@@ -249,8 +271,10 @@ export default (videoBox) => {
             textInfo.classList.add('uk-hidden');
         }
         // Show error notification message
-        let message = videoURLTextAreaElement.getAttribute('data-url-error');
-        if (message && message !== '') {
+        let message = (currentURL !== null && currentURL === '')
+            ? videoURLTextAreaElement.getAttribute('data-empty-url')
+            : videoURLTextAreaElement.getAttribute('data-url-error');
+        if (message !== null) {
             createNotification(message, groupOption, true, 'error', 'warning');
         }
         // Keep and update existing validation icon
@@ -278,6 +302,8 @@ export default (videoBox) => {
         iframePreview.setAttribute('src', videoBox.url);
         // Update watch link
         watchLink.setAttribute('href', videoBox.browserLink);
+        // Show watch link
+        watchLink.classList.remove('uk-hidden');
         // Show video iframe and success infos (watch link and text info)
         iframeParentPreview.classList.remove('uk-hidden');
         // Show saved video text info
