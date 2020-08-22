@@ -6,6 +6,8 @@ namespace App\Domain\Entity;
 
 use App\Domain\Repository\TrickRepository;
 use App\Utils\Traits\StringHelperTrait;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
@@ -95,6 +97,13 @@ class Trick
     private $updateDate;
 
     /**
+     * @var Collection (inverse side of entity relation)
+     *
+     * @ORM\OneToMany(targetEntity=Comment::class, orphanRemoval=true, mappedBy="trick")
+     */
+    private $comments;
+
+    /**
      * @var MediaOwner|null (inverse side of entity relation)
      *
      * The media owner can be null if application allows no media at creation/update!
@@ -159,6 +168,7 @@ class Trick
         $this->creationDate = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
         $this->updateDate = $this->creationDate;
         $this->rank = null;
+        $this->comments = new ArrayCollection();
     }
 
     /**
@@ -306,6 +316,37 @@ class Trick
     }
 
     /**
+     * Add Comment entity to collection.
+     *
+     * @param Comment $comment
+     *
+     * @return Trick
+     */
+    public function addComment(Comment $comment) : self
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
+            $comment->modifyUser($this);
+        }
+        return $this;
+    }
+
+    /**
+     * Remove Comment entity from collection.
+     *
+     * @param Comment $comment
+     *
+     * @return Trick
+     */
+    public function removeComment(Comment $comment) : self
+    {
+        if ($this->comments->contains($comment)) {
+            $this->comments->removeElement($comment);
+        }
+        return $this;
+    }
+
+    /**
      * @return UuidInterface
      */
     public function getUuid() : UuidInterface
@@ -359,6 +400,14 @@ class Trick
     public function getIsPublished() : bool
     {
         return $this->isPublished;
+    }
+
+    /**
+     * @return Collection|Comment[]
+     */
+    public function getComments() : Collection
+    {
+        return $this->comments;
     }
 
     /**

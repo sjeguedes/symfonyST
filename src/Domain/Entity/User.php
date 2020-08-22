@@ -164,6 +164,13 @@ class User implements UserInterface, \Serializable
     /**
      * @var Collection (inverse side of entity relation)
      *
+     * @ORM\OneToMany(targetEntity=Comment::class, orphanRemoval=true, mappedBy="user")
+     */
+    private $comments;
+
+    /**
+     * @var Collection (inverse side of entity relation)
+     *
      * @ORM\OneToMany(targetEntity=Media::class, orphanRemoval=true, mappedBy="user")
      */
     private $medias;
@@ -225,6 +232,7 @@ class User implements UserInterface, \Serializable
         $this->isActivated = false;
         $this->creationDate = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
         $this->updateDate = $this->creationDate;
+        $this->comments = new ArrayCollection();
         $this->medias = new ArrayCollection();
         $this->tricks = new ArrayCollection();
     }
@@ -533,6 +541,37 @@ class User implements UserInterface, \Serializable
     }
 
     /**
+     * Add Comment entity to collection.
+     *
+     * @param Comment $comment
+     *
+     * @return User
+     */
+    public function addComment(Comment $comment) : self
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
+            $comment->modifyUser($this);
+        }
+        return $this;
+    }
+
+    /**
+     * Remove Comment entity from collection.
+     *
+     * @param Comment $comment
+     *
+     * @return User
+     */
+    public function removeComment(Comment $comment) : self
+    {
+        if ($this->comments->contains($comment)) {
+            $this->comments->removeElement($comment);
+        }
+        return $this;
+    }
+
+    /**
      * Add Media entity to collection.
      *
      * @param Media $media
@@ -746,6 +785,14 @@ class User implements UserInterface, \Serializable
     public function getMediaOwner() : ?MediaOwner
     {
         return $this->mediaOwner;
+    }
+
+    /**
+     * @return Collection|Comment[]
+     */
+    public function getComments() : Collection
+    {
+        return $this->comments;
     }
 
     /**
