@@ -110,13 +110,13 @@ class Comment
     /**
      * Change parent comment (possibly with reply case) after creation.
      *
-     * @param UuidInterface $parentComment
+     * @param Comment $parentComment
      *
      * @return Comment
      *
      * @throws \Exception
      */
-    public function modifyParentComment(UuidInterface $parentComment) : self
+    public function modifyParentComment(Comment $parentComment) : self
     {
         $this->parentComment = $parentComment;
         return $this;
