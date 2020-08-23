@@ -99,7 +99,7 @@ class Trick
     /**
      * @var Collection (inverse side of entity relation)
      *
-     * @ORM\OneToMany(targetEntity=Comment::class, orphanRemoval=true, mappedBy="trick")
+     * @ORM\OneToMany(targetEntity=Comment::class, cascade={"remove"}, orphanRemoval=true, mappedBy="trick")
      */
     private $comments;
 
@@ -326,7 +326,7 @@ class Trick
     {
         if (!$this->comments->contains($comment)) {
             $this->comments->add($comment);
-            $comment->modifyUser($this);
+            $comment->modifyTrick($this);
         }
         return $this;
     }
