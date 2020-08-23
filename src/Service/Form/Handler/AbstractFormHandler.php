@@ -6,6 +6,7 @@ namespace App\Service\Form\Handler;
 
 use App\Domain\Entity\Trick;
 use App\Domain\Entity\User;
+use App\Domain\ServiceLayer\CommentManager;
 use App\Domain\ServiceLayer\ImageManager;
 use App\Domain\ServiceLayer\MediaManager;
 use App\Domain\ServiceLayer\TrickManager;
@@ -28,14 +29,15 @@ class AbstractFormHandler implements FormHandlerInterface
      * Define data keys and types to check which are used in form request process.
      */
     const DATA_CONFIG_TO_CHECK = [
-        'imageService'  => ImageManager::class,
-        'mediaService'  => MediaManager::class,
-        'request'       => Request::class,
-        'trickService'  => TrickManager::class,
-        'trickToUpdate' => Trick::class,
-        'userService'   => UserManager::class,
-        'userToUpdate'  => User::class,
-        'videoService'  => VideoManager::class
+        'commentService' => CommentManager::class,
+        'imageService'   => ImageManager::class,
+        'mediaService'   => MediaManager::class,
+        'request'        => Request::class,
+        'trickService'   => TrickManager::class,
+        'trickToUpdate'  => Trick::class,
+        'userService'    => UserManager::class,
+        'userToUpdate'   => User::class,
+        'videoService'   => VideoManager::class
     ];
 
     /**

@@ -8,6 +8,7 @@ use App\Domain\Entity\Trick;
 use App\Domain\ServiceLayer\MediaTypeManager;
 use App\Domain\ServiceLayer\TrickManager;
 use App\Responder\SingleTrickResponder;
+use App\Service\Form\Handler\FormHandlerInterface;
 use App\Service\Security\Voter\TrickVoter;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
@@ -39,6 +40,11 @@ class SingleTrickAction
     private $trickService;
 
     /**
+     * @var FormHandlerInterface
+     */
+    private $formHandler;
+
+    /**
      * @var AuthorizationCheckerInterface
      */
     private $authorizationChecker;
@@ -48,6 +54,7 @@ class SingleTrickAction
      *
      * @param MediaTypeManager              $mediaTypeService
      * @param TrickManager                  $trickService
+     * @param FormHandlerInterface          $formHandler
      * @param AuthorizationCheckerInterface $authorizationChecker
      * @param LoggerInterface               $logger
      *
@@ -56,6 +63,7 @@ class SingleTrickAction
     public function __construct(
         MediaTypeManager $mediaTypeService,
         TrickManager $trickService,
+        FormHandlerInterface $formHandler,
         AuthorizationCheckerInterface $authorizationChecker,
         LoggerInterface $logger
     ) {
@@ -64,6 +72,7 @@ class SingleTrickAction
         $this->authorizationChecker = $authorizationChecker;
         $this->setLogger($logger);
 
+        $this->formHandler = $formHandler;
     }
 
     /**
@@ -87,19 +96,17 @@ class SingleTrickAction
         // Get registered normal image type (corresponds particular dimensions)
         $trickNormalImageTypeValue = $this->mediaTypeService->getMandatoryDefaultTypes()['trickNormal'];
         $normalImageMediaType = $this->mediaTypeService->findSingleByUniqueType($trickNormalImageTypeValue);
-        // Check wrong parameters!
-        if (\is_null($normalImageMediaType) || \is_null($trick)) {
-            $error = \is_null($normalImageMediaType) ? 'Trick normal image type' : 'Trick uuid';
-            $this->logger->error("[trace app snowTricks] SingleTrickAction/__invoke => ' . $error . ': null");
-            throw new NotFoundHttpException('Trick can not be found or correctly shown! Wrong parameters are used.');
-        }
+        // Set trick comment form without initial model data and set the request by binding it
+        $createTrickCommentForm = $this->formHandler->initForm()->bindRequest($request);
         $data = [
-            'mediaError'           => 'Media loading error',
-            'mediaTypesValues'     => $this->mediaTypeService->getMandatoryDefaultTypes(),
-            'normalImageMediaType' => $normalImageMediaType,
-            'trick'                => $trick,
+            'createCommentForm'         => $createTrickCommentForm->createView(),
+            'mediaError'                => 'Media loading error',
+            'mediaTypesValues'          => $this->mediaTypeService->getMandatoryDefaultTypes(),
+            'normalImageMediaType'      => $normalImageMediaType,
+            'trick'                     => $trick,
+            'trickCommentCreationError' => null,
             // Empty declared url is more explicit!
-            'videoURLProxyPath'    => $this->trickService->generateURLFromRoute(
+            'videoURLProxyPath'         => $this->trickService->generateURLFromRoute(
                 'load_trick_video_url_check', ['url' => ''],
                 UrlGeneratorInterface::ABSOLUTE_URL
             )

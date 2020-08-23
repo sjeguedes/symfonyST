@@ -265,15 +265,23 @@
             <h1 class="uk-heading-bullet uk-text-large uk-text-center uk-text-uppercase uk-text-bold">
                 Follow comments from members about this trick.
             </h1>
-            <p class="uk-text-center uk-text-uppercase uk-text-bold st-color-red">
             {% if is_granted('ROLE_USER') %}
+            <p class="uk-text-center uk-text-uppercase uk-text-bold st-color-red">
                 Use the form below to create a new comment.
-                {# TODO: here, create and include comment form template #}
+            </p>
+            {# ------------------------------------------------------------------------- #}
+            {# Get trick comment form #}
+            {% include 'form/create_comment.html.twig' with {
+                'createCommentForm': createCommentForm,
+                'trickCommentCreationError': trickCommentCreationError
+            } %}
+            {# ------------------------------------------------------------------------- #}
             {% else %}
+            <p class="uk-text-center uk-text-uppercase uk-text-bold st-color-red">
                 You can participate if you have an account. To register, simply fill in the form.<br>
                 Then you will able to post comments on your own.
-            {% endif %}
             </p>
+            {% endif %}
         </div>
         <!-- Trick comments -->
         <div class="uk-container uk-padding">

@@ -1,0 +1,7 @@
+# https://symfony.com/doc/current/validation.html#validation-constraints
+# https://symfony.com/doc/current/validation/groups.html
+App\Domain\DTO\CreateCommentDTO:
+    properties:
+        content:
+            - NotBlank:
+                message: Please fill in a content.

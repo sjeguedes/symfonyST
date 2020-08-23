@@ -48,6 +48,18 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
+    # add form handler when showing a trick
+    App\Action\SingleTrickAction:
+        tags: ['controller.service_arguments']
+        arguments:
+            $formHandler: '@App\Service\Form\Handler\CreateCommentHandler'
+
+    # add form handler when creating a new trick comment
+    App\Action\Admin\CreateCommentAction:
+        tags: ['controller.service_arguments']
+        arguments:
+            $formHandler: '@App\Service\Form\Handler\CreateCommentHandler'
+
     # add form handler when creating a new trick
     App\Action\Admin\CreateTrickAction:
         tags: ['controller.service_arguments']
@@ -111,6 +123,9 @@ services:
 
     # add login handler
     App\Service\Form\Handler\LoginHandler:
+
+    # add comment creation handler
+    App\Service\Form\Handler\CreateCommentHandler:
 
     # add trick creation handler
     App\Service\Form\Handler\CreateTrickHandler:
