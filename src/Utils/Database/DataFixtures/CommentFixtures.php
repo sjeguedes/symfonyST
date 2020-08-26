@@ -66,7 +66,7 @@ class CommentFixtures extends BaseFixture implements DependentFixtureInterface
                 $proxy2,
                 $data[$i]['fields']['content'],
                 null, // depends on existing comments
-                new \DateTime(sprintf("+%d days", -$i))
+                new \DateTime(sprintf("+%d days", - \count($data) +$i)) // must be this to have a coherent list
             );
             // Store comments to retrieve possible parent comment or null for each created comment
             $commentReferences[$i + 1] = $comment;

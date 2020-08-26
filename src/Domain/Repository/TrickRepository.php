@@ -259,15 +259,15 @@ class TrickRepository extends ServiceEntityRepository
      */
     public function findOneByName(string $name) : ?Trick
     {
-        // TODO: complete query later with users messages or use Message (Comment) Repository to limit result!
         $queryBuilder = $this->createQueryBuilder('t');
         // No need to join media types and trick group due to no particular filter on data
         // trick group and media type data are added automatically thanks to lazy loading!
         // Specifying joins reduces query numbers!
         $result = $queryBuilder
             // IMPORTANT! This feeds all objects properties correctly!
-            ->select(['t', 'tg','mo', 'm', 'mt', 'ms', 'i', 'v'])
+            ->select(['t', 'tg', 'c', 'mo', 'm', 'mt', 'ms', 'i', 'v'])
             ->leftJoin('t.trickGroup', 'tg', 'WITH', 't.trickGroup = tg.uuid')
+            ->leftJoin('t.comments', 'c', 'WITH', 'c.trick = t.uuid')
             ->leftJoin('t.mediaOwner', 'mo', 'WITH', 'mo.trick = t.uuid')
             ->leftJoin('mo.medias', 'm', 'WITH', 'm.mediaOwner = mo.uuid')
             ->leftJoin('m.mediaType', 'mt', 'WITH', 'm.mediaType = mt.uuid')
@@ -277,6 +277,8 @@ class TrickRepository extends ServiceEntityRepository
             ->where('t.name = ?1')
             ->orderBy('i.creationDate', 'DESC')
             ->addOrderBy('v.creationDate', 'DESC')
+            // List comments by ordering them with ascending creation date to have a coherent presentation
+            ->addOrderBy('c.creationDate', 'ASC')
             ->setParameter(1, $name)
             ->getQuery()
             ->getOneOrNullResult();
@@ -308,16 +310,16 @@ class TrickRepository extends ServiceEntityRepository
      */
     public function findOneToShowByUuid(UuidInterface $uuid) : ?Trick
     {
-        // TODO: complete query later with users messages or use Message (Comment) Repository to limit result!
         $queryBuilder = $this->createQueryBuilder('t');
         // Specifying joins reduces query numbers!
         $result = $queryBuilder
             // IMPORTANT! This feeds all objects properties correctly!
-            ->select(['t', 'tg','mo', 'm', 'mt', 'ms', 'i', 'v'])
+            ->select(['t', 'tg','c', 'mo', 'm', 'mt', 'ms', 'i', 'v'])
             // CAUTION! 'HIDDEN' is a DQL keyword and
             // uses 'INVISIBLE' (or limited query result "tips") equivalence for MariaDB/MySQL up to date server version,
             // not to keep this column in final result.
             ->addSelect('FIELD(mt.sourceType, ?8, ?9) AS HIDDEN ordered_media_source_type')
+            ->leftJoin('t.comments', 'c', 'WITH', 'c.trick = t.uuid')
             ->leftJoin('t.trickGroup', 'tg', 'WITH', 't.trickGroup = tg.uuid')
             ->leftJoin('t.mediaOwner', 'mo', 'WITH', 'mo.trick = t.uuid')
             ->leftJoin('mo.medias', 'm', 'WITH', 'm.mediaOwner = mo.uuid')
@@ -338,6 +340,8 @@ class TrickRepository extends ServiceEntityRepository
             ->orderBy('ordered_media_source_type')
             // Each group of medias sorted earlier by types are sorted by show list rank data.
             ->addOrderBy('m.showListRank', 'ASC')
+            // List comments by ordering them with ascending creation date to have a coherent presentation
+            ->addOrderBy('c.creationDate', 'DESC')
             ->setParameter(1, $uuid->getBytes())
             ->setParameter(2, MediaType::TYPE_CHOICES['trickThumbnail'])
             ->setParameter(3, MediaType::TYPE_CHOICES['trickNormal'])

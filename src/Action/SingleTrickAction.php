@@ -92,18 +92,21 @@ class SingleTrickAction
     public function __invoke(SingleTrickResponder $responder, Request $request) : Response
     {
         // Check access to single page
-        $trick = $this->checkAccessToSingleAction($request);
+        $currentTrick = $this->checkAccessToSingleAction($request);
         // Get registered normal image type (corresponds particular dimensions)
         $trickNormalImageTypeValue = $this->mediaTypeService->getMandatoryDefaultTypes()['trickNormal'];
         $normalImageMediaType = $this->mediaTypeService->findSingleByUniqueType($trickNormalImageTypeValue);
+        // Use current trick as form type options
+        $options = ['trickToUpdate'  => $currentTrick];
         // Set trick comment form without initial model data and set the request by binding it
-        $createTrickCommentForm = $this->formHandler->initForm()->bindRequest($request);
+        $createTrickCommentForm = $this->formHandler->initForm(null, null, $options)->bindRequest($request);
         $data = [
             'createCommentForm'         => $createTrickCommentForm->createView(),
             'mediaError'                => 'Media loading error',
             'mediaTypesValues'          => $this->mediaTypeService->getMandatoryDefaultTypes(),
             'normalImageMediaType'      => $normalImageMediaType,
-            'trick'                     => $trick,
+            'noList'                    => 'No comment exists for this trick at this time!',
+            'trick'                     => $currentTrick,
             'trickCommentCreationError' => null,
             // Empty declared url is more explicit!
             'videoURLProxyPath'         => $this->trickService->generateURLFromRoute(

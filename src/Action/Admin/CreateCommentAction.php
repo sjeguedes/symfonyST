@@ -103,8 +103,10 @@ class CreateCommentAction
     {
         // Check access to creation form
         $currentTrick = $this->checkAccessToCreationAction($request);
+        // Use current trick as form type options
+        $options = ['trickToUpdate'  => $currentTrick];
         // Set form without initial model data and set the request by binding it
-        $createTrickCommentForm = $this->formHandler->initForm()->bindRequest($request);
+        $createTrickCommentForm = $this->formHandler->initForm(null, null, $options)->bindRequest($request);
         // Get registered normal image type (corresponds particular dimensions)
         $trickNormalImageTypeValue = $this->mediaTypeService->getMandatoryDefaultTypes()['trickNormal'];
         $normalImageMediaType = $this->mediaTypeService->findSingleByUniqueType($trickNormalImageTypeValue);
@@ -128,6 +130,7 @@ class CreateCommentAction
             'mediaError'                => 'Media loading error',
             'mediaTypesValues'          => $this->mediaTypeService->getMandatoryDefaultTypes(),
             'normalImageMediaType'      => $normalImageMediaType,
+            'noList'                    => 'No comment exists for this trick at this time!',
             'trick'                     => $currentTrick,
             'trickCommentCreationError' => $this->formHandler->getCommentCreationError() ?? null,
             // Empty declared url is more explicit!

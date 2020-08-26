@@ -6,8 +6,10 @@ namespace App\Service\Form\Type\Admin;
 
 use App\Domain\DTO\CreateCommentDTO;
 use App\Domain\Entity\Comment;
+use App\Domain\Entity\Trick;
 use App\Domain\ServiceLayer\CommentManager;
 use App\Utils\Traits\UuidHelperTrait;
+use Ramsey\Uuid\UuidInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -55,34 +57,45 @@ class CreateCommentType extends AbstractType
         $commentService = $this->commentService;
         // init an index for comment loop
         $commentIndex = 0;
+        $currentTrick = $options['trickToUpdate'];
         $builder
-            ->add('parentComment', EntityType::class, [
-                'class'           => Comment::class,
-                // Order comments by creation date descending order when feeding select
-                'query_builder'   => function () use ($commentService) {
-                    return $commentService->getRepository()
-                        ->createQueryBuilder('c')
-                        ->orderBy('c.creationDate', 'DESC');
-                },
-                // Show group names in select
-                'choice_label'    => function ($comment) use (&$commentIndex) {
-                    $commentIndex ++;
-                    /** @var Comment $comment */
-                    return "Comment #{$commentIndex} posted by " . $comment->getUser()->getNickName();
-                },
-                // Use encoded uuid value to query entities
-                // Replace the need to use a setter for "parentComment" corresponding CreateCommentDTO property
-                'choice_value'    => function (Comment $group = null) {
-                    return !\is_null($group) ? $this->encode($group->getUuid()) : '';
-                },
-                'placeholder'     => 'No reply',
-                'invalid_message' => "You are not allowed to tamper\nparent comments choice list!"
-            ])
             ->add('content', TextareaType::class, [
             ])
             ->add('token', HiddenType::class, [
                 'inherit_data' => true
             ]);
+        // Enable reply field if at least a previous comment was posted for current trick
+        if (\count($currentTrick->getComments()) !== 0) {
+            $builder
+                ->add('parentComment', EntityType::class, [
+                    'class'           => Comment::class,
+                    // Order comments by creation date descending order when feeding select
+                    'query_builder'   => function () use ($commentService, $currentTrick) {
+                        /** @var UuidInterface $currentTrickUuid */
+                        $currentTrickUuid = $currentTrick->getUuid();
+                        return $commentService->getRepository()
+                            ->createQueryBuilder('c')
+                            ->join('c.trick', 't', 'WITH', 'c.trick = t.uuid')
+                            ->where('t.uuid = ?1')
+                            ->orderBy('c.creationDate', 'ASC')
+                            ->setParameter(1, $currentTrickUuid->getBytes());
+                    },
+                    // Show group names in select
+                    'choice_label'    => function ($comment) use (&$commentIndex) {
+                        $commentIndex ++;
+                        /** @var Comment $comment */
+                        return "Comment #{$commentIndex} posted by " . $comment->getUser()->getNickName() .
+                                ' added on ' . $comment->getCreationDate()->format('d/m/Y');
+                    },
+                    // Use encoded uuid value to query entities
+                    // Replace the need to use a setter for "parentComment" corresponding CreateCommentDTO property
+                    'choice_value'    => function (Comment $comment = null) {
+                        return !\is_null($comment) ? $this->encode($comment->getUuid()) : '';
+                    },
+                    'placeholder'     => 'No reply',
+                    'invalid_message' => "You are not allowed to tamper\nparent comments choice list!"
+                ]);
+        }
     }
 
     /**
@@ -98,7 +111,9 @@ class CreateCommentType extends AbstractType
             'data_class'     => CreateCommentDTO::class,
             'empty_data'     => function (FormInterface $form) {
                 return new CreateCommentDTO(
-                    $form->get('parentComment')->getData(),
+                    // "null" by default if no previous comment was posted (Select field is not available!)
+                    $form->offsetExists('parentComment')
+                        ? $form->get('parentComment')->getData() : null,
                     $form->get('content')->getData()
                 );
             },
@@ -108,5 +123,13 @@ class CreateCommentType extends AbstractType
             'csrf_field_name' => 'token',
             'csrf_token_id'   => 'create_comment_token',
         ]);
+        // Check "trickToUpdate" option
+        $resolver->setRequired('trickToUpdate');
+        $resolver->setAllowedValues('trickToUpdate', function ($value) {
+            if (!$value instanceof Trick) {
+                return false;
+            }
+            return true;
+        });
     }
 }

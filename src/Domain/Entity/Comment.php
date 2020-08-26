@@ -17,8 +17,8 @@ use Ramsey\Uuid\UuidInterface;
  * @ORM\Entity(repositoryClass=CommentRepository::class)
  * @ORM\Table(name="comments")
  *
- * @see self referencing:
- * https://doctrine2.readthedocs.io/en/latest/reference/association-mapping.html#one-to-one-self-referencing
+ * @see self referencing with one to many relationship:
+ * https://doctrine2.readthedocs.io/en/latest/reference/association-mapping.html#one-to-many-self-referencing
  */
 class Comment
 {
@@ -33,12 +33,12 @@ class Comment
     private $uuid;
 
     /**
-     * A parent comment in case of reply (self referencing relation)
+     * A parent comment in case of reply (self referencing unidirectional relation)
      *
      * @var Comment|null
      *
-     * @ORM\OneToOne(targetEntity="Comment")
-     * @ORM\JoinColumn(name="parent_comment_uuid", referencedColumnName="uuid")
+     * @ORM\ManyToOne(targetEntity="Comment")
+     * @ORM\JoinColumn(name="parent_comment_uuid", referencedColumnName="uuid", onDelete="SET NULL")
      */
     private $parentComment;
 
@@ -94,7 +94,7 @@ class Comment
         Trick $trick,
         User $user,
         string $content,
-        Comment $parentComment = null,
+        ?Comment $parentComment,
         \DateTimeInterface $creationDate = null
     ) {
         \assert(!empty($content), 'Comment content can not be empty!');
@@ -193,9 +193,9 @@ class Comment
     }
 
     /**
-     * @return Comment
+     * @return Comment|null
      */
-    public function getParentComment() : Comment
+    public function getParentComment() : ?Comment
     {
         return $this->parentComment;
     }

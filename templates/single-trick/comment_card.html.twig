@@ -1,0 +1,72 @@
+<div class="uk-card uk-card-default uk-card-body uk-position-relative uk-box-shadow-hover-large uk-padding-small st-background-yellow st-border-white-small">
+    {% if currentKey == trickCommentLength %}
+    {# Last comment indicator #}
+    <div id="st-last-comment-indicator" class="uk-position-top-right uk-text-center uk-text-small uk-text-uppercase uk-text-bold uk-padding-small uk-padding-remove-top uk-padding-remove-bottom st-background-blue st-last-comment-indicator">
+        <span class="st-color-yellow">Last most recent comment</span>
+    </div>
+    {% endif %}
+    <div class="uk-grid-small uk-flex uk-flex-middle" uk-grid>
+        <div class="uk-width-1-4@m">
+            <div class="uk-grid-small uk-flex uk-flex-middle" uk-grid>
+                <div class="uk-width-auto">
+                    <div class="uk-comment-avatar uk-display-inline-block uk-border-circle st-border-white-small">
+                        {# Get comment author default avatar image #}
+                        {% set defaultAvatarImageNamePath = globalImageDirectory~'profile-default-avatar.png' %}
+                        {% set defaultAvatarImageAlt = 'No '~comment.user.nickName~'\'s avatar is available.' %}
+                        {% set avatarImageNamePath = defaultAvatarImageNamePath %}
+                        {% set avatarImageAlt = defaultAvatarImageAlt %}
+                        {# Get a possible comment author avatar image #}
+                        {% if comment.user.mediaOwner is not null %}
+                            {% for media in comment.user.mediaOwner.medias %}
+                                {# Comment author has defined a profile avatar image! #}
+                                {% if media.mediaType.type == mediaTypesValues['userAvatar'] %}
+                                    {% set userAvatarImage = media.mediaSource.image %}
+                                    {% set avatarImageNamePath = globalAvatarUploadDirectory~userAvatarImage.getName()~'.'~userAvatarImage.getFormat() %}
+                                    {% set avatarImageAlt = userAvatarImage.getDescription() %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                        <img class="uk-border-circle st-avatar-default" width="80" height="80" src="{{ asset(avatarImageNamePath)|e('html_attr') }}" alt="{{ avatarImageAlt|e('html_attr') }}">
+                    </div>
+                </div>
+                <div class="uk-width-expand">
+                    <span class="uk-text-uppercase uk-text-small uk-display-block uk-margin-small-right">
+                        <strong><span class="st-color-red">Comment #</span> <span class="st-color-blue">{{ currentKey }}</span></strong>
+                    </span>
+                    <span class="uk-comment-meta uk-display-block uk-margin-remove-top">
+                        <strong><span class="uk-label st-background-blue">On {{ comment.creationDate|date('d/m/Y') }}</span></strong>
+                    </span>
+                    <p class="uk-comment-title uk-margin-small-top uk-margin-remove-bottom uk-text-small uk-text-uppercase uk-text-bold">
+                        <span uk-icon="icon: user; ratio: 1"><small></span> Posted by<br><span class="st-color-blue">{{ comment.user.firstName~' '~comment.user.familyName }}</small></span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="uk-width-3-4@m">
+            <div class="uk-comment-body uk-grid-small uk-flex uk-flex-middle">
+                <p class="{{ is_granted('ROLE_USER') ? 'uk-width-5-6' : 'uk-width-1-1' }} uk-margin-remove-top uk-margin-remove-bottom uk-padding-small st-color-blue">
+                    {{ comment.content }}
+                </p>
+                {% if is_granted('ROLE_USER') %}
+                <div class="uk-width-1-6 uk-margin-small-left uk-text-right">
+                    {# TODO: update this form link with JS smooth scroll behaviour! #}
+                    {# Reply to comment #}
+                    <a id="st-reply-comment-{{ currentKey }}" href="#"
+                       class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-margin-small-bottom st-reply-comment" title="Reply to this particular comment">
+                        <span uk-icon="icon: comments; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-update st-svg-icon-actions"></span>
+                    </a>
+                    {# TODO: update this deletion link with AJAX modal and JS behaviour! #}
+                    {# Delete comment if authenticated user is administrator or comment author #}
+                    {% if is_granted('ROLE_ADMIN') or (comment.user.uuid == app.user.uuid) %}
+                    <a id="st-delete-comment" href="#st-modal-delete-comment"
+                       data-action="#{#{{ path('delete_media', { 'mainRoleLabel': app.user.mainRoleLabel|lower, 'encodedUuid': commentUuid|uuid_encode, 'csrfToken': csrf_token('delete_comment') }) }}#}"
+                       class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-margin-small-bottom st-delete-comment" title="Delete" uk-toggle>
+                        <span uk-icon="icon: trash; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-delete st-svg-icon-actions"></span>
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
