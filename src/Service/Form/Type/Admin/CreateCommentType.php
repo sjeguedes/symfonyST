@@ -69,7 +69,7 @@ class CreateCommentType extends AbstractType
             $builder
                 ->add('parentComment', EntityType::class, [
                     'class'           => Comment::class,
-                    // Order comments by creation date descending order when feeding select
+                    // Order comments by creation date ascending order when feeding select
                     'query_builder'   => function () use ($commentService, $currentTrick) {
                         /** @var UuidInterface $currentTrickUuid */
                         $currentTrickUuid = $currentTrick->getUuid();
@@ -81,11 +81,13 @@ class CreateCommentType extends AbstractType
                             ->setParameter(1, $currentTrickUuid->getBytes());
                     },
                     // Show group names in select
-                    'choice_label'    => function ($comment) use (&$commentIndex) {
+                    'choice_label'    => function (Comment $comment) use (&$commentIndex) {
                         $commentIndex ++;
+                        $userFullName = $comment->getUser()->getFirstName() . ' ' .$comment->getUser()->getFamilyName();
                         /** @var Comment $comment */
-                        return "Comment #{$commentIndex} posted by " . $comment->getUser()->getNickName() .
-                                ' added on ' . $comment->getCreationDate()->format('d/m/Y');
+                        return "Comment #{$commentIndex} posted by " . $userFullName .
+                               ' (' . $comment->getUser()->getNickName() . ')' .
+                               ' added on ' . $comment->getCreationDate()->format('d/m/Y');
                     },
                     // Use encoded uuid value to query entities
                     // Replace the need to use a setter for "parentComment" corresponding CreateCommentDTO property
