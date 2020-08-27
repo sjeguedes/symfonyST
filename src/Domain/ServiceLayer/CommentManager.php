@@ -132,4 +132,21 @@ class CommentManager extends AbstractServiceLayer
     {
         return $this->repository;
     }
+
+    /**
+     * Remove an Comment entity and all associated entities depending on cascade operations.
+     *
+     * @param Comment $comment
+     * @param bool    $isFlushed
+     *
+     * @return bool
+     */
+    public function removeComment(Comment $comment, bool $isFlushed = true) : bool
+    {
+        // Update associated user and trick comment collections, but it is not really necessary!
+        $comment->getUser()->removeComment($comment);
+        $comment->getTrick()->removeComment($comment);
+        // Proceed to removal in database
+        return $this->removeAndSaveNoMoreEntity($comment, $isFlushed);
+    }
 }

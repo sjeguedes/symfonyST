@@ -211,12 +211,12 @@
             <!-- Trick update medias deletion links -->
             {% if is_granted('AUTHOR_OR_ADMIN_CAN_UPDATE_OR_DELETE_TRICKS', trick) %}
                 {# ------------------------------------------------------------------------- #}
-                {# Get image removal ajax form in modal #}
+                {# Get image removal ajax action in modal #}
                 {% include 'admin/removal/delete_media.html.twig' with {
                     mediaType: 'image'
                 } only %}
                 {# ------------------------------------------------------------------------- #}
-                {# Get video removal ajax form in modal #}
+                {# Get video removal ajax action in modal #}
                 {% include 'admin/removal/delete_media.html.twig' with {
                     mediaType: 'video'
                 } only %}
@@ -288,13 +288,20 @@
         {% if trick.comments|length != 0 %}
         {# Comments messages list #}
         <div class="uk-container uk-padding">
+            {# Comments #}
             {% include 'single-trick/comment_list.html.twig' with {
                 'mediaTypesValues': mediaTypesValues,
                 'trick': trick
             } %}
+            {% if is_granted('ROLE_USER') %}
+            {# ------------------------------------------------------------------------- #}
+            {# Get comment removal ajax action in modal #}
+            {% include 'admin/removal/delete_comment.html.twig' only %}
+            {# ------------------------------------------------------------------------- #}
+            {% endif %}
         </div>
         {% else %}
-        {# No trick was found! #}
+        {# No comment was found! #}
         <div class="uk-container uk-margin-top uk-text-center">
             <p class="uk-display-inline-block uk-padding-small uk-text-bold uk-text-uppercase st-background-yellow st-box-shadow-full-small">
                 <span class="st-color-blue"><span uk-icon="icon: warning"></span> {{ noList }}</span>

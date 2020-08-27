@@ -1,7 +1,8 @@
+import deleteComment from './comment/removal/delete-comment';
 import deleteMedia from './media/removal/delete-media';
 import deleteTrick from './trick/removal/delete-trick';
+import removeCommentBox from './comment/removal/remove-comment-box';
 import request from './all/ajax-request';
-import smoothScroll from './all/smooth-vertical-scroll';
 import stringHelper from './all/encode-decode-string';
 import UIkit from '../../uikit/dist/js/uikit.min';
 import warnBeforeMediaRemoval from './media/removal/warn-before-media-removal';
@@ -722,14 +723,15 @@ export default () => {
             const createCommentForm = document.getElementById('st-create-comment-form');
             const parentCommentSelect = createCommentForm.querySelector('.uk-select');
             if (createCommentForm && parentCommentSelect) {
-                let commentReplyLinks =  trickCommentList.querySelectorAll('.st-reply-comment');
+                let commentReplyLinks = trickCommentList.querySelectorAll('.st-reply-comment');
                 commentReplyLinks.forEach((commentReplyLink, index) => {
-                    commentReplyLink.addEventListener('click', (event) => {
+                    // Manage comment reply
+                    const clickReplyCommentButtonHandler = event => {
                         event.preventDefault();
                         let commentId = commentReplyLink.getAttribute('id');
                         let matches = commentId.match(/^st-reply-comment-(\d+)$/i);
                         let commentKey = matches[1];
-                        // CAUTION! Comments in select are listed in ascending order in select
+                        // CAUTION! Comments in select are listed in ascending order in select.
                         // contrary to comment list to show.
                         parentCommentSelect.options[commentKey].selected = true;
                         // Position scroll on comment creation form with smooth effect
@@ -739,7 +741,40 @@ export default () => {
                             top: offsetTop,
                             behavior: "smooth"
                         });
-                    });
+                    };
+                    commentReplyLink.addEventListener('click', clickReplyCommentButtonHandler);
+                });
+            }
+
+            // ------------------------------------------------------------------------------------------------------------
+
+            // Manage comments removal
+            let commentDeletionLinks = trickCommentList.querySelectorAll('.st-delete-comment');
+            if (commentDeletionLinks !== null) {
+                // Prepare element to which window will scroll after deletion
+                let referenceElementToScroll = trickCommentList;
+                commentDeletionLinks.forEach((commentDeletionLink, index) => {
+                    // "Click" event on comment box removal button (link)
+                    // Activate event listener
+                    const clickRemoveCommentButtonHandler = event => {
+                        // Prevent link anchor to scroll up the window
+                        event.preventDefault();
+                        // Get current comment removal button which is clicked
+                        let removeCommentButtonElement = event.currentTarget; // item
+                        // Delete existing comment on server with AJAX if necessary
+                        // If deletion failed, comment box will not be removed.
+                        if (removeCommentButtonElement.hasAttribute('data-action')) {
+                            // Comment box element removal will be called internally if it is ok!
+                            deleteComment(
+                                removeCommentButtonElement,
+                                referenceElementToScroll, // reference element to target with scroll
+                                0,
+                                removeCommentBox,
+                                [removeCommentButtonElement, null]
+                            );
+                        }
+                    };
+                    commentDeletionLink.addEventListener('click', clickRemoveCommentButtonHandler);
                 });
             }
         }

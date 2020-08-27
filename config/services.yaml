@@ -66,6 +66,10 @@ services:
         arguments:
             $formHandler: '@App\Service\Form\Handler\CreateTrickHandler'
 
+    # add comment deletion without form and form handler
+    App\Action\Admin\AjaxDeleteCommentAction:
+        tags: ['controller.service_arguments']
+
     # add media deletion without form and form handler
     App\Action\Admin\AjaxDeleteMediaAction:
         tags: ['controller.service_arguments']

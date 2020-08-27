@@ -1,4 +1,4 @@
-<div class="uk-card uk-card-default uk-card-body uk-position-relative uk-box-shadow-hover-large uk-padding-small st-background-yellow st-border-white-small">
+<div id="st-comment-{{ currentKey }}" class="uk-card uk-card-default uk-card-body uk-position-relative uk-box-shadow-hover-large uk-padding-small st-background-yellow st-border-white-small">
     {% if currentKey == trickCommentLength %}
     {# Last comment indicator #}
     <div id="st-last-comment-indicator" class="uk-position-top-right uk-text-center uk-text-small uk-text-uppercase uk-text-bold uk-padding-small uk-padding-remove-top uk-padding-remove-bottom st-background-blue st-last-comment-indicator">
@@ -54,11 +54,10 @@
                        class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-margin-small-bottom st-reply-comment" title="Reply to this particular comment">
                         <span uk-icon="icon: comments; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-update st-svg-icon-actions"></span>
                     </a>
-                    {# TODO: update this deletion link with AJAX modal and JS behaviour! #}
                     {# Delete comment if authenticated user is an administrator or the comment author #}
                     {% if is_granted('ROLE_ADMIN') or (comment.user.uuid == app.user.uuid) %}
-                    <a id="st-delete-comment" href="#st-modal-delete-comment"
-                       data-action="#{#{{ path('delete_media', { 'mainRoleLabel': app.user.mainRoleLabel|lower, 'encodedUuid': commentUuid|uuid_encode, 'csrfToken': csrf_token('delete_comment') }) }}#}"
+                    <a id="st-delete-comment-{{ currentKey }}" href="#st-modal-delete-comment"
+                       data-action="{{ path('delete_comment', { 'mainRoleLabel': app.user.mainRoleLabel|lower, 'encodedUuid': comment.uuid|uuid_encode, 'csrfToken': csrf_token('delete_comment') }) }}"
                        class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-margin-small-bottom st-delete-comment" title="Delete" uk-toggle>
                         <span uk-icon="icon: trash; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-delete st-svg-icon-actions"></span>
                     </a>
