@@ -1,6 +1,7 @@
 import deleteMedia from './media/removal/delete-media';
 import deleteTrick from './trick/removal/delete-trick';
 import request from './all/ajax-request';
+import smoothScroll from './all/smooth-vertical-scroll';
 import stringHelper from './all/encode-decode-string';
 import UIkit from '../../uikit/dist/js/uikit.min';
 import warnBeforeMediaRemoval from './media/removal/warn-before-media-removal';
@@ -24,6 +25,8 @@ export default () => {
     // https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent
     // Youtube JS player "onStateChange" event: http://jsfiddle.net/jeffposnick/yhWsG/3/
     // Guide to iframe security and event: https://blog.logrocket.com/the-ultimate-guide-to-iframes/
+    // Select box options management: https://www.dyn-web.com/tutorials/forms/select/selected.php
+    // Vanilla JS scrolling: https://webdesign.tutsplus.com/tutorials/smooth-scrolling-vanilla-javascript--cms-35165
 
     // ------------------------------------------------------------------------------------------------------------
 
@@ -84,7 +87,7 @@ export default () => {
                         // Load iframe and autoplay modal iframe video
                         mediaElement.setAttribute('src', iframeSrc);
                         // Manage video loading with C.O.R.S ajax request
-                        mediaElement.addEventListener("load", () => {
+                        mediaElement.addEventListener('load', () => {
                             // This event do not guaranty iframe content is correctly loaded, so we use C.O.R.S proxy.
                             let proxyURL = videoProxyPath + '/' + iframeSrc;
                             checkLoadingCORSRequest('GET', proxyURL, afterMediaLoaded, whenMediaError, [mediaElement]);
@@ -93,12 +96,12 @@ export default () => {
                         // Load image (image loading was already checked before with thumbnail src which the same!)
                         mediaElement.setAttribute('src', mediaElement.getAttribute('data-src'));
                         // Call image loading rendering behavior:
-                        mediaElement.addEventListener("load", () => {
+                        mediaElement.addEventListener('load', () => {
                             // This event guaranties an image is correctly loaded contrary to iframe.
                             afterMediaLoaded(mediaElement);
                         });
                         // Call image loading error behavior:
-                        mediaElement.addEventListener("error", () => {
+                        mediaElement.addEventListener('error', () => {
                             whenMediaError(mediaElement);
                         });
                     }
@@ -325,7 +328,7 @@ export default () => {
         // ------------------------------------------------------------------------------------------------------------
 
         // Click event on medias toggle button (available on small screen only: max viewport width == 639px)
-        mediasToggleButton.addEventListener("click", () => {
+        mediasToggleButton.addEventListener('click', () => {
             // Already on inactive state.
             if (!mediasSliderContainer.classList.contains('st-active')) {
                 mediasSliderContainer.classList.add('st-active');
@@ -372,7 +375,7 @@ export default () => {
         // ------------------------------------------------------------------------------------------------------------
 
         // Transition end event to improve fade out effect and make slider disappear at the end
-        transitionEvent && mediasSliderContainer.addEventListener("transitionend", () => {
+        transitionEvent && mediasSliderContainer.addEventListener('transitionend', () => {
             // Hide with fade out
             if (!mediasSliderContainer.classList.contains('st-active') && !mediasSliderContainer.classList.contains('uk-visible@s')) {
                 // Use height to enable fade effect (display is not adapted to have time to see fade out transition)
@@ -425,11 +428,11 @@ export default () => {
             // thumbnail is in background with data-src attribute (no img tag contrary to modal image)
             img.src = images[i].getAttribute('data-src');
             // Call image loading rendering behavior:
-            img.addEventListener("load", () => {
+            img.addEventListener('load', () => {
                 afterMediaLoaded(images[i]);
             });
             // Call image loading error behavior:
-            img.addEventListener("error", () => {
+            img.addEventListener('error', () => {
                 whenMediaError(images[i]);
             });
 
@@ -708,6 +711,37 @@ export default () => {
                     }
                 }
             }, [{/*add object properties if necessary*/}]); // args must be a array containing a unique object!
+        }
+
+        // ------------------------------------------------------------------------------------------------------------
+
+        // Manage comment click in list to create a smooth scroll to comment form
+        // by updating parentComment select drop down
+        const trickCommentList = document.getElementById('st-trick-comment-list');
+        if (trickCommentList !== null) {
+            const createCommentForm = document.getElementById('st-create-comment-form');
+            const parentCommentSelect = createCommentForm.querySelector('.uk-select');
+            if (createCommentForm && parentCommentSelect) {
+                let commentReplyLinks =  trickCommentList.querySelectorAll('.st-reply-comment');
+                commentReplyLinks.forEach((commentReplyLink, index) => {
+                    commentReplyLink.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        let commentId = commentReplyLink.getAttribute('id');
+                        let matches = commentId.match(/^st-reply-comment-(\d+)$/i);
+                        let commentKey = matches[1];
+                        // CAUTION! Comments in select are listed in ascending order in select
+                        // contrary to comment list to show.
+                        parentCommentSelect.options[commentKey].selected = true;
+                        // Position scroll on comment creation form with smooth effect
+                        const anchor = commentReplyLink.getAttribute('href');
+                        const offsetTop = document.querySelector(anchor).offsetTop;
+                        window.scroll({
+                            top: offsetTop,
+                            behavior: "smooth"
+                        });
+                    });
+                });
+            }
         }
 
         // ------------------------------------------------------------------------------------------------------------

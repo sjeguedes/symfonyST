@@ -34,7 +34,7 @@
 {% endmacro %}
 {# ------------------------------------------------------------------------- #}
 {# list comments #}
-<ul class="uk-comment-list">
+<ul id="st-trick-comment-list" class="uk-comment-list">
     {% for key, comment in trickComments %}
         {# Get current key #}
         {% set currentKey = trickComments|length - key %}

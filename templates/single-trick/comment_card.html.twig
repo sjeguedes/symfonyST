@@ -45,18 +45,17 @@
         <div class="uk-width-3-4@m">
             <div class="uk-comment-body uk-grid-small uk-flex uk-flex-middle">
                 <p class="{{ is_granted('ROLE_USER') ? 'uk-width-5-6' : 'uk-width-1-1' }} uk-margin-remove-top uk-margin-remove-bottom uk-padding-small st-color-blue">
-                    {{ comment.content }}
+                    {{ comment.content|nl2br }}
                 </p>
                 {% if is_granted('ROLE_USER') %}
                 <div class="uk-width-1-6 uk-margin-small-left uk-text-right">
-                    {# TODO: update this form link with JS smooth scroll behaviour! #}
-                    {# Reply to comment #}
-                    <a id="st-reply-comment-{{ currentKey }}" href="#"
+                    {# Reply to comment by using this comment creation form link anchor with JS smooth scroll behaviour! #}
+                    <a id="st-reply-comment-{{ currentKey }}" href="#st-create-comment-form"
                        class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-margin-small-bottom st-reply-comment" title="Reply to this particular comment">
                         <span uk-icon="icon: comments; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-update st-svg-icon-actions"></span>
                     </a>
                     {# TODO: update this deletion link with AJAX modal and JS behaviour! #}
-                    {# Delete comment if authenticated user is administrator or comment author #}
+                    {# Delete comment if authenticated user is an administrator or the comment author #}
                     {% if is_granted('ROLE_ADMIN') or (comment.user.uuid == app.user.uuid) %}
                     <a id="st-delete-comment" href="#st-modal-delete-comment"
                        data-action="#{#{{ path('delete_media', { 'mainRoleLabel': app.user.mainRoleLabel|lower, 'encodedUuid': commentUuid|uuid_encode, 'csrfToken': csrf_token('delete_comment') }) }}#}"
