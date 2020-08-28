@@ -445,13 +445,14 @@ class TrickRepository extends ServiceEntityRepository
                     LEFT JOIN trick_groups tg ON t.trick_group_uuid = tg.uuid
                     LEFT JOIN media_owners mo ON mo.trick_uuid = t.uuid
                     -- Filter with current user authentication state
-                      WHERE
+                    WHERE
                     CASE WHEN @userAuthenticationState = '" . User::UNAUTHENTICATED_STATE . "' -- ANONYMOUS
                          THEN t.is_published = 1
                          WHEN @userAuthenticationState = '" . User::DEFAULT_ROLE . "' -- SIMPLE MEMBER
                          THEN t.is_published = 1 OR (t.user_uuid = :userUuid AND t.is_published = 0) 
                          WHEN @userAuthenticationState = '" . User::ADMIN_ROLE . "' -- ADMINISTRATOR 
                          THEN t.is_published = 1 OR t.is_published = 0 END 
+                    -- AND t.uuid IS NOT NULL     
                     ORDER BY
                     CASE WHEN @sortDirection = 'DESC' THEN t.creation_date END DESC,
                     CASE WHEN @sortDirection = 'ASC' THEN t.creation_date END

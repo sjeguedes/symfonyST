@@ -134,8 +134,14 @@
                         </div>
                         {% endif %}
                     </div>
-                    <div class="uk-card-body uk-padding-small">
-                        <h2 class="uk-card-title">{{ trick.name }}</h2>
+                    <div class="uk-card-body uk-position-relative uk-padding-small">
+                        {% if trick.comments|length != 0 %}
+                        {# Trick comment counter #}
+                        <small class="uk-position-top-right uk-padding-small uk-padding-remove-bottom">
+                            <span uk-icon="icon: comment; ratio: 1"></span> {{ trick.comments|length > 1 ? trick.comments|length~' comments' : '1 comment' }}
+                        </small>
+                        {% endif %}
+                        <h2 class="uk-card-title uk-margin-small-top uk-padding-small uk-padding-remove-left uk-padding-remove-right uk-padding-remove-bottom">{{ trick.name }}</h2>
                     </div>
                     <div class="uk-card-footer">
                         <div class="uk-flex uk-flex-middle{{ is_granted('AUTHOR_OR_ADMIN_CAN_UPDATE_OR_DELETE_TRICKS', trick) ? ' uk-flex-between' : ' uk-flex-right' }} st-card-link-footer">
