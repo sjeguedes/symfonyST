@@ -63,7 +63,6 @@ class MediaSource
     private $media;
 
     /**
-     *
      * @var \DateTimeInterface
      *
      * @ORM\Column(type="datetime")
@@ -71,7 +70,6 @@ class MediaSource
     private $creationDate;
 
     /**
-     *
      * @var \DateTimeInterface
      *
      * @ORM\Column(type="datetime")

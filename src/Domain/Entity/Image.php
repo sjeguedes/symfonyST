@@ -51,7 +51,6 @@ class Image
     private $format;
 
     /**
-     *
      * @var integer
      *
      * @ORM\Column(type="integer")

@@ -66,7 +66,6 @@ class Media
     private $user;
 
     /**
-     *
      * @var bool
      *
      * @ORM\Column(type="boolean")
@@ -74,7 +73,6 @@ class Media
     private $isMain;
 
     /**
-     *
      * @var bool
      *
      * @ORM\Column(type="boolean")
@@ -82,7 +80,6 @@ class Media
     private $isPublished;
 
     /**
-     *
      * @var int
      *
      * @ORM\Column(type="smallint", nullable=true, options={"unsigned":true})
@@ -90,7 +87,6 @@ class Media
     private $showListRank;
 
     /**
-     *
      * @var \DateTimeInterface
      *
      * @ORM\Column(type="datetime")
@@ -98,7 +94,6 @@ class Media
     private $creationDate;
 
     /**
-     *
      * @var \DateTimeInterface
      *
      * @ORM\Column(type="datetime")

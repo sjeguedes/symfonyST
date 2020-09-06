@@ -50,7 +50,6 @@ class Trick
     private $uuid;
 
     /**
-     *
      * @var string
      *
      * @ORM\Column(type="string", unique=true)
@@ -58,7 +57,6 @@ class Trick
     private $name;
 
     /**
-     *
      * @var string
      *
      * @ORM\Column(type="text")
@@ -66,7 +64,6 @@ class Trick
     private $description;
 
     /**
-     *
      * @var string
      *
      * @ORM\Column(type="string", unique=true)
@@ -81,7 +78,6 @@ class Trick
     private $isPublished;
 
     /**
-     *
      * @var \DateTimeInterface
      *
      * @ORM\Column(type="datetime")
@@ -89,7 +85,6 @@ class Trick
     private $creationDate;
 
     /**
-     *
      * @var \DateTimeInterface
      *
      * @ORM\Column(type="datetime")
@@ -130,13 +125,11 @@ class Trick
 
     /**
      * @var integer|null a rank value used in lists
-     *
      */
     private $rank;
 
     /**
      * @var integer|null a comment total count value used in lists
-     *
      */
     private $commentCount;
 

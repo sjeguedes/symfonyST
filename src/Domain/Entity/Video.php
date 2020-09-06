@@ -72,7 +72,7 @@ class Video
     private $mediaSource;
 
     /**
-     * Image constructor.
+     * Video constructor.
      *
      * @param string                  $name
      * @param string                  $url

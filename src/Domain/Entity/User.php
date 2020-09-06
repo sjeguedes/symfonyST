@@ -69,7 +69,6 @@ class User implements UserInterface, \Serializable
     private $uuid;
 
     /**
-     *
      * @var string
      *
      * @ORM\Column(type="string")
@@ -77,7 +76,6 @@ class User implements UserInterface, \Serializable
     private $familyName;
 
     /**
-     *
      * @var string
      *
      * @ORM\Column(type="string")
@@ -85,7 +83,6 @@ class User implements UserInterface, \Serializable
     private $firstName;
 
     /**
-     *
      * @var string
      *
      * @ORM\Column(type="string", unique=true)
@@ -93,7 +90,6 @@ class User implements UserInterface, \Serializable
     private $nickName;
 
     /**
-     *
      * @var string
      *
      * @ORM\Column(type="string", unique=true)
@@ -101,7 +97,6 @@ class User implements UserInterface, \Serializable
     private $email;
 
     /**
-     *
      * @var string
      *
      * @ORM\Column(type="string", length=60, unique=true)
@@ -122,7 +117,6 @@ class User implements UserInterface, \Serializable
     private $roles;
 
     /**
-     *
      * @var boolean
      *
      * @ORM\Column(type="boolean")
@@ -130,7 +124,6 @@ class User implements UserInterface, \Serializable
     private $isActivated;
 
     /**
-     *
      * @var string
      *
      * @ORM\Column(type="string", length=15, unique=true, nullable=true)
@@ -138,7 +131,6 @@ class User implements UserInterface, \Serializable
     private $renewalToken;
 
     /**
-     *
      * @var \DateTimeInterface
      *
      * @ORM\Column(type="datetime")
@@ -146,7 +138,6 @@ class User implements UserInterface, \Serializable
     private $creationDate;
 
     /**
-     *
      * @var \DateTimeInterface
      *
      * @ORM\Column(type="datetime")
@@ -154,7 +145,6 @@ class User implements UserInterface, \Serializable
     private $updateDate;
 
      /**
-     *
      * @var \DateTimeInterface
      *
      * @ORM\Column(type="datetime", name="renewal_request_date", nullable=true)
@@ -198,8 +188,8 @@ class User implements UserInterface, \Serializable
      * @param string                  $firstName
      * @param string                  $nickName
      * @param string                  $email
-     * @param string                  $password   an encoded password
-     * @param string                  $algorithm  a hash algorithm type for password
+     * @param string                  $password     an encoded password
+     * @param string                  $algorithm    a hash algorithm type for password
      * @param array                   $roles
      * @param \DateTimeInterface|null $creationDate
      *
@@ -287,8 +277,6 @@ class User implements UserInterface, \Serializable
      * @param string $algorithm
      *
      * @return bool
-     *
-     * // TODO: use EncoderFactoryInterface $encoderFactory
      */
     private function isPasswordValidated(string $password, string $algorithm) : bool
     {
