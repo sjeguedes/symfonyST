@@ -3,7 +3,7 @@
 {% block title %}SnowTricks - {{ app.user.nickName }}'s Profile update form{% endblock %}
 
 {% block header %}
-    {% include 'all/image_header_loader.html.twig' with {'spinnerRatio': '2.5'} %}
+    {% include 'partials/all/image_header_loader.html.twig' with {'spinnerRatio': '2.5'} %}
     <div class="uk-position-relative uk-flex uk-flex-center uk-flex-middle uk-background-cover uk-background-blend-darken uk-invisible st-background-image-header" data-src="{{ asset(globalImageDirectory~'snowboard-4.jpg') }}" style="background-position: 40% 25%; height: 600px" uk-img>
         <div class="uk-position-center uk-text-center uk-padding-small st-overlay-image-header-container">
             <p class="st-color-white st-text-shadow-dark uk-text-large">
@@ -58,11 +58,11 @@
                     {# Update profile avatar and infos forms #}
                     <div id="st-form" class="uk-card-body uk-padding-medium{{ updateProfileInfosForm.vars.valid == 1 and uniqueUserError is null ?: ' st-form-error' }}">
                         {# Update profile avatar form #}
-                        {% include 'form/update_profile_avatar.html.twig' %}
+                        {% include 'admin/partials/form/update_profile_avatar.html.twig' %}
                         <hr>
                         <!-- //------------------------------------------------------------------------------------------------------------------------------------// -->
                         {# Update profile infos form #}
-                        {% form_theme updateProfileInfosForm 'form/uikit_3_form.html.twig' %}
+                        {% form_theme updateProfileInfosForm 'partials/form/uikit_3_form.html.twig' %}
                         {{ form_start(updateProfileInfosForm, {'attr': {'class': 'uk-grid uk-grid-collapse', 'novalidate': ''}}) }}
                             {# Family name #}
                             <div class="uk-width-1-1 uk-margin-small-bottom">

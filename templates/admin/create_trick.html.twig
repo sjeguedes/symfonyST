@@ -3,7 +3,7 @@
 {% block title %}SnowTricks - Trick creation form{% endblock %}
 
 {% block header %}
-    {% include 'all/image_header_loader.html.twig' with {'spinnerRatio': '2.5'} %}
+    {% include 'partials/all/image_header_loader.html.twig' with {'spinnerRatio': '2.5'} %}
     <div class="uk-position-relative uk-flex uk-flex-center uk-flex-middle uk-background-cover uk-background-blend-darken uk-invisible st-background-image-header" data-src="{{ asset(globalImageDirectory~'snowboard-4.jpg') }}" style="background-position: 40% 25%; height: 600px" uk-img>
         <div class="uk-position-center uk-text-center uk-padding-small st-overlay-image-header-container">
             <p class="st-color-white st-text-shadow-dark uk-text-large">
@@ -51,7 +51,7 @@
                     {% endif %}
                     {# Trick creation form #}
                     <div id="st-form" class="uk-card-body uk-padding-medium{{ createTrickForm.vars.valid == 1 and trickCreationError == false ?: ' st-form-error' }}">
-                        {% form_theme createTrickForm 'form/uikit_3_form.html.twig' %}
+                        {% form_theme createTrickForm 'partials/form/uikit_3_form.html.twig' %}
                         {{ form_start(createTrickForm, {'attr': {'class': 'uk-grid uk-grid-collapse', 'novalidate': ''}}) }}
                             {# Group #}
                             <div class="uk-width-1-1 uk-margin-small-bottom">
@@ -227,7 +227,7 @@
                                 {# --- end Images reminder --- #}
                                 <div class="uk-inline uk-display-block uk-flex">
                                     {# Images collection #}
-                                    {% set imageToCropTemplate = include('form/image_to_crop.html.twig', { rootForm: createTrickForm })|e('html_attr') %}
+                                    {% set imageToCropTemplate = include('admin/partials/form/image_to_crop.html.twig', { rootForm: createTrickForm })|e('html_attr') %}
                                     {# Get "prototype_name" option value from images Collection #}
                                     {% set imageIndex = createTrickForm.images.vars.prototype.vars.name %}
                                     <div id="st-images-collection" class="st-images-collection" data-prototype="{{ imageToCropTemplate }}" data-prototype-name="{{ imageIndex }}">
@@ -236,7 +236,7 @@
                                                 {# Loop on children to retrieve all associated images (with corresponding box) on the way to be possibly created #}
                                                 {% for imageIndex, formView in createTrickForm.images.children %}
                                                     {# index = imageIndex, value = formView  #}
-                                                    {% include 'form/editable_image_to_crop.html.twig' with {
+                                                    {% include 'admin/partials/form/editable_image_to_crop.html.twig' with {
                                                             rootForm: createTrickForm,
                                                             mediaOwnerType: 'trick',
                                                             rank: loop.index,
@@ -305,7 +305,7 @@
                                 {# --- end Videos reminder --- #}
                                 <div class="uk-inline uk-display-block uk-flex">
                                     {# Videos collection #}
-                                    {% set videoInfosTemplate = include('form/video_infos.html.twig', { rootForm: createTrickForm })|e('html_attr') %}
+                                    {% set videoInfosTemplate = include('admin/partials/form/video_infos.html.twig', { rootForm: createTrickForm })|e('html_attr') %}
                                     {# Get "prototype_name" option value from videos Collection #}
                                     {% set videoIndex = createTrickForm.videos.vars.prototype.vars.name %}
                                     <div id="st-videos-collection" class="st-images-collection" data-prototype="{{ videoInfosTemplate }}" data-prototype-name="{{ videoIndex }}"
@@ -315,7 +315,7 @@
                                                 {# Loop on children to retrieve all associated videos (with corresponding box) on the way to be possibly created #}
                                                 {% for videoIndex, formView in createTrickForm.videos.children %}
                                                     {# index = videoIndex, value = formView  #}
-                                                    {% include 'form/editable_video_infos.html.twig' with {
+                                                    {% include 'admin/partials/form/editable_video_infos.html.twig' with {
                                                         rootForm: createTrickForm,
                                                         mediaOwnerType: 'trick',
                                                         rank: loop.index,
@@ -409,13 +409,13 @@
                         {% endif %}
                         {# ------------------------------------------------------------------------- #}
                         {# Get image removal ajax form in modal #}
-                        {% include 'admin/removal/delete_media.html.twig' with {
+                        {% include 'admin/partials/removal/delete_media.html.twig' with {
                             mediaType: 'image'
                         } only %}
                         {# ------------------------------------------------------------------------- #}
                         {# CAUTION: unnecessary for trick creation at this time, since videos are not temporary saved! #}
                         {# Get video removal ajax form in modal #}
-                        {% include 'admin/removal/delete_media.html.twig' with {
+                        {% include 'admin/partials/removal/delete_media.html.twig' with {
                             mediaType: 'video'
                         } only %}
                     </div>

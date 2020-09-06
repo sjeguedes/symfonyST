@@ -12,7 +12,7 @@
         <li class="uk-comment uk-margin-small-top uk-visible-toggle">
             <span class="uk-margin-small uk-padding-small uk-border-circle st-color-yellow st-background-blue" uk-icon="icon: reply; ratio; 2.5"></span>
             <strong><span class="uk-padding-small-left uk-text-uppercase uk-text-small st-color-blue">Replied to comment # {{ parentCommentKey }}</span></strong>
-            {% include 'single-trick/comment_card.html.twig' with {
+            {% include 'single-trick/partials/comment_card.html.twig' with {
                 'comment': childComment,
                 'currentKey': currentKey,
                 'isReply': true,
@@ -61,7 +61,7 @@
                 {% if ((ajaxMode is not defined) and (loop.index != 1)) or ajaxMode is defined %}
                 <hr class="uk-margin-medium-top uk-margin-medium-bottom">
                 {% endif %}
-                {% include 'single-trick/comment_card.html.twig' with {
+                {% include 'single-trick/partials/comment_card.html.twig' with {
                     'comment': comment,
                     'currentKey': currentKey,
                     'isFirstLevelParent': true,

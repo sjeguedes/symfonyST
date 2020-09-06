@@ -3,7 +3,7 @@
 {% block title %}SnowTricks - Registration form{% endblock %}
 
 {% block header %}
-    {% include 'all/image_header_loader.html.twig' with {'spinnerRatio': '2.5'} %}
+    {% include 'partials/all/image_header_loader.html.twig' with {'spinnerRatio': '2.5'} %}
     <div class="uk-position-relative uk-flex uk-flex-center uk-flex-middle uk-background-cover uk-background-blend-darken uk-invisible st-background-image-header" data-src="{{ asset(globalImageDirectory~'snowboard-4.jpg') }}" style="background-position: 40% 25%; height: 600px" uk-img>
         <div class="uk-position-center uk-text-center uk-padding-small st-overlay-image-header-container">
             <p class="st-color-white st-text-shadow-dark uk-text-large">
@@ -51,7 +51,7 @@
                     {% endif %}
                     {# Registration form #}
                     <div id="st-form" class="uk-card-body uk-padding-medium{{ registerForm.vars.valid == 1 and uniqueUserError is null ?: ' st-form-error' }}">
-                        {% form_theme registerForm 'form/uikit_3_form.html.twig' %}
+                        {% form_theme registerForm 'partials/form/uikit_3_form.html.twig' %}
                         {{ form_start(registerForm, {'attr': {'class': 'uk-grid uk-grid-collapse', 'novalidate': ''}}) }}
                             {# Family name #}
                             <div class="uk-width-1-1 uk-margin-small-bottom">

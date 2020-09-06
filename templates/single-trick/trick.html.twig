@@ -25,7 +25,7 @@
 {% endfor %}
 
 {% block header %}
-    {% include 'all/image_header_loader.html.twig' with {'spinnerRatio': '2.5'} %}
+    {% include 'partials/all/image_header_loader.html.twig' with {'spinnerRatio': '2.5'} %}
     <div id="st-trick-main-image" class="uk-position-relative uk-flex uk-flex-center uk-flex-middle uk-background-cover uk-background-blend-darken uk-invisible st-background-image-header"
          data-src="{{ mainImage }}" data-default-img="{{ asset(globalImageDirectory~'trick-default-image-1600x900.png') }}" style="background-position: 50% 50%; height: 600px" uk-img>
         <div id="st-trick-main-image-box" class="uk-padding">
@@ -161,7 +161,7 @@
                     {% set showListRank = media.showListRank %}
                     <li id="st-single-trick-image-slide-{{ showListRank }}">
                         {# html attribute escaping is used inside when necessary! #}
-                        {% include 'single-trick/media_card.html.twig' with {
+                        {% include 'single-trick/partials/media_card.html.twig' with {
                             'trick': trick,
                             'mediaTypesValues': mediaTypesValues,
                             'mediaType': media.mediaType,
@@ -186,7 +186,7 @@
                     {% set showListRank = media.showListRank %}
                     <li id="st-single-trick-video-slide-{{ showListRank }}">
                         {# html attribute escaping is used inside when necessary! #}
-                        {% include 'single-trick/media_card.html.twig' with {
+                        {% include 'single-trick/partials/media_card.html.twig' with {
                             'trick': trick,
                             'mediaTypesValues': mediaTypesValues,
                             'mediaType': media.mediaType,
@@ -212,12 +212,12 @@
             {% if is_granted('AUTHOR_OR_ADMIN_CAN_UPDATE_OR_DELETE_TRICKS', trick) %}
                 {# ------------------------------------------------------------------------- #}
                 {# Get image removal ajax action in modal #}
-                {% include 'admin/removal/delete_media.html.twig' with {
+                {% include 'admin/partials/removal/delete_media.html.twig' with {
                     mediaType: 'image'
                 } only %}
                 {# ------------------------------------------------------------------------- #}
                 {# Get video removal ajax action in modal #}
-                {% include 'admin/removal/delete_media.html.twig' with {
+                {% include 'admin/partials/removal/delete_media.html.twig' with {
                     mediaType: 'video'
                 } only %}
             {% endif %}
@@ -256,7 +256,7 @@
                     </a>
                     {# ------------------------------------------------------------------------- #}
                     {# Get trick removal ajax action in modal #}
-                    {% include 'admin/removal/delete_trick.html.twig' only %}
+                    {% include 'admin/partials/removal/delete_trick.html.twig' only %}
                 </p>
             </div>
         {% endif %}
@@ -270,8 +270,8 @@
                 Use the form below to create a new comment.
             </p>
             {# ------------------------------------------------------------------------- #}
-            {# Get trick comment form #}
-            {% include 'form/create_comment.html.twig' with {
+            {# Get trick comment creation form #}
+            {% include 'admin/partials/form/create_comment.html.twig' with {
                 'createCommentForm': createCommentForm,
                 'trick': trick,
                 'trickCommentCreationError': trickCommentCreationError
@@ -289,7 +289,7 @@
         {# Comments messages list #}
         <div class="uk-container uk-padding uk-padding-remove-bottom">
             {# Comments #}
-            {% include 'single-trick/comment_list.html.twig' with {
+            {% include 'single-trick/partials/comment_list.html.twig' with {
                 'commentAjaxLoadingPath': commentAjaxLoadingPath,
                 'commentCount': commentCount,
                 'commentLoadingMode': commentLoadingMode,
@@ -303,7 +303,7 @@
             {% if is_granted('ROLE_USER') %}
             {# ------------------------------------------------------------------------- #}
             {# Get comment removal ajax action in modal #}
-            {% include 'admin/removal/delete_comment.html.twig' only %}
+            {% include 'admin/partials/removal/delete_comment.html.twig' only %}
             {# ------------------------------------------------------------------------- #}
             {% endif %}
             <!-- Load more -->

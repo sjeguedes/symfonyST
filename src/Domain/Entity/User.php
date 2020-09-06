@@ -10,6 +10,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
+use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -280,7 +281,6 @@ class User implements UserInterface, \Serializable
      */
     private function isPasswordValidated(string $password, string $algorithm) : bool
     {
-        //$encoder = $encoderFactory->getEncoder(self::class);
         if (!\in_array($algorithm, self::HASH_ALGORITHMS)) {
             return false;
         }

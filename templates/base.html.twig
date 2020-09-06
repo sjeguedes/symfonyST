@@ -43,7 +43,7 @@
                 {# this check prevents starting a session when there are no flash messages. #}
                 {% if app.request.hasPreviousSession %}
                     {# Flash messages with notification component #}
-                    {% include 'all/flash_message.html.twig' %}
+                    {% include 'partials/all/flash_message.html.twig' %}
                 {% endif %}
                     {% block content %}{% endblock %}
                 </section>

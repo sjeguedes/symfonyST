@@ -13,7 +13,7 @@ inside included template when a loop is used! #}
     </div>
     <div class="uk-card-body uk-position-relative uk-padding-remove st-background-black">
         {# Video or image card loading spinner #}
-        {% include 'all/trick_media_loader.html.twig' with {'spinnerRatio': '1.5'} %}
+        {% include 'partials/all/trick_media_loader.html.twig' with {'spinnerRatio': '1.5'} %}
         {# filter media type to output content with necessary html tag #}
     {# -------------------------------------------------------------------------------------------------------------------#}
         {# Images #}
@@ -36,7 +36,7 @@ inside included template when a loop is used! #}
                     <button class="uk-modal-close-outside" type="button" uk-close></button>
                     <div class="uk-position-relative uk-modal-body uk-padding-remove st-background-black">
                         {# Image loading spinner #}
-                        {% include 'all/trick_media_loader.html.twig' with {'spinnerRatio': '2'} %}
+                        {% include 'partials/all/trick_media_loader.html.twig' with {'spinnerRatio': '2'} %}
                         {% set normalImageName = mediaToExpand|e('html_attr') %}
                         {% set normalImageDesc = mediaDescription|e('html_attr') %}
                         <img id="st-modal-image-{{ index }}" class="st-modal-image" width="{{ normalImageMediaType.width }}" height="{{ normalImageMediaType.height }}" src="" data-src="{{ asset(globalTrickUploadDirectory~normalImageName) }}" alt="{{ normalImageDesc }}">
@@ -62,7 +62,7 @@ inside included template when a loop is used! #}
                     <button class="uk-modal-close-outside" type="button" uk-close></button>
                     <div class="uk-position-relative uk-modal-body uk-padding-remove st-background-black">
                         {# Video loading spinner #}
-                        {% include 'all/trick_media_loader.html.twig' with {'spinnerRatio': '2'} %}
+                        {% include 'partials/all/trick_media_loader.html.twig' with {'spinnerRatio': '2'} %}
                         {% set youtubeVideoURL = mediaToExpand|e('html_attr') %}
                         <iframe id="st-modal-iframe-{{ index }}" class="uk-invisible st-modal-iframe st-yt-iframe" width="{{ mediaType.width }}" height="{{ mediaType.height }}" data-src="{{ youtubeVideoURL }}?enablejsapi=1&amp;origin={{ app.request.getSchemeAndHttpHost() }}&amp;autoplay=0" title="{{ youtubeVideoDesc }}"
                                 allowfullscreen allow="autoplay; encrypted-media" uk-responsive></iframe>
@@ -86,7 +86,7 @@ inside included template when a loop is used! #}
                     <button class="uk-modal-close-outside" type="button" uk-close></button>
                     <div class="uk-position-relative uk-modal-body uk-padding-remove st-background-black">
                         {# Video loading spinner #}
-                        {% include 'all/trick_media_loader.html.twig' with {'spinnerRatio': '2'} %}
+                        {% include 'partials/all/trick_media_loader.html.twig' with {'spinnerRatio': '2'} %}
                         {% set vimeoVideoURL = mediaToExpand|e('html_attr') %}
                         <iframe id="st-modal-iframe-{{ index }}" class="uk-invisible st-modal-iframe st-vm-iframe" width="{{ mediaType.width }}" height="{{ mediaType.height }}" data-src="{{ vimeoVideoURL }}?api=1&amp;origin={{ app.request.getSchemeAndHttpHost() }}&amp;autoplay=0" title="{{ vimeoVideoDesc }}"
                                 allowfullscreen allow="autoplay" uk-responsive></iframe>
@@ -110,7 +110,7 @@ inside included template when a loop is used! #}
                     <button class="uk-modal-close-outside" type="button" uk-close></button>
                     <div class="uk-position-relative uk-modal-body uk-padding-remove st-background-black">
                         {# Video loading spinner #}
-                        {% include 'all/trick_media_loader.html.twig' with {'spinnerRatio': '2'} %}
+                        {% include 'partials/all/trick_media_loader.html.twig' with {'spinnerRatio': '2'} %}
                         {% set dailymotionVideoURL = mediaToExpand|e('html_attr') %}
                         <iframe id="st-modal-iframe-{{ index }}" class="uk-invisible st-modal-iframe st-dm-iframe" width="{{ mediaType.width }}" height="{{ mediaType.height }}" data-src="{{ dailymotionVideoURL }}?api=1&amp;origin={{ app.request.getSchemeAndHttpHost() }}&amp;autoplay=0" title="{{ dailymotionVideoDesc }}"
                                 allowfullscreen allow="autoplay" uk-responsive></iframe>

@@ -20,7 +20,7 @@
             {% endif %}
             {# Trick comment creation form #}
             <div id="st-form" class="uk-card-body uk-padding-medium{{ createCommentForm.vars.valid == 1 and trickCommentCreationError == false ?: ' st-form-error' }}">
-                {% form_theme createCommentForm 'form/uikit_3_form.html.twig' %}
+                {% form_theme createCommentForm 'partials/form/uikit_3_form.html.twig' %}
                 {{ form_start(createCommentForm, {'attr': {'class': 'uk-grid uk-grid-collapse', 'novalidate': ''}}) }}
                     {# Enable reply field if at least a previous comment was posted for current trick #}
                     {% if trick.comments|length != 0 %}

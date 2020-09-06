@@ -3,7 +3,7 @@
 {% block title %}SnowTricks - Error{% endblock %}
 
 {% block header %}
-    {% include 'all/image_header_loader.html.twig' with {'spinnerRatio': '2.5'} %}
+    {% include 'partials/all/image_header_loader.html.twig' with {'spinnerRatio': '2.5'} %}
     <div class="uk-position-relative uk-flex uk-flex-center uk-flex-middle uk-background-cover uk-background-blend-darken uk-invisible st-background-image-header" data-src="{{ asset(globalImageDirectory~'error-snowboard.jpg') }}" style="background-position: 40% 25%; height: 600px" uk-img>
         <div class="uk-position-center uk-text-center uk-padding-small st-overlay-image-header-container">
             <p class="st-color-white st-text-shadow-dark uk-text-large">
@@ -33,10 +33,6 @@
                     <small class="uk-text-uppercase st-color-blue">{{ status_text }}</small><br>
                     A <span class="st-color-red">bad request</span> or <span class="st-color-red">technical error</span> happened - Please contact us if necessary!
                 </em><br>
-                {# CAUTION: Use only with custom exception to be sure to expose message to user! #}
-                {#<span class="uk-display-inline-block uk-padding-small uk-text-uppercase uk-text-bold st-color-red">
-                    {{ exception.message|nl2br }}
-                </span><br>#}
                 <a href="{{ path('home') }}" title="Go back to homepage" class="uk-button uk-button-secondary uk-display-inline-block uk-margin-small-top uk-border-rounded uk-box-shadow-hover-medium">
                     <span uk-icon="icon: chevron-left; ratio: 1.3"></span>&nbsp;<span class="uk-text-bold">Go back to homepage</span>
                 </a>
