@@ -41,7 +41,7 @@ class SingleTrickAction extends AbstractCommentListAction
     /**
      * @var MediaTypeManager
      */
-    private $mediaTypeService;
+    protected $mediaTypeService;
 
     /**
      * @var TrickManager
@@ -80,7 +80,7 @@ class SingleTrickAction extends AbstractCommentListAction
         RouterInterface $router,
         LoggerInterface $logger
     ) {
-        parent::__construct($commentService);
+        parent::__construct($commentService, $mediaTypeService);
         $this->commentService = $commentService;
         $this->mediaTypeService = $mediaTypeService;
         $this->trickService = $trickService;
@@ -131,6 +131,7 @@ class SingleTrickAction extends AbstractCommentListAction
             'commentCount'              => $selectedTrickCommentsData['commentsTotalCount'],
             'selectedTrickComments'     => $selectedTrickCommentsData['commentListWithRanks'],
             'trick'                     => $currentTrick,
+            'trickCommentCreationError' => null,
             // Empty declared url is more explicit!
             'videoURLProxyPath'         => $this->router->generate(
                 'load_trick_video_url_check', [
@@ -142,7 +143,7 @@ class SingleTrickAction extends AbstractCommentListAction
             CommentManager::COMMENT_COUNT_SESSION_KEY_PREFIX . $currentTrick->getUuid()->toString(),
             $selectedTrickCommentsData['commentsTotalCount']
         );
-        // Get complementary needed comments and medias data
+        // Get complementary needed comment list and medias data
         $data = array_merge($this->getCommentListData(), $this->getMediasData(), $data);
         return $responder($data);
     }
@@ -168,22 +169,5 @@ class SingleTrickAction extends AbstractCommentListAction
             throw new AccessDeniedException("Current user can not view this unpublished trick!");
         }
         return $trick;
-    }
-
-    /**
-     * Get medias necessary data.
-     *
-     * @return array
-     */
-    private function getMediasData() : array
-    {
-        // Get registered normal image type (corresponds particular dimensions)
-        $mediaTypesValues = $this->mediaTypeService->getMandatoryDefaultTypes();
-        $normalImageMediaType = $this->mediaTypeService->findSingleByUniqueType($mediaTypesValues['trickNormal']);
-        return [
-            'mediaError'                => 'Media loading error',
-            'mediaTypesValues'          => $mediaTypesValues,
-            'normalImageMediaType'      => $normalImageMediaType
-        ];
     }
 }

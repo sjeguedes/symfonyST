@@ -28,14 +28,14 @@ class AjaxCommentListAction extends AbstractCommentListAction
     use UuidHelperTrait;
 
     /**
-     * @var MediaTypeManager
-     */
-    private $mediaTypeService;
-
-    /**
      * @var CommentManager
      */
     protected $commentService;
+
+    /**
+     * @var MediaTypeManager
+     */
+    protected $mediaTypeService;
 
     /**
      * AjaxCommentListAction constructor.
@@ -48,7 +48,7 @@ class AjaxCommentListAction extends AbstractCommentListAction
      */
     public function __construct(CommentManager $commentService, MediaTypeManager $mediaTypeService, LoggerInterface $logger)
     {
-        parent::__construct($commentService);
+        parent::__construct($commentService, $mediaTypeService);
         $this->mediaTypeService = $mediaTypeService;
         $this->commentService = $commentService;
         $this->setLogger($logger);
@@ -108,12 +108,10 @@ class AjaxCommentListAction extends AbstractCommentListAction
             'commentCount'          => $selectedTrickCommentsData['commentsTotalCount'],
             // Get list error by checking outdated comment count to reinitialize list
             'listError'             => $listError,
-            // Get all media types to filter comments authors avatar type
-            'mediaTypesValues'      => $this->mediaTypeService->getMandatoryDefaultTypes(),
             'selectedTrickComments' => $selectedTrickCommentsData['commentListWithRanks']
         ];
-        // Get complementary needed comment list data
-        $data = array_merge($this->getCommentListData(), $data);
+        // Get complementary needed comment list and medias (avatar) data
+        $data = array_merge($this->getCommentListData(), $this->getMediasData(), $data);
         return $responder($data);
     }
 

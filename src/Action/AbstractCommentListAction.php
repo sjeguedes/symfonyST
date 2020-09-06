@@ -6,6 +6,7 @@ namespace App\Action;
 
 use App\Domain\Entity\Comment;
 use App\Domain\ServiceLayer\CommentManager;
+use App\Domain\ServiceLayer\MediaTypeManager;
 use Ramsey\Uuid\UuidInterface;
 
 /**
@@ -21,6 +22,11 @@ abstract class AbstractCommentListAction
     protected $commentService;
 
     /**
+     * @var MediaTypeManager
+     */
+    protected $mediaTypeService;
+
+    /**
      * @var array
      */
     private $commentListData;
@@ -28,29 +34,49 @@ abstract class AbstractCommentListAction
     /**
      * AbstractCommentListAction constructor.
      *
-     * @param CommentManager $commentService
+     * @param CommentManager   $commentService
+     * @param MediaTypeManager $mediaTypeService
      */
-    public function __construct(CommentManager $commentService)
+    public function __construct(CommentManager $commentService, MediaTypeManager $mediaTypeService)
     {
         $this->commentService = $commentService;
+        $this->mediaTypeService = $mediaTypeService;
         $this->commentListData = [
-            'commentLoadingMode'        => Comment::COMMENT_LOADING_MODE,
-            'commentNumberPerLoading'   => Comment::COMMENT_NUMBER_PER_LOADING,
-            'listEnded'                 => 'No more comment to load!',
-            'noList'                    => 'No comment exists for this trick at this time!',
-            'technicalError'            => 'Sorry, something wrong happened' . "\n" .
-                                           'during comment list loading!' . "\n" .
-                                           'Please contact us or try again later.' . "\n",
-            'trickCommentCreationError' => null
+            'commentLoadingMode'      => Comment::COMMENT_LOADING_MODE,
+            'commentNumberPerLoading' => Comment::COMMENT_NUMBER_PER_LOADING,
+            'listEnded'               => 'No more comment to load!',
+            'noList'                  => 'No comment exists for this trick at this time!',
+            'technicalError'          => 'Sorry, something wrong happened' . "\n" .
+                                         'during comment list loading!' . "\n" .
+                                         'Please contact us or try again later.' . "\n",
         ];
     }
 
     /**
      * Get comment list necessary data.
+     *
+     * @return array
      */
     protected function getCommentListData() : array
     {
         return $this->commentListData;
+    }
+
+    /**
+     * Get medias necessary data.
+     *
+     * @return array
+     */
+    protected function getMediasData() : array
+    {
+        // Get registered normal image type (corresponds particular dimensions)
+        $mediaTypesValues = $this->mediaTypeService->getMandatoryDefaultTypes();
+        $normalImageMediaType = $this->mediaTypeService->findSingleByUniqueType($mediaTypesValues['trickNormal']);
+        return [
+            'mediaError'                => 'Media loading error',
+            'mediaTypesValues'          => $mediaTypesValues,
+            'normalImageMediaType'      => $normalImageMediaType
+        ];
     }
 
     /**

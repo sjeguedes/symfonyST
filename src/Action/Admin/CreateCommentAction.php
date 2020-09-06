@@ -4,6 +4,8 @@ declare(strict_types = 1);
 
 namespace App\Action\Admin;
 
+use App\Action\AbstractCommentListAction;
+use App\Domain\Entity\Comment;
 use App\Domain\Entity\Trick;
 use App\Domain\ServiceLayer\CommentManager;
 use App\Domain\ServiceLayer\MediaTypeManager;
@@ -27,7 +29,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  *
  * Manage trick comment creation form.
  */
-class CreateCommentAction
+class CreateCommentAction extends AbstractCommentListAction
 {
     use RouterHelperTrait;
     use UuidHelperTrait;
@@ -35,12 +37,12 @@ class CreateCommentAction
     /**
      * @var CommentManager
      */
-    private $commentService;
+    protected $commentService;
 
     /**
      * @var MediaTypeManager
      */
-    private $mediaTypeService;
+    protected $mediaTypeService;
 
     /**
      * @var UserManager
@@ -75,6 +77,7 @@ class CreateCommentAction
         FormHandlerInterface $formHandler,
         RouterInterface $router
     ) {
+        parent::__construct($commentService, $mediaTypeService);
         $this->commentService = $commentService;
         $this->mediaTypeService = $mediaTypeService;
         $this->userService = $userService;
@@ -107,9 +110,6 @@ class CreateCommentAction
         $options = ['trickToUpdate'  => $currentTrick];
         // Set form without initial model data and set the request by binding it
         $createTrickCommentForm = $this->formHandler->initForm(null, null, $options)->bindRequest($request);
-        // Get registered normal image type (corresponds particular dimensions)
-        $trickNormalImageTypeValue = $this->mediaTypeService->getMandatoryDefaultTypes()['trickNormal'];
-        $normalImageMediaType = $this->mediaTypeService->findSingleByUniqueType($trickNormalImageTypeValue);
         // Process only on submit
         if ($createTrickCommentForm->isSubmitted()) {
             // Constraints and custom validation: call actions to perform if necessary on success
@@ -125,12 +125,23 @@ class CreateCommentAction
                 return $redirectionResponder($routingParameters['routeName'], $routingParameters['routeParameters']);
             }
         }
+        // Get comments list with ranks and comments total count
+        $selectedTrickCommentsData = $this->prepareTrickCommentsListWithRanks(
+            $currentTrick->getUuid(),
+            0,
+            Comment::COMMENT_NUMBER_PER_LOADING,
+            Comment::COMMENT_LOADING_MODE
+        );
         $data = [
             'createCommentForm'         => $createTrickCommentForm->createView(),
-            'mediaError'                => 'Media loading error',
-            'mediaTypesValues'          => $this->mediaTypeService->getMandatoryDefaultTypes(),
-            'normalImageMediaType'      => $normalImageMediaType,
-            'noList'                    => 'No comment exists for this trick at this time!',
+            // Offset and limit are not defined by default here!
+            'commentAjaxLoadingPath'    => $this->router->generate(
+                'load_trick_comments_offset_limit', [
+                'trickEncodedUuid' => $request->attributes->get('encodedUuid')
+            ]),
+            // Get total trick comment count
+            'commentCount'              => $selectedTrickCommentsData['commentsTotalCount'],
+            'selectedTrickComments'     => $selectedTrickCommentsData['commentListWithRanks'],
             'trick'                     => $currentTrick,
             'trickCommentCreationError' => $this->formHandler->getCommentCreationError() ?? null,
             // Empty declared url is more explicit!
@@ -139,6 +150,8 @@ class CreateCommentAction
                 UrlGeneratorInterface::ABSOLUTE_URL
             )
         ];
+        // Get complementary needed comment list and medias data
+        $data = array_merge($this->getCommentListData(), $this->getMediasData(), $data);
         return $responder($data);
     }
 

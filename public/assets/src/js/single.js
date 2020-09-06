@@ -4,6 +4,7 @@ import deleteMedia from './media/removal/delete-media';
 import deleteTrick from './trick/removal/delete-trick';
 import removeCommentBox from './comment/removal/remove-comment-box';
 import request from './all/ajax-request';
+import smoothScroll from './all/smooth-vertical-scroll';
 import stringHelper from './all/encode-decode-string';
 import UIkit from '../../uikit/dist/js/uikit.min';
 import URIHelper from './all/encode-decode-uri';
@@ -110,18 +111,13 @@ export default () => {
                         });
                     }
                 });
-                // Reset video media before modal is hidden
+                // Reset image or video media in modal before modal is hidden
                 UIkit.util.on(modalElementID, 'beforehide', () => {
-                    if (modalElementID.match(/video/gi) !== null) {
+                    if (modalElementID.match(/image|video/gi) !== null) {
                         // Stop video removing src
                         mediaElement.removeAttribute('src');
-                    }
-                });
-                // Reset image media when modal is hidden
-                UIkit.util.on(modalElementID, 'hidden', () => {
-                    if (modalElementID.match(/image/gi) !== null) {
-                        // Reset image removing src
-                        mediaElement.removeAttribute('src');
+                        let referenceElementToScroll = document.getElementById('st-single-trick');
+                        smoothScroll(referenceElementToScroll, 0);
                     }
                 });
             }
