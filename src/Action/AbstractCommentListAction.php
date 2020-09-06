@@ -96,7 +96,7 @@ abstract class AbstractCommentListAction
         int $offset,
         int $limit,
         string $commentLoadingMode
-    ) : ?array
+    ) : array
     {
         // Get comments filtered list
         $selectedTrickComments = $this->commentService->findOnesByTrickWithOffsetLimit(
@@ -106,10 +106,6 @@ abstract class AbstractCommentListAction
             $commentLoadingMode,
             true
         );
-        // No results were found!
-        if (0 === $selectedTrickComments->count()) {
-            throw new \UnexpectedValueException('Trick comments list can not be retrieved due to wrong parameters!');
-        }
         // Get uuid data with a second simple query to use it for comparison
         $trickCommentsUuidData = $this->commentService->findOnesByTrick($trickUuid, $commentLoadingMode, true);
         // Add comment ranks to filtered comments
