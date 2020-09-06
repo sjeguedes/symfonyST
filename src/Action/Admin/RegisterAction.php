@@ -21,7 +21,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class RegisterAction
 {
     /**
-     * @var UserManager $userService
+     * @var UserManager
      */
     private $userService;
 
@@ -76,8 +76,8 @@ class RegisterAction
             }
         }
         $data = [
-            'uniqueUserError'  => $this->formHandler->getUniqueUserError() ?? null,
-            'registerForm' => $registerForm->createView()
+            'uniqueUserError' => $this->formHandler->getUniqueUserError() ?? null,
+            'registerForm'    => $registerForm->createView()
         ];
         return $responder($data);
     }

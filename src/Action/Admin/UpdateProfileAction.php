@@ -32,7 +32,7 @@ class UpdateProfileAction
     use RouterHelperTrait;
 
     /**
-     * @var ImageManager $imageService
+     * @var ImageManager
      */
     private $imageService;
 
@@ -47,7 +47,7 @@ class UpdateProfileAction
     private $trickService;
 
     /**
-     * @var UserManager $userService
+     * @var UserManager
      */
     private $userService;
 

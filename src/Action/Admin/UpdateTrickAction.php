@@ -148,10 +148,10 @@ class UpdateTrickAction
             }
         }
         $data = [
-            'trickToUpdate'         => $trickToUpdate,
-            'trickUpdateError'      => $this->formHandler->getTrickUpdateError() ?? null,
-            'updateTrickForm'       => $updateTrickForm->createView(),
-            'videoURLProxyPath'     => $this->trickService->generateURLFromRoute(
+            'trickToUpdate'     => $trickToUpdate,
+            'trickUpdateError'  => $this->formHandler->getTrickUpdateError() ?? null,
+            'updateTrickForm'   => $updateTrickForm->createView(),
+            'videoURLProxyPath' => $this->trickService->generateURLFromRoute(
                 'load_trick_video_url_check', ['url' => ''],
                 UrlGeneratorInterface::ABSOLUTE_URL
             )

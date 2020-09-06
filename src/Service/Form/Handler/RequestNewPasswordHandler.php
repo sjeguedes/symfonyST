@@ -6,7 +6,6 @@ namespace App\Service\Form\Handler;
 
 use App\Action\Admin\RequestNewPasswordAction;
 use App\Domain\Entity\User;
-use App\Domain\ServiceLayer\UserManager;
 use App\Service\Form\Type\Admin\RequestNewPasswordType;
 use App\Service\Mailer\Email\EmailConfigFactory;
 use App\Service\Mailer\Email\EmailConfigFactoryInterface;
@@ -126,10 +125,9 @@ final class RequestNewPasswordHandler extends AbstractFormHandler
         // Check UserManager instance in passed data
         $this->checkNecessaryData($actionData);
         $userService = $actionData['userService'];
-        $user = $this->userToUpdate;
         // Save data
         /** @var User $updatedUser */
-        $updatedUser = $userService->generatePasswordRenewalToken($user);
+        $updatedUser = $userService->generatePasswordRenewalToken($this->userToUpdate);
         // Send email notification
         $emailParameters = [
             'receiver'     => [$updatedUser->getEmail() => $updatedUser->getFirstName() . ' ' . $updatedUser->getFamilyName()],

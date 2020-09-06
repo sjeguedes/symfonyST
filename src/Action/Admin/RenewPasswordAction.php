@@ -21,7 +21,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class RenewPasswordAction
 {
     /**
-     * @var UserManager $userService
+     * @var UserManager
      */
     private $userService;
 

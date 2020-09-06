@@ -95,14 +95,14 @@ class SwiftMailerManager
      */
     public function sendEmail(array $from, array $to, string $subject, string $body) : bool
     {
-        $mail = (new \Swift_Message($subject))
+        $email = (new \Swift_Message($subject))
             ->setFrom($from)
             ->setTo($to)
             ->setSubject($subject)
             ->setBody($body)
             ->setReplyTo($from)
             ->setContentType('text/html');
-        if (!$this->mailer->send($mail)) {
+        if (!$this->mailer->send($email)) {
             return false;
         }
         return true;
@@ -134,7 +134,4 @@ class SwiftMailerManager
         }
         return $isEmailSent;
     }
-
-
-
 }
