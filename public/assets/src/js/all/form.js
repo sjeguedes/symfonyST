@@ -1,4 +1,4 @@
-import smoothScroll from "./smooth-vertical-scroll";
+import smoothScroll from './smooth-vertical-scroll';
 export default () => {
     // Scroll to form automatically when a form is not valid after submission.
     const formElement = document.getElementById('st-form');

@@ -6,7 +6,7 @@ twig:
     date:
         timezone: Europe/Paris
     # UIkit form themes
-    form_themes: ['form/uikit_3_form.html.twig']
+    form_themes: ['partials/form/uikit_3_form.html.twig']
     # Global custom variables
     globals:
         # Texts to show configuration

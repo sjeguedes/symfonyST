@@ -581,6 +581,11 @@ main {
     box-sizing: border-box;
 }
 
+// Border radius
+.st-border-rounded-small {
+    border-radius: 5px;
+}
+
 // Icons
 .st-svg-icon-button-default {
     border: 1px solid transparent !important;

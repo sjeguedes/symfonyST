@@ -10,6 +10,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
+use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -69,7 +70,6 @@ class User implements UserInterface, \Serializable
     private $uuid;
 
     /**
-     *
      * @var string
      *
      * @ORM\Column(type="string")
@@ -77,7 +77,6 @@ class User implements UserInterface, \Serializable
     private $familyName;
 
     /**
-     *
      * @var string
      *
      * @ORM\Column(type="string")
@@ -85,7 +84,6 @@ class User implements UserInterface, \Serializable
     private $firstName;
 
     /**
-     *
      * @var string
      *
      * @ORM\Column(type="string", unique=true)
@@ -93,7 +91,6 @@ class User implements UserInterface, \Serializable
     private $nickName;
 
     /**
-     *
      * @var string
      *
      * @ORM\Column(type="string", unique=true)
@@ -101,7 +98,6 @@ class User implements UserInterface, \Serializable
     private $email;
 
     /**
-     *
      * @var string
      *
      * @ORM\Column(type="string", length=60, unique=true)
@@ -122,7 +118,6 @@ class User implements UserInterface, \Serializable
     private $roles;
 
     /**
-     *
      * @var boolean
      *
      * @ORM\Column(type="boolean")
@@ -130,7 +125,6 @@ class User implements UserInterface, \Serializable
     private $isActivated;
 
     /**
-     *
      * @var string
      *
      * @ORM\Column(type="string", length=15, unique=true, nullable=true)
@@ -138,7 +132,6 @@ class User implements UserInterface, \Serializable
     private $renewalToken;
 
     /**
-     *
      * @var \DateTimeInterface
      *
      * @ORM\Column(type="datetime")
@@ -146,7 +139,6 @@ class User implements UserInterface, \Serializable
     private $creationDate;
 
     /**
-     *
      * @var \DateTimeInterface
      *
      * @ORM\Column(type="datetime")
@@ -154,12 +146,18 @@ class User implements UserInterface, \Serializable
     private $updateDate;
 
      /**
-     *
      * @var \DateTimeInterface
      *
      * @ORM\Column(type="datetime", name="renewal_request_date", nullable=true)
      */
     private $renewalRequestDate;
+
+    /**
+     * @var Collection (inverse side of entity relation)
+     *
+     * @ORM\OneToMany(targetEntity=Comment::class, orphanRemoval=true, mappedBy="user")
+     */
+    private $comments;
 
     /**
      * @var Collection (inverse side of entity relation)
@@ -191,8 +189,8 @@ class User implements UserInterface, \Serializable
      * @param string                  $firstName
      * @param string                  $nickName
      * @param string                  $email
-     * @param string                  $password   an encoded password
-     * @param string                  $algorithm  a hash algorithm type for password
+     * @param string                  $password     an encoded password
+     * @param string                  $algorithm    a hash algorithm type for password
      * @param array                   $roles
      * @param \DateTimeInterface|null $creationDate
      *
@@ -225,6 +223,7 @@ class User implements UserInterface, \Serializable
         $this->isActivated = false;
         $this->creationDate = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
         $this->updateDate = $this->creationDate;
+        $this->comments = new ArrayCollection();
         $this->medias = new ArrayCollection();
         $this->tricks = new ArrayCollection();
     }
@@ -279,12 +278,9 @@ class User implements UserInterface, \Serializable
      * @param string $algorithm
      *
      * @return bool
-     *
-     * // TODO: use EncoderFactoryInterface $encoderFactory
      */
     private function isPasswordValidated(string $password, string $algorithm) : bool
     {
-        //$encoder = $encoderFactory->getEncoder(self::class);
         if (!\in_array($algorithm, self::HASH_ALGORITHMS)) {
             return false;
         }
@@ -533,6 +529,37 @@ class User implements UserInterface, \Serializable
     }
 
     /**
+     * Add Comment entity to collection.
+     *
+     * @param Comment $comment
+     *
+     * @return User
+     */
+    public function addComment(Comment $comment) : self
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
+            $comment->modifyUser($this);
+        }
+        return $this;
+    }
+
+    /**
+     * Remove Comment entity from collection.
+     *
+     * @param Comment $comment
+     *
+     * @return User
+     */
+    public function removeComment(Comment $comment) : self
+    {
+        if ($this->comments->contains($comment)) {
+            $this->comments->removeElement($comment);
+        }
+        return $this;
+    }
+
+    /**
      * Add Media entity to collection.
      *
      * @param Media $media
@@ -746,6 +773,14 @@ class User implements UserInterface, \Serializable
     public function getMediaOwner() : ?MediaOwner
     {
         return $this->mediaOwner;
+    }
+
+    /**
+     * @return Collection|Comment[]
+     */
+    public function getComments() : Collection
+    {
+        return $this->comments;
     }
 
     /**

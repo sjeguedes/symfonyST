@@ -39,7 +39,6 @@ class TrickGroup
     private $name;
 
     /**
-     *
      * @var string
      *
      * @ORM\Column(type="text")

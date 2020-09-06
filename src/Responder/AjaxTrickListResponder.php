@@ -10,15 +10,10 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Class AjaxTrickListResponder.
  *
- * Manage a response with html content block based on ajax data, to add more trick(s) to an existing list.
+ * Manage a response with block html content based on ajax data, to add more trick(s) to an existing list.
  */
-final class AjaxTrickListResponder
+final class AjaxTrickListResponder extends AbstractAjaxListResponder
 {
-    /**
-     * @var TemplateBlockRendererInterface
-     */
-    private $renderer;
-
     /**
      * AjaxTrickListResponder constructor.
      *
@@ -28,7 +23,7 @@ final class AjaxTrickListResponder
      */
     public function __construct(TemplateBlockRendererInterface $renderer)
     {
-        $this->renderer = $renderer;
+        parent::__construct($renderer);
     }
 
     /**
@@ -43,10 +38,6 @@ final class AjaxTrickListResponder
     public function __invoke(array $data) : Response
     {
         // Render a template block
-        $template = $this->renderer->getTemplateBlock(self::class)['template'];
-        $block = $this->renderer->getTemplateBlock(self::class)['block'];
-        $response = new Response($this->renderer->renderTemplateBlock($template, $block, $data));
-        $response->headers->set('Content-Type', 'text/html');
-        return $response;
+        return $this->setHTMLBlockResponse($data, self::class);
     }
 }

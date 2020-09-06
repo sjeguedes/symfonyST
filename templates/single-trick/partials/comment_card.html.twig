@@ -1,0 +1,113 @@
+<div id="st-comment-{{ currentKey }}"
+     class="uk-card uk-card-default uk-position-relative uk-box-shadow-hover-large st-background-yellow st-border-white-small">
+    {# Last comment indicator #}
+    {%  set LastRank = commentCount - 1 %}
+    {% if currentKey - 1 == LastRank %}
+    <div id="st-last-comment-indicator" class="uk-position-top-right uk-text-center uk-text-small uk-text-uppercase uk-text-bold uk-padding-small uk-padding-remove-top uk-padding-remove-bottom st-background-blue st-last-comment-indicator">
+        <span class="st-color-yellow">Last most recent comment</span>
+    </div>
+    {% endif %}
+    <div class="uk-card-body uk-grid-small uk-flex uk-flex-middle uk-padding-small" uk-grid>
+        <div class="uk-width-auto">
+            <div class="uk-comment-avatar uk-display-inline-block uk-border-circle st-border-white-small">
+                {# Get comment author default avatar image #}
+                {% set defaultAvatarImageNamePath = globalImageDirectory~'profile-default-avatar.png' %}
+                {% set defaultAvatarImageAlt = 'No '~comment.user.nickName~'\'s avatar is available.' %}
+                {% set avatarImageNamePath = defaultAvatarImageNamePath %}
+                {% set avatarImageAlt = defaultAvatarImageAlt %}
+                {# Get a possible comment author avatar image #}
+                {% if comment.user.mediaOwner is not null %}
+                    {% for media in comment.user.mediaOwner.medias %}
+                        {# Comment author has defined a profile avatar image! #}
+                        {% if media.mediaType.type == mediaTypesValues['userAvatar'] %}
+                            {% set userAvatarImage = media.mediaSource.image %}
+                            {% set avatarImageNamePath = globalAvatarUploadDirectory~userAvatarImage.getName()~'.'~userAvatarImage.getFormat() %}
+                            {% set avatarImageAlt = userAvatarImage.getDescription() %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                <img class="uk-border-circle st-avatar-default" width="80" height="80" src="{{ asset(avatarImageNamePath)|e('html_attr') }}" alt="{{ avatarImageAlt|e('html_attr') }}">
+            </div>
+        </div>
+        <div class="uk-width-auto">
+            <span class="uk-text-uppercase uk-text-small uk-display-block uk-margin-small-right">
+                <strong><span class="st-color-red">Comment #</span> <span class="st-color-blue">{{ currentKey }}</span></strong>
+            </span>
+            <span class="uk-comment-meta uk-display-block uk-margin-remove-top">
+                <strong><span class="uk-label st-background-blue">On {{ comment.creationDate|date('d/m/Y') }}</span></strong>
+            </span>
+            <p class="uk-comment-title uk-margin-small-top uk-margin-remove-bottom uk-text-small uk-text-uppercase uk-text-bold">
+                <span uk-icon="icon: user; ratio: 1"><small></span> Posted by<br><span class="st-color-blue">{{ comment.user.firstName~' '~comment.user.familyName }}</small></span>
+            </p>
+        </div>
+        <div class="uk-width-expand@m">
+            <div class="uk-comment-body uk-grid-small uk-flex uk-flex-middle">
+                <p class="uk-margin-remove-top uk-margin-remove-bottom st-color-blue">
+                    {{ comment.content|nl2br }}
+                </p>
+            </div>
+        </div>
+    </div>
+    {# This bloc is available all the time due to comment text information #}
+    <div class="uk-card-footer uk-flex uk-flex-middle uk-flex-between uk-padding-small uk-padding-remove-small-top st-background-blue">
+        {# This comment has existing replies! #}
+        {% set childCount = comment.children|length %}
+        {% if childCount != 0 %}
+        <div class="uk-flex-left">
+            {# Distinct comment replies link on first level comment for JavaScript #}
+            {% set specialClass = isFirstLevelParent is defined and isFirstLevelParent ? ' st-first-level-parent' : '' %}
+           <a id="st-view-replies-{{ currentKey }}" href="#" uk-toggle="target: #st-replies-to-{{ currentKey }}; animation: uk-animation-scale-up"
+              class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove uk-margin-small-right st-border-rounded-small st-view-replies{{ specialClass }}" title="View comment {{ childCount > 1 ? 'replies' : 'reply' }}">
+                <span uk-icon="icon: comments; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-other st-svg-icon-actions">
+                    <span uk-icon="icon: arrow-down; ratio: 1" class="st-switch-replies-arrow"></span>
+                    <span data-view-text="View" data-close-text="Close"
+                          class="uk-display-inline-block uk-margin-small-left uk-margin-small-right st-switch-replies-text">
+                        View {{ childCount }} {{ childCount > 1 ? 'replies' : 'reply' }}
+                    </span>
+                </span>
+            </a>
+        </div>
+        {% endif %}
+        {# Text info to show to show, if current comment is a simple comment or a reply #}
+        <div class="uk-flex-1 uk-padding-remove">
+            {% if childCount == 0 %}
+            <p class="uk-display-inline-block uk-margin-remove uk-margin-small-right uk-text-left st-color-white">
+               <span uk-icon="icon: comments; ratio: 1" class="uk-display-inline-block uk-margin-small-right">
+                   <span class="uk-display-inline-block uk-margin-small-right uk-text-small">
+                       No reply exists.
+                   </span>
+               </span>
+            </p>
+            {% endif %}
+            <p class="uk-visible@m uk-display-inline-block uk-margin-remove uk-text-left uk-text-small st-color-yellow">
+                <span uk-icon="icon: users; ratio: 1"></span>
+                {{ comment.user.firstName~' '~comment.user.familyName~' ' }}
+                {% if isFirstLevelParent is defined and isFirstLevelParent %}
+                commented this trick.
+                {% elseif isReply is defined and isReply %}
+                replied to comment # {{ parentCommentKey }}.
+                {% endif %}
+            </p>
+        </div>
+        {# Comment actions are availabe here when a user is authenticated! #}
+        {% if is_granted('ROLE_USER') %}
+        <div class="uk-width-auto uk-flex-right">
+            {# Reply to comment by using this comment creation form link anchor with JS smooth scroll behaviour! #}
+            <a id="st-reply-comment-{{ currentKey }}" href="#st-create-comment-form"
+               class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove st-border-rounded-small st-reply-comment" title="Reply to this particular comment">
+                <span uk-icon="icon: reply; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-update st-svg-icon-actions">
+                    <span class="uk-display-inline-block uk-margin-small-right">Reply</span>
+                </span>
+            </a>
+            {# Delete comment if authenticated user is an administrator or the comment author #}
+            {% if is_granted('ROLE_ADMIN') or (app.user and comment.user.uuid == app.user.uuid) %}
+            <a id="st-delete-comment-{{ currentKey }}" href="#st-modal-delete-comment"
+               data-action="{{ path('delete_comment', { 'mainRoleLabel': app.user.mainRoleLabel|lower, 'encodedUuid': comment.uuid|uuid_encode, 'csrfToken': csrf_token('delete_comment') }) }}"
+               class="uk-button uk-box-shadow-medium uk-box-shadow-hover-large uk-padding-remove st-delete-comment" title="Delete" uk-toggle>
+                <span uk-icon="icon: trash; ratio: 1" class="uk-icon st-color-white st-background-black st-svg-icon-button st-svg-icon-delete st-svg-icon-actions"></span>
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>

@@ -67,7 +67,6 @@ class MediaOwner
     private $user;
 
     /**
-     *
      * @var \DateTimeInterface
      *
      * @ORM\Column(type="datetime")
@@ -75,7 +74,6 @@ class MediaOwner
     private $creationDate;
 
     /**
-     *
      * @var \DateTimeInterface
      *
      * @ORM\Column(type="datetime")

@@ -1,0 +1,130 @@
+<div id="st-create-comment-form" class="uk-container-expand st-createComment-form">
+    <div class="uk-text-center">
+        <h2 class="uk-display-inline-block uk-padding-small uk-box-shadow-medium st-border-white-small uk-text-small uk-text-bold uk-text-uppercase st-background-yellow">
+            Trick comment message area
+        </h2>
+    </div>
+    <div class="uk-flex-center uk-grid uk-grid-collapse">
+        <div class="uk-width-5-6 uk-width-2-3@s uk-width-3-5@m uk-width-1-2@l uk-width-2-5@xl uk-card uk-card-primary uk-box-shadow-medium st-border-white-small">
+            {% if trickCommentCreationError %}
+                <div class="uk-card-header uk-padding-small uk-text-center">
+                    {# Trick comment creation error #}
+                    <div class="uk-label uk-form-danger uk-box-shadow-large uk-text-bold">
+                        <p class="uk-margin-remove">
+                            <span uk-icon="icon: warning; ratio: 0.8"></span>
+                            {# Show comment creation error message #}
+                            {{ trickCommentCreationError|nl2br }}
+                        </p>
+                    </div>
+                </div>
+            {% endif %}
+            {# Trick comment creation form #}
+            <div id="st-form" class="uk-card-body uk-padding-medium{{ createCommentForm.vars.valid == 1 and trickCommentCreationError == false ?: ' st-form-error' }}">
+                {% form_theme createCommentForm 'partials/form/uikit_3_form.html.twig' %}
+                {{ form_start(createCommentForm, {'attr': {'class': 'uk-grid uk-grid-collapse', 'novalidate': ''}}) }}
+                    {# Enable reply field if at least a previous comment was posted for current trick #}
+                    {% if trick.comments|length != 0 %}
+                    {# Parent comment #}
+                    <div class="uk-width-1-1 uk-margin-small-bottom">
+                        {% if createCommentForm.parentComment.vars.valid == 0 %}
+                            {{ form_errors(createCommentForm.parentComment) }}
+                        {% endif %}
+                        {{ form_label(createCommentForm.parentComment, 'Reply to an existing comment?', {'label_attr': {'class': 'uk-form-label'}}) }}
+                        {# --- Parent comment reminder --- #}
+                        <div class="uk-inline">
+                            <a href="#" class="uk-button-link">
+                                <span class="st-color-yellow" uk-icon="icon: question; ratio: 1.25"></span>
+                            </a>
+                            <div uk-drop="mode: click; pos: top-center; animation: uk-animation-slide-top-small; duration: 500">
+                                <div class="uk-inline uk-position-relative uk-padding-small uk-border-rounded uk-box-shadow-medium st-background-yellow st-color-black">
+                                    <a href="#" class="uk-drop-close uk-position-absolute uk-padding-small">
+                                        <span class="st-color-blue" uk-icon="icon: close"></span>
+                                    </a>
+                                    <p class="uk-margin-remove uk-text-center st-line-height-normal">
+                                        <small class="uk-display-block uk-margin-small-top uk-margin-small-bottom uk-text-bold">
+                                            <span uk-icon="icon: info"></span> Parent comment reminder<br>
+                                        </small>
+                                        <small>
+                                            Parent comment can be used to reply to an existing comment.<br>
+                                            Your child comment will be ordered depending on its parent.
+                                        </small>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        {# --- end Parent comment reminder --- #}
+                        <div class="uk-inline uk-flex">
+                            <span class="uk-form-icon" uk-icon="icon: reply"></span>
+                            {% if createCommentForm.parentComment.vars.errors.form.submitted == 1 %}
+                                {% set onValidationClass = createCommentForm.parentComment.vars.valid == 0 ? ' st-select-error' : ' st-select-success' %}
+                            {% else %}
+                                {% set onValidationClass = '' %}
+                            {% endif %}
+                            {{ form_widget(createCommentForm.parentComment, {
+                                'attr': {'class': 'uk-select'~onValidationClass },
+                                'value': createCommentForm.parentComment.vars.value})
+                            }}
+                            {% if createCommentForm.parentComment.vars.errors.form.submitted == 1 %}
+                                {% set class = createCommentForm.parentComment.vars.valid == 0 ? 'uk-form-danger' : 'uk-form-success' %}
+                                {% set icon = createCommentForm.parentComment.vars.valid == 0 ? 'warning' : 'check' %}
+                                <span class="uk-form-icon uk-form-icon-flip {{ class }}" uk-icon="icon: {{ icon }}"></span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    {# end Enable reply field if at least a previous comment was posted for current trick #}
+                    {# Content #}
+                    <div class="uk-width-1-1 uk-margin-small-bottom">
+                        {% if createCommentForm.content.vars.valid == 0 %}
+                            {{ form_errors(createCommentForm.content) }}
+                        {% endif %}
+                        {{ form_label(createCommentForm.content, 'Content (or reply)', {'label_attr': {'class': 'uk-form-label'}}) }}
+                        {# --- Content reminder --- #}
+                        <div class="uk-inline">
+                            <a href="#" class="uk-button-link">
+                                <span class="st-color-yellow" uk-icon="icon: question; ratio: 1.25"></span>
+                            </a>
+                            <div uk-drop="mode: click; pos: top-center; animation: uk-animation-slide-top-small; duration: 500">
+                                <div class="uk-inline uk-position-relative uk-padding-small uk-border-rounded uk-box-shadow-medium st-background-yellow st-color-black">
+                                    <a href="#" class="uk-drop-close uk-position-absolute uk-padding-small">
+                                        <span class="st-color-blue" uk-icon="icon: close"></span>
+                                    </a>
+                                    <p class="uk-margin-remove uk-text-center st-line-height-normal">
+                                        <small class="uk-display-block uk-margin-small-top uk-margin-small-bottom uk-text-bold">
+                                            <span uk-icon="icon: info"></span> Content reminder<br>
+                                        </small>
+                                        <small>
+                                            You need to comment being respectful with the other members.
+                                            You can express yourself, but you have to know your comment will be checked with post moderation!
+                                        </small>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        {# --- end Content reminder --- #}
+                        <div class="uk-inline uk-position-relative uk-flex">
+                            <span class="uk-form-icon st-textarea-icon" uk-icon="icon: file-edit"></span>
+                            {{ form_widget(createCommentForm.content, {
+                                'attr': {'class': 'uk-textarea', 'rows': 5},
+                                'value': createCommentForm.content.vars.value})
+                            }}
+                            {% if createCommentForm.content.vars.errors.form.submitted == 1 %}
+                                {% set class = createCommentForm.content.vars.valid == 0 ? 'uk-form-danger' : 'uk-form-success' %}
+                                {% set icon = createCommentForm.content.vars.valid == 0 ? 'warning' : 'check' %}
+                                <span class="uk-form-icon uk-form-icon-flip {{ class }} st-textarea-icon" uk-icon="icon: {{ icon }}"></span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {# CSRF token #}
+                    {{ form_row(createCommentForm.token, {'value': csrf_token('create_comment_token')}) }}
+                    <div class="uk-width-1-1 uk-flex uk-flex-center">
+                        <button type="submit" class="uk-button uk-button-secondary uk-border-rounded uk-box-shadow-hover-medium uk-text-bold" title="Validate">
+                            Create <span uk-icon="icon: chevron-right; ratio: 1.3"></span>
+                        </button>
+                    </div>
+                {{ form_end(createCommentForm) }}
+                <p class="uk-margin-small-top uk-text-center"><small>Reply selection field is not mandatory.<br>You can simply create a comment.</small></p>
+            </div>
+       </div>
+    </div>
+</div>

@@ -102,7 +102,6 @@ class MediaType
     private $name;
 
     /**
-     *
      * @var string
      *
      * @ORM\Column(type="string")
@@ -110,7 +109,6 @@ class MediaType
     private $description;
 
     /**
-     *
      * @var string
      *
      * @ORM\Column(type="integer")
@@ -118,7 +116,6 @@ class MediaType
     private $width;
 
     /**
-     *
      * @var string
      *
      * @ORM\Column(type="integer")

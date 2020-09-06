@@ -26,12 +26,27 @@ trait SessionHelperTrait
      *
      * @return void
      */
-    public function setSession(SessionInterface $session)
+    public function setSession(SessionInterface $session) : void
     {
         $this->session = $session;
         if (!$this->session->isStarted()) {
             $this->session->start();
         }
+    }
+
+    /**
+     * Get initialized session.
+     *
+     * @return SessionInterface
+     *
+     * @throws \Exception
+     */
+    public function getSession() : SessionInterface
+    {
+        if (\is_null($this->session)) {
+            throw new \RuntimeException('SessionInterface implementation must be set before!');
+        }
+        return $this->session;
     }
 
     /**
@@ -49,45 +64,6 @@ trait SessionHelperTrait
         } else {
             $this->session->remove($name);
             $this->session->set($name, $value);
-        }
-    }
-
-    /**
-     * Get data from session.
-     *
-     * @param string $name
-     *
-     * @return array|null
-     */
-    public function getFromSession(string $name) : ?array
-    {
-        if (!$this->session->has($name)) {
-            return null;
-        }
-        return [$name => $this->session->get($name)];
-    }
-
-    /**
-     * Get all session attributes.
-     *
-     * @return array
-     */
-    public function getAllFromSession() : array
-    {
-        return $this->session->all();
-    }
-
-    /*
-     * Remove data from session.
-     *
-     * @param string $name
-     *
-     * @return void
-     */
-    public function removeFromSession(string $name) : void
-    {
-        if ($this->session->has($name)) {
-            $this->session->remove($name);
         }
     }
 }

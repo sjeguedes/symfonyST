@@ -6,6 +6,8 @@ namespace App\Domain\Entity;
 
 use App\Domain\Repository\TrickRepository;
 use App\Utils\Traits\StringHelperTrait;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
@@ -48,7 +50,6 @@ class Trick
     private $uuid;
 
     /**
-     *
      * @var string
      *
      * @ORM\Column(type="string", unique=true)
@@ -56,7 +57,6 @@ class Trick
     private $name;
 
     /**
-     *
      * @var string
      *
      * @ORM\Column(type="text")
@@ -64,7 +64,6 @@ class Trick
     private $description;
 
     /**
-     *
      * @var string
      *
      * @ORM\Column(type="string", unique=true)
@@ -79,7 +78,6 @@ class Trick
     private $isPublished;
 
     /**
-     *
      * @var \DateTimeInterface
      *
      * @ORM\Column(type="datetime")
@@ -87,12 +85,18 @@ class Trick
     private $creationDate;
 
     /**
-     *
      * @var \DateTimeInterface
      *
      * @ORM\Column(type="datetime")
      */
     private $updateDate;
+
+    /**
+     * @var Collection (inverse side of entity relation)
+     *
+     * @ORM\OneToMany(targetEntity=Comment::class, cascade={"remove"}, orphanRemoval=true, mappedBy="trick")
+     */
+    private $comments;
 
     /**
      * @var MediaOwner|null (inverse side of entity relation)
@@ -121,9 +125,13 @@ class Trick
 
     /**
      * @var integer|null a rank value used in lists
-     *
      */
     private $rank;
+
+    /**
+     * @var integer|null a comment total count value used in lists
+     */
+    private $commentCount;
 
     /**
      * Trick constructor.
@@ -159,6 +167,8 @@ class Trick
         $this->creationDate = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
         $this->updateDate = $this->creationDate;
         $this->rank = null;
+        $this->commentCount = null;
+        $this->comments = new ArrayCollection();
     }
 
     /**
@@ -286,6 +296,57 @@ class Trick
     }
 
     /**
+     * Add Comment entity to collection.
+     *
+     * @param Comment $comment
+     *
+     * @return Trick
+     */
+    public function addComment(Comment $comment) : self
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
+            $comment->modifyTrick($this);
+        }
+        return $this;
+    }
+
+    /**
+     * Remove Comment entity from collection.
+     *
+     * @param Comment $comment
+     *
+     * @return Trick
+     */
+    public function removeComment(Comment $comment) : self
+    {
+        if ($this->comments->contains($comment)) {
+            $this->comments->removeElement($comment);
+        }
+        return $this;
+    }
+
+    /**
+     * Assign a comment count length value to get trick comments length (Used in list to show).
+     *
+     * This data is not persisted but generated during a database query.
+     *
+     * @param int commentCount
+     *
+     * @return Trick
+     *
+     * @throws \Exception
+     */
+    public function assignCommentCount(int $commentCount) : self
+    {
+        if ($commentCount < 0) {
+            throw new \InvalidArgumentException('Trick comments length value can not be negative!');
+        }
+        $this->commentCount = $commentCount;
+        return $this;
+    }
+
+    /**
      * Assign a rank to sort trick (Used to manage a list to show).
      *
      * This data is not persisted but generated during a database query.
@@ -362,6 +423,14 @@ class Trick
     }
 
     /**
+     * @return Collection|Comment[]
+     */
+    public function getComments() : Collection
+    {
+        return $this->comments;
+    }
+
+    /**
      * @return MediaOwner|null
      *
      * * The media owner can be null when no media is set (trick creation/update)!
@@ -395,5 +464,13 @@ class Trick
     public function getRank() : ?int
     {
         return $this->rank;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getCommentCount() : ?int
+    {
+        return $this->commentCount;
     }
 }

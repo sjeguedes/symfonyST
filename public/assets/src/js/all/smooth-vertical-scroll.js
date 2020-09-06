@@ -1,6 +1,7 @@
 import coords from './element-coords';
 import UIkit from "../../../uikit/dist/js/uikit.min";
-export default (element, adjustYPosition = null) => { // HHTMLNodeElement, + or - integer
+// arguments: HHTMLNodeElement, +/- integer, integer
+export default (element, adjustYPosition = null, fromStartPosition = null) => {
     // Pure JavaScript cross browser smooth scroll:
     // https://www.youtube.com/watch?v=hPT1SSHptWA
     // Code inspired from:
@@ -24,11 +25,18 @@ export default (element, adjustYPosition = null) => { // HHTMLNodeElement, + or 
     element.scrollFinished = setTimeout(() => {
         // Close all existing notifications on scroll
         UIkit.notification.closeAll();
-        // Stop process if a scroll is active!
-        if (window.pageYOffset !== 0) return;
-        // Define parameters
+        // Define start position
         let startPosition = 0;
         let targetPosition = coords(element).y + adjustYPosition;
+        if (fromStartPosition !== null) {
+            // Force start position with parameter!
+            startPosition = fromStartPosition;
+        } else {
+            // Stop process if a scroll is active!
+            if (window.pageYOffset !== 0) return;
+        }
+        // Define parameters
+        //let targetPosition = coords(element).y + adjustYPosition;
         let distance = targetPosition - startPosition;
         const duration = 1000;
         let start = null;
@@ -53,7 +61,7 @@ export default (element, adjustYPosition = null) => { // HHTMLNodeElement, + or 
             window.scrollTo(0, easeInOutCubic(...args)); // [progress, startPosition, distance, duration]
             // Recursive scrolling animation
             if (progress < duration) {
-                window.requestAnimationFrame(step)
+                window.requestAnimationFrame(step);
             } else {
                 cancelAnimationFrame(request);
             }

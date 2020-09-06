@@ -3,7 +3,7 @@
 {% block title %}SnowTricks - Complete trick list with pagination{% endblock %}
 
 {% block header %}
-    {% include 'all/image_header_loader.html.twig' with {'spinnerRatio': '2.5'} %}
+    {% include 'partials/all/image_header_loader.html.twig' with {'spinnerRatio': '2.5'} %}
     <div class="uk-position-relative uk-flex uk-flex-center uk-flex-middle uk-background-cover uk-background-blend-darken uk-invisible st-background-image-header" data-src="{{ asset(globalImageDirectory~'snowboard-4.jpg') }}" style="background-position: 40% 25%; height: 600px" uk-img>
         <div class="uk-position-center uk-text-center uk-padding-small st-overlay-image-header-container">
             <p class="st-color-white st-text-shadow-dark uk-text-large">
@@ -51,7 +51,7 @@
                         </span>
                     </div>
                     <div class="uk-card-media-top uk-position-relative st-background-black">
-                        {% include 'all/trick_media_loader.html.twig' with {'spinnerRatio': '1.5'} %}
+                        {% include 'partials/all/trick_media_loader.html.twig' with {'spinnerRatio': '1.5'} %}
                         {# Get trick main image thumbnail or default thumbnail #}
                         {% set trickImage = asset(globalImageDirectory~'trick-default-image-400x225.png') %}
                         {% set trickImageDesc = 'No description is available. A main image must be defined!' %}
@@ -76,8 +76,14 @@
                             </div>
                         {% endif %}
                     </div>
-                    <div class="uk-card-body uk-padding-small">
-                        <h2 class="uk-card-title">{{ trick.name }}</h2>
+                    <div class="uk-card-body uk-position-relative uk-padding-small">
+                        {% if trick.commentCount != 0 %}
+                            {# Trick comment counter #}
+                            <small class="uk-position-top-right uk-padding-small uk-padding-remove-bottom">
+                                <span uk-icon="icon: comment; ratio: 1"></span> {{ trick.commentCount > 1 ? trick.commentCount~' comments' : '1 comment' }}
+                            </small>
+                        {% endif %}
+                        <h2 class="uk-card-title uk-margin-small-top uk-padding-small uk-padding-remove-left uk-padding-remove-right uk-padding-remove-bottom">{{ trick.name }}</h2>
                     </div>
                     <div class="uk-card-footer">
                         <div class="uk-flex uk-flex-middle{{ is_granted('AUTHOR_OR_ADMIN_CAN_UPDATE_OR_DELETE_TRICKS', trick) ? ' uk-flex-between' : ' uk-flex-right' }} st-card-link-footer">
@@ -102,7 +108,7 @@
                                 </a>
                                 {# ------------------------------------------------------------------------- #}
                                 {# Get trick removal ajax action in modal #}
-                                {% include 'admin/removal/delete_trick.html.twig' only %}
+                                {% include 'admin/partials/removal/delete_trick.html.twig' only %}
                             </div>
                             {% endif %}
                         </div>

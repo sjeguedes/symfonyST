@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Domain\Repository;
 
+use App\Domain\Entity\Comment;
 use App\Domain\Entity\MediaOwner;
 use App\Domain\Entity\MediaType;
 use App\Domain\Entity\Trick;
@@ -237,10 +238,11 @@ class TrickRepository extends ServiceEntityRepository
             return null;
         }
         $tricks = [];
-        // Rearrange results array to loop easily in template with rank
+        // Rearrange results array to loop easily in template with rank and comment count per trick
         for ($i = 0; $i < $count; $i ++) {
             $tricks[$i] = $result[$i][0];
             $tricks[$i]->assignRank($result[$i]['rank']);
+            $tricks[$i]->assignCommentCount($result[$i]['commentCountPerTrick']);
         }
         // Return an array of objects with tricks data
         return $tricks;
@@ -259,15 +261,15 @@ class TrickRepository extends ServiceEntityRepository
      */
     public function findOneByName(string $name) : ?Trick
     {
-        // TODO: complete query later with users messages or use Message (Comment) Repository to limit result!
         $queryBuilder = $this->createQueryBuilder('t');
         // No need to join media types and trick group due to no particular filter on data
         // trick group and media type data are added automatically thanks to lazy loading!
         // Specifying joins reduces query numbers!
         $result = $queryBuilder
             // IMPORTANT! This feeds all objects properties correctly!
-            ->select(['t', 'tg','mo', 'm', 'mt', 'ms', 'i', 'v'])
+            ->select(['t', 'tg', 'c', 'mo', 'm', 'mt', 'ms', 'i', 'v'])
             ->leftJoin('t.trickGroup', 'tg', 'WITH', 't.trickGroup = tg.uuid')
+            ->leftJoin('t.comments', 'c', 'WITH', 'c.trick = t.uuid')
             ->leftJoin('t.mediaOwner', 'mo', 'WITH', 'mo.trick = t.uuid')
             ->leftJoin('mo.medias', 'm', 'WITH', 'm.mediaOwner = mo.uuid')
             ->leftJoin('m.mediaType', 'mt', 'WITH', 'm.mediaType = mt.uuid')
@@ -277,6 +279,8 @@ class TrickRepository extends ServiceEntityRepository
             ->where('t.name = ?1')
             ->orderBy('i.creationDate', 'DESC')
             ->addOrderBy('v.creationDate', 'DESC')
+            // List comments by ordering them with ascending creation date to have a coherent presentation
+            ->addOrderBy('c.creationDate', 'ASC')
             ->setParameter(1, $name)
             ->getQuery()
             ->getOneOrNullResult();
@@ -308,16 +312,16 @@ class TrickRepository extends ServiceEntityRepository
      */
     public function findOneToShowByUuid(UuidInterface $uuid) : ?Trick
     {
-        // TODO: complete query later with users messages or use Message (Comment) Repository to limit result!
         $queryBuilder = $this->createQueryBuilder('t');
         // Specifying joins reduces query numbers!
         $result = $queryBuilder
             // IMPORTANT! This feeds all objects properties correctly!
-            ->select(['t', 'tg','mo', 'm', 'mt', 'ms', 'i', 'v'])
+            ->select(['t', 'tg','c', 'mo', 'm', 'mt', 'ms', 'i', 'v'])
             // CAUTION! 'HIDDEN' is a DQL keyword and
             // uses 'INVISIBLE' (or limited query result "tips") equivalence for MariaDB/MySQL up to date server version,
             // not to keep this column in final result.
             ->addSelect('FIELD(mt.sourceType, ?8, ?9) AS HIDDEN ordered_media_source_type')
+            ->leftJoin('t.comments', 'c', 'WITH', 'c.trick = t.uuid')
             ->leftJoin('t.trickGroup', 'tg', 'WITH', 't.trickGroup = tg.uuid')
             ->leftJoin('t.mediaOwner', 'mo', 'WITH', 'mo.trick = t.uuid')
             ->leftJoin('mo.medias', 'm', 'WITH', 'm.mediaOwner = mo.uuid')
@@ -338,6 +342,8 @@ class TrickRepository extends ServiceEntityRepository
             ->orderBy('ordered_media_source_type')
             // Each group of medias sorted earlier by types are sorted by show list rank data.
             ->addOrderBy('m.showListRank', 'ASC')
+            // List comments by ordering them with ascending creation date to have a coherent presentation
+            ->addOrderBy('c.creationDate', 'DESC')
             ->setParameter(1, $uuid->getBytes())
             ->setParameter(2, MediaType::TYPE_CHOICES['trickThumbnail'])
             ->setParameter(3, MediaType::TYPE_CHOICES['trickNormal'])
@@ -424,6 +430,8 @@ class TrickRepository extends ServiceEntityRepository
                     -- Sub query to order tricks by date with sort direction 
                     -- and retrieve associated entities with necessary data for trick list
                     SELECT t.uuid, t.name AS t_name, t.slug, t.is_published, t.creation_date,
+                           COUNT(c.uuid) AS commentCountPerTrick,
+                           c.uuid AS c_uuid,
                            u.uuid AS u_uuid,
                            tg.uuid AS tg_uuid, tg.name AS tg_name,
                            mo.uuid AS mo_uuid
@@ -437,17 +445,20 @@ class TrickRepository extends ServiceEntityRepository
                                @sortDirection := :sortDirection
                     ) AS s,
                     tricks t
+                    LEFT JOIN comments c ON t.uuid = c.trick_uuid
                     LEFT JOIN users u ON t.user_uuid = u.uuid
                     LEFT JOIN trick_groups tg ON t.trick_group_uuid = tg.uuid
                     LEFT JOIN media_owners mo ON mo.trick_uuid = t.uuid
                     -- Filter with current user authentication state
-                      WHERE
+                    WHERE
                     CASE WHEN @userAuthenticationState = '" . User::UNAUTHENTICATED_STATE . "' -- ANONYMOUS
                          THEN t.is_published = 1
                          WHEN @userAuthenticationState = '" . User::DEFAULT_ROLE . "' -- SIMPLE MEMBER
                          THEN t.is_published = 1 OR (t.user_uuid = :userUuid AND t.is_published = 0) 
                          WHEN @userAuthenticationState = '" . User::ADMIN_ROLE . "' -- ADMINISTRATOR 
                          THEN t.is_published = 1 OR t.is_published = 0 END 
+                    -- Group rows to have coherent results   
+                    GROUP BY t.uuid, t.creation_date   
                     ORDER BY
                     CASE WHEN @sortDirection = 'DESC' THEN t.creation_date END DESC,
                     CASE WHEN @sortDirection = 'ASC' THEN t.creation_date END
@@ -475,6 +486,9 @@ class TrickRepository extends ServiceEntityRepository
             ->addFieldResult('t', 'is_published', 'isPublished')
             ->addFieldResult('t', 'creation_date', 'creationDate')
             ->addScalarResult('rank', 'rank', 'integer');
+        $resultSetMapping->addJoinedEntityResult(Comment::class , 'c', 't', 'comments')
+            ->addFieldResult('c', 'c_uuid', 'uuid')
+            ->addScalarResult('commentCountPerTrick', 'commentCountPerTrick', 'integer');
         $resultSetMapping->addJoinedEntityResult(User::class , 'u', 't', 'user')
             ->addFieldResult('u', 'u_uuid', 'uuid');
         $resultSetMapping->addJoinedEntityResult(TrickGroup::class , 'tg', 't', 'trickGroup')

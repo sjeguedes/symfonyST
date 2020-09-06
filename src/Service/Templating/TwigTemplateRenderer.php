@@ -66,6 +66,11 @@ final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateB
                 'name'  => 'admin/update_trick.html.twig'
             ],
             [
+                'class' => 'App\\Responder\\AjaxCommentListResponder',
+                'name'  => 'single-trick/partials/comment_list.html.twig',
+                'block' => 'comment_cards'
+            ],
+            [
                 'class' => 'App\\Responder\\AjaxTrickListResponder',
                 'name'  => 'home/trick_list.html.twig',
                 'block' => 'trick_cards'
