@@ -37,6 +37,11 @@ class TrickManager extends AbstractServiceLayer
     use UuidHelperTrait;
 
     /**
+     * Define a session key name to store current trick total count.
+     */
+    const TRICK_COUNT_SESSION_KEY = 'trickCount';
+
+    /**
      * @var CustomEventFactoryInterface
      */
     private $customEventFactory;
@@ -202,8 +207,8 @@ class TrickManager extends AbstractServiceLayer
      * @return int
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
-     * @throws \UnexpectedValueException
      * @throws \Doctrine\ORM\NoResultException
+     * @throws \UnexpectedValueException
      */
     public function countAll() : int
     {
@@ -624,9 +629,10 @@ class TrickManager extends AbstractServiceLayer
      */
     public function isCountAllOutdated(int $count) : bool
     {
-        if ($this->session->has('trickCount') && $this->session->get('trickCount') !== $count) {
-            $this->session->remove('trickCount');
-            $this->session->set('trickCount', $count);
+        $keyName = self::TRICK_COUNT_SESSION_KEY;
+        if ($this->session->has($keyName) && $this->session->get($keyName) !== $count) {
+            // Update trick total count stored in session
+            $this->session->set($keyName, $count);
             return true;
         }
         return false;

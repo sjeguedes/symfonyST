@@ -8,14 +8,14 @@ use App\Service\Templating\TemplateBlockRendererInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Class AjaxTrickListResponder.
+ * Class AjaxCommentListResponder.
  *
- * Manage a response with block html content based on ajax data, to add more trick(s) to an existing list.
+ * Manage a response with block html content based on ajax data, to add more comment(s) to an existing list.
  */
-final class AjaxTrickListResponder extends AbstractAjaxListResponder
+final class AjaxCommentListResponder extends AbstractAjaxListResponder
 {
     /**
-     * AjaxTrickListResponder constructor.
+     * AjaxCommentListResponder constructor.
      *
      * @param TemplateBlockRendererInterface $renderer avoid coupling with template engine
      *

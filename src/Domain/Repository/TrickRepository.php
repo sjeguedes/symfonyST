@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Domain\Repository;
 
+use App\Domain\Entity\Comment;
 use App\Domain\Entity\MediaOwner;
 use App\Domain\Entity\MediaType;
 use App\Domain\Entity\Trick;
@@ -237,10 +238,11 @@ class TrickRepository extends ServiceEntityRepository
             return null;
         }
         $tricks = [];
-        // Rearrange results array to loop easily in template with rank
+        // Rearrange results array to loop easily in template with rank and comment count per trick
         for ($i = 0; $i < $count; $i ++) {
             $tricks[$i] = $result[$i][0];
             $tricks[$i]->assignRank($result[$i]['rank']);
+            $tricks[$i]->assignCommentCount($result[$i]['commentCountPerTrick']);
         }
         // Return an array of objects with tricks data
         return $tricks;
@@ -428,6 +430,8 @@ class TrickRepository extends ServiceEntityRepository
                     -- Sub query to order tricks by date with sort direction 
                     -- and retrieve associated entities with necessary data for trick list
                     SELECT t.uuid, t.name AS t_name, t.slug, t.is_published, t.creation_date,
+                           COUNT(c.uuid) AS commentCountPerTrick,
+                           c.uuid AS c_uuid,
                            u.uuid AS u_uuid,
                            tg.uuid AS tg_uuid, tg.name AS tg_name,
                            mo.uuid AS mo_uuid
@@ -441,6 +445,7 @@ class TrickRepository extends ServiceEntityRepository
                                @sortDirection := :sortDirection
                     ) AS s,
                     tricks t
+                    LEFT JOIN comments c ON t.uuid = c.trick_uuid
                     LEFT JOIN users u ON t.user_uuid = u.uuid
                     LEFT JOIN trick_groups tg ON t.trick_group_uuid = tg.uuid
                     LEFT JOIN media_owners mo ON mo.trick_uuid = t.uuid
@@ -452,7 +457,8 @@ class TrickRepository extends ServiceEntityRepository
                          THEN t.is_published = 1 OR (t.user_uuid = :userUuid AND t.is_published = 0) 
                          WHEN @userAuthenticationState = '" . User::ADMIN_ROLE . "' -- ADMINISTRATOR 
                          THEN t.is_published = 1 OR t.is_published = 0 END 
-                    -- AND t.uuid IS NOT NULL     
+                    -- Group rows to have coherent results   
+                    GROUP BY t.uuid, t.creation_date   
                     ORDER BY
                     CASE WHEN @sortDirection = 'DESC' THEN t.creation_date END DESC,
                     CASE WHEN @sortDirection = 'ASC' THEN t.creation_date END
@@ -480,6 +486,9 @@ class TrickRepository extends ServiceEntityRepository
             ->addFieldResult('t', 'is_published', 'isPublished')
             ->addFieldResult('t', 'creation_date', 'creationDate')
             ->addScalarResult('rank', 'rank', 'integer');
+        $resultSetMapping->addJoinedEntityResult(Comment::class , 'c', 't', 'comments')
+            ->addFieldResult('c', 'c_uuid', 'uuid')
+            ->addScalarResult('commentCountPerTrick', 'commentCountPerTrick', 'integer');
         $resultSetMapping->addJoinedEntityResult(User::class , 'u', 't', 'user')
             ->addFieldResult('u', 'u_uuid', 'uuid');
         $resultSetMapping->addJoinedEntityResult(TrickGroup::class , 'tg', 't', 'trickGroup')

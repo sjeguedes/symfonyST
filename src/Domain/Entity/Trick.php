@@ -135,6 +135,12 @@ class Trick
     private $rank;
 
     /**
+     * @var integer|null a comment total count value used in lists
+     *
+     */
+    private $commentCount;
+
+    /**
      * Trick constructor.
      *
      * @param TrickGroup              $trickGroup
@@ -168,6 +174,7 @@ class Trick
         $this->creationDate = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
         $this->updateDate = $this->creationDate;
         $this->rank = null;
+        $this->commentCount = null;
         $this->comments = new ArrayCollection();
     }
 
@@ -296,26 +303,6 @@ class Trick
     }
 
     /**
-     * Assign a rank to sort trick (Used to manage a list to show).
-     *
-     * This data is not persisted but generated during a database query.
-     *
-     * @param int $rank
-     *
-     * @return Trick
-     *
-     * @throws \Exception
-     */
-    public function assignRank(int $rank) : self
-    {
-        if ($rank < 0) {
-            throw new \InvalidArgumentException('Trick rank value can not be negative!');
-        }
-        $this->rank = $rank;
-        return $this;
-    }
-
-    /**
      * Add Comment entity to collection.
      *
      * @param Comment $comment
@@ -343,6 +330,46 @@ class Trick
         if ($this->comments->contains($comment)) {
             $this->comments->removeElement($comment);
         }
+        return $this;
+    }
+
+    /**
+     * Assign a comment count length value to get trick comments length (Used in list to show).
+     *
+     * This data is not persisted but generated during a database query.
+     *
+     * @param int commentCount
+     *
+     * @return Trick
+     *
+     * @throws \Exception
+     */
+    public function assignCommentCount(int $commentCount) : self
+    {
+        if ($commentCount < 0) {
+            throw new \InvalidArgumentException('Trick comments length value can not be negative!');
+        }
+        $this->commentCount = $commentCount;
+        return $this;
+    }
+
+    /**
+     * Assign a rank to sort trick (Used to manage a list to show).
+     *
+     * This data is not persisted but generated during a database query.
+     *
+     * @param int $rank
+     *
+     * @return Trick
+     *
+     * @throws \Exception
+     */
+    public function assignRank(int $rank) : self
+    {
+        if ($rank < 0) {
+            throw new \InvalidArgumentException('Trick rank value can not be negative!');
+        }
+        $this->rank = $rank;
         return $this;
     }
 
@@ -444,5 +471,13 @@ class Trick
     public function getRank() : ?int
     {
         return $this->rank;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getCommentCount() : ?int
+    {
+        return $this->commentCount;
     }
 }

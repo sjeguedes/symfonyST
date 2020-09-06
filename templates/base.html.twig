@@ -52,8 +52,10 @@
                     <div class="uk-position-relative uk-padding st-footer-infos">
                         {# Only on home page #}
                         {% if app.request.pathinfo == '/'~app.request.get('_locale') %}
-                        <!-- Home page only-->
-                        <div id="st-home-top" class="uk-position-top-right" uk-scrollspy="cls:uk-animation-slide-right-medium; delay: 500; repeat: true"><a class="uk-button uk-button-primary" href="#st-trick-list" uk-scroll><span uk-icon="icon: arrow-up; ratio: 2"></span>&nbsp;Go back to top</a></div>
+                        <!-- Home page only -->
+                        <div id="st-home-top" class="uk-position-top-right" uk-scrollspy="cls:uk-animation-slide-right-medium; delay: 500; repeat: true">
+                            <a class="uk-button uk-button-primary" href="#st-trick-list" uk-scroll><span uk-icon="icon: arrow-up; ratio: 2"></span>&nbsp;Go back to top</a>
+                        </div>
                         {% endif %}
                         <p class="uk-margin-remove-bottom uk-text-center">SnowTricks&nbsp;© {{ "now"|date("Y") }}<br>Powered by<br class="uk-hidden@m"> Symfony 4 & UIkit frameworks</p>
                         <p class="uk-margin-remove uk-text-center uk-text-bold st-color-blue">A website about snowboard tricks</p>

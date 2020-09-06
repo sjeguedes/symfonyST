@@ -4,19 +4,22 @@ declare(strict_types = 1);
 
 namespace App\Action;
 
+use App\Domain\Entity\Comment;
 use App\Domain\Entity\Trick;
+use App\Domain\ServiceLayer\CommentManager;
 use App\Domain\ServiceLayer\MediaTypeManager;
 use App\Domain\ServiceLayer\TrickManager;
 use App\Responder\SingleTrickResponder;
 use App\Service\Form\Handler\FormHandlerInterface;
 use App\Service\Security\Voter\TrickVoter;
+use App\Utils\Traits\RouterHelperTrait;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -25,9 +28,15 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  *
  * Manage single trick page display.
  */
-class SingleTrickAction
+class SingleTrickAction extends AbstractCommentListAction
 {
     use LoggerAwareTrait;
+    use RouterHelperTrait;
+
+    /**
+     * @var CommentManager
+     */
+    protected $commentService;
 
     /**
      * @var MediaTypeManager
@@ -52,27 +61,33 @@ class SingleTrickAction
     /**
      * SingleTrickAction constructor.
      *
+     * @param CommentManager                $commentService
      * @param MediaTypeManager              $mediaTypeService
      * @param TrickManager                  $trickService
-     * @param FormHandlerInterface          $formHandler
      * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param FormHandlerInterface          $formHandler
+     * @param RouterInterface               $router
      * @param LoggerInterface               $logger
      *
      * @return void
      */
     public function __construct(
+        CommentManager $commentService,
         MediaTypeManager $mediaTypeService,
         TrickManager $trickService,
-        FormHandlerInterface $formHandler,
         AuthorizationCheckerInterface $authorizationChecker,
+        FormHandlerInterface $formHandler,
+        RouterInterface $router,
         LoggerInterface $logger
     ) {
+        parent::__construct($commentService);
+        $this->commentService = $commentService;
         $this->mediaTypeService = $mediaTypeService;
         $this->trickService = $trickService;
         $this->authorizationChecker = $authorizationChecker;
-        $this->setLogger($logger);
-
         $this->formHandler = $formHandler;
+        $this->setRouter($router);
+        $this->setLogger($logger);
     }
 
     /**
@@ -88,32 +103,47 @@ class SingleTrickAction
      * @return Response
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws \Exception
      */
     public function __invoke(SingleTrickResponder $responder, Request $request) : Response
     {
         // Check access to single page
         $currentTrick = $this->checkAccessToSingleAction($request);
-        // Get registered normal image type (corresponds particular dimensions)
-        $trickNormalImageTypeValue = $this->mediaTypeService->getMandatoryDefaultTypes()['trickNormal'];
-        $normalImageMediaType = $this->mediaTypeService->findSingleByUniqueType($trickNormalImageTypeValue);
         // Use current trick as form type options
         $options = ['trickToUpdate'  => $currentTrick];
         // Set trick comment form without initial model data and set the request by binding it
         $createTrickCommentForm = $this->formHandler->initForm(null, null, $options)->bindRequest($request);
+        // Get comments list with ranks and comments total count
+        $selectedTrickCommentsData = $this->prepareTrickCommentsListWithRanks(
+            $currentTrick->getUuid(),
+            0,
+            Comment::COMMENT_NUMBER_PER_LOADING,
+            Comment::COMMENT_LOADING_MODE
+        );
         $data = [
+            // Offset and limit are not defined by default here!
+            'commentAjaxLoadingPath'    => $this->router->generate(
+                'load_trick_comments_offset_limit', [
+                'trickEncodedUuid' => $request->attributes->get('encodedUuid')
+            ]),
             'createCommentForm'         => $createTrickCommentForm->createView(),
-            'mediaError'                => 'Media loading error',
-            'mediaTypesValues'          => $this->mediaTypeService->getMandatoryDefaultTypes(),
-            'normalImageMediaType'      => $normalImageMediaType,
-            'noList'                    => 'No comment exists for this trick at this time!',
+            // Get total trick comment count
+            'commentCount'              => $selectedTrickCommentsData['commentsTotalCount'],
+            'selectedTrickComments'     => $selectedTrickCommentsData['commentListWithRanks'],
             'trick'                     => $currentTrick,
-            'trickCommentCreationError' => null,
             // Empty declared url is more explicit!
-            'videoURLProxyPath'         => $this->trickService->generateURLFromRoute(
-                'load_trick_video_url_check', ['url' => ''],
-                UrlGeneratorInterface::ABSOLUTE_URL
-            )
+            'videoURLProxyPath'         => $this->router->generate(
+                'load_trick_video_url_check', [
+                    'url' => ''
+            ])
         ];
+        // Store trick comments total count in session for use of ajax request.
+        $this->commentService->storeInSession(
+            CommentManager::COMMENT_COUNT_SESSION_KEY_PREFIX . $currentTrick->getUuid()->toString(),
+            $selectedTrickCommentsData['commentsTotalCount']
+        );
+        // Get complementary needed comments and medias data
+        $data = array_merge($this->getCommentListData(), $this->getMediasData(), $data);
         return $responder($data);
     }
 
@@ -138,5 +168,22 @@ class SingleTrickAction
             throw new AccessDeniedException("Current user can not view this unpublished trick!");
         }
         return $trick;
+    }
+
+    /**
+     * Get medias necessary data.
+     *
+     * @return array
+     */
+    private function getMediasData() : array
+    {
+        // Get registered normal image type (corresponds particular dimensions)
+        $mediaTypesValues = $this->mediaTypeService->getMandatoryDefaultTypes();
+        $normalImageMediaType = $this->mediaTypeService->findSingleByUniqueType($mediaTypesValues['trickNormal']);
+        return [
+            'mediaError'                => 'Media loading error',
+            'mediaTypesValues'          => $mediaTypesValues,
+            'normalImageMediaType'      => $normalImageMediaType
+        ];
     }
 }

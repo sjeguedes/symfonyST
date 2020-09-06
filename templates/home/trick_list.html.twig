@@ -101,7 +101,7 @@
         {% block trick_cards %}
             {% for trick in tricks %}
             <div class="st-card-container" data-offset="{{ trick.rank }}"{% if (loop.index == 1) and (listError is defined) and (listError is not null) %} data-error="{{ listError }}"{% endif %}>
-                <div class="uk-card uk-card-primary uk-box-shadow-medium uk-box-shadow-hover-large{{ ajaxMode is defined ? ' uk-animation-slide-left-small' }} st-border-white-small st-translate-effect">
+                <div class="uk-card uk-card-primary uk-box-shadow-medium uk-box-shadow-hover-large{{ ajaxMode is defined ? ' uk-animation-slide-bottom-medium' }} st-border-white-small">
                     <div class="uk-card-badge uk-label uk-flex uk-flex-center uk-flex-middle uk-box-shadow-large uk-text-center">
                         <span>
                             <span class="st-color-red">In</span> {{ trick.trickGroup.name }}<br>
@@ -135,11 +135,11 @@
                         {% endif %}
                     </div>
                     <div class="uk-card-body uk-position-relative uk-padding-small">
-                        {% if trick.comments|length != 0 %}
-                        {# Trick comment counter #}
-                        <small class="uk-position-top-right uk-padding-small uk-padding-remove-bottom">
-                            <span uk-icon="icon: comment; ratio: 1"></span> {{ trick.comments|length > 1 ? trick.comments|length~' comments' : '1 comment' }}
-                        </small>
+                        {% if trick.commentCount != 0 %}
+                            {# Trick comment counter #}
+                            <small class="uk-position-top-right uk-padding-small uk-padding-remove-bottom">
+                                <span uk-icon="icon: comment; ratio: 1"></span> {{ trick.commentCount > 1 ? trick.commentCount~' comments' : '1 comment' }}
+                            </small>
                         {% endif %}
                         <h2 class="uk-card-title uk-margin-small-top uk-padding-small uk-padding-remove-left uk-padding-remove-right uk-padding-remove-bottom">{{ trick.name }}</h2>
                     </div>

@@ -41,8 +41,8 @@ export default () => {
             (loadingMode === 'ASC' && lastOffset === countAll - 1)) {
             ajaxPrevented = true;
         } else {
-            // Add load more button which is hidden by default
-            document.querySelector('#st-home-load-more').classList.remove('uk-hidden');
+            // Show load more button which is hidden by default
+            loadMoreButton.classList.remove('uk-hidden');
         }
         // Trick list anchor "Let's go!" mouse behaviors for slideshow:
         const toHomeListButton = document.getElementById('st-home-list-anchor');
@@ -65,7 +65,7 @@ export default () => {
         const toTop = () => {
             nodes = element.querySelectorAll('.uk-card');
             if (toTopButton) {
-                if (nodes.length < limit + 1) {
+                if (nodes.length <= 10) {
                     // Hide
                     toTopButton.classList.add('uk-hidden');
                     // Remove scrollspy behavior
@@ -118,6 +118,7 @@ export default () => {
 
                 // AJAX request
                 if (!ajaxPrevented) {
+                    // Prepare path to AJAX action
                     const pathHandler = URIHelper();
                     requestPath = pathHandler.uriOnString.encode(requestPath);
                     startOffset = pathHandler.uriOnString.encodeParamWithRFC3986(startOffset.toString());
@@ -127,7 +128,7 @@ export default () => {
                         url: limit !== definedLimit ? (requestPath + '/' + startOffset + '/' + limit) : (requestPath + '/' + startOffset),
                         async: true,
                         withCredentials: false,
-                        responseType: 'text', // 'document' do not work in this case!
+                        responseType: 'text', // 'document' does not work in this case!
                         onLoadStartFunction: () => {
                             // Disable button
                             document.querySelector('#st-home-load-more').classList.add('uk-disabled');
@@ -147,6 +148,12 @@ export default () => {
                                 document.querySelector('#st-trick-list .uk-grid').innerHTML = '';
                                 listError = true;
                             }
+                            // Add appearance effect on trick list container
+                            element.setAttribute(
+                                'uk-scrollspy',
+                                'target: > .uk-card; cls: uk-animation-fade; delay: 1000'
+                            );
+                            // Hide card element before feeding and show
                             card.classList.add('uk-hidden');
                             // Show card
                             let to = setTimeout(() => {
@@ -156,13 +163,15 @@ export default () => {
                                 imageListLoader(document.getElementById('st-card-image-' + card.getAttribute('data-offset')));
                                 // Last card
                                 if (index === cards.length - 1) {
+                                    // Hide loading spinner
                                     document.querySelector('#st-home-load-more .st-home-spinner').classList.add('uk-hidden');
+                                    // Check end of list
                                     if (loadingMode === 'DESC' && parseInt(card.getAttribute('data-offset')) === 0) {
-                                        // Hide loading spinner
+                                        // Hide Load more button
                                         document.querySelector('#st-home-load-more').classList.add('uk-hidden');
                                         endReached = true;
                                     } else if (loadingMode === 'ASC' && parseInt(card.getAttribute('data-offset')) === maxOffset) {
-                                        // Hide loading spinner
+                                        // Hide Load more button
                                         document.querySelector('#st-home-load-more').classList.add('uk-hidden');
                                         endReached = true;
                                     }
@@ -195,10 +204,12 @@ export default () => {
                                     // ------------------------------------------------------------------------------------------------------------
 
                                     // Manage trick deletion also here to update removal links list after AJAX request success
-                                    deleteTrick(card.querySelector('.st-delete-trick'));
+                                    let trickDeletionLink = card.querySelector('.st-delete-trick');
+                                    if (trickDeletionLink !== null) {
+                                        deleteTrick(trickDeletionLink);
+                                    }
                                 }
                                 clearTimeout(to);
-
                             }, (index + 1) * 250);
                         });
                     })

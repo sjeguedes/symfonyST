@@ -77,10 +77,10 @@
                         {% endif %}
                     </div>
                     <div class="uk-card-body uk-position-relative uk-padding-small">
-                        {% if trick.comments|length != 0 %}
+                        {% if trick.commentCount != 0 %}
                             {# Trick comment counter #}
                             <small class="uk-position-top-right uk-padding-small uk-padding-remove-bottom">
-                                <span uk-icon="icon: comment; ratio: 1"></span> {{ trick.comments|length > 1 ? trick.comments|length~' comments' : '1 comment' }}
+                                <span uk-icon="icon: comment; ratio: 1"></span> {{ trick.commentCount > 1 ? trick.commentCount~' comments' : '1 comment' }}
                             </small>
                         {% endif %}
                         <h2 class="uk-card-title uk-margin-small-top uk-padding-small uk-padding-remove-left uk-padding-remove-right uk-padding-remove-bottom">{{ trick.name }}</h2>

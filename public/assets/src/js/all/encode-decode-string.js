@@ -246,7 +246,9 @@ export default () => {
                 return '';
             }
             let breakTag = (isXhtml) ? '<br />' : '<br>';
-            return  (string + '').replace(/([\r\n]?)/, '').replace(/(\n)/gi, breakTag);
+            return  (string + '').replace(/([\r\n]?)/, '')
+                                 .replace(/(\n)/gi, breakTag)
+                                 .replace(/(\\n)/gi, breakTag);
         },
         /**
          * Converts a encapsulating common double quote pair in text format into a <strong> html tag

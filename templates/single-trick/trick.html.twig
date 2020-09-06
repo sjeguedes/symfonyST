@@ -275,7 +275,7 @@
                 'createCommentForm': createCommentForm,
                 'trick': trick,
                 'trickCommentCreationError': trickCommentCreationError
-            } %}
+            } only %}
             {# ------------------------------------------------------------------------- #}
             {% else %}
             <p class="uk-text-center uk-text-uppercase uk-text-bold st-color-red">
@@ -287,17 +287,33 @@
         <!-- Trick comments -->
         {% if trick.comments|length != 0 %}
         {# Comments messages list #}
-        <div class="uk-container uk-padding">
+        <div class="uk-container uk-padding uk-padding-remove-bottom">
             {# Comments #}
             {% include 'single-trick/comment_list.html.twig' with {
+                'commentAjaxLoadingPath': commentAjaxLoadingPath,
+                'commentCount': commentCount,
+                'commentLoadingMode': commentLoadingMode,
+                'commentNumberPerLoading': commentNumberPerLoading,
+                'selectedTrickComments': selectedTrickComments,
+                'listEnded': listEnded,
                 'mediaTypesValues': mediaTypesValues,
+                'technicalError': technicalError,
                 'trick': trick
-            } %}
+            } only %}
             {% if is_granted('ROLE_USER') %}
             {# ------------------------------------------------------------------------- #}
             {# Get comment removal ajax action in modal #}
             {% include 'admin/removal/delete_comment.html.twig' only %}
             {# ------------------------------------------------------------------------- #}
+            {% endif %}
+            <!-- Load more -->
+            {% if commentNumberPerLoading < commentCount %}
+            <div class="uk-flex uk-flex-center uk-margin-medium-top">
+                <button id="st-single-load-more" class="uk-button uk-button-secondary uk-border-rounded uk-box-shadow-hover-medium">
+                    <span class="st-single-spinner st-color-yellow uk-hidden" uk-spinner="ratio: 0.8"></span>
+                    Load more&nbsp;&nbsp;<span uk-icon="plus-circle"></span>
+                </button>
+            </div>
             {% endif %}
         </div>
         {% else %}

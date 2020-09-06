@@ -5,6 +5,8 @@ declare(strict_types = 1);
 namespace App\Domain\Entity;
 
 use App\Domain\Repository\CommentRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
@@ -17,11 +19,22 @@ use Ramsey\Uuid\UuidInterface;
  * @ORM\Entity(repositoryClass=CommentRepository::class)
  * @ORM\Table(name="comments")
  *
- * @see self referencing with one to many relationship:
- * https://doctrine2.readthedocs.io/en/latest/reference/association-mapping.html#one-to-many-self-referencing
+ * For personal information:
+ * @see https://doctrine2.readthedocs.io/en/latest/reference/association-mapping.html#one-to-many-self-referencing
+ * @see https://stackoverflow.com/questions/13623285/doctrine-self-referencing-entity-disable-fetching-of-children
  */
 class Comment
 {
+    /**
+     * Sort direction to show comment list.
+     */
+    const COMMENT_LOADING_MODE = 'DESC';
+
+    /**
+     * Number of comments to load for single page "load more" functionality.
+     */
+    const COMMENT_NUMBER_PER_LOADING = 10;
+
     /**
      * The internal primary identity key.
      *
@@ -33,11 +46,20 @@ class Comment
     private $uuid;
 
     /**
-     * A parent comment in case of reply (self referencing unidirectional relation)
+     * One Comment can have many children Comment entities (self referencing inverse side of bidirectional relation).
+     *
+     * @var Comment[]|Collection
+     *
+     * @ORM\OneToMany(targetEntity="Comment", mappedBy="parentComment")
+     */
+    private $children;
+
+    /**
+     * A parent comment in case of reply (self referencing owning side of bidirectional relation)
      *
      * @var Comment|null
      *
-     * @ORM\ManyToOne(targetEntity="Comment")
+     * @ORM\ManyToOne(targetEntity="Comment", inversedBy="children")
      * @ORM\JoinColumn(name="parent_comment_uuid", referencedColumnName="uuid", onDelete="SET NULL")
      */
     private $parentComment;
@@ -80,6 +102,12 @@ class Comment
     private $updateDate;
 
     /**
+     * @var integer|null a rank value used in lists
+     *
+     */
+    private $rank;
+
+    /**
      * Comment constructor.
      *
      * @param Trick                   $trick
@@ -105,6 +133,28 @@ class Comment
         $this->user = $user;
         $this->creationDate = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
         $this->updateDate = $this->creationDate;
+        $this->rank = null;
+        $this->children = new ArrayCollection();
+    }
+
+    /**
+    * Assign a rank to sort comment (Used to manage a list to show).
+    *
+    * This data is not persisted but used with a database query.
+    *
+    * @param int $rank
+    *
+    * @return Comment
+    *
+    * @throws \Exception
+    */
+    public function assignRank(int $rank) : self
+    {
+        if ($rank < 0) {
+            throw new \InvalidArgumentException('Comment rank value can not be negative!');
+        }
+        $this->rank = $rank;
+        return $this;
     }
 
     /**
@@ -193,6 +243,14 @@ class Comment
     }
 
     /**
+     * @return Comment[]|Collection
+     */
+    public function getChildren() : Collection
+    {
+        return $this->children;
+    }
+
+    /**
      * @return Comment|null
      */
     public function getParentComment() : ?Comment
@@ -238,5 +296,13 @@ class Comment
     public function getUpdateDate() : \DateTimeInterface
     {
         return $this->updateDate;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getRank() : ?int
+    {
+        return $this->rank;
     }
 }

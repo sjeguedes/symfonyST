@@ -1,61 +1,89 @@
+{# Resource! manage a counter in twig loop: https://stackoverflow.com/questions/24943462/increment-value-in-twig-file #}
+{# ------------------------------------------------------------------------- #}
 {# Declare a macro to create a hierarchical comment list (parent and children realtioship) #}
-{% set trickComments = trick.comments %}
-{# Manage a counter in twig loop: https://stackoverflow.com/questions/24943462/increment-value-in-twig-file #}
-{% macro list_comments(mediaTypesValues, trickComments, parentComment, parentCommentKey) %}
-    {% set counter = 0 %}
-    {% for key, childComment in trickComments %}
+{% macro list_comments(childrenComments, parentComment, commentCount, commentLoadingMode, mediaTypesValues) %}
+    {# Open ul tag #}
+    {% set parentCommentKey = parentComment.rank + 1 %}
+    <ul id="st-replies-to-{{ parentCommentKey }}"
+        class="uk-comment-list uk-margin-small-top uk-margin-medium-left st-comment-replies" hidden>
+    {% for childComment in childrenComments %}
         {# Get current key #}
-        {% set currentKey = trickComments|length - key %}
-        {# Get possible children #}
-        {% if (childComment.parentComment is not null) and (parentComment.uuid == childComment.parentComment.uuid) %}
-            {% set counter = counter + 1 %}
-            {# Open ul tag if one was opened due to children comment as replies #}
-            {% if counter == 1 %}
-            <ul class="uk-comment-list uk-margin-small-top uk-margin-medium-left">
+        {% set currentKey = childComment.rank + 1 %}
+        <li class="uk-comment uk-margin-small-top uk-visible-toggle">
+            <span class="uk-margin-small uk-padding-small uk-border-circle st-color-yellow st-background-blue" uk-icon="icon: reply; ratio; 2.5"></span>
+            <strong><span class="uk-padding-small-left uk-text-uppercase uk-text-small st-color-blue">Replied to comment # {{ parentCommentKey }}</span></strong>
+            {% include 'single-trick/comment_card.html.twig' with {
+                'comment': childComment,
+                'currentKey': currentKey,
+                'isReply': true,
+                'parentCommentKey': parentCommentKey,
+                'mediaTypesValues': mediaTypesValues,
+                'commentCount': commentCount,
+                'commentLoadingMode': commentLoadingMode
+            } only %}
+            {# Call possibly macro recursively, if child comment has also children comments! #}
+            {%  set childrenComments2 = childComment.children %}
+            {% if childrenComments2|length != 0 %}
+                {# Child comment becomes a parent comment! #}
+                {% set parentComment2 = childComment %}
+                {{ _self.list_comments(
+                    childrenComments2,
+                    parentComment2,
+                    commentCount,
+                    commentLoadingMode,
+                    mediaTypesValues
+                ) }}
             {% endif %}
-            <li class="uk-comment uk-margin-small-top uk-visible-toggle">
-                <span class="uk-margin-small uk-padding-small uk-border-circle st-color-yellow st-background-blue" uk-icon="icon: reply; ratio; 2.5"></span>
-                <strong><span class="uk-padding-small-left uk-text-uppercase uk-text-small st-color-blue">Replied to comment # {{ parentCommentKey }}</span></strong>
-                {% include 'single-trick/comment_card.html.twig' with {
-                    'comment': childComment,
-                    'currentKey': currentKey,
-                    'mediaTypesValues': mediaTypesValues,
-                    'trickCommentLength': trickComments|length
-                } %}
-                {# Use macro recursively #}
-                {{ _self.list_comments(mediaTypesValues, trickComments, childComment, currentKey) }}
-            </li>
-        {% endif %}
+        </li>
     {% endfor %}
-    {# Close ul tag if one was opened due to children comment as replies #}
-    {% if counter != 0 %}
-        </ul>
-    {% endif %}
+    {# Close ul tag #}
+    </ul>
 {% endmacro %}
 {# ------------------------------------------------------------------------- #}
 {# list comments #}
-<ul id="st-trick-comment-list" class="uk-comment-list">
-    {% for key, comment in trickComments %}
+<ul id="st-trick-comment-list" class="uk-comment-list"
+    data-loading-mode="{{ commentLoadingMode }}" data-limit="{{ commentNumberPerLoading }}"
+    data-path="{{ commentAjaxLoadingPath }}" data-ended="{{ listEnded }}"
+    data-technical-error="{{ technicalError }}">
+{# This block is also used for ajax loading! #}
+{% block comment_cards %}
+    {% for comment in selectedTrickComments %}
         {# Get current key #}
-        {% set currentKey = trickComments|length - key %}
+        {% set currentKey = comment.rank + 1 %}
         {# Get all comments at first level #}
         {% if comment.parentComment is null %}
-            <li class="uk-comment uk-margin-remove-top uk-visible-toggle">
-                {% if loop.index != 1 %}
+            {# Show comment at first level #}
+            <li class="uk-comment uk-margin-remove-top uk-visible-toggle st-first-level-comment
+                {{ ajaxMode is defined ? ' uk-animation-slide-bottom-medium' }}"
+                {% if (loop.index == 1) and (listError is defined) and (listError is not null) %} data-error="{{ listError }}"{% endif %}
+                {% if loop.index == 1 %} data-count="{{ commentCount }}"{% endif %}>
+                {# Check first comment when page is loaded not to define a <hr> tag for this case! #}
+                {% if ((ajaxMode is not defined) and (loop.index != 1)) or ajaxMode is defined %}
                 <hr class="uk-margin-medium-top uk-margin-medium-bottom">
                 {% endif %}
                 {% include 'single-trick/comment_card.html.twig' with {
                     'comment': comment,
                     'currentKey': currentKey,
+                    'isFirstLevelParent': true,
                     'mediaTypesValues': mediaTypesValues,
-                    'trickCommentLength': trickComments|length
-                } %}
-                {# Call macro for each comment #}
-                {% set currentKey = trickComments|length - key %}
-                {{ _self.list_comments(mediaTypesValues, trickComments, comment, currentKey) }}
+                    'commentCount': commentCount,
+                    'commentLoadingMode': commentLoadingMode
+                } only %}
+                {# Call macro for children comment #}
+                {%  set childrenComments = comment.children %}
+                {% if childrenComments|length != 0 %}
+                    {{ _self.list_comments(
+                        childrenComments,
+                        comment,
+                        commentCount,
+                        commentLoadingMode,
+                        mediaTypesValues
+                    ) }}
+                {% endif %}
             </li>
-        {% endif %}
+       {% endif %}
     {% endfor %}
+{% endblock comment_cards %}
 </ul>
 
 
