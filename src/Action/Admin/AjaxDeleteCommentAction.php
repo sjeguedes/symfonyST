@@ -79,6 +79,9 @@ class AjaxDeleteCommentAction
      *
      * @return Response
      *
+     * CAUTION! Update any URI change in:
+     * @see LoginFormAuthenticationManager::onAuthenticationSuccess()
+     *
      * @throws \Exception
      */
     public function __invoke(CsrfTokenManagerInterface $csrfTokenManager, JsonResponder $jsonResponder, Request $request) : Response

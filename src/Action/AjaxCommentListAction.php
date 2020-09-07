@@ -71,6 +71,9 @@ class AjaxCommentListAction extends AbstractCommentListAction
      *
      * @return Response
      *
+     * CAUTION! Update any URI change in:
+     * @see LoginFormAuthenticationManager::onAuthenticationSuccess()
+     *
      * @throws \Throwable
      */
     public function __invoke(AjaxCommentListResponder $responder, Request $request) : Response

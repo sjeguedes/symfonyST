@@ -59,6 +59,8 @@ class AjaxVideoURLCheckAction
      * @see VideoURLProxyChecker::filterURLAttribute()
      * About trailing slash:
      * @see https://symfony.com/doc/current/routing/slash_in_parameter.html
+     * CAUTION! Update any URI change in:
+     * @see LoginFormAuthenticationManager::onAuthenticationSuccess()
      */
     public function __invoke(JsonResponder $responder, Request $request) : JsonResponse
     {

@@ -135,15 +135,32 @@ class LoginFormAuthenticationManager extends AbstractFormLoginAuthenticator
 
     /**
      * {@inheritdoc}
+     *
+     * For information to define this config in security.yaml instead of these success and failure callbacks methods:
+     * @see https://symfony.com/doc/current/security/form_login.html#changing-the-default-page
      */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey) : RedirectResponse
     {
         $targetPath = $this->getTargetPath($request->getSession(), $providerKey);
         // Target path is defined in configuration.
         if (!\is_null($targetPath)) {
-            return new RedirectResponse($targetPath);
+            // Check URI
+            switch (true) {
+                // Exclude AJAX request called as referer to avoid issue!
+                case preg_match('/delete-comment/', $targetPath):
+                case preg_match('/delete-media/', $targetPath):
+                case preg_match('/delete-trick/', $targetPath):
+                case preg_match('/load-tricks/', $targetPath):
+                case preg_match('/load-trick-comments/', $targetPath):
+                case preg_match('/load-trick-video/', $targetPath):
+                    // By default, redirect to referer if it is not an AJAX request.
+                    return new RedirectResponse($this->router->generate('home'));
+                default:
+                    // Otherwise, redirect to homepage by default
+                    return new RedirectResponse($targetPath);
+            }
         }
-        // Otherwise, redirect by default to homepage.
+        // Redirect to homepage if no target path (referer) exists!
         return new RedirectResponse($this->router->generate('home'));
     }
 

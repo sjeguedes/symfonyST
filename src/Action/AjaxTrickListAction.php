@@ -53,6 +53,9 @@ class AjaxTrickListAction
      *
      * @return Response
      *
+     * CAUTION! Update any URI change in:
+     * @see LoginFormAuthenticationManager::onAuthenticationSuccess()
+     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      * @throws \Throwable
