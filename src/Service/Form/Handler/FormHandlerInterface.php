@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Form\Handler;
 
@@ -23,7 +23,7 @@ interface FormHandlerInterface
      *
      * @throws \RuntimeException
      */
-    public function bindRequest(Request $request) : FormInterface;
+    public function bindRequest(Request $request): FormInterface;
 
     /**
      * Get password renewal request form with a form factory.
@@ -32,7 +32,7 @@ interface FormHandlerInterface
      *
      * @throws \RuntimeException
      */
-    public function getForm() : FormInterface;
+    public function getForm(): FormInterface;
 
     /**
      * Initialize a form by creating it with a form factory.
@@ -45,14 +45,14 @@ interface FormHandlerInterface
      *
      * @throws \RuntimeException
      */
-    public function initForm(array $modelData = null, string $formType = null, array $options = null) : FormHandlerInterface;
+    public function initForm(array $modelData = null, string $formType = null, array $options = null): FormHandlerInterface;
 
     /**
      * Check if form handles current request.
      *
      * @return bool
      */
-    public function isRequestHandled() : bool;
+    public function isRequestHandled(): bool;
 
     /**
      * Deal with form request to return validation state only if request is bind.
@@ -63,5 +63,5 @@ interface FormHandlerInterface
      *
      * @return bool
      */
-    public function processFormRequest(array $actionData = null) : bool;
+    public function processFormRequest(array $actionData = null): bool;
 }

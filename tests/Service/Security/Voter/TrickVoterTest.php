@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Tests\Service\Security\Voter;
 
@@ -36,9 +36,11 @@ class TrickVoterTest extends TestCase
     /**
      * Setup one trick voter instance.
      *
+     * @return void
+     *
      * @throws \Exception
      */
-    public function setUp() : void
+    public function setUp(): void
     {
         $this->voter = new TrickVoter();
     }
@@ -50,7 +52,7 @@ class TrickVoterTest extends TestCase
      *
      * @return TrickGroup
      */
-    private function createTrickGroup(UuidInterface $uuid) : TrickGroup
+    private function createTrickGroup(UuidInterface $uuid): TrickGroup
     {
         $trickGroup = $this->createMock(TrickGroup::class);
         $trickGroup->method('getUuid')->willReturn($uuid);
@@ -67,7 +69,7 @@ class TrickVoterTest extends TestCase
      *
      * @throws \Exception
      */
-    private function createUser(UuidInterface $uuid, array $roles = null) : User
+    private function createUser(UuidInterface $uuid, array $roles = null): User
     {
         $user = $this->createMock(User::class);
         $user->method('getUuid')->willReturn($uuid);
@@ -82,7 +84,7 @@ class TrickVoterTest extends TestCase
      *
      * @return TokenInterface
      */
-    private function createUserToken(?User $user) : TokenInterface
+    private function createUserToken(?User $user): TokenInterface
     {
         $token = new AnonymousToken('secret', 'anonymous');
         if ($user) {
@@ -100,7 +102,7 @@ class TrickVoterTest extends TestCase
      *
      * @throws \Exception
      */
-    private function createUuidData() : array
+    private function createUuidData(): array
     {
         // Prepare a trick group uuid and two user uuid
         return $this->uuidData = [
@@ -118,7 +120,7 @@ class TrickVoterTest extends TestCase
      *
      * @throws \Exception
      */
-    public function getAnonymousUserUpdateOrDeleteDataProvider() : \Generator
+    public function getAnonymousUserUpdateOrDeleteDataProvider(): \Generator
     {
         // Get uuid instances
         $this->createUuidData();
@@ -162,7 +164,7 @@ class TrickVoterTest extends TestCase
      *
      * @throws \Exception
      */
-    public function getAuthenticatedMemberUpdateOrDeleteDataProvider() : \Generator
+    public function getAuthenticatedMemberUpdateOrDeleteDataProvider(): \Generator
     {
         // Get uuid instances
         $this->createUuidData();
@@ -234,7 +236,7 @@ class TrickVoterTest extends TestCase
      *
      * @throws \Exception
      */
-    public function getAuthenticatedAdminUpdateOrDeleteDataProvider() : \Generator
+    public function getAuthenticatedAdminUpdateOrDeleteDataProvider(): \Generator
     {
         // Get uuid instances
         $this->createUuidData();
@@ -306,7 +308,7 @@ class TrickVoterTest extends TestCase
      *
      * @throws \Exception
      */
-    public function getAnonymousUserViewDataProvider() : \Generator
+    public function getAnonymousUserViewDataProvider(): \Generator
     {
         // Get uuid instances
         $this->createUuidData();
@@ -350,7 +352,7 @@ class TrickVoterTest extends TestCase
      *
      * @throws \Exception
      */
-    public function getAuthenticatedMemberViewDataProvider() : \Generator
+    public function getAuthenticatedMemberViewDataProvider(): \Generator
     {
         // Get uuid instances
         $this->createUuidData();
@@ -395,7 +397,7 @@ class TrickVoterTest extends TestCase
      *
      * @throws \Exception
      */
-    public function getAuthenticatedAdminViewDataProvider() : \Generator
+    public function getAuthenticatedAdminViewDataProvider(): \Generator
     {
         // Get uuid instances
         $this->createUuidData();
@@ -430,17 +432,6 @@ class TrickVoterTest extends TestCase
     }
 
     /**
-     *
-     * @throws \Exception
-     */
-    /*public function testUserCanViewPublishedTricks() : void
-    {
-        // Get uuid instances
-        $this->createUuidData();
-        $canPublishedTrickBeViewed = $this->voter->
-    }*/
-
-    /**
      * Test if an anonymous user can update or delete trick.
      *
      * @dataProvider getAnonymousUserUpdateOrDeleteDataProvider
@@ -457,7 +448,7 @@ class TrickVoterTest extends TestCase
         Trick $trick,
         ?User $user,
         $expectedVote
-    ) : void {
+    ): void {
         // Get TrickVoter instance
         $voter = $this->voter;
         // Get user token (anonymous or authenticated one)
@@ -485,7 +476,7 @@ class TrickVoterTest extends TestCase
         Trick $trick,
         ?User $user,
         $expectedVote
-    ) : void {
+    ): void {
         // Get TrickVoter instance
         $voter = $this->voter;
         // Get user token (anonymous or authenticated one)
@@ -513,7 +504,7 @@ class TrickVoterTest extends TestCase
         Trick $trick,
         ?User $user,
         $expectedVote
-    ) : void {
+    ): void {
         // Get TrickVoter instance
         $voter = $this->voter;
         // Get user token (anonymous or authenticated one)
@@ -541,7 +532,7 @@ class TrickVoterTest extends TestCase
         Trick $trick,
         ?User $user,
         $expectedVote
-    ) : void {
+    ): void {
         // Get TrickVoter instance
         $voter = $this->voter;
         // Get user token (anonymous or authenticated one)
@@ -569,7 +560,7 @@ class TrickVoterTest extends TestCase
         Trick $trick,
         ?User $user,
         $expectedVote
-    ) : void {
+    ): void {
         // Get TrickVoter instance
         $voter = $this->voter;
         // Get user token (anonymous or authenticated one)
@@ -597,7 +588,7 @@ class TrickVoterTest extends TestCase
         Trick $trick,
         ?User $user,
         $expectedVote
-    ) : void {
+    ): void {
         // Get TrickVoter instance
         $voter = $this->voter;
         // Get user token (anonymous or authenticated one)
@@ -612,6 +603,8 @@ class TrickVoterTest extends TestCase
      * Test if a wrong role attribute is passed to TrickVoter::voteOnAttribute().
      *
      * Please note direct usage of this method TrickVoter::voteOnAttribute() is not expected!
+     *
+     * @return void
      *
      * @throws \Exception
      */
@@ -641,8 +634,10 @@ class TrickVoterTest extends TestCase
 
     /**
      * Clear setup to free memory.
+     *
+     * @return void
      */
-    public function tearDown() : void
+    public function tearDown(): void
     {
         $this->voter = null;
         $this->uuidData = [];

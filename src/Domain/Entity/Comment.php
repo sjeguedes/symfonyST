@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\Entity;
 
@@ -125,7 +125,7 @@ class Comment
         ?Comment $parentComment,
         \DateTimeInterface $creationDate = null
     ) {
-        \assert(!empty($content), 'Comment content can not be empty!');
+        \assert(!empty($content), 'Comment content cannot be empty!');
         $this->uuid = Uuid::uuid4();
         $this->parentComment = $parentComment;
         $this->content = $content;
@@ -148,10 +148,10 @@ class Comment
     *
     * @throws \Exception
     */
-    public function assignRank(int $rank) : self
+    public function assignRank(int $rank): self
     {
         if ($rank < 0) {
-            throw new \InvalidArgumentException('Comment rank value can not be negative!');
+            throw new \InvalidArgumentException('Comment rank value cannot be negative!');
         }
         $this->rank = $rank;
         return $this;
@@ -166,7 +166,7 @@ class Comment
      *
      * @throws \Exception
      */
-    public function modifyParentComment(Comment $parentComment) : self
+    public function modifyParentComment(Comment $parentComment): self
     {
         $this->parentComment = $parentComment;
         return $this;
@@ -181,10 +181,10 @@ class Comment
      *
      * @throws \Exception
      */
-    public function modifyContent(string $content) : self
+    public function modifyContent(string $content): self
     {
         if (empty($content)) {
-            throw new \InvalidArgumentException('Comment content can not be empty!');
+            throw new \InvalidArgumentException('Comment content cannot be empty!');
         }
         $this->content = $content;
         return $this;
@@ -197,7 +197,7 @@ class Comment
      *
      * @return Comment
      */
-    public function modifyTrick(Trick $trick) : self
+    public function modifyTrick(Trick $trick): self
     {
         $this->trick = $trick;
         return $this;
@@ -210,7 +210,7 @@ class Comment
      *
      * @return Comment
      */
-    public function modifyUser(User $user) : self
+    public function modifyUser(User $user): self
     {
         $this->user = $user;
         return $this;
@@ -225,10 +225,10 @@ class Comment
      *
      * @throws \Exception
      */
-    public function modifyUpdateDate(\DateTimeInterface $updateDate) : self
+    public function modifyUpdateDate(\DateTimeInterface $updateDate): self
     {
         if ($this->creationDate > $updateDate) {
-            throw new \RuntimeException('Update date is not logical: Media can not be created after modified update date!');
+            throw new \RuntimeException('Update date is not logical: Media cannot be created after modified update date!');
         }
         $this->updateDate = $updateDate;
         return $this;
@@ -237,7 +237,7 @@ class Comment
     /**
      * @return UuidInterface
      */
-    public function getUuid() : UuidInterface
+    public function getUuid(): UuidInterface
     {
         return $this->uuid;
     }
@@ -245,7 +245,7 @@ class Comment
     /**
      * @return Comment[]|Collection
      */
-    public function getChildren() : Collection
+    public function getChildren(): Collection
     {
         return $this->children;
     }
@@ -253,7 +253,7 @@ class Comment
     /**
      * @return Comment|null
      */
-    public function getParentComment() : ?Comment
+    public function getParentComment(): ?Comment
     {
         return $this->parentComment;
     }
@@ -261,7 +261,7 @@ class Comment
     /**
      * @return string
      */
-    public function getContent() : string
+    public function getContent(): string
     {
         return $this->content;
     }
@@ -269,7 +269,7 @@ class Comment
     /**
      * @return Trick
      */
-    public function getTrick() : Trick
+    public function getTrick(): Trick
     {
         return $this->trick;
     }
@@ -277,7 +277,7 @@ class Comment
     /**
      * @return User
      */
-    public function getUser() : User
+    public function getUser(): User
     {
         return $this->user;
     }
@@ -285,7 +285,7 @@ class Comment
     /**
      * @return \DateTimeInterface
      */
-    public function getCreationDate() : \DateTimeInterface
+    public function getCreationDate(): \DateTimeInterface
     {
         return $this->creationDate;
     }
@@ -293,7 +293,7 @@ class Comment
     /**
      * @return \DateTimeInterface
      */
-    public function getUpdateDate() : \DateTimeInterface
+    public function getUpdateDate(): \DateTimeInterface
     {
         return $this->updateDate;
     }
@@ -301,7 +301,7 @@ class Comment
     /**
      * @return int|null
      */
-    public function getRank() : ?int
+    public function getRank(): ?int
     {
         return $this->rank;
     }

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\Repository;
 
@@ -31,13 +31,13 @@ class VideoRepository extends ServiceEntityRepository
      * Find many Video entities uuid, source type (image or video at this time)
      * with one query based on their names.
      *
-     * @link https://stackoverflow.com/questions/5929036/how-to-use-where-in-with-doctrine-2
+     * @see https://stackoverflow.com/questions/5929036/how-to-use-where-in-with-doctrine-2
      *
      * @param array $names
      *
      * @return array|null
      */
-    public function findManyToShowInFomByNames(array $names) : ?array
+    public function findManyToShowInFomByNames(array $names): ?array
     {
         $results = $this->createQueryBuilder('v')
             ->select( 'v.uuid, v.name, mt.sourceType')
@@ -49,7 +49,7 @@ class VideoRepository extends ServiceEntityRepository
             ->getQuery()
             ->getScalarResult();
         if (!\is_null($results)) {
-            for ($i = 0; $i < \count($results); $i ++) {
+            for ($i = 0; $i < \count($results); $i++) {
                 // Redefine $key and value for each iteration and delete previous entry
                 $newKey = $results[$i]['name'];
                 $sourceType = $results[$i]['sourceType'];

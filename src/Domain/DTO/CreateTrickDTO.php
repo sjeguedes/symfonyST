@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\DTO;
 
@@ -84,7 +84,7 @@ final class CreateTrickDTO
     /**
      * @return TrickGroup|null
      */
-    public function getGroup() : ?TrickGroup
+    public function getGroup(): ?TrickGroup
     {
         return $this->group;
     }
@@ -92,7 +92,7 @@ final class CreateTrickDTO
     /**
      * @return string|null
      */
-    public function getName() : ?string
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -100,7 +100,7 @@ final class CreateTrickDTO
     /**
      * @return string|null
      */
-    public function getDescription() : ?string
+    public function getDescription(): ?string
     {
         return $this->description;
     }
@@ -108,7 +108,7 @@ final class CreateTrickDTO
     /**
      * @return DTOCollection|ImageToCropDTO[]
      */
-    public function getImages() : DTOCollection
+    public function getImages(): DTOCollection
     {
         return $this->images;
     }
@@ -116,7 +116,7 @@ final class CreateTrickDTO
     /**
      * @return DTOCollection|VideoInfosDTO[]
      */
-    public function getVideos() : DTOCollection
+    public function getVideos(): DTOCollection
     {
         return $this->videos;
     }
@@ -124,7 +124,7 @@ final class CreateTrickDTO
     /**
      * @return bool|null
      */
-    public function getIsPublished() : ?bool
+    public function getIsPublished(): ?bool
     {
         return $this->isPublished;
     }

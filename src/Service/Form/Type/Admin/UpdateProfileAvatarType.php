@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Form\Type\Admin;
 
@@ -49,7 +49,7 @@ class UpdateProfileAvatarType extends AbstractType
      *
      * @return void
      */
-    private function addStringToBoolCustomDataTransformer(FormBuilderInterface $formBuilder, string $formName) : void
+    private function addStringToBoolCustomDataTransformer(FormBuilderInterface $formBuilder, string $formName): void
     {
         $formBuilder
             ->get($formName)
@@ -83,7 +83,7 @@ class UpdateProfileAvatarType extends AbstractType
      *
      * @return void
      */
-    public function buildForm(FormBuilderInterface $builder, array $options) : void
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('avatar', FileType::class, [
@@ -108,7 +108,7 @@ class UpdateProfileAvatarType extends AbstractType
      *
      * @return void
      */
-    public function configureOptions(OptionsResolver $resolver) : void
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class'     => UpdateProfileAvatarDTO::class,

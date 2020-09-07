@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Templating;
 
@@ -115,7 +115,7 @@ final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateB
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
      */
-    public function renderTemplate(string $template, array $data) : string
+    public function renderTemplate(string $template, array $data): string
     {
         return $this->templateRenderer->render($template, $data);
     }
@@ -130,15 +130,15 @@ final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateB
      * @see https://stackoverflow.com/questions/22407370/how-to-check-if-class-exists-within-a-namespace
      * @see https://stackoverflow.com/questions/15839292/is-there-a-namespace-aware-alternative-to-phps-class-exists?noredirect=1&lq=1
      */
-    public function getTemplate(string $className) : string
+    public function getTemplate(string $className): string
     {
         if (!class_exists($className)) {
-            throw new \InvalidArgumentException('Template can not be rendered: mandatory class does not exist!');
+            throw new \InvalidArgumentException('Template cannot be rendered: mandatory class does not exist!');
         }
         $data = '';
         $i = 0;
         foreach ($this->templates as $template) {
-            ++ $i;
+            ++$i;
             $hasBlock = !isset($template['block']) ? false : true;
             $isMatched = $className !== $template['class'] ? false : true;
             if ($i === \count($this->templates) && false === $isMatched) {
@@ -164,7 +164,7 @@ final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateB
      *
      * @throws \Throwable
      */
-    public function renderTemplateBlock(string $template, string $block, array $data) : string
+    public function renderTemplateBlock(string $template, string $block, array $data): string
     {
         return $this->renderBlock($this->templateRenderer, $template, $block, $data);
     }
@@ -180,15 +180,15 @@ final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateB
      *
      * @return array an associative array which contains template name and template block name
      */
-    public function getTemplateBlock(string $className) : array
+    public function getTemplateBlock(string $className): array
     {
         if (!class_exists($className)) {
-            throw new \InvalidArgumentException('Template block can not be rendered: mandatory class does not exist!');
+            throw new \InvalidArgumentException('Template block cannot be rendered: mandatory class does not exist!');
         }
         $data = [];
         $i = 0;
         foreach ($this->templates as $template) {
-            ++ $i;
+            ++$i;
             $hasBlock = !isset($template['block']) ? false : true;
             $isMatched = $className !== $template['class'] ? false : true;
             if ($i === \count($this->templates) && false === $isMatched) {

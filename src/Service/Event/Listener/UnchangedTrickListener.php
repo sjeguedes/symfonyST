@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Event\Listener;
 
@@ -51,7 +51,7 @@ class UnchangedTrickListener
      *
      * @return void
      */
-    public function onFormUnchanged(FormUnchangedEvent $event) : void
+    public function onFormUnchanged(FormUnchangedEvent $event): void
     {
         // Check if action corresponds to trick update page
         if ($isUpdateTrickAction = UpdateTrickAction::class === $this->request->attributes->get('_controller')) {

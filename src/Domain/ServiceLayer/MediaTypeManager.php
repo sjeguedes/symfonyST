@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\ServiceLayer;
 
@@ -52,7 +52,7 @@ class MediaTypeManager
      *
      * @return MediaType|null
      */
-    public function findSingleByUniqueType(string $type) : ?MediaType
+    public function findSingleByUniqueType(string $type): ?MediaType
     {
         return $this->repository->findOneByType($type);
     }
@@ -62,7 +62,7 @@ class MediaTypeManager
      *
      * @return EntityManagerInterface
      */
-    public function getEntityManager() : EntityManagerInterface
+    public function getEntityManager(): EntityManagerInterface
     {
         return $this->entityManager;
     }
@@ -72,7 +72,7 @@ class MediaTypeManager
      *
      * @return array
      */
-    public function getMandatoryDefaultTypes() : array
+    public function getMandatoryDefaultTypes(): array
     {
         return MediaType::TYPE_CHOICES;
     }
@@ -82,7 +82,7 @@ class MediaTypeManager
      *
      * @return MediaTypeRepository
      */
-    public function getRepository() : MediaTypeRepository
+    public function getRepository(): MediaTypeRepository
     {
         return $this->repository;
     }
@@ -94,7 +94,7 @@ class MediaTypeManager
      *
      * @return string|null
      */
-    public function getType(string $mediaTypeKey) : ?string
+    public function getType(string $mediaTypeKey): ?string
     {
         $type = $this->getMandatoryDefaultTypes()[$mediaTypeKey] ?? null;
         return $type;

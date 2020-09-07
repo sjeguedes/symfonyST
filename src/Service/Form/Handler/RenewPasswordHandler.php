@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Form\Handler;
 
@@ -83,7 +83,7 @@ final class RenewPasswordHandler extends AbstractFormHandler implements InitMode
      *
      * @throws \Exception
      */
-    protected function addCustomValidation(array $actionData) : bool
+    protected function addCustomValidation(array $actionData): bool
     {
         $csrfToken = $this->request->request->get('renew_password')['token'];
         // CSRF token is not valid.
@@ -123,7 +123,7 @@ final class RenewPasswordHandler extends AbstractFormHandler implements InitMode
      *
      * @see AbstractFormHandler::processFormRequest()
      */
-    protected function addCustomAction(array $actionData) : void
+    protected function addCustomAction(array $actionData): void
     {
         // Check UserManager instance in passed data
         $this->checkNecessaryData($actionData);
@@ -167,7 +167,7 @@ final class RenewPasswordHandler extends AbstractFormHandler implements InitMode
      *
      * @return string|null
      */
-    public function getUserNameError() : ?string
+    public function getUserNameError(): ?string
     {
         return $this->customError;
     }
@@ -180,7 +180,7 @@ final class RenewPasswordHandler extends AbstractFormHandler implements InitMode
      * {@inheritDoc}
      *
      */
-    public function initForm(array $data = null, string $formType = null, array $options = null) : FormHandlerInterface
+    public function initForm(array $data = null, string $formType = null, array $options = null): FormHandlerInterface
     {
         $currentFormHandler = parent::initForm($data, $formType, $options);
         // if username field is disabled, remove model data already set (no way to do that before form creation in init).
@@ -198,7 +198,7 @@ final class RenewPasswordHandler extends AbstractFormHandler implements InitMode
      *
      * @throws \Exception
      */
-    public function initModelData(array $data) : object
+    public function initModelData(array $data): object
     {
         $this->checkNecessaryData($data);
         $user = $data['userToUpdate'];
@@ -212,7 +212,7 @@ final class RenewPasswordHandler extends AbstractFormHandler implements InitMode
      *
      * @return bool
      */
-    private function isIdentifiedUserMatchedInForm(User $identifiedUser) : bool
+    private function isIdentifiedUserMatchedInForm(User $identifiedUser): bool
     {
         $matchedNickNames = $identifiedUser->getNickName() === $this->form->get('userName')->getData();
         $matchedEmails =  $identifiedUser->getEmail() === $this->form->get('userName')->getData();

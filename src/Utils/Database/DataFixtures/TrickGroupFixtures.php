@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Utils\Database\DataFixtures;
 
@@ -23,7 +23,7 @@ class TrickGroupFixtures extends BaseFixture
      *
      * @throws \Exception
      */
-    public function loadData(ObjectManager $manager) : void
+    public function loadData(ObjectManager $manager): void
     {
         $array = $this->parseYamlFile('trick_group_fixtures.yaml');
         $data = $array['trick_groups'];

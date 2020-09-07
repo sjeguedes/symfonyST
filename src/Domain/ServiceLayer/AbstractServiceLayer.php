@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\ServiceLayer;
 
@@ -14,7 +14,7 @@ use Psr\Log\LoggerInterface;
  * Define Entity "service layers" essential responsibilities.
  *
  * For information, for entity persistence management, a better way with Doctrine transactions:
- * @link https://www.thinktocode.com/2019/03/28/abstracting-the-doctrine-orm-flush/
+ * @see https://www.thinktocode.com/2019/03/28/abstracting-the-doctrine-orm-flush/
  */
 abstract class AbstractServiceLayer
 {
@@ -58,7 +58,7 @@ abstract class AbstractServiceLayer
      *
      * @return object|null
      */
-    public function addAndSaveNewEntity(object $entity, bool $isPersisted = false, bool $isFlushed = false) : ?object
+    public function addAndSaveNewEntity(object $entity, bool $isPersisted = false, bool $isFlushed = false): ?object
     {
         // Nothing to do!
         if (!$isPersisted && !$isFlushed) {
@@ -106,7 +106,7 @@ abstract class AbstractServiceLayer
      *
      * @return bool
      */
-    public function removeAndSaveNoMoreEntity(object $entity, bool $isFlushed = true) : bool
+    public function removeAndSaveNoMoreEntity(object $entity, bool $isFlushed = true): bool
     {
         // Create a new entity manager instance, if previous has detached managed entities with close() method!
         if (!$this->entityManager->isOpen()) {

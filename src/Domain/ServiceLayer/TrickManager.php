@@ -1,5 +1,5 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\ServiceLayer;
 
@@ -94,7 +94,7 @@ class TrickManager extends AbstractServiceLayer
      *
      * @return array
      */
-    private function adaptTrickListParameters(array $condition, array $parameters) : array
+    private function adaptTrickListParameters(array $condition, array $parameters): array
     {
         if (\count($condition) > 1) {
             throw new \RuntimeException("Condition can't be checked: only one condition must be passed at once!");
@@ -131,7 +131,7 @@ class TrickManager extends AbstractServiceLayer
                     break;
             }
             $this->logger->error(
-                sprintf("[trace app snowTricks] TrickManager/filterParametersWithOrder - \"%s\" case => parameters: %s", key($condition), serialize($parameters))
+                sprintf("[trace app SnowTricks] TrickManager/filterParametersWithOrder - \"%s\" case => parameters: %s", key($condition), serialize($parameters))
             );
         }
         return $parameters;
@@ -154,7 +154,7 @@ class TrickManager extends AbstractServiceLayer
      *
      * @throws \Exception
      */
-    public function addAndSaveTrick(Trick $trick, bool $isPersisted = false, bool $isFlushed = false) : ?Trick
+    public function addAndSaveTrick(Trick $trick, bool $isPersisted = false, bool $isFlushed = false): ?Trick
     {
         $object = $this->addAndSaveNewEntity($trick, $isPersisted, $isFlushed);
         return \is_null($object) ? null : $trick;
@@ -176,8 +176,7 @@ class TrickManager extends AbstractServiceLayer
         string $submittedName,
         Trick $trick = null,
         bool $isTrickChecked = false
-    ) : bool
-    {
+    ): bool {
         // Prepare data to filter for trick creation by getting all tricks
         if (\is_null($trick)) {
             $dataToFilter = $this->getRepository()->findAll();
@@ -210,11 +209,11 @@ class TrickManager extends AbstractServiceLayer
      * @throws \Doctrine\ORM\NoResultException
      * @throws \UnexpectedValueException
      */
-    public function countAll() : int
+    public function countAll(): int
     {
         $result = $this->repository->countAll();
         if (\is_null($result)) {
-            throw new \UnexpectedValueException('Trick total count error: list can not be generated!');
+            throw new \UnexpectedValueException('Trick total count error: list cannot be generated!');
         }
         return $result;
     }
@@ -232,7 +231,7 @@ class TrickManager extends AbstractServiceLayer
      *
      * @throws \Exception
      */
-    public function createAndDispatchTrickEvent(string $eventContext, Trick $trick, User $authenticatedUser) : void
+    public function createAndDispatchTrickEvent(string $eventContext, Trick $trick, User $authenticatedUser): void
     {
         $event = $this->customEventFactory->createFromContext(
             $eventContext,
@@ -264,8 +263,7 @@ class TrickManager extends AbstractServiceLayer
         UserInterface $authenticatedUser,
         bool $isPersisted = false,
         bool $isFlushed = false
-    ) : ?Trick
-    {
+    ): ?Trick {
         $newTrick = new Trick(
             $createTrickDTO->getGroup(), // At this time an array of TrickGroup is returned to possibly manage several "categories".
             $authenticatedUser,
@@ -287,7 +285,7 @@ class TrickManager extends AbstractServiceLayer
      *
      * @return array
      */
-    public function findOnesByAuthor(UuidInterface $userUuid) : array
+    public function findOnesByAuthor(UuidInterface $userUuid): array
     {
         return $this->repository->findAllByAuthor($userUuid);
     }
@@ -313,7 +311,7 @@ class TrickManager extends AbstractServiceLayer
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function findSingleByName(string $name) : ?Trick
+    public function findSingleByName(string $name): ?Trick
     {
         return $this->repository->findOneByName($name);
     }
@@ -327,7 +325,7 @@ class TrickManager extends AbstractServiceLayer
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function findSingleToShowByEncodedUuid(string $encodedUuid) : ?Trick
+    public function findSingleToShowByEncodedUuid(string $encodedUuid): ?Trick
     {
         $uuid = $this->decode($encodedUuid);
         return $this->repository->findOneToShowByUuid($uuid);
@@ -342,7 +340,7 @@ class TrickManager extends AbstractServiceLayer
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function findSingleToUpdateInFormByEncodedUuid(string $encodedUuid) : ?Trick
+    public function findSingleToUpdateInFormByEncodedUuid(string $encodedUuid): ?Trick
     {
         $uuid = $this->decode($encodedUuid);
         return $this->repository->findOneToUpdateInFormByUuid($uuid);
@@ -358,7 +356,7 @@ class TrickManager extends AbstractServiceLayer
      * @throws \Doctrine\ORM\NonUniqueResultException
      * @throws \Doctrine\ORM\NoResultException
      */
-    public function getTrickListParameters() : array
+    public function getTrickListParameters(): array
     {
         $startOffset = $this->getStartOffset();
         $parameters = $this->filterParametersWithOrder($startOffset);
@@ -381,7 +379,7 @@ class TrickManager extends AbstractServiceLayer
         int $offset, // can be adjusted to be coherent
         int $limit = Trick::TRICK_NUMBER_PER_LOADING, // can be updated after first load to be coherent
         string $order = Trick::TRICK_LOADING_MODE
-    ) : ?array {
+    ): ?array {
         // Define init value to define starting rank in SQL query:
         //So in ASC order, first assigned rank in SQL query will start at "0", and in DESC order it will start at $this->countAll() - 1
         $init = ('DESC' === $order) ? $this->countAll() : -1;
@@ -398,7 +396,7 @@ class TrickManager extends AbstractServiceLayer
      *
      * @return array
      */
-    public function getTrickListConfigParameters() : array
+    public function getTrickListConfigParameters(): array
     {
         return [
             'loadingMode'      => Trick::TRICK_LOADING_MODE,
@@ -419,7 +417,7 @@ class TrickManager extends AbstractServiceLayer
      * @throws \Doctrine\ORM\NonUniqueResultException
      * @throws \Doctrine\ORM\NoResultException
      */
-    public function getTrickListPaginationParameters(int $pageIndex) : ?array
+    public function getTrickListPaginationParameters(int $pageIndex): ?array
     {
         // Count all tricks
         $countAll = $this->countAll();
@@ -430,7 +428,7 @@ class TrickManager extends AbstractServiceLayer
         $trickNumberOnLastPage = 0 === $trickNumberToShowModulo ? 1 : $trickNumberToShowModulo;
         $calculatedPageCount = $countAll / $trickNumberPerPage;
         $pageCount = (0 === $trickNumberToShowModulo) ? $calculatedPageCount : (int) floor($calculatedPageCount) + 1;
-        // Page doesn't exist and obviously can not be reached! This will throw a not found exception.
+        // Page doesn't exist and obviously cannot be reached! This will throw a not found exception.
         if ($pageIndex <= 0 || $pageIndex > $pageCount) {
             return null;
         }
@@ -471,7 +469,7 @@ class TrickManager extends AbstractServiceLayer
      * @throws \Doctrine\ORM\NonUniqueResultException
      * @throws \Doctrine\ORM\NoResultException
      */
-    public function getStartOffset() : int
+    public function getStartOffset(): int
     {
         // Get tricks total number
         $countAll = $this->countAll();
@@ -497,7 +495,7 @@ class TrickManager extends AbstractServiceLayer
         int $offset,
         int $limit = Trick::TRICK_NUMBER_PER_LOADING,
         string $order = Trick::TRICK_LOADING_MODE
-    ) : array {
+    ): array {
         $count = $this->repository->countAll();
         $minOffset = 0;
         $maxOffset = $count - 1;
@@ -552,7 +550,7 @@ class TrickManager extends AbstractServiceLayer
      *
      * @throws \Exception
      */
-    public function filterPaginationRequestAttribute(Request $request) : int
+    public function filterPaginationRequestAttribute(Request $request): int
     {
         // Prevent issue if "page" attribute has no default value defined (no redirection is made)
         $page = \is_null($request->attributes->get('page')) ? '' : $request->attributes->get('page');
@@ -563,9 +561,9 @@ class TrickManager extends AbstractServiceLayer
         // This is an optional check thanks to requirements and default empty parameters on route at this time
         if (!$isPageParameterCorrect && !$isDefaultParameter) {
             $this->logger->error(
-                sprintf("[trace app snowTricks] TrickManager/filterPaginationRequestAttribute => pagination error with parameter: %s", $page)
+                sprintf("[trace app SnowTricks] TrickManager/filterPaginationRequestAttribute => pagination error with parameter: %s", $page)
             );
-            throw new \UnexpectedValueException('Trick list pagination parameters error: list can not be generated!');
+            throw new \UnexpectedValueException('Trick list pagination parameters error: list cannot be generated!');
         }
         // Adjust Default parameter
         return $isPageParameterCorrect && !$isDefaultParameter ? (int) $page : 1;
@@ -580,11 +578,11 @@ class TrickManager extends AbstractServiceLayer
      *
      * @throws \UnexpectedValueException
      */
-    public function filterListRequestAttributes(Request $request) : array
+    public function filterListRequestAttributes(Request $request): array
     {
         if (!$request->attributes->has('offset') || !\ctype_digit((string) $request->attributes->get('offset'))) {
-            $this->logger->error("[trace app snowTricks] TrickManager/filterListRequestAttributes => list error: at least, offset route placeholder is expected!");
-            throw new \UnexpectedValueException('Trick list parameters error: list can not be generated!');
+            $this->logger->error("[trace app SnowTricks] TrickManager/filterListRequestAttributes => list error: at least, offset route placeholder is expected!");
+            throw new \UnexpectedValueException('Trick list parameters error: list cannot be generated!');
         }
         // Get starting rank
         $offset = (int) $request->attributes->get('offset');
@@ -603,7 +601,7 @@ class TrickManager extends AbstractServiceLayer
      *
      * @return EntityManagerInterface
      */
-    public function getEntityManager() : EntityManagerInterface
+    public function getEntityManager(): EntityManagerInterface
     {
         return $this->entityManager;
     }
@@ -613,7 +611,7 @@ class TrickManager extends AbstractServiceLayer
      *
      * @return TrickRepository
      */
-    public function getRepository() : TrickRepository
+    public function getRepository(): TrickRepository
     {
         return $this->repository;
     }
@@ -627,7 +625,7 @@ class TrickManager extends AbstractServiceLayer
      *
      * @return bool
      */
-    public function isCountAllOutdated(int $count) : bool
+    public function isCountAllOutdated(int $count): bool
     {
         $keyName = self::TRICK_COUNT_SESSION_KEY;
         if ($this->session->has($keyName) && $this->session->get($keyName) !== $count) {
@@ -646,7 +644,7 @@ class TrickManager extends AbstractServiceLayer
      *
      * @return bool
      */
-    public function removeTrick(Trick $trick, bool $isFlushed = true) : bool
+    public function removeTrick(Trick $trick, bool $isFlushed = true): bool
     {
         // Proceed to removal in database
         return $this->removeAndSaveNoMoreEntity($trick, $isFlushed);
@@ -671,8 +669,7 @@ class TrickManager extends AbstractServiceLayer
         UserInterface $authenticatedUser,
         bool $mustAuthorBeReplaced = false,
         bool $isFlushed = false
-    ) : Trick
-    {
+    ): Trick {
         // Must author be replaced (updated)?
         // CAUTION! This is the case when an author account is deleted, then a particular anonymous becomes trick author.
         // At this time user author is not changed on update to keep the original author.

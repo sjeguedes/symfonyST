@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Utils\Database\DataFixtures;
 
@@ -22,7 +22,7 @@ class MediaSourceFixtures extends BaseFixture implements DependentFixtureInterfa
      *
      * @return array
      */
-    public function getDependencies() : array
+    public function getDependencies(): array
     {
         return [
             ImageFixtures::class,
@@ -39,7 +39,7 @@ class MediaSourceFixtures extends BaseFixture implements DependentFixtureInterfa
      *
      * @throws \Exception
      */
-    public function loadData(ObjectManager $manager) : void
+    public function loadData(ObjectManager $manager): void
     {
         $array = $this->parseYamlFile('media_source_fixtures.yaml');
         $data = $array['media_sources'];

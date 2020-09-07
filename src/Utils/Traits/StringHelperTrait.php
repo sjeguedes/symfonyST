@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Utils\Traits;
 
@@ -22,7 +22,7 @@ trait StringHelperTrait
      *
      * @throws \Exception
      */
-    public function makeSlug(string $string, array $replace = [], string $delimiter = '-') : string
+    public function makeSlug(string $string, array $replace = [], string $delimiter = '-'): string
     {
         if (!extension_loaded('iconv')) {
           throw new \Exception('Sorry, "iconv" module is not loaded!');
@@ -58,7 +58,7 @@ trait StringHelperTrait
      *
      * @see https://www.php.net/manual/en/transliterator.transliterate.php
      */
-    public function sanitizeString(string $string, string $delimiter = '-') : ?string
+    public function sanitizeString(string $string, string $delimiter = '-'): ?string
     {
         // Replace latin characters and lower-case string, remove non spacing mark but not punctuation...
         $string = transliterator_transliterate("Any-Latin; Latin-ASCII; NFD; [:Nonspacing Mark:] Remove; NFC; Lower();", $string);

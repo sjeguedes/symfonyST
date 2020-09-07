@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Utils\Database\DataFixtures;
 
@@ -22,7 +22,7 @@ class MediaOwnerFixtures extends BaseFixture implements DependentFixtureInterfac
      *
      * @return array
      */
-    public function getDependencies() : array
+    public function getDependencies(): array
     {
         return [
             TrickFixtures::class,
@@ -39,7 +39,7 @@ class MediaOwnerFixtures extends BaseFixture implements DependentFixtureInterfac
      *
      * @throws \Exception
      */
-    public function loadData(ObjectManager $manager) : void
+    public function loadData(ObjectManager $manager): void
     {
         $array = $this->parseYamlFile('media_owner_fixtures.yaml');
         $data = $array['media_owners'];

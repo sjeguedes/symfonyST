@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Action\Admin;
 
@@ -84,7 +84,7 @@ class AjaxDeleteCommentAction
      *
      * @throws \Exception
      */
-    public function __invoke(CsrfTokenManagerInterface $csrfTokenManager, JsonResponder $jsonResponder, Request $request) : Response
+    public function __invoke(CsrfTokenManagerInterface $csrfTokenManager, JsonResponder $jsonResponder, Request $request): Response
     {
         // Filter AJAX request
         if (!$request->isXmlHttpRequest()) {
@@ -114,7 +114,7 @@ class AjaxDeleteCommentAction
      *
      * @return void
      */
-    private function checkAccessToDeletionAction(?Comment $commentToDelete) : void
+    private function checkAccessToDeletionAction(?Comment $commentToDelete): void
     {
         if ($this->security->isGranted('ROLE_ADMIN')) {
             return;
@@ -125,7 +125,7 @@ class AjaxDeleteCommentAction
         $isUserAuthor = $authenticatedUser->getUuid()->toString() === $commentToDelete->getUser()->getUuid()->toString();
 
         if ($this->security->isGranted('ROLE_USER') && !$isUserAuthor) {
-            throw new AccessDeniedException("Current user can not delete this comment!");
+            throw new AccessDeniedException("Current user cannot delete this comment!");
         }
     }
 
@@ -138,7 +138,7 @@ class AjaxDeleteCommentAction
      * @return array
      *
      */
-    private function manageCommentDeletionResult(?Comment $commentToDelete, Request $request) : array
+    private function manageCommentDeletionResult(?Comment $commentToDelete, Request $request): array
     {
         // Filter authenticated user permissions
         $this->checkAccessToDeletionAction($commentToDelete);

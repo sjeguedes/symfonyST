@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Form\Handler;
 
@@ -53,7 +53,7 @@ final class LoginHandler extends AbstractFormHandler
      *
      * @see AbstractFormHandler::processFormRequest()
      */
-    protected function addCustomValidation() : bool
+    protected function addCustomValidation(): bool
     {
         // Get the last authentication error
         $authenticationError = $this->authenticationUtils->getLastAuthenticationError();
@@ -74,7 +74,7 @@ final class LoginHandler extends AbstractFormHandler
      *
      * @return string|null
      */
-    public function getAuthenticationError() : ?string
+    public function getAuthenticationError(): ?string
     {
         return $this->customError;
     }

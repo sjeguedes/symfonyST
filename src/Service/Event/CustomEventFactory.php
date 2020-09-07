@@ -1,5 +1,5 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Event;
 
@@ -85,7 +85,7 @@ class CustomEventFactory implements CustomEventFactoryInterface
      *
      * @throws \Exception
      */
-     public function createFromContext(string $eventContext, array $eventParameters) : ?CustomEventInterface
+     public function createFromContext(string $eventContext, array $eventParameters): ?CustomEventInterface
      {
         // Event context is unknown.
         if (!\array_key_exists($eventContext, self::CUSTOM_EVENT_LIST)) {
@@ -118,7 +118,7 @@ class CustomEventFactory implements CustomEventFactoryInterface
      *
      * @throws \Exception
      */
-    private function buildEventDataConfiguration(string $eventContext, array $eventParameters) : array
+    private function buildEventDataConfiguration(string $eventContext, array $eventParameters): array
     {
         // Check event parameters with expected data configuration
         $dataConfiguration = self::CUSTOM_EVENT_LIST[$eventContext]['data'];
@@ -144,7 +144,7 @@ class CustomEventFactory implements CustomEventFactoryInterface
      *
      * @return EventDispatcherInterface
      */
-    public function getEventDispatcher() : EventDispatcherInterface
+    public function getEventDispatcher(): EventDispatcherInterface
     {
         return $this->eventDispatcher;
     }
@@ -156,7 +156,7 @@ class CustomEventFactory implements CustomEventFactoryInterface
      *
      * @return void
      */
-    private function initEventDataOptions(array $dataConfiguration) : void
+    private function initEventDataOptions(array $dataConfiguration): void
     {
         // Avoid potential issue when resolving: if any options were previously configured or resolved, clean them?
         $this->optionsResolver->clear();
@@ -180,7 +180,7 @@ class CustomEventFactory implements CustomEventFactoryInterface
      *
      * @return string
      */
-    public function getEventNameByContext(string $eventContext) : string
+    public function getEventNameByContext(string $eventContext): string
     {
         return  self::CUSTOM_EVENT_LIST[$eventContext]['eventName'];
     }

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Mailer\Email;
 
@@ -90,7 +90,7 @@ class EmailConfigFactory implements EmailConfigFactoryInterface
     /**
      * {@inheritDoc}
      */
-    public function createFromActionContext(string $actionClassName, string $actionContext, array $emailParameters) : EmailConfigInterface
+    public function createFromActionContext(string $actionClassName, string $actionContext, array $emailParameters): EmailConfigInterface
     {
         if (!\array_key_exists($actionContext, self::CUSTOM_PARAMETERS_CONFIG[$actionClassName])) {
             throw new \InvalidArgumentException('Action context argument does not exist in list!');

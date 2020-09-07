@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\ServiceLayer;
 
@@ -83,8 +83,7 @@ class CommentManager extends AbstractServiceLayer
         Comment $newComment,
         bool $isPersisted = false,
         bool $isFlushed = false
-    ) : ?Comment
-    {
+    ): ?Comment {
         // Add comment to trick and user corresponding comment collections
         $newComment->getTrick()->addComment($newComment);
         $newComment->getUser()->addComment($newComment);
@@ -110,8 +109,7 @@ class CommentManager extends AbstractServiceLayer
         array $trickCommentsUuidData,
         \IteratorAggregate $commentEntries,
         string $order = 'ASC'
-    ) : \IteratorAggregate
-    {
+    ): \IteratorAggregate {
         return $this->repository->findCommentsRanks(
             $trickCommentsUuidData,
             $commentEntries,
@@ -140,8 +138,7 @@ class CommentManager extends AbstractServiceLayer
         User $userToUpdate,
         bool $isPersisted = false,
         bool $isFlushed = false
-    ) : ?Comment
-    {
+    ): ?Comment {
         // Create/get trick comment entity
         $commentContent = $dataModel->getContent();
         $commentParentComment = $dataModel->getParentComment();
@@ -170,8 +167,7 @@ class CommentManager extends AbstractServiceLayer
         UuidInterface $trickUuid,
         string $order = 'ASC',
         bool $hasUuidOnly = false
-    ) : array
-    {
+    ): array {
         return $this->repository->findAllByTrick($trickUuid, $order, $hasUuidOnly);
     }
 
@@ -195,8 +191,7 @@ class CommentManager extends AbstractServiceLayer
         int $limit,
         string $order = 'ASC',
         bool $isAtFirstLevel = false
-    ) : \IteratorAggregate
-    {
+    ): \IteratorAggregate {
         return $this->repository->findAllByTrickWithOffsetLimit(
             $trickUuid,
             $offset,
@@ -211,7 +206,7 @@ class CommentManager extends AbstractServiceLayer
      *
      * @return EntityManagerInterface
      */
-    public function getEntityManager() : EntityManagerInterface
+    public function getEntityManager(): EntityManagerInterface
     {
         return $this->entityManager;
     }
@@ -221,7 +216,7 @@ class CommentManager extends AbstractServiceLayer
      *
      * @return CommentRepository
      */
-    public function getRepository() : CommentRepository
+    public function getRepository(): CommentRepository
     {
         return $this->repository;
     }
@@ -237,7 +232,7 @@ class CommentManager extends AbstractServiceLayer
      *
      * @return bool
      */
-    public function isCountAllOutdated(UuidInterface $trickUuid, int $count) : bool
+    public function isCountAllOutdated(UuidInterface $trickUuid, int $count): bool
     {
         $keyName = self::COMMENT_COUNT_SESSION_KEY_PREFIX . $trickUuid->toString();
         if ($this->session->has($keyName) && $this->session->get($keyName) !== $count) {
@@ -256,7 +251,7 @@ class CommentManager extends AbstractServiceLayer
      *
      * @return bool
      */
-    public function removeComment(Comment $comment, bool $isFlushed = true) : bool
+    public function removeComment(Comment $comment, bool $isFlushed = true): bool
     {
         // Update associated user and trick comment collections, but it is not really necessary!
         $comment->getUser()->removeComment($comment);

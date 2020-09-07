@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Action\Admin;
 
@@ -105,7 +105,7 @@ class UpdateProfileAction
      *
      * @throws \Exception
      */
-    public function __invoke(RedirectionResponder $redirectionResponder, UpdateProfileResponder $responder, Request $request) : ?Response
+    public function __invoke(RedirectionResponder $redirectionResponder, UpdateProfileResponder $responder, Request $request): ?Response
     {
         // Get user from Symfony security context: access is controlled by ACL.
         /** @var UserInterface|User $authenticatedUser */
@@ -149,7 +149,7 @@ class UpdateProfileAction
      *
      * @return Response|null
      */
-    private function getAvatarUploadResponse(bool $isFormRequestValid, RedirectionResponder $redirectionResponder, Request $request) : ?Response
+    private function getAvatarUploadResponse(bool $isFormRequestValid, RedirectionResponder $redirectionResponder, Request $request): ?Response
     {
         $routeName = 'update_profile';
         $routeParameters = ['mainRoleLabel' => $request->attributes->get('mainRoleLabel')];
@@ -164,7 +164,7 @@ class UpdateProfileAction
                 $response = new JsonResponse($avatarUploadError);
             }
         } else {
-            $response = $isFormRequestValid ? $redirectionResponder($routeName, $routeParameters) : null;
+            $response = $isFormRequestValid ? $redirectionResponder($routeName, $routeParameters): null;
         }
         return $response;
     }
@@ -186,8 +186,7 @@ class UpdateProfileAction
         FormInterface $updateProfileAvatarForm,
         FormInterface $updateProfileInfosForm,
         UserInterface $identifiedUser
-    ) : ?Response
-    {
+    ): ?Response {
         $actionData = ['userService' => $this->userService, 'userToUpdate' => $identifiedUser];
         // Manage the forms
         switch ($submittedRequest = $request->request) {
@@ -205,7 +204,7 @@ class UpdateProfileAction
                 // Constraints and custom validation: call actions to perform if necessary on success
                 $isFormRequestValid =$this->formHandlers[1]->processFormRequest($actionData);
                 // Redirect to the right page if form request is a success
-                $response = $isFormRequestValid ? $redirectionResponder('home') : null;
+                $response = $isFormRequestValid ? $redirectionResponder('home'): null;
                 break;
             default:
                 $response = null;

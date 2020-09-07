@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\DTOToEmbed;
 
@@ -85,7 +85,7 @@ final class ImageToCropDTO extends AbstractReadableDTO
     /**
      * @return UploadedFile|null
      */
-    public function getImage() : ?UploadedFile
+    public function getImage(): ?UploadedFile
     {
         return $this->image;
     }
@@ -93,7 +93,7 @@ final class ImageToCropDTO extends AbstractReadableDTO
     /**
      * @return string|null
      */
-    public function getDescription() : ?string
+    public function getDescription(): ?string
     {
         return $this->description;
     }
@@ -101,7 +101,7 @@ final class ImageToCropDTO extends AbstractReadableDTO
     /**
      * @return string|null
      */
-    public function getCropJSONData() : ?string
+    public function getCropJSONData(): ?string
     {
         return $this->cropJSONData;
     }
@@ -109,7 +109,7 @@ final class ImageToCropDTO extends AbstractReadableDTO
     /**
      * @return string|null
      */
-    public function getImagePreviewDataURI() : ?string
+    public function getImagePreviewDataURI(): ?string
     {
         return $this->imagePreviewDataURI;
     }
@@ -117,7 +117,7 @@ final class ImageToCropDTO extends AbstractReadableDTO
     /**
      * @return string|null
      */
-    public function getSavedImageName() : ?string
+    public function getSavedImageName(): ?string
     {
         return $this->savedImageName;
     }
@@ -125,7 +125,7 @@ final class ImageToCropDTO extends AbstractReadableDTO
     /**
      * @return int
      */
-    public function getShowListRank() : int
+    public function getShowListRank(): int
     {
         return $this->showListRank;
     }
@@ -133,7 +133,7 @@ final class ImageToCropDTO extends AbstractReadableDTO
     /**
      * @return bool
      */
-    public function getIsMain() : bool
+    public function getIsMain(): bool
     {
         return $this->isMain;
     }
@@ -143,7 +143,7 @@ final class ImageToCropDTO extends AbstractReadableDTO
      *
      * @return ImageToCropDTO
      */
-    public function setImage(?UploadedFile $image) : self
+    public function setImage(?UploadedFile $image): self
     {
         $this->image = $image;
         return $this;
@@ -154,7 +154,7 @@ final class ImageToCropDTO extends AbstractReadableDTO
      *
      * @return ImageToCropDTO
      */
-    public function setDescription(?string $description) : self
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
         return $this;
@@ -165,7 +165,7 @@ final class ImageToCropDTO extends AbstractReadableDTO
      *
      * @return ImageToCropDTO
      */
-    public function setCropJSONData(?string $cropJSONData) : self
+    public function setCropJSONData(?string $cropJSONData): self
     {
         $this->cropJSONData = $cropJSONData;
         return $this;
@@ -176,7 +176,7 @@ final class ImageToCropDTO extends AbstractReadableDTO
      *
      * @return ImageToCropDTO
      */
-    public function setImagePreviewDataURI(?string $imagePreviewDataURI) : self
+    public function setImagePreviewDataURI(?string $imagePreviewDataURI): self
     {
         $this->imagePreviewDataURI = $imagePreviewDataURI;
         return $this;
@@ -187,7 +187,7 @@ final class ImageToCropDTO extends AbstractReadableDTO
      *
      * @return ImageToCropDTO
      */
-    public function setSavedImageName(?string $savedImageName) : self
+    public function setSavedImageName(?string $savedImageName): self
     {
         $this->savedImageName = $savedImageName;
         return $this;
@@ -198,7 +198,7 @@ final class ImageToCropDTO extends AbstractReadableDTO
      *
      * @return ImageToCropDTO
      */
-    public function setShowListRank(int $showListRank) : self
+    public function setShowListRank(int $showListRank): self
     {
         $this->showListRank = $showListRank;
         return $this;
@@ -209,7 +209,7 @@ final class ImageToCropDTO extends AbstractReadableDTO
      *
      * @return ImageToCropDTO
      */
-    public function setIsMain(bool $isMain) : self
+    public function setIsMain(bool $isMain): self
     {
         $this->isMain = $isMain;
         return $this;

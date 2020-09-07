@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\Repository;
 
@@ -42,7 +42,7 @@ class TrickGroupRepository extends ServiceEntityRepository
      * @see: use of string codec instead of uuid:
      * https://github.com/ramsey/uuid/blob/29fb62b48611761b4c0c4e8f4a428cad19c2b690/src/Codec/StringCodec.php#L61-L100
      */
-    public function findOneByUuid(UuidInterface $uuid) : ?TrickGroup
+    public function findOneByUuid(UuidInterface $uuid): ?TrickGroup
     {
         $queryBuilder = $this->createQueryBuilder('tg' );
         $result = $queryBuilder

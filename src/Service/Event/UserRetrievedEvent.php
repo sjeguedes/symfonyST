@@ -1,5 +1,5 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Event;
 
@@ -46,7 +46,7 @@ class UserRetrievedEvent extends Event implements CustomEventInterface
     /**
      * {@inheritDoc}
      */
-    public function getEventContext() : string
+    public function getEventContext(): string
     {
         return $this->eventContext;
     }
@@ -54,7 +54,7 @@ class UserRetrievedEvent extends Event implements CustomEventInterface
     /**
      * @return User
      */
-    public function getUser() : User
+    public function getUser(): User
     {
         return $this->user;
     }

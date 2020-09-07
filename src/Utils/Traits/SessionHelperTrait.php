@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Utils\Traits;
 
@@ -26,7 +26,7 @@ trait SessionHelperTrait
      *
      * @return void
      */
-    public function setSession(SessionInterface $session) : void
+    public function setSession(SessionInterface $session): void
     {
         $this->session = $session;
         if (!$this->session->isStarted()) {
@@ -41,7 +41,7 @@ trait SessionHelperTrait
      *
      * @throws \Exception
      */
-    public function getSession() : SessionInterface
+    public function getSession(): SessionInterface
     {
         if (\is_null($this->session)) {
             throw new \RuntimeException('SessionInterface implementation must be set before!');
@@ -57,7 +57,7 @@ trait SessionHelperTrait
      *
      * @return void
      */
-    public function storeInSession(string $name, $value) : void
+    public function storeInSession(string $name, $value): void
     {
         if (!$this->session->has($name)) {
             $this->session->set($name, $value);

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Form\Type\Admin;
 
@@ -64,7 +64,7 @@ abstract class AbstractTrickType extends AbstractType
      *
      * @return void
      */
-    protected function addArrayToDTOCollectionCustomDataTransformer(FormBuilderInterface $formBuilder, string $formName) : void
+    protected function addArrayToDTOCollectionCustomDataTransformer(FormBuilderInterface $formBuilder, string $formName): void
     {
         /** @var FormBuilderInterface $form */
         $form = $formBuilder->get($formName);
@@ -98,7 +98,7 @@ abstract class AbstractTrickType extends AbstractType
      *
      * @throws \Exception
      */
-    public function finishView(FormView $view, FormInterface $form, array $options) : void
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         // Maintain a correct order for images or videos collection form view to be sure to loop correctly on view data
         // and adapt show list ranks data depending on their validity.
@@ -116,7 +116,7 @@ abstract class AbstractTrickType extends AbstractType
      *
      * @throws \Exception
      */
-    private function manageImagesCollectionData(FormView $view, FormInterface $form) : void
+    private function manageImagesCollectionData(FormView $view, FormInterface $form): void
     {
         // Reorder "image to crop" boxes data in images collection and redefine rank if necessary
         $this->updateCollectionOrderAndRanks('images', $view, $form);
@@ -134,7 +134,7 @@ abstract class AbstractTrickType extends AbstractType
      *
      * @throws \Exception
      */
-    private function manageVideosCollectionData(FormView $view, FormInterface $form) : void
+    private function manageVideosCollectionData(FormView $view, FormInterface $form): void
     {
         // Reorder "video infos" boxes data in videos collection and redefine rank if necessary
         $this->updateCollectionOrderAndRanks('videos', $view, $form);
@@ -154,7 +154,7 @@ abstract class AbstractTrickType extends AbstractType
      *
      * @throws \Exception
      */
-    private function retrieveMediasSourcesEntities(string $collectionName, FormView $view, FormInterface $form) : void
+    private function retrieveMediasSourcesEntities(string $collectionName, FormView $view, FormInterface $form): void
     {
         $config = [
             // This array will store all valid image collection entity items "identifier" names.
@@ -209,8 +209,7 @@ abstract class AbstractTrickType extends AbstractType
         array $results,
         FormView $imageFormView,
         string $savedImageName
-    ) : void
-    {
+    ): void {
         // Check temporary saved image or existing image to update
         $temporaryIdentifierPattern = preg_quote(ImageManager::DEFAULT_IMAGE_IDENTIFIER_NAME, '/');
         $isTemporaryImage = preg_match('/'. $temporaryIdentifierPattern . '/', $savedImageName);
@@ -255,7 +254,7 @@ abstract class AbstractTrickType extends AbstractType
      *
      * @throws \Exception
      */
-    private function transmitMediasSourcesDataToTemplate(array $results, array $formViewsCollection, string $childFormName) : void
+    private function transmitMediasSourcesDataToTemplate(array $results, array $formViewsCollection, string $childFormName): void
     {
         // Get image thumbnail type by querying once
         $type = MediaType::TYPE_CHOICES['trickThumbnail'];
@@ -300,7 +299,7 @@ abstract class AbstractTrickType extends AbstractType
      *
      * @throws \Exception
      */
-    private function updateCollectionOrderAndRanks(string $collectionName, FormView $view, FormInterface $form) : void
+    private function updateCollectionOrderAndRanks(string $collectionName, FormView $view, FormInterface $form): void
     {
         $isShowListRankValid = true;
         // Check if at least one show list rank was tampered by malicious user thanks to custom validator!
@@ -327,7 +326,7 @@ abstract class AbstractTrickType extends AbstractType
             $i = 1;
             foreach ($array as $formView) {
                 $formView->children['showListRank']->vars['value'] = $i;
-                $i ++;
+                $i++;
             }
         }
         // Update collection array order to guarantee coherent loop on view

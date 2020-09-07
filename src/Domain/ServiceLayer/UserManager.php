@@ -1,5 +1,5 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\ServiceLayer;
 
@@ -125,7 +125,7 @@ class UserManager
      *
      * @throws \Exception
      */
-    public function createUser(RegisterUserDTO $dataModel) : User
+    public function createUser(RegisterUserDTO $dataModel): User
     {
         // Create a new instance based on DTO
         $newUser =  new User(
@@ -150,7 +150,7 @@ class UserManager
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function activateAccount(string $userEncodedId) : bool
+    public function activateAccount(string $userEncodedId): bool
     {
         $userToValidate = $this->findSingleByEncodedUuid($userEncodedId);
         // User is unknown or his account is already activated.
@@ -175,7 +175,7 @@ class UserManager
      *
      * @throws \Exception
      */
-    public function createAndDispatchUserEvent(string $eventContext, User $user) : void
+    public function createAndDispatchUserEvent(string $eventContext, User $user): void
     {
         $event = $this->customEventFactory->createFromContext($eventContext, ['user' => $user]);
         if (\is_null($event)) {
@@ -196,7 +196,7 @@ class UserManager
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function findSingleByEncodedUuid(string $encodedUuid) : ?User
+    public function findSingleByEncodedUuid(string $encodedUuid): ?User
     {
         return $this->repository->findOneByUuid($this->decode($encodedUuid));
     }
@@ -210,7 +210,7 @@ class UserManager
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function findSingleByEmail(string $email) : ?User
+    public function findSingleByEmail(string $email): ?User
     {
         return $this->repository->findOneByEmail($email);
     }
@@ -220,7 +220,7 @@ class UserManager
      *
      * @return UserInterface
      */
-    public function getAuthenticatedMember() : UserInterface
+    public function getAuthenticatedMember(): UserInterface
     {
         return $this->security->getUser();
     }
@@ -234,7 +234,7 @@ class UserManager
      *
      * @return string
      */
-    public function generateCustomToken(string $tokenId) : string
+    public function generateCustomToken(string $tokenId): string
     {
         return substr(hash('sha256', bin2hex($tokenId . openssl_random_pseudo_bytes(8))), 0, 15);
     }
@@ -248,7 +248,7 @@ class UserManager
      *
      * @throws \Exception
      */
-    public function generatePasswordRenewalToken(User $user) : User
+    public function generatePasswordRenewalToken(User $user): User
     {
         $user->updateRenewalRequestDate(new \DateTime('now'));
         $user->updateRenewalToken($this->generateCustomToken($user->getNickName()));
@@ -263,7 +263,7 @@ class UserManager
      *
      * @return EntityManagerInterface
      */
-    public function getEntityManager() : EntityManagerInterface
+    public function getEntityManager(): EntityManagerInterface
     {
         return $this->entityManager;
     }
@@ -273,7 +273,7 @@ class UserManager
      *
      * @return UserRepository
      */
-    public function getRepository() : UserRepository
+    public function getRepository(): UserRepository
     {
         return $this->repository;
     }
@@ -283,7 +283,7 @@ class UserManager
      *
      * @return Security
      */
-    public function getSecurity() : Security
+    public function getSecurity(): Security
     {
         return $this->security;
     }
@@ -295,7 +295,7 @@ class UserManager
      *
      * @throws \Exception
      */
-    public function getUserFoundInPasswordRenewalRequest() : ?User
+    public function getUserFoundInPasswordRenewalRequest(): ?User
     {
         // 2 methods can be used: some request query parameters or attributes (placeholders) are expected in url!
         // User identifier is not used, but expected as mandatory.
@@ -314,7 +314,7 @@ class UserManager
      *
      * @return string
      */
-    public function getUserAuthenticationState() : string
+    public function getUserAuthenticationState(): string
     {
         /** @var User|UserInterface $user */
         if ($user = $this->security->getUser()) {
@@ -339,7 +339,7 @@ class UserManager
      *
      * @throws \Exception
      */
-    public function isPasswordRenewalRequestOutdated(?DateTimeInterface $renewalRequestDate) : bool
+    public function isPasswordRenewalRequestOutdated(?DateTimeInterface $renewalRequestDate): bool
     {
         // Outdated personal link is used to access password renewal page.
         // The reason is user password was already changed, and that caused password request date to be set to "null" again!
@@ -360,7 +360,7 @@ class UserManager
      *
      * @throws \Exception
      */
-    public function isPasswordRenewalRequestTokenAllowed(User $user) : bool
+    public function isPasswordRenewalRequestTokenAllowed(User $user): bool
     {
         // 2 methods can be used: some request query parameters or attributes (placeholders) are expected in url!
         // Token is not used, but expected.
@@ -391,7 +391,7 @@ class UserManager
      *
      * @throws \Exception
      */
-    private function removeAvatarImage(User $user, ImageManager $imageService) : void
+    private function removeAvatarImage(User $user, ImageManager $imageService): void
     {
         $imageService->removeUserAvatar($user);
     }
@@ -406,7 +406,7 @@ class UserManager
      *
      * @throws \Exception
      */
-    public function renewPassword(User $user, string $plainPassword) : User
+    public function renewPassword(User $user, string $plainPassword): User
     {
         // Generate encrypted password with BCrypt
         $newPassword = $this->userPasswordEncoder->encodePassword($plainPassword, null);
@@ -438,8 +438,7 @@ class UserManager
         User $user,
         ImageManager $imageService,
         MediaManager $mediaService
-    ) : bool
-    {
+    ): bool {
         // Data are saved thanks to image service which calls entity manager in both cases, no need to flush change here!
         // Update avatar image media attached to user
         if (!\is_null($dataModel->getAvatar())) {
@@ -500,7 +499,7 @@ class UserManager
      *
      * @throws \Exception
      */
-    public function updateUserProfileInfos(UpdateProfileInfosDTO $dataModel, User $user) : void
+    public function updateUserProfileInfos(UpdateProfileInfosDTO $dataModel, User $user): void
     {
         // Update user
         $user->modifyFamilyName($dataModel->getFamilyName())

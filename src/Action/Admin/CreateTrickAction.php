@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Action\Admin;
 
@@ -109,7 +109,7 @@ class CreateTrickAction
      * @throws AccessDeniedException
      * @throws \Exception
      */
-    public function __invoke(RedirectionResponder $redirectionResponder, CreateTrickResponder $responder, Request $request) : Response
+    public function __invoke(RedirectionResponder $redirectionResponder, CreateTrickResponder $responder, Request $request): Response
     {
         // Check access to creation form page
         $this->checkAccessToCreationAction();
@@ -152,12 +152,12 @@ class CreateTrickAction
      *
      * @throws AccessDeniedException
      */
-    private function checkAccessToCreationAction() : void
+    private function checkAccessToCreationAction(): void
     {
         // Check access permissions to trick creation page
         $security = $this->userService->getSecurity();
         if (!$security->isGranted('ROLE_USER')) {
-            throw new AccessDeniedException("Current user can not create a trick!");
+            throw new AccessDeniedException("Current user cannot create a trick!");
         }
     }
 
@@ -168,7 +168,7 @@ class CreateTrickAction
      *
      * @return array
      */
-    private function manageTrickCreationResultRouting(UserInterface $authenticatedUser) : array
+    private function manageTrickCreationResultRouting(UserInterface $authenticatedUser): array
     {
         // Get new trick, or null if an issue occurred!
         /** @var Trick $newTrick */

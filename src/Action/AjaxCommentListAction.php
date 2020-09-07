@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Action;
 
@@ -76,7 +76,7 @@ class AjaxCommentListAction extends AbstractCommentListAction
      *
      * @throws \Throwable
      */
-    public function __invoke(AjaxCommentListResponder $responder, Request $request) : Response
+    public function __invoke(AjaxCommentListResponder $responder, Request $request): Response
     {
         // Filter AJAX request
         if (!$request->isXmlHttpRequest()) {
@@ -127,12 +127,12 @@ class AjaxCommentListAction extends AbstractCommentListAction
      *
      * @return string|null an error notification message as "$listError"
      */
-    private function checkOutdatedCommentList(UuidInterface $trickUuid, int $commentCount) : ?string
+    private function checkOutdatedCommentList(UuidInterface $trickUuid, int $commentCount): ?string
     {
         $listError = null;
         if ($this->commentService->isCountAllOutdated($trickUuid, $commentCount)) {
             $this->logger->error(
-                "[trace app snowTricks] AjaxCommentListAction/__invoke => commentCount: $commentCount"
+                "[trace app SnowTricks] AjaxCommentListAction/__invoke => commentCount: $commentCount"
             );
             $listError = 'Trick comment list was reinitialized!' . "\n" .
                 'Wrong total count is used' . "\n" .

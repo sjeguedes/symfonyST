@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Responder;
 
@@ -41,7 +41,7 @@ abstract class AbstractAjaxListResponder
      *
      * @return Response
      */
-    public function setHTMLBlockResponse(array $data, string $className) : Response
+    public function setHTMLBlockResponse(array $data, string $className): Response
     {
         // Render a template block
         $template = $this->renderer->getTemplateBlock($className)['template'];

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\Repository;
 
@@ -55,7 +55,7 @@ class CommentRepository extends ServiceEntityRepository
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function countAllByTrick(UuidInterface $trickUuid, bool $isAtFirstLevel = false) : int
+    public function countAllByTrick(UuidInterface $trickUuid, bool $isAtFirstLevel = false): int
     {
         $queryBuilder = $this->createQueryBuilder('c');
         $queryBuilder->select($queryBuilder->expr()->count('c.uuid'));
@@ -83,8 +83,7 @@ class CommentRepository extends ServiceEntityRepository
         UuidInterface $trickUuid,
         string $order = 'ASC',
         bool $hasUuidOnly = false
-     ) : array
-    {
+     ): array {
         // Get comments entities or comments uuid data only
         $queryBuilder = $this->createQueryBuilder('c');
         $query = $queryBuilder
@@ -116,8 +115,7 @@ class CommentRepository extends ServiceEntityRepository
         int $limit,
         string $order = 'ASC',
         bool $isAtFirstLevel = false
-    ) : \IteratorAggregate
-    {
+    ): \IteratorAggregate {
         // Filter order parameter by whitelisting
         $order = \in_array($order, ['ASC', 'DESC']) ? $order : 'ASC';
         // Get comments (parents and children) depending on offset, limit and sort order
@@ -134,7 +132,8 @@ class CommentRepository extends ServiceEntityRepository
                 ->setFirstResult($offset)
                 ->setParameter(1, $trickUuid->getBytes())
                 ->getQuery(),
-                // This is default value but specified explicitly since it is fundamental to have correct results!
+                // This is the default value, but it is specified explicitly
+                // since it is fundamental to have correct results!
                 true
           );
         // Return comments selected list
@@ -155,14 +154,13 @@ class CommentRepository extends ServiceEntityRepository
         array $trickCommentsUuidData,
         \IteratorAggregate $commentEntries,
         string $order = 'ASC'
-    ) : \IteratorAggregate
-    {
+    ): \IteratorAggregate {
         // Get uuid data count obtained with a second simple query to use it for comparison
         // This count corresponds to trick comments total count!
         $commentCount = \count($trickCommentsUuidData);
         // Prepare Closure not to repeat rank assigning process
         $function = function (Comment $comment) use (&$function, $trickCommentsUuidData, $commentCount, $order) {
-            for ($i = 0; $i < $commentCount; $i ++) {
+            for ($i = 0; $i < $commentCount; $i++) {
                 if ($trickCommentsUuidData[$i]['uuid'] === $comment->getUuid()->getBytes()) {
                     $comment->assignRank('DESC' === $order ? ($commentCount - 1 - $i) : $i);
                     break;

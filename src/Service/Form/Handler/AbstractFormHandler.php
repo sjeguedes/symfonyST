@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Form\Handler;
 
@@ -100,7 +100,7 @@ class AbstractFormHandler implements FormHandlerInterface
     /**
      * {@inheritDoc}
      */
-    public function bindRequest(Request $request) : FormInterface
+    public function bindRequest(Request $request): FormInterface
     {
         if (\is_null($this->form)) {
             throw new \RuntimeException('The form must be initialized first with "initForm" method!');
@@ -118,7 +118,7 @@ class AbstractFormHandler implements FormHandlerInterface
      *
      * @return void
      */
-    protected function checkNecessaryData(array $data) : void
+    protected function checkNecessaryData(array $data): void
     {
         $dataConfig = self::DATA_CONFIG_TO_CHECK;
         array_filter($data, function ($value, $key) use ($dataConfig) {
@@ -136,7 +136,7 @@ class AbstractFormHandler implements FormHandlerInterface
     /**
      * {@inheritDoc}
      */
-    public function initForm(array $data = null, string $formType = null, array $options = null) : FormHandlerInterface
+    public function initForm(array $data = null, string $formType = null, array $options = null): FormHandlerInterface
     {
         // Set model data with $data parameter
         if (!\is_null($data)) {
@@ -155,7 +155,7 @@ class AbstractFormHandler implements FormHandlerInterface
     /**
      * {@inheritDoc}
      */
-    public function isRequestHandled() : bool
+    public function isRequestHandled(): bool
     {
         return $this->requestHandled;
     }
@@ -163,7 +163,7 @@ class AbstractFormHandler implements FormHandlerInterface
     /**
      * {@inheritDoc}
      */
-    public function getForm() : FormInterface
+    public function getForm(): FormInterface
     {
         if (\is_null($this->form)) {
             throw new \RuntimeException('The form must be initialized first with "initForm" method!');
@@ -174,7 +174,7 @@ class AbstractFormHandler implements FormHandlerInterface
     /**
      * {@inheritDoc}
      */
-    public function processFormRequest(array $actionData = null) : bool
+    public function processFormRequest(array $actionData = null): bool
     {
         if (!$this->isRequestHandled()) {
             throw new \RuntimeException('The form handler must bind the request first!');

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Form\Handler;
 
@@ -82,7 +82,7 @@ final class RequestNewPasswordHandler extends AbstractFormHandler
      *
      * @throws \Exception
      */
-    protected function addCustomValidation(array $actionData) : bool
+    protected function addCustomValidation(array $actionData): bool
     {
         $csrfToken = $this->request->request->get('request_new_password')['token'];
         // CSRF token is not valid.
@@ -94,9 +94,9 @@ final class RequestNewPasswordHandler extends AbstractFormHandler
         // Find user who asks for a new password by using a user service
         $userService = $actionData['userService'];
         $loadedUser = $userService->getRepository()->loadUserByUsername($this->form->getData()->getUserName()); // or $this->form->get('userName')->getData()
-        // DTO is in valid state but user can not be found.
+        // DTO is in valid state but user cannot be found.
         if (\is_null($loadedUser)) {
-            $userError = 'Please check your credentials!' . "\n" . 'User can not be found.';
+            $userError = 'Please check your credentials!' . "\n" . 'User cannot be found.';
             $this->customError = $userError;
             $this->flashBag->add(
                 'danger',
@@ -120,7 +120,7 @@ final class RequestNewPasswordHandler extends AbstractFormHandler
      *
      * @see AbstractFormHandler::processFormRequest()
      */
-    protected function addCustomAction(array $actionData) : void
+    protected function addCustomAction(array $actionData): void
     {
         // Check UserManager instance in passed data
         $this->checkNecessaryData($actionData);
@@ -163,7 +163,7 @@ final class RequestNewPasswordHandler extends AbstractFormHandler
      *
      * @return string|null
      */
-    public function getUserError() : ?string
+    public function getUserError(): ?string
     {
         return $this->customError;
     }

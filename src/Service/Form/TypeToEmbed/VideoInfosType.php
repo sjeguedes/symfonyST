@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Form\TypeToEmbed;
 
@@ -76,7 +76,7 @@ class VideoInfosType extends AbstractTrickCollectionEntryType
      *
      * @return void
      */
-    public function buildForm(FormBuilderInterface $builder, array $options) : void
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('url', TextareaType::class, [
@@ -106,7 +106,7 @@ class VideoInfosType extends AbstractTrickCollectionEntryType
      *
      * @return void
      */
-    public function configureOptions(OptionsResolver $resolver) : void
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class'     => VideoInfosDTO::class,
@@ -131,7 +131,7 @@ class VideoInfosType extends AbstractTrickCollectionEntryType
      *
      * @return void
      */
-    private function generateVideoUniqueName(FormBuilderInterface $builder) : void
+    private function generateVideoUniqueName(FormBuilderInterface $builder): void
     {
         $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
             // Get current "video infos" form

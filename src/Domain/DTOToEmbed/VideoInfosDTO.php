@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\DTOToEmbed;
 
@@ -60,7 +60,7 @@ final class VideoInfosDTO extends AbstractReadableDTO
     /**
      * @return string|null
      */
-    public function getUrl() : ?string
+    public function getUrl(): ?string
     {
         return $this->url;
     }
@@ -68,7 +68,7 @@ final class VideoInfosDTO extends AbstractReadableDTO
     /**
      * @return string|null
      */
-    public function getDescription() : ?string
+    public function getDescription(): ?string
     {
         return $this->description;
     }
@@ -76,7 +76,7 @@ final class VideoInfosDTO extends AbstractReadableDTO
     /**
      * @return string|null
      */
-    public function getSavedVideoName() : ?string
+    public function getSavedVideoName(): ?string
     {
         return $this->savedVideoName;
     }
@@ -84,7 +84,7 @@ final class VideoInfosDTO extends AbstractReadableDTO
     /**
      * @return int
      */
-    public function getShowListRank() : int
+    public function getShowListRank(): int
     {
         return $this->showListRank;
     }
@@ -94,7 +94,7 @@ final class VideoInfosDTO extends AbstractReadableDTO
      *
      * @return VideoInfosDTO
      */
-    public function setUrl(?string $url) : self
+    public function setUrl(?string $url): self
     {
         $this->url = $url;
         return $this;
@@ -105,7 +105,7 @@ final class VideoInfosDTO extends AbstractReadableDTO
      *
      * @return VideoInfosDTO
      */
-    public function setDescription(?string $description) : self
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
         return $this;
@@ -116,7 +116,7 @@ final class VideoInfosDTO extends AbstractReadableDTO
      *
      * @return VideoInfosDTO
      */
-    public function setSavedVideoName(?string $savedVideoName) : self
+    public function setSavedVideoName(?string $savedVideoName): self
     {
         $this->savedVideoName = $savedVideoName;
         return $this;
@@ -127,7 +127,7 @@ final class VideoInfosDTO extends AbstractReadableDTO
      *
      * @return VideoInfosDTO
      */
-    public function setShowListRank(int $showListRank) : self
+    public function setShowListRank(int $showListRank): self
     {
         $this->showListRank = $showListRank;
         return $this;

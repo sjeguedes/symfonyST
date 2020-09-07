@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\Entity;
 
@@ -167,8 +167,8 @@ class MediaType
     ) {
         \assert(\in_array($type, self::TYPE_CHOICES), 'MediaType type does not exist!');
         \assert(\in_array($sourceType, self::SOURCE_TYPES), 'MediaType source type does not exist!');
-        \assert(!empty($name), 'MediaType name can not be empty!');
-        \assert(!empty($description), 'MediaType description can not be empty!');
+        \assert(!empty($name), 'MediaType name cannot be empty!');
+        \assert(!empty($description), 'MediaType description cannot be empty!');
         \assert($width > 0, 'MediaType width must be greater than 0!');
         \assert($height > 0, 'MediaType height must be greater than 0!');
         $this->uuid = Uuid::uuid4();
@@ -192,7 +192,7 @@ class MediaType
      *
      * @throws \Exception
      */
-    public function modifySourceType(string $sourceType) : self
+    public function modifySourceType(string $sourceType): self
     {
         if (!\in_array($sourceType, self::SOURCE_TYPES)) {
             throw new \InvalidArgumentException('MediaType source type is unknown!');
@@ -210,10 +210,10 @@ class MediaType
      *
      * @throws \Exception
      */
-    public function modifyName(string $name) : self
+    public function modifyName(string $name): self
     {
         if (empty($name)) {
-            throw new \InvalidArgumentException('MediaType name can not be empty!');
+            throw new \InvalidArgumentException('MediaType name cannot be empty!');
         }
         $this->name = $name;
         return $this;
@@ -228,10 +228,10 @@ class MediaType
     *
     * @throws \Exception
     */
-    public function modifyDescription(string $description) : self
+    public function modifyDescription(string $description): self
     {
         if (empty($description)) {
-            throw new \InvalidArgumentException('MediaType description can not be empty!');
+            throw new \InvalidArgumentException('MediaType description cannot be empty!');
         }
         $this->description = $description;
         return $this;
@@ -246,10 +246,10 @@ class MediaType
      *
      * @throws \Exception
      */
-    public function modifyUpdateDate(\DateTimeInterface $updateDate) : self
+    public function modifyUpdateDate(\DateTimeInterface $updateDate): self
     {
         if ($this->creationDate > $updateDate) {
-            throw new \RuntimeException('Update date is not logical: MediaType can not be created after modified update date!');
+            throw new \RuntimeException('Update date is not logical: MediaType cannot be created after modified update date!');
         }
         $this->updateDate = $updateDate;
         return $this;
@@ -262,7 +262,7 @@ class MediaType
      *
      * @return MediaType
      */
-    public function addMedia(Media $media) : self
+    public function addMedia(Media $media): self
     {
         if (!$this->medias->contains($media)) {
             $this->medias->add($media);
@@ -278,7 +278,7 @@ class MediaType
      *
      * @return MediaType
      */
-    public function removeMedia(Media $media) : self
+    public function removeMedia(Media $media): self
     {
         if ($this->medias->contains($media)) {
             $this->medias->removeElement($media);
@@ -289,7 +289,7 @@ class MediaType
     /**
      * @return UuidInterface
      */
-    public function getUuid() : UuidInterface
+    public function getUuid(): UuidInterface
     {
         return $this->uuid;
     }
@@ -297,7 +297,7 @@ class MediaType
     /**
      * @return string
      */
-    public function getType() : string
+    public function getType(): string
     {
         return $this->type;
     }
@@ -305,7 +305,7 @@ class MediaType
     /**
      * @return string
      */
-    public function getSourceType() : string
+    public function getSourceType(): string
     {
         return $this->sourceType;
     }
@@ -313,7 +313,7 @@ class MediaType
     /**
      * @return string
      */
-    public function getName() : string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -321,7 +321,7 @@ class MediaType
     /**
      * @return string
      */
-    public function getDescription() : string
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -329,7 +329,7 @@ class MediaType
     /**
      * @return int
      */
-    public function getWidth() : int
+    public function getWidth(): int
     {
         return $this->width;
     }
@@ -337,7 +337,7 @@ class MediaType
     /**
      * @return int
      */
-    public function getHeight() : int
+    public function getHeight(): int
     {
         return $this->height;
     }
@@ -345,7 +345,7 @@ class MediaType
     /**
      * @return \DateTimeInterface
      */
-    public function getCreationDate() : \DateTimeInterface
+    public function getCreationDate(): \DateTimeInterface
     {
         return $this->creationDate;
     }
@@ -353,7 +353,7 @@ class MediaType
     /**
      * @return \DateTimeInterface
      */
-    public function getUpdateDate() : \DateTimeInterface
+    public function getUpdateDate(): \DateTimeInterface
     {
         return $this->updateDate;
     }
@@ -361,7 +361,7 @@ class MediaType
     /**
      * @return Collection|Media[]
      */
-    public function getMedias() : Collection
+    public function getMedias(): Collection
     {
         return $this->medias;
     }

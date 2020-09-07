@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Form\Validator;
 
@@ -44,7 +44,7 @@ final class VideoInfosConstraintValidator extends AbstractTrickCollectionConstra
      * @throws \Exception
      * @throws \Symfony\Component\Validator\Exception\UnexpectedTypeException
      */
-    public function validate($object, Constraint $constraint) : void
+    public function validate($object, Constraint $constraint): void
     {
         if (!$object instanceof VideoInfosDTO) {
             throw new \InvalidArgumentException('Object to validate must be an instance of "VideoInfosDTO"!');
@@ -68,7 +68,7 @@ final class VideoInfosConstraintValidator extends AbstractTrickCollectionConstra
      *
      * @see For information: root namespace special compiled functions: https://github.com/FriendsOfPHP/PHP-CS-Fixer/issues/3048
      */
-    public function validateUrl(ExecutionContextInterface $context, $payload = null) : void
+    public function validateUrl(ExecutionContextInterface $context, $payload = null): void
     {
         // Get current validated object (VideoInfosDTO)
         $object = $context->getObject();
@@ -81,7 +81,7 @@ final class VideoInfosConstraintValidator extends AbstractTrickCollectionConstra
                     ->atPath('url')
                     ->addViolation();
             } else {
-                // Video content can not be retrieved or does not exist!
+                // Video content cannot be retrieved or does not exist!
                 if (false === $this->videoURLProxyChecker->isContent($url)) {
                     $context->buildViolation("Video content is not available!\nPlease check source URL.")
                         ->atPath('url')
@@ -101,7 +101,7 @@ final class VideoInfosConstraintValidator extends AbstractTrickCollectionConstra
      *
      * @see For information: root namespace special compiled functions: https://github.com/FriendsOfPHP/PHP-CS-Fixer/issues/3048
      */
-    public function validateShowListRank(ExecutionContextInterface $context, $payload = null) : void
+    public function validateShowListRank(ExecutionContextInterface $context, $payload = null): void
     {
         // Validate current collection item show list rank by checking VideoInfosDTO data
         $this->validateItemCollectionRank('videos', $context, $payload);

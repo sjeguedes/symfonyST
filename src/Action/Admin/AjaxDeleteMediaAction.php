@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Action\Admin;
 
@@ -104,7 +104,7 @@ class AjaxDeleteMediaAction
      *
      * @throws \Exception
      */
-    public function __invoke(CsrfTokenManagerInterface $csrfTokenManager, JsonResponder $jsonResponder, Request $request) : Response
+    public function __invoke(CsrfTokenManagerInterface $csrfTokenManager, JsonResponder $jsonResponder, Request $request): Response
     {
         // Filter AJAX request
         if (!$request->isXmlHttpRequest()) {
@@ -149,7 +149,7 @@ class AjaxDeleteMediaAction
      *
      * @throws \Exception
      */
-    private function manageMediaDeletionResult(?object $mediaToDelete, string $mediaType, Request $request) : array
+    private function manageMediaDeletionResult(?object $mediaToDelete, string $mediaType, Request $request): array
     {
         // Error parameters
         $parameters = [
@@ -197,7 +197,7 @@ class AjaxDeleteMediaAction
      *
      * @throws \Exception
      */
-    private function manageMediaRemoval(object $mediaToDelete, string $mediaType) : bool
+    private function manageMediaRemoval(object $mediaToDelete, string $mediaType): bool
     {
         // Delete media
         switch ($mediaType) {

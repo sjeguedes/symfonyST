@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Responder\Admin;
 
@@ -38,7 +38,7 @@ final class CreateTrickResponder
      *
      * @return Response
      */
-    public function __invoke(array $data) : Response
+    public function __invoke(array $data): Response
     {
         $template = $this->renderer->getTemplate(self::class);
         return new Response($this->renderer->renderTemplate($template, $data));

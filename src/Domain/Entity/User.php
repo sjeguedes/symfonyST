@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\Entity;
 
@@ -206,8 +206,8 @@ class User implements UserInterface, \Serializable
         array $roles = [self::DEFAULT_ROLE],
         \DateTimeInterface $creationDate = null
     ) {
-        \assert(!empty($familyName), 'User family name can not be empty!');
-        \assert(!empty($firstName), 'User first name can not be empty!');
+        \assert(!empty($familyName), 'User family name cannot be empty!');
+        \assert(!empty($firstName), 'User first name cannot be empty!');
         \assert($this->isNickNameValidated($nickName), 'User nickname format must be valid!');
         \assert($this->isEmailValidated($email), 'User email format must be valid!');
         \assert($this->isPasswordValidated($password, $algorithm), 'User password must be valid!');
@@ -235,7 +235,7 @@ class User implements UserInterface, \Serializable
      *
      * @return $this
      */
-    public function assignMediaOwner(MediaOwner $mediaOwner) : self
+    public function assignMediaOwner(MediaOwner $mediaOwner): self
     {
         $this->mediaOwner = $mediaOwner;
         return $this;
@@ -248,7 +248,7 @@ class User implements UserInterface, \Serializable
      *
      * @return bool
      */
-    private function isEmailValidated(string $email) : bool
+    private function isEmailValidated(string $email): bool
     {
         if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return false;
@@ -263,7 +263,7 @@ class User implements UserInterface, \Serializable
      *
      * @return bool
      */
-    private function isNickNameValidated(string $username) : bool
+    private function isNickNameValidated(string $username): bool
     {
         if (empty($username) || !preg_match('/^[\w-]{3,15}$/u', $username)) {
             return false;
@@ -279,7 +279,7 @@ class User implements UserInterface, \Serializable
      *
      * @return bool
      */
-    private function isPasswordValidated(string $password, string $algorithm) : bool
+    private function isPasswordValidated(string $password, string $algorithm): bool
     {
         if (!\in_array($algorithm, self::HASH_ALGORITHMS)) {
             return false;
@@ -298,7 +298,7 @@ class User implements UserInterface, \Serializable
      *
      * @return bool
      */
-    private function isRenewalTokenValidated(?string $renewalToken) : bool
+    private function isRenewalTokenValidated(?string $renewalToken): bool
     {
         if (!\is_null($renewalToken) && !preg_match('/^[a-z0-9]{15}$/', $renewalToken)) {
             return false;
@@ -313,7 +313,7 @@ class User implements UserInterface, \Serializable
      *
      * @return bool
      */
-    private function isRolesArrayValidated(array $roles) : bool
+    private function isRolesArrayValidated(array $roles): bool
     {
         if (!\in_array(self::DEFAULT_ROLE, $roles)) {
             $roles[] = self::DEFAULT_ROLE;
@@ -337,10 +337,10 @@ class User implements UserInterface, \Serializable
      *
      * @throws \Exception
      */
-    public function modifyFamilyName(string $familyName) : self
+    public function modifyFamilyName(string $familyName): self
     {
         if (empty($familyName)) {
-            throw new \InvalidArgumentException('User family name can not be empty!');
+            throw new \InvalidArgumentException('User family name cannot be empty!');
         }
         $this->familyName = strtoupper($familyName);
         return $this;
@@ -355,10 +355,10 @@ class User implements UserInterface, \Serializable
      *
      * @throws \Exception
      */
-    public function modifyFirstName(string $firstName) : self
+    public function modifyFirstName(string $firstName): self
     {
         if (empty($firstName)) {
-            throw new \InvalidArgumentException('User first name can not be empty!');
+            throw new \InvalidArgumentException('User first name cannot be empty!');
         }
         $this->firstName = ucwords(strtolower($firstName));
         return $this;
@@ -373,7 +373,7 @@ class User implements UserInterface, \Serializable
      *
      * @throws \Exception
      */
-    public function modifyNickName(string $userName) : self
+    public function modifyNickName(string $userName): self
     {
         if (!$this->isNickNameValidated($userName)) {
             throw new \InvalidArgumentException('User nickname is not valid!');
@@ -391,7 +391,7 @@ class User implements UserInterface, \Serializable
      *
      * @throws \Exception
      */
-    public function modifyEmail(string $email) : self
+    public function modifyEmail(string $email): self
     {
         if (!$this->isEmailValidated($email)) {
             throw new \InvalidArgumentException('User email is not valid!');
@@ -410,7 +410,7 @@ class User implements UserInterface, \Serializable
      *
      * @throws \Exception
      */
-    public function modifyPassword(string $password, string $algorithm) : self
+    public function modifyPassword(string $password, string $algorithm): self
     {
         // BCrypt encoded password
         if (!$this->isPasswordValidated($password, $algorithm)) {
@@ -429,7 +429,7 @@ class User implements UserInterface, \Serializable
      *
      * @throws \Exception
      */
-    public function modifyRoles(array $roles) : self
+    public function modifyRoles(array $roles): self
     {
         if (!$this->isRolesArrayValidated($roles)) {
             throw new \InvalidArgumentException('Each role must begin with "ROLE_"!');
@@ -447,10 +447,10 @@ class User implements UserInterface, \Serializable
      *
      * @throws \Exception
      */
-    public function modifySalt(string $salt) : self
+    public function modifySalt(string $salt): self
     {
         if (empty($salt)) {
-            throw new \InvalidArgumentException('Password salt can not be empty!');
+            throw new \InvalidArgumentException('Password salt cannot be empty!');
         }
         $this->salt = $salt;
         return $this;
@@ -463,7 +463,7 @@ class User implements UserInterface, \Serializable
      *
      * @return User
      */
-    public function modifyIsActivated(bool $isActivated) : self
+    public function modifyIsActivated(bool $isActivated): self
     {
         $this->isActivated = $isActivated;
         return $this;
@@ -481,7 +481,7 @@ class User implements UserInterface, \Serializable
      *
      * @throws \Exception
      */
-    public function updateRenewalToken(?string $renewalToken) : self
+    public function updateRenewalToken(?string $renewalToken): self
     {
         if (!$this->isRenewalTokenValidated($renewalToken)) {
             throw new \InvalidArgumentException('User password renewal token must be valid!');
@@ -499,10 +499,10 @@ class User implements UserInterface, \Serializable
      *
      * @throws \Exception
      */
-    public function modifyUpdateDate(\DateTimeInterface $updateDate) : self
+    public function modifyUpdateDate(\DateTimeInterface $updateDate): self
     {
         if ($this->creationDate > $updateDate) {
-            throw new \RuntimeException('Update date is not logical: User can not be created after modified update date!');
+            throw new \RuntimeException('Update date is not logical: User cannot be created after modified update date!');
         }
         $this->updateDate = $updateDate;
         return $this;
@@ -519,10 +519,10 @@ class User implements UserInterface, \Serializable
      *
      * @throws \Exception
      */
-    public function updateRenewalRequestDate(?\DateTimeInterface $renewalRequestDate) : self
+    public function updateRenewalRequestDate(?\DateTimeInterface $renewalRequestDate): self
     {
         if (!\is_null($renewalRequestDate) && $this->creationDate > $renewalRequestDate) {
-            throw new \RuntimeException('Renewal request date is not logical: user renewal token can not be created before user creation date!');
+            throw new \RuntimeException('Renewal request date is not logical: user renewal token cannot be created before user creation date!');
         }
         $this->renewalRequestDate = $renewalRequestDate;
         return $this;
@@ -535,7 +535,7 @@ class User implements UserInterface, \Serializable
      *
      * @return User
      */
-    public function addComment(Comment $comment) : self
+    public function addComment(Comment $comment): self
     {
         if (!$this->comments->contains($comment)) {
             $this->comments->add($comment);
@@ -551,7 +551,7 @@ class User implements UserInterface, \Serializable
      *
      * @return User
      */
-    public function removeComment(Comment $comment) : self
+    public function removeComment(Comment $comment): self
     {
         if ($this->comments->contains($comment)) {
             $this->comments->removeElement($comment);
@@ -566,7 +566,7 @@ class User implements UserInterface, \Serializable
      *
      * @return User
      */
-    public function addMedia(Media $media) : self
+    public function addMedia(Media $media): self
     {
         if (!$this->medias->contains($media)) {
             $this->medias->add($media);
@@ -582,7 +582,7 @@ class User implements UserInterface, \Serializable
      *
      * @return User
      */
-    public function removeMedia(Media $media) : self
+    public function removeMedia(Media $media): self
     {
         if ($this->medias->contains($media)) {
             $this->medias->removeElement($media);
@@ -597,7 +597,7 @@ class User implements UserInterface, \Serializable
      *
      * @return User
      */
-    public function addTrick(Trick $trick) : self
+    public function addTrick(Trick $trick): self
     {
         if (!$this->tricks->contains($trick)) {
             $this->tricks->add($trick);
@@ -613,7 +613,7 @@ class User implements UserInterface, \Serializable
      *
      * @return User
      */
-    public function removeTrick(Trick $trick) : self
+    public function removeTrick(Trick $trick): self
     {
         if ($this->tricks->contains($trick)) {
             $this->tricks->removeElement($trick);
@@ -624,7 +624,7 @@ class User implements UserInterface, \Serializable
     /**
      * @return UuidInterface
      */
-    public function getUuid() : UuidInterface
+    public function getUuid(): UuidInterface
     {
         return $this->uuid;
     }
@@ -632,7 +632,7 @@ class User implements UserInterface, \Serializable
     /**
      * @return string
      */
-    public function getFamilyName() : string
+    public function getFamilyName(): string
     {
         return $this->familyName;
     }
@@ -640,7 +640,7 @@ class User implements UserInterface, \Serializable
     /**
      * @return string
      */
-    public function getFirstName() : string
+    public function getFirstName(): string
     {
         return $this->firstName;
     }
@@ -648,7 +648,7 @@ class User implements UserInterface, \Serializable
     /**
      * @return string
      */
-    public function getNickName() : string
+    public function getNickName(): string
     {
         return $this->nickName;
     }
@@ -656,7 +656,7 @@ class User implements UserInterface, \Serializable
     /**
      * @return string
      */
-    public function getEmail() : string
+    public function getEmail(): string
     {
         return $this->email;
     }
@@ -666,7 +666,7 @@ class User implements UserInterface, \Serializable
      *
      * Mandatory method name due to UserInterface
      */
-    public function getPassword() : string
+    public function getPassword(): string
     {
         return $this->password;
     }
@@ -674,7 +674,7 @@ class User implements UserInterface, \Serializable
     /**
      * @return array
      */
-    public function getRoles() : array
+    public function getRoles(): array
     {
         return $this->roles;
     }
@@ -684,7 +684,7 @@ class User implements UserInterface, \Serializable
      *
      * @return string
      */
-    public function getMainRoleLabel() : string
+    public function getMainRoleLabel(): string
     {
         $roleLabels = self::ROLE_LABELS;
         $roles = $this->getRoles();
@@ -711,7 +711,7 @@ class User implements UserInterface, \Serializable
     /**
      * {@inheritdoc}
      */
-    public function getSalt() : ?string
+    public function getSalt(): ?string
     {
         return $this->salt;
     }
@@ -719,7 +719,7 @@ class User implements UserInterface, \Serializable
     /**
      * {@inheritdoc}
      */
-    public function getUsername() : string
+    public function getUsername(): string
     {
         // Nickname equals username in App.
         return $this->nickName;
@@ -728,7 +728,7 @@ class User implements UserInterface, \Serializable
     /**
      * @return bool
      */
-    public function getIsActivated() : bool
+    public function getIsActivated(): bool
     {
         return $this->isActivated;
     }
@@ -736,7 +736,7 @@ class User implements UserInterface, \Serializable
     /**
      * @return string|null
      */
-    public function getRenewalToken() : ?string
+    public function getRenewalToken(): ?string
     {
         return $this->renewalToken;
     }
@@ -744,7 +744,7 @@ class User implements UserInterface, \Serializable
     /**
      * @return \DateTimeInterface
      */
-    public function getCreationDate() : \DateTimeInterface
+    public function getCreationDate(): \DateTimeInterface
     {
         return $this->creationDate;
     }
@@ -752,7 +752,7 @@ class User implements UserInterface, \Serializable
     /**
      * @return \DateTimeInterface
      */
-    public function getUpdateDate() : \DateTimeInterface
+    public function getUpdateDate(): \DateTimeInterface
     {
         return $this->updateDate;
     }
@@ -760,7 +760,7 @@ class User implements UserInterface, \Serializable
     /**
      * @return \DateTimeInterface|null
      */
-    public function getRenewalRequestDate() : ?\DateTimeInterface
+    public function getRenewalRequestDate(): ?\DateTimeInterface
     {
         return $this->renewalRequestDate;
     }
@@ -770,7 +770,7 @@ class User implements UserInterface, \Serializable
      *
      * The media owner can be null when no avatar is set (user registration)!
      */
-    public function getMediaOwner() : ?MediaOwner
+    public function getMediaOwner(): ?MediaOwner
     {
         return $this->mediaOwner;
     }
@@ -778,7 +778,7 @@ class User implements UserInterface, \Serializable
     /**
      * @return Collection|Comment[]
      */
-    public function getComments() : Collection
+    public function getComments(): Collection
     {
         return $this->comments;
     }
@@ -786,7 +786,7 @@ class User implements UserInterface, \Serializable
     /**
      * @return Collection|Media[]
      */
-    public function getMedias() : Collection
+    public function getMedias(): Collection
     {
         return $this->medias;
     }
@@ -794,7 +794,7 @@ class User implements UserInterface, \Serializable
     /**
      * @return Collection|Trick[]
      */
-    public function getTricks() : Collection
+    public function getTricks(): Collection
     {
         return $this->tricks;
     }
@@ -802,7 +802,7 @@ class User implements UserInterface, \Serializable
     /**
      * {@inheritdoc}
      */
-    public function eraseCredentials() : void
+    public function eraseCredentials(): void
     {
         // UserInterface method implementation is not used.
     }
@@ -812,7 +812,7 @@ class User implements UserInterface, \Serializable
      *
      * @see \Serializable::serialize()
      */
-    public function serialize() : string
+    public function serialize(): string
     {
         return serialize([
             $this->uuid,
@@ -828,7 +828,7 @@ class User implements UserInterface, \Serializable
      *
      * @see \Serializable::unserialize()
      */
-    public function unserialize($serialized) : void
+    public function unserialize($serialized): void
     {
         list(
             $this->uuid,

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\Entity;
 
@@ -150,7 +150,7 @@ class Media
      *
      * @return Media
      */
-    public function modifyMediaOwner(MediaOwner $mediaOwner) : self
+    public function modifyMediaOwner(MediaOwner $mediaOwner): self
     {
         $this->mediaOwner = $mediaOwner;
         return $this;
@@ -163,7 +163,7 @@ class Media
      *
      * @return Media
      */
-    public function modifyMediaSource(MediaSource $mediaSource) : self
+    public function modifyMediaSource(MediaSource $mediaSource): self
     {
         $this->mediaSource = $mediaSource;
         return $this;
@@ -176,7 +176,7 @@ class Media
      *
      * @return Media
      */
-    public function modifyMediaType(MediaType $mediaType) : self
+    public function modifyMediaType(MediaType $mediaType): self
     {
         $this->mediaType = $mediaType;
         return $this;
@@ -192,7 +192,7 @@ class Media
      *
      * @return Media
      */
-    public function modifyUser(User $user) : self
+    public function modifyUser(User $user): self
     {
         $this->user = $user;
         return $this;
@@ -209,10 +209,10 @@ class Media
      *
      * @throws \Exception
      */
-    public function modifyIsMain(bool $isMain) : self
+    public function modifyIsMain(bool $isMain): self
     {
         if (true === $isMain && false === $this->isPublished) {
-            throw new \RuntimeException('You can not use this media as main, if it is not published as the same time!');
+            throw new \RuntimeException('You cannot use this media as main, if it is not published as the same time!');
         }
         $this->isMain = $isMain;
         return $this;
@@ -227,10 +227,10 @@ class Media
      *
      * @throws \Exception
      */
-    public function modifyIsPublished(bool $isPublished) : self
+    public function modifyIsPublished(bool $isPublished): self
     {
         if (false === $this->isPublished && true === $this->isMain) {
-            throw new \RuntimeException('You can not un-publish this media, if it is used as main at the same time!');
+            throw new \RuntimeException('You cannot un-publish this media, if it is used as main at the same time!');
         }
         $this->isPublished = $isPublished;
         return $this;
@@ -247,7 +247,7 @@ class Media
      *
      * @throws \Exception
      */
-    public function modifyShowListRank(int $showListRank) : self
+    public function modifyShowListRank(int $showListRank): self
     {
         if (0 >= $showListRank) {
             throw new \RuntimeException('Show list rank must be greater than 0!');
@@ -265,10 +265,10 @@ class Media
      *
      * @throws \Exception
      */
-    public function modifyUpdateDate(\DateTimeInterface $updateDate) : self
+    public function modifyUpdateDate(\DateTimeInterface $updateDate): self
     {
         if ($this->creationDate > $updateDate) {
-            throw new \RuntimeException('Update date is not logical: Media can not be created after modified update date!');
+            throw new \RuntimeException('Update date is not logical: Media cannot be created after modified update date!');
         }
         $this->updateDate = $updateDate;
         return $this;
@@ -277,7 +277,7 @@ class Media
     /**
      * @return UuidInterface
      */
-    public function getUuid() : UuidInterface
+    public function getUuid(): UuidInterface
     {
         return $this->uuid;
     }
@@ -285,7 +285,7 @@ class Media
     /**
      * @return MediaOwner
      */
-    public function getMediaOwner() : MediaOwner
+    public function getMediaOwner(): MediaOwner
     {
         return $this->mediaOwner;
     }
@@ -293,7 +293,7 @@ class Media
     /**
      * @return MediaSource
      */
-    public function getMediaSource() : MediaSource
+    public function getMediaSource(): MediaSource
     {
         return $this->mediaSource;
     }
@@ -301,7 +301,7 @@ class Media
     /**
      * @return MediaType
      */
-    public function getMediaType() : MediaType
+    public function getMediaType(): MediaType
     {
         return $this->mediaType;
     }
@@ -309,7 +309,7 @@ class Media
     /**
      * @return User
      */
-    public function getUser() : User
+    public function getUser(): User
     {
         return $this->user;
     }
@@ -317,7 +317,7 @@ class Media
     /**
      * @return bool
      */
-    public function getIsMain() : bool
+    public function getIsMain(): bool
     {
         return $this->isMain;
     }
@@ -325,7 +325,7 @@ class Media
     /**
      * @return bool
      */
-    public function getIsPublished() : bool
+    public function getIsPublished(): bool
     {
         return $this->isPublished;
     }
@@ -333,7 +333,7 @@ class Media
     /**
      * @return int
      */
-    public function getShowListRank() : int
+    public function getShowListRank(): int
     {
         return $this->showListRank;
     }
@@ -341,7 +341,7 @@ class Media
     /**
      * @return \DateTimeInterface
      */
-    public function getCreationDate() : \DateTimeInterface
+    public function getCreationDate(): \DateTimeInterface
     {
         return $this->creationDate;
     }
@@ -349,7 +349,7 @@ class Media
     /**
      * @return \DateTimeInterface
      */
-    public function getUpdateDate() : \DateTimeInterface
+    public function getUpdateDate(): \DateTimeInterface
     {
         return $this->updateDate;
     }

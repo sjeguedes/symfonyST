@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\DTO;
 
@@ -84,7 +84,7 @@ final class UpdateTrickDTO extends AbstractReadableDTO
     /**
      * @return TrickGroup|null
      */
-    public function getGroup() : ?TrickGroup
+    public function getGroup(): ?TrickGroup
     {
         return $this->group;
     }
@@ -92,7 +92,7 @@ final class UpdateTrickDTO extends AbstractReadableDTO
     /**
      * @return string|null
      */
-    public function getName() : ?string
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -100,7 +100,7 @@ final class UpdateTrickDTO extends AbstractReadableDTO
     /**
      * @return string|null
      */
-    public function getDescription() : ?string
+    public function getDescription(): ?string
     {
         return $this->description;
     }
@@ -108,7 +108,7 @@ final class UpdateTrickDTO extends AbstractReadableDTO
     /**
      * @return DTOCollection|ImageToCropDTO[]
      */
-    public function getImages() : DTOCollection
+    public function getImages(): DTOCollection
     {
         return $this->images;
     }
@@ -116,7 +116,7 @@ final class UpdateTrickDTO extends AbstractReadableDTO
     /**
      * @return DTOCollection|VideoInfosDTO[]
      */
-    public function getVideos() : DTOCollection
+    public function getVideos(): DTOCollection
     {
         return $this->videos;
     }
@@ -124,7 +124,7 @@ final class UpdateTrickDTO extends AbstractReadableDTO
     /**
      * @return bool|null
      */
-    public function getIsPublished() : ?bool
+    public function getIsPublished(): ?bool
     {
         return $this->isPublished;
     }
@@ -134,7 +134,7 @@ final class UpdateTrickDTO extends AbstractReadableDTO
      *
      * @return UpdateTrickDTO
      */
-    public function setGroup(?TrickGroup $group) : self
+    public function setGroup(?TrickGroup $group): self
     {
         $this->group = $group;
         return $this;
@@ -145,7 +145,7 @@ final class UpdateTrickDTO extends AbstractReadableDTO
      *
      * @return UpdateTrickDTO
      */
-    public function setName(?string $name) : self
+    public function setName(?string $name): self
     {
         $this->name = $name;
         return $this;
@@ -156,7 +156,7 @@ final class UpdateTrickDTO extends AbstractReadableDTO
      *
      * @return UpdateTrickDTO
      */
-    public function setDescription(?string $description) : self
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
         return $this;
@@ -169,7 +169,7 @@ final class UpdateTrickDTO extends AbstractReadableDTO
      *
      * @throws \Exception
      */
-    public function setImages(DTOCollection $images) : self
+    public function setImages(DTOCollection $images): self
     {
         $this->images = $images;
         return $this;
@@ -182,7 +182,7 @@ final class UpdateTrickDTO extends AbstractReadableDTO
      *
      * @throws \Exception
      */
-    public function setVideos(DTOCollection $videos) : self
+    public function setVideos(DTOCollection $videos): self
     {
         $this->videos = $videos;
         return $this;
@@ -193,7 +193,7 @@ final class UpdateTrickDTO extends AbstractReadableDTO
      *
      * @return UpdateTrickDTO
      */
-    public function setIsPublished(?bool $isPublished) : self
+    public function setIsPublished(?bool $isPublished): self
     {
         $this->isPublished = $isPublished;
         return $this;

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\Repository;
 
@@ -36,7 +36,7 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function findOneByEmail(string $email) : ?User
+    public function findOneByEmail(string $email): ?User
     {
         // Avoid unexpected case sensitive SQL collation to compare lowercase stored email
         $email = strtolower($email);
@@ -56,7 +56,7 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function findOneByUuid(UuidInterface $uuid) : ?User
+    public function findOneByUuid(UuidInterface $uuid): ?User
     {
         return $this->createQueryBuilder('u')
         ->where('u.uuid = :uuid')
@@ -76,7 +76,7 @@ class UserRepository extends ServiceEntityRepository implements UserLoaderInterf
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function loadUserByUsername($username) : ?User
+    public function loadUserByUsername($username): ?User
     {
         // Avoid unexpected case sensitive SQL collation to compare lowercase stored email
         $isEmail = preg_match('/@/', $username);

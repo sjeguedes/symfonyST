@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\Entity;
 
@@ -93,7 +93,7 @@ class MediaOwner
         // Check parent class to make also fixture proxy work!
         \assert(
             \array_key_exists(
-                !\get_parent_class($owner) ? \get_class($owner) : \get_parent_class($owner),
+                !\get_parent_class($owner) ? \get_class($owner): \get_parent_class($owner),
                 self::OWNER_TYPES
             ),
             'MediaOwner owner type is not allowed!'
@@ -115,7 +115,7 @@ class MediaOwner
      *
      * @return $this
      */
-    public function setTrick(Trick $trick) : self
+    public function setTrick(Trick $trick): self
     {
         $this->trick = $trick;
         return $this;
@@ -130,7 +130,7 @@ class MediaOwner
      *
      * @return $this
      */
-    public function setUser(User $user) : self
+    public function setUser(User $user): self
     {
         $this->user = $user;
         return $this;
@@ -139,7 +139,7 @@ class MediaOwner
     /**
      * @return UuidInterface
      */
-    public function getUuid() : UuidInterface
+    public function getUuid(): UuidInterface
     {
         return $this->uuid;
     }
@@ -147,7 +147,7 @@ class MediaOwner
     /**
      * @return Collection|Media[]
      */
-    public function getMedias() : Collection
+    public function getMedias(): Collection
     {
         return $this->medias;
     }
@@ -155,7 +155,7 @@ class MediaOwner
     /**
      * @return Trick|null
      */
-    public function getTrick() : ?Trick
+    public function getTrick(): ?Trick
     {
         return $this->trick;
     }
@@ -163,7 +163,7 @@ class MediaOwner
     /**
      * @return User|null
      */
-    public function getUser() : ?User
+    public function getUser(): ?User
     {
         return $this->user;
     }
@@ -171,7 +171,7 @@ class MediaOwner
     /**
      * @return \DateTimeInterface
      */
-    public function getCreationDate() : \DateTimeInterface
+    public function getCreationDate(): \DateTimeInterface
     {
         return $this->creationDate;
     }
@@ -179,7 +179,7 @@ class MediaOwner
     /**
      * @return \DateTimeInterface
      */
-    public function getUpdateDate() : \DateTimeInterface
+    public function getUpdateDate(): \DateTimeInterface
     {
         return $this->updateDate;
     }
@@ -191,7 +191,7 @@ class MediaOwner
      *
      * @return MediaOwner
      */
-    public function addMedia(Media $media) : self
+    public function addMedia(Media $media): self
     {
         if (!$this->medias->contains($media)) {
             $this->medias->add($media);
@@ -207,7 +207,7 @@ class MediaOwner
      *
      * @return MediaOwner
      */
-    public function removeMedia(Media $media) : self
+    public function removeMedia(Media $media): self
     {
         if ($this->medias->contains($media)) {
             $this->medias->removeElement($media);

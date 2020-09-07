@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\Repository;
 
@@ -32,7 +32,7 @@ class MediaTypeRepository extends ServiceEntityRepository
      *
      * @return MediaType|null
      */
-    public function findOneByType(string $type) : ?MediaType
+    public function findOneByType(string $type): ?MediaType
     {
         $queryBuilder = $this->createQueryBuilder('mt' );
         $result = $queryBuilder

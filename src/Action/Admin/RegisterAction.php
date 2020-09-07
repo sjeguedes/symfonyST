@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Action\Admin;
 
@@ -63,7 +63,7 @@ class RegisterAction
      *
      * @throws \Exception
      */
-    public function __invoke(RedirectionResponder $redirectionResponder, RegisterResponder $responder, Request $request) : Response
+    public function __invoke(RedirectionResponder $redirectionResponder, RegisterResponder $responder, Request $request): Response
     {
         // Set form without initial model data and set the request by binding it
         $registerForm = $this->formHandler->initForm()->bindRequest($request);
@@ -96,7 +96,7 @@ class RegisterAction
      *
      * @throws \Exception
      */
-    public function activateUserAccount(RedirectionResponder $redirectionResponder, Request $request) : Response
+    public function activateUserAccount(RedirectionResponder $redirectionResponder, Request $request): Response
     {
         $userId = $request->attributes->get('userId');
         $isActivated = $this->userService->activateAccount($userId);

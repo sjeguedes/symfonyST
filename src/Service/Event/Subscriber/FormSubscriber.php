@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Event\Subscriber;
 
@@ -141,7 +141,7 @@ class FormSubscriber implements EventSubscriberInterface
      *
      * @throws \Exception
      */
-    private function cloneChildrenObjectsForUpdateContext(object $previousDataModel) : void
+    private function cloneChildrenObjectsForUpdateContext(object $previousDataModel): void
     {
         // Switch previous DTO which corresponds to an update process
         switch ($previousDataModel) {
@@ -179,8 +179,7 @@ class FormSubscriber implements EventSubscriberInterface
         ?AbstractReadableDTO $firstModel,
         ?AbstractReadableDTO $secondModel,
         bool $isComparedStrictly = true
-    ) : bool
-    {
+    ): bool {
         $modelDataClassName = !\is_null($className) ? $className : $this->currentForm->getConfig()->getDataClass();
         $isSameInstance = $firstModel instanceof $modelDataClassName && $secondModel instanceof $modelDataClassName;
         if (!\is_null($firstModel) && !\is_null($secondModel) && !$isSameInstance) {
@@ -242,7 +241,7 @@ class FormSubscriber implements EventSubscriberInterface
      *
      * @throws \Exception
      */
-    private function createAndDispatchUnchangedUserProfileEvent(FormEvent $event) : void
+    private function createAndDispatchUnchangedUserProfileEvent(FormEvent $event): void
     {
         /** @var User $authenticatedUser */
         $authenticatedUser = $this->userService->getAuthenticatedMember();
@@ -261,7 +260,7 @@ class FormSubscriber implements EventSubscriberInterface
      *
      * @throws \Exception
      */
-    private function createAndDispatchUnchangedTrickContentEvent(FormEvent $event) : void
+    private function createAndDispatchUnchangedTrickContentEvent(FormEvent $event): void
     {
         $form = $event->getForm();
         $formOptions = $form->getConfig()->getOptions();
@@ -278,7 +277,7 @@ class FormSubscriber implements EventSubscriberInterface
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() : array
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::PRE_SET_DATA => 'onPreSetData',
@@ -296,7 +295,7 @@ class FormSubscriber implements EventSubscriberInterface
      *
      * @return bool
      */
-    private function isUpdateFormAction(FormTypeInterface $formType) : bool
+    private function isUpdateFormAction(FormTypeInterface $formType): bool
     {
         $isUpdateFormAction = \in_array(\get_class($formType), self::UPDATE_FORMS_LIST) ? true : false;
         // Feed form subscriber update form action property
@@ -324,8 +323,7 @@ class FormSubscriber implements EventSubscriberInterface
         AbstractReadableDTO $modelDataBefore,
         AbstractReadableDTO $modelDataAfter,
         bool  $isComparedStrictly = true
-    ) : bool
-    {
+    ): bool {
         $modelDataClassName = $form->getConfig()->getDataClass();
         // Check if form is unchanged or not
         $isUnChangedForm = $this->compareObjectsPropertiesValues(
@@ -348,7 +346,7 @@ class FormSubscriber implements EventSubscriberInterface
      *
      * @return void
      */
-    public function onPreSetData(FormEvent $event) : void
+    public function onPreSetData(FormEvent $event): void
     {
         // Store current form to share it in methods where it is not possible to get this data.
         $this->currentForm = $event->getForm();
@@ -363,7 +361,7 @@ class FormSubscriber implements EventSubscriberInterface
      *
      * @throws /Exception
      */
-    public function onKernelException(GetResponseForExceptionEvent $event) : void
+    public function onKernelException(GetResponseForExceptionEvent $event): void
     {
         // Catch exception thrown by updated forms and throw a new custom exception
         // To avoid response management with "onKernelResponse" callback!
@@ -394,7 +392,7 @@ class FormSubscriber implements EventSubscriberInterface
      *
      * @return RedirectResponse|null
      */
-    public function onKernelResponse(FilterResponseEvent $event) : ?RedirectResponse
+    public function onKernelResponse(FilterResponseEvent $event): ?RedirectResponse
     {
         $response = null;
         // Check if it is not a form action
@@ -425,7 +423,7 @@ class FormSubscriber implements EventSubscriberInterface
      *
      * @throws \Exception
      */
-    public function onPreSubmit(FormEvent $event) : void
+    public function onPreSubmit(FormEvent $event): void
     {
         $form = $event->getForm();
         $formType = $form->getConfig()->getType()->getInnerType();
@@ -436,7 +434,7 @@ class FormSubscriber implements EventSubscriberInterface
             // instantiate manually a default empty data object)
             $emptyDataOption = $form->getConfig()->getOption('empty_data');
             $previousDataModel = $event->getForm()->getData() ?? call_user_func($emptyDataOption, $form); // $form->getData()
-            // Previous data model instance provided by $event->getForm()->getData() can not be set directly,
+            // Previous data model instance provided by $event->getForm()->getData() cannot be set directly,
             // because it is the same object (reference).
             // Its properties will change (it will become the new updated model) once the next events happen.
             $this->previousDataModel = clone $previousDataModel;
@@ -459,7 +457,7 @@ class FormSubscriber implements EventSubscriberInterface
      *
      * @throws \Exception
      */
-    public function onPostSubmit(FormEvent $event) : void
+    public function onPostSubmit(FormEvent $event): void
     {
         // Get the form with potential changes (CAUTION! During pre submit event, it was the previous submitted form!)
         $form = $event->getForm();
@@ -497,7 +495,7 @@ class FormSubscriber implements EventSubscriberInterface
      *
      * @return RedirectResponse|null
      */
-    private function setUnchangedFormActionResponse(FormTypeInterface $formType, FilterResponseEvent $event) : ?RedirectResponse
+    private function setUnchangedFormActionResponse(FormTypeInterface $formType, FilterResponseEvent $event): ?RedirectResponse
     {
         // Redirect to the correct url
         $formTypeClassName = \get_class($formType);

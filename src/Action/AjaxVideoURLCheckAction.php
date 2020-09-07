@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Action;
 
@@ -62,13 +62,13 @@ class AjaxVideoURLCheckAction
      * CAUTION! Update any URI change in:
      * @see LoginFormAuthenticationManager::onAuthenticationSuccess()
      */
-    public function __invoke(JsonResponder $responder, Request $request) : JsonResponse
+    public function __invoke(JsonResponder $responder, Request $request): JsonResponse
     {
         // Check video URL value
         $url = $this->trickVideoChecker->filterURLAttribute($request);
         if (\is_null($url)) {
             $this->logger->error(
-                "[trace app snowTricks] AjaxVideoURLCheckAction/__invoke => " .
+                "[trace app SnowTricks] AjaxVideoURLCheckAction/__invoke => " .
                 "Technical error due to video url set to null: check loading process for both client and server side!"
             );
         }

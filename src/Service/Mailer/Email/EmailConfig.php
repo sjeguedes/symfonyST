@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Mailer\Email;
 
@@ -85,7 +85,7 @@ class EmailConfig implements EmailConfigInterface
     /**
      * {@inheritDoc}
      */
-    public function buildConfiguration(array $parameters) : void
+    public function buildConfiguration(array $parameters): void
     {
         // Set initial options with resolver
         $this->initOptions();
@@ -109,7 +109,7 @@ class EmailConfig implements EmailConfigInterface
      *
      * @return bool
      */
-    private function checkArrayFormat(array $value) : bool
+    private function checkArrayFormat(array $value): bool
     {
         return 1 == \count($value) && false === !filter_var(array_keys($value)[0], FILTER_VALIDATE_EMAIL) && \is_string(array_values($value)[0]);
     }
@@ -117,7 +117,7 @@ class EmailConfig implements EmailConfigInterface
     /**
      * {@inheritDoc}
      */
-    public function initOptions() : void
+    public function initOptions(): void
     {
         // Avoid potential issue when resolving: if any options were previously configured or resolved, clean them?
         $this->optionsResolver->clear();
@@ -144,7 +144,7 @@ class EmailConfig implements EmailConfigInterface
      *
      * @return void
      */
-    private function initTemplateDataOptions() : void
+    private function initTemplateDataOptions(): void
     {
         $this->optionsResolver->setAllowedTypes('templateData', 'array');
         $this->optionsResolver->setDefault('templateData', function (OptionsResolver $templateDataResolver) {
@@ -166,7 +166,7 @@ class EmailConfig implements EmailConfigInterface
     /**
      * @return string
      */
-    public function getActionClassName() : string
+    public function getActionClassName(): string
     {
         return $this->actionClassName;
     }
@@ -174,7 +174,7 @@ class EmailConfig implements EmailConfigInterface
     /**
      * @return string
      */
-    public function getActionContext() : string
+    public function getActionContext(): string
     {
         return $this->actionContext;
     }
@@ -182,7 +182,7 @@ class EmailConfig implements EmailConfigInterface
     /**
      * @return array
      */
-    public function getReceiver() : array
+    public function getReceiver(): array
     {
         return $this->receiver;
     }
@@ -190,7 +190,7 @@ class EmailConfig implements EmailConfigInterface
     /**
      * @return array
      */
-    public function getSender() : array
+    public function getSender(): array
     {
         return $this->sender;
     }
@@ -198,7 +198,7 @@ class EmailConfig implements EmailConfigInterface
     /**
      * @return string
      */
-    public function getSubject() : string
+    public function getSubject(): string
     {
         return $this->subject;
     }
@@ -206,7 +206,7 @@ class EmailConfig implements EmailConfigInterface
     /**
      * @return array
      */
-    public function getTemplateData() : array
+    public function getTemplateData(): array
     {
         return $this->templateData;
     }

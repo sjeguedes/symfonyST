@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Form\Handler;
 
@@ -45,7 +45,7 @@ class AbstractUploadFormHandler extends AbstractFormHandler
      *
      * @throws \Exception
      */
-    public function checkCropData(UploadedFile $image, ?string $cropJSONData) : bool
+    public function checkCropData(UploadedFile $image, ?string $cropJSONData): bool
     {
         if (\is_null($cropJSONData)) {
             return false;

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Form\Handler;
 
@@ -60,7 +60,7 @@ final class CreateCommentHandler extends AbstractFormHandler
      *
      * @see AbstractFormHandler::processFormRequest()
      */
-    protected function addCustomValidation(array $actionData) : bool
+    protected function addCustomValidation(array $actionData): bool
     {
         $csrfToken = $this->request->request->get('create_comment')['token'];
         // CSRF token is not valid.
@@ -85,7 +85,7 @@ final class CreateCommentHandler extends AbstractFormHandler
      *
      * @see AbstractFormHandler::processFormRequest()
      */
-    protected function addCustomAction(array $actionData) : void
+    protected function addCustomAction(array $actionData): void
     {
         // Check CommentManager, current Trick and authenticated User instances in passed data
         $this->checkNecessaryData($actionData);
@@ -130,7 +130,7 @@ final class CreateCommentHandler extends AbstractFormHandler
      *
      * @return string|null
      */
-    public function getCommentCreationError() : ?string
+    public function getCommentCreationError(): ?string
     {
         return $this->customError;
     }

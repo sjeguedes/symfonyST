@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Form\Handler;
 
@@ -137,7 +137,7 @@ final class UpdateTrickHandler extends AbstractTrickFormHandler implements InitM
      *
      * @see AbstractFormHandler::processFormRequest()
      */
-    protected function addCustomValidation(array $actionData) : bool
+    protected function addCustomValidation(array $actionData): bool
     {
         $csrfToken = $this->request->request->get('update_trick')['token'];
         // CSRF token is not valid.
@@ -196,7 +196,7 @@ final class UpdateTrickHandler extends AbstractTrickFormHandler implements InitM
      *
      * @see AbstractFormHandler::processFormRequest()
      */
-    protected function addCustomAction(array $actionData) : void
+    protected function addCustomAction(array $actionData): void
     {
         // Check Managers instances in passed data
         $this->checkNecessaryData($actionData);
@@ -227,8 +227,7 @@ final class UpdateTrickHandler extends AbstractTrickFormHandler implements InitM
         Trick $trickToUpdate,
         DTOCollection $imagesDTOCollection,
         array $actionData
-    ) : DTOCollection
-    {
+    ): DTOCollection {
         /** @var ImageManager $imageService */
         $imageService = $actionData['imageService'];
         /** @var DTOCollection $previousImagesDTOCollection */
@@ -285,8 +284,7 @@ final class UpdateTrickHandler extends AbstractTrickFormHandler implements InitM
         Trick $trickToUpdate,
         DTOCollection $videosDTOCollection,
         array $actionData
-    ) : DTOCollection
-    {
+    ): DTOCollection {
         /** @var DTOCollection $previousVideosDTOCollection */
         $previousVideosDTOCollection = $this->initialVideosDTOCollection;
         $nextVideosDTOCollection = $videosDTOCollection;
@@ -331,8 +329,7 @@ final class UpdateTrickHandler extends AbstractTrickFormHandler implements InitM
         Trick $trick,
         array $actionData,
         bool $isExceptionThrown = true
-    ) : bool
-    {
+    ): bool {
         /** @var ImageManager $imageService */
         $imageService = $actionData['imageService'];
         /** @var MediaManager $mediaService */
@@ -354,7 +351,7 @@ final class UpdateTrickHandler extends AbstractTrickFormHandler implements InitM
             if (!$isMediaRemoved = $mediaService->removeMedia($media, false)) {
                 $this->logger->critical(
                     sprintf(
-                        "[trace app snowTricks] UpdateTrickHandler/cancelTrickUpdateProcess => error: " .
+                        "[trace app SnowTricks] UpdateTrickHandler/cancelTrickUpdateProcess => error: " .
                         "images removal was not performed correctly!"
                     )
                 );
@@ -390,7 +387,7 @@ final class UpdateTrickHandler extends AbstractTrickFormHandler implements InitM
      *
      * @return bool
      */
-    private function checkTemporaryImageName(string $savedImageName) : bool
+    private function checkTemporaryImageName(string $savedImageName): bool
     {
         // Get default temporary name as pattern
         $temporaryIdentifier = ImageManager::DEFAULT_IMAGE_IDENTIFIER_NAME;
@@ -402,7 +399,7 @@ final class UpdateTrickHandler extends AbstractTrickFormHandler implements InitM
      *
      * @return Trick|null
      */
-    public function getUpdatedTrick() : ?Trick
+    public function getUpdatedTrick(): ?Trick
     {
         return $this->updatedTrick;
     }
@@ -412,7 +409,7 @@ final class UpdateTrickHandler extends AbstractTrickFormHandler implements InitM
      *
      * @return string|null
      */
-    public function getTrickUpdateError() : ?string
+    public function getTrickUpdateError(): ?string
     {
         return $this->customError;
     }
@@ -428,7 +425,7 @@ final class UpdateTrickHandler extends AbstractTrickFormHandler implements InitM
      *
      * @throws \Exception
      */
-    private function initTrickMediasCollectionDataBySourceType(Trick $trick, string $type) : DTOCollection
+    private function initTrickMediasCollectionDataBySourceType(Trick $trick, string $type): DTOCollection
     {
         if (!preg_match('/^image|video$/', $type)) {
             throw new RuntimeException('Media source type label to create collection is unknown!');
@@ -481,7 +478,7 @@ final class UpdateTrickHandler extends AbstractTrickFormHandler implements InitM
      *
      * @throws \Exception
      */
-    public function initModelData(array $data) : object
+    public function initModelData(array $data): object
     {
         // Check Trick instance in passed data
         $this->checkNecessaryData($data);
@@ -509,7 +506,7 @@ final class UpdateTrickHandler extends AbstractTrickFormHandler implements InitM
      *
      * @return Collection
      */
-    public function setTrickMediaListToRemove(Trick $trick, Collection $excludedMediasList = null) : Collection
+    public function setTrickMediaListToRemove(Trick $trick, Collection $excludedMediasList = null): Collection
     {
         // Get current trick media list
         $currentList = $trick->getMediaOwner()->getMedias();
@@ -564,8 +561,7 @@ final class UpdateTrickHandler extends AbstractTrickFormHandler implements InitM
         DTOCollection $imagesDTOCollection,
         DTOCollection $videosDTOCollection,
         array $actionData
-    ) : void
-    {
+    ): void {
         // Loop on new form images collection to create images and merge corresponding medias with trick to update
         $imagesDTOCollectionToRemove = $this->addOrUpdateImagesDTOCollection(
             $trickToUpdate,
@@ -603,7 +599,7 @@ final class UpdateTrickHandler extends AbstractTrickFormHandler implements InitM
      *
      * @throws \Exception
      */
-    private function removeExistingTrickImagesNotFoundInCollection(DTOCollection $imagesDTOCollectionToRemove, array $actionData) : void
+    private function removeExistingTrickImagesNotFoundInCollection(DTOCollection $imagesDTOCollectionToRemove, array $actionData): void
     {
         /** @var ImageManager $imageService */
         $imageService = $actionData['imageService'];
@@ -647,7 +643,7 @@ final class UpdateTrickHandler extends AbstractTrickFormHandler implements InitM
      *
      * @return void
      */
-    private function removeExistingTrickVideosNotFoundInCollection(DTOCollection $videosDTOCollectionToRemove, array $actionData) : void
+    private function removeExistingTrickVideosNotFoundInCollection(DTOCollection $videosDTOCollectionToRemove, array $actionData): void
     {
         /** @var VideoManager $videoService */
         $videoService = $actionData['videoService'];
@@ -687,7 +683,7 @@ final class UpdateTrickHandler extends AbstractTrickFormHandler implements InitM
      *
      * @throws \Exception
      */
-    private function renameAllUpdatedImagesWithNewTrickName(Trick $updatedTrick, array $actionData) : void
+    private function renameAllUpdatedImagesWithNewTrickName(Trick $updatedTrick, array $actionData): void
     {
         /** @var ImageManager $imageService */
         $imageService = $actionData['imageService'];
@@ -736,7 +732,7 @@ final class UpdateTrickHandler extends AbstractTrickFormHandler implements InitM
      *
      * @throws \Exception
      */
-    private function startTrickUpdateProcess(array $actionData) : Trick
+    private function startTrickUpdateProcess(array $actionData): Trick
     {
         /** @var TrickManager $trickService */
         $trickService = $actionData['trickService'];
@@ -768,7 +764,7 @@ final class UpdateTrickHandler extends AbstractTrickFormHandler implements InitM
      *
      * @see https://paragonie.com/blog/2015/06/preventing-xss-vulnerabilities-in-php-everything-you-need-know
      */
-    private function terminateTrickUpdateProcess(Trick $trick, array $actionData) : void
+    private function terminateTrickUpdateProcess(Trick $trick, array $actionData): void
     {
         /** @var TrickManager $trickService */
         $trickService = $actionData['trickService'];
@@ -799,7 +795,7 @@ final class UpdateTrickHandler extends AbstractTrickFormHandler implements InitM
                        'or contact us if necessary.';
             if (!$isProcessCorrectlyCanceled) {
                 $loggerMessage = sprintf(
-                    "[trace app snowTricks] UpdateTrickHandler/terminateTrickUpdateProcess =>" .
+                    "[trace app SnowTricks] UpdateTrickHandler/terminateTrickUpdateProcess =>" .
                     "Trick associated medias removal issue with \"%s\" which has uuid: %s",
                     $trick->getName(),
                     $trick->getUuid()->toString()
@@ -827,7 +823,7 @@ final class UpdateTrickHandler extends AbstractTrickFormHandler implements InitM
      *
      * @throws \Exception
      */
-    private function updateTrickImageFromCollection(ImageToCropDTO $imageToCropDTO, int $versionLength = 3) : bool
+    private function updateTrickImageFromCollection(ImageToCropDTO $imageToCropDTO, int $versionLength = 3): bool
     {
         /** @var User|UserInterface $authenticatedUser */
         // $authenticatedUser = $this->security->getUser();
@@ -850,10 +846,10 @@ final class UpdateTrickHandler extends AbstractTrickFormHandler implements InitM
             $imageToCropDTOWithoutFormat = preg_replace('/(\d+x\d+)$/', '', $imageDTOName);
             // Image exists and must be updated!
             if ($imageToCropDTOWithoutFormat === $imageEntityNameWithoutFormat) {
-                $count ++;
+                $count++;
                 $isImageNew = false;
                 $now = new \DateTime('now');
-                // Update corresponding Image entity (image name and physical file can not be changed!)
+                // Update corresponding Image entity (image name and physical file cannot be changed!)
                 $imageEntity
                     ->modifyDescription($imageToCropDTO->getDescription())
                     ->modifyUpdateDate($now);
@@ -883,7 +879,7 @@ final class UpdateTrickHandler extends AbstractTrickFormHandler implements InitM
      *
      * @throws \Exception
      */
-    private function updateTrickVideoFromCollection(VideoInfosDTO $videoInfosDTO) : bool
+    private function updateTrickVideoFromCollection(VideoInfosDTO $videoInfosDTO): bool
     {
         /** @var User|UserInterface $authenticatedUser */
         // $authenticatedUser = $this->security->getUser();

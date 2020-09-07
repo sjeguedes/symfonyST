@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Utils\Traits;
 
@@ -25,7 +25,7 @@ trait UuidHelperTrait
      *
      * @return string
      */
-    public function encode(UuidInterface $uuid) : string
+    public function encode(UuidInterface $uuid): string
     {
         // Convert GMP number to base62 string
         return gmp_strval(
@@ -45,7 +45,7 @@ trait UuidHelperTrait
      *
      * @return null|UuidInterface
      */
-    public function decode(string $encoded) : ?UuidInterface
+    public function decode(string $encoded): ?UuidInterface
     {
         try {
             return Uuid::fromString(array_reduce(

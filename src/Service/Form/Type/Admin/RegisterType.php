@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Form\Type\Admin;
 
@@ -31,7 +31,7 @@ class RegisterType extends AbstractType
      *
      * @return void
      */
-    public function buildForm(FormBuilderInterface $builder, array $options) : void
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('familyName', TextType::class, [
@@ -65,7 +65,7 @@ class RegisterType extends AbstractType
      *
      * @return void
      */
-    public function configureOptions(OptionsResolver $resolver) : void
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class'     => RegisterUserDTO::class,

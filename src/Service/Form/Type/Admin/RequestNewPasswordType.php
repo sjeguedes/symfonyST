@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Form\Type\Admin;
 
@@ -27,7 +27,7 @@ class RequestNewPasswordType extends AbstractType
      *
      * @return void
      */
-    public function buildForm(FormBuilderInterface $builder, array $options) : void
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('userName', TextType::class, [
@@ -44,7 +44,7 @@ class RequestNewPasswordType extends AbstractType
      *
      * @return void
      */
-    public function configureOptions(OptionsResolver $resolver) : void
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class'     => RequestNewPasswordDTO::class,

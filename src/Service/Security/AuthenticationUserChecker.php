@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Security;
 
@@ -24,7 +24,7 @@ class AuthenticationUserChecker implements UserCheckerInterface
      *
      * @throws \Exception
      */
-    public function checkPreAuth(UserInterface $user) : void
+    public function checkPreAuth(UserInterface $user): void
     {
         if (!$user instanceof User) {
             throw new \InvalidArgumentException('User instance has invalid type.');
@@ -40,7 +40,7 @@ class AuthenticationUserChecker implements UserCheckerInterface
      *
      * @throws \Exception
      */
-    public function checkPostAuth(UserInterface $user) : void
+    public function checkPostAuth(UserInterface $user): void
     {
         if (!$user instanceof User) {
             throw new \InvalidArgumentException('User instance has invalid type.');

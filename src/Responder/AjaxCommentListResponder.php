@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Responder;
 
@@ -35,7 +35,7 @@ final class AjaxCommentListResponder extends AbstractAjaxListResponder
      *
      * @throws \Throwable
      */
-    public function __invoke(array $data) : Response
+    public function __invoke(array $data): Response
     {
         // Render a template block
         return $this->setHTMLBlockResponse($data, self::class);

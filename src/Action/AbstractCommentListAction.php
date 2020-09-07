@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Action;
 
@@ -57,7 +57,7 @@ abstract class AbstractCommentListAction
      *
      * @return array
      */
-    protected function getCommentListData() : array
+    protected function getCommentListData(): array
     {
         return $this->commentListData;
     }
@@ -67,15 +67,15 @@ abstract class AbstractCommentListAction
      *
      * @return array
      */
-    protected function getMediasData() : array
+    protected function getMediasData(): array
     {
         // Get registered normal image type (corresponds particular dimensions)
         $mediaTypesValues = $this->mediaTypeService->getMandatoryDefaultTypes();
         $normalImageMediaType = $this->mediaTypeService->findSingleByUniqueType($mediaTypesValues['trickNormal']);
         return [
-            'mediaError'                => 'Media loading error',
-            'mediaTypesValues'          => $mediaTypesValues,
-            'normalImageMediaType'      => $normalImageMediaType
+            'mediaError'           => 'Media loading error',
+            'mediaTypesValues'     => $mediaTypesValues,
+            'normalImageMediaType' => $normalImageMediaType
         ];
     }
 
@@ -96,8 +96,7 @@ abstract class AbstractCommentListAction
         int $offset,
         int $limit,
         string $commentLoadingMode
-    ) : array
-    {
+    ): array {
         // Get comments filtered list
         $selectedTrickComments = $this->commentService->findOnesByTrickWithOffsetLimit(
             $trickUuid,

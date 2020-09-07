@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Form\Type\Admin;
 
@@ -87,7 +87,7 @@ class CreateTrickType extends AbstractTrickType
      * https://github.com/symfony/symfony/issues/25675
      * https://stackoverflow.com/questions/25363926/symfony-form-with-form-collection-cannot-pass-options-array-into-sub-forms
      */
-    public function buildForm(FormBuilderInterface $builder, array $options) : void
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $trickGroupService = $this->trickGroupService;
         $builder
@@ -164,7 +164,7 @@ class CreateTrickType extends AbstractTrickType
      *
      * @return void
      */
-    public function configureOptions(OptionsResolver $resolver) : void
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class'     => CreateTrickDTO::class,
@@ -177,7 +177,7 @@ class CreateTrickType extends AbstractTrickType
                     $form->get('videos')->getData(),
                     // "false" by default for members which are not administrator (Select field is not available!)
                     $form->offsetExists('isPublished')
-                        ? $form->get('isPublished')->getData() : false
+                        ? $form->get('isPublished')->getData(): false
                 );
             },
             'required'        => false,

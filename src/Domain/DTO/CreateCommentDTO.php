@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\DTO;
 
@@ -44,7 +44,7 @@ final class CreateCommentDTO
     /**
      * @return Comment|null
      */
-    public function getParentComment() : ?Comment
+    public function getParentComment(): ?Comment
     {
         return $this->parentComment;
     }
@@ -52,7 +52,7 @@ final class CreateCommentDTO
     /**
      * @return string|null
      */
-    public function getContent() : ?string
+    public function getContent(): ?string
     {
         return $this->content;
     }

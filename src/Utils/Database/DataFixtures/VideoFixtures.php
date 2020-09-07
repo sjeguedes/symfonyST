@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Utils\Database\DataFixtures;
 
@@ -42,7 +42,7 @@ class VideoFixtures extends BaseFixture
      *
      * @throws \Exception
      */
-    public function loadData(ObjectManager $manager) : void
+    public function loadData(ObjectManager $manager): void
     {
         $array = $this->parseYamlFile('video_fixtures.yaml');
         $data = $array['videos'];

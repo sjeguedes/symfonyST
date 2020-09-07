@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Form\DataMapper;
 
@@ -44,7 +44,7 @@ class DTOMapper implements DataMapperInterface
      *
      * @throws \Exception
      */
-    public function mapDataToForms($data, $forms) : array
+    public function mapDataToForms($data, $forms): array
     {
         // A AbstractReadableDTO instance is expected.
         if (!is_subclass_of($data, AbstractReadableDTO::class)) {
@@ -54,7 +54,7 @@ class DTOMapper implements DataMapperInterface
         $forms = iterator_to_array($forms);
         // initialize form field values
         $dtoProperties = $this->propertyListExtractor->getProperties($data);
-        for ($i = 0; $i < \count($dtoProperties); $i ++) {
+        for ($i = 0; $i < \count($dtoProperties); $i++) {
             $offset = ucfirst($dtoProperties[$i]);
             /** @var AbstractReadableDTO|ArrayAccess $data */
             $dtoPropertyValue = $data->offsetGet($offset);
@@ -71,7 +71,7 @@ class DTOMapper implements DataMapperInterface
      *
      * @throws \Exception
      */
-    public function mapFormsToData($forms, &$data) : AbstractReadableDTO
+    public function mapFormsToData($forms, &$data): AbstractReadableDTO
     {
         // A AbstractReadableDTO instance is expected.
         /** @var FormInterface $forms */
@@ -90,11 +90,11 @@ class DTOMapper implements DataMapperInterface
         $data = array_combine(array_values($dtoProperties), array_values($data));
         // Loop on properties
         $dtoPropertyValues = [];
-        for ($i = 0; $i < \count($dtoProperties); $i ++) {
+        for ($i = 0; $i < \count($dtoProperties); $i++) {
             $key = $dtoProperties[$i];
             // Object property name and form data key to map Comparison do not match
             if (!\array_key_exists($key, $data)) {
-                throw new \RuntimeException('Form data can not be mapped due to unmatched object property!');
+                throw new \RuntimeException('Form data cannot be mapped due to unmatched object property!');
             }
             // Use form dynamic value to feed array from data with no needed transformation.
             $value = $forms[$key]->isSubmitted() ? $forms[$key]->getData() : $data[$key];

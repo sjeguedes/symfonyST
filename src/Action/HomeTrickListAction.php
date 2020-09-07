@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Action;
 
@@ -60,7 +60,7 @@ class HomeTrickListAction
      * @throws \Doctrine\ORM\NonUniqueResultException
      * @throws \Doctrine\ORM\NoResultException
      */
-    public function __invoke(HomeTrickListResponder $responder, Request $request) : Response
+    public function __invoke(HomeTrickListResponder $responder, Request $request): Response
     {
         // Initialize default list.
         $parameters = $this->trickService->getTrickListParameters();
@@ -68,11 +68,11 @@ class HomeTrickListAction
         if (($parameters['error'])) {
             $this->logger->error(
                 sprintf(
-                    "[trace app snowTricks] HomeTrickListAction/__invoke => parameters: %s",
+                    "[trace app SnowTricks] HomeTrickListAction/__invoke => parameters: %s",
                     serialize($parameters)
                 )
             );
-            throw new NotFoundHttpException('Trick list can not be initialized! Wrong parameters are used.');
+            throw new NotFoundHttpException('Trick list cannot be initialized! Wrong parameters are used.');
         }
         $data = [
             'listEnded'             => 'No more trick to load!',

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Utils\Database\DataFixtures;
 
@@ -22,7 +22,7 @@ class TrickFixtures extends BaseFixture implements DependentFixtureInterface
      *
      * @return array
      */
-    public function getDependencies() : array
+    public function getDependencies(): array
     {
         return [
             TrickGroupFixtures::class,
@@ -39,7 +39,7 @@ class TrickFixtures extends BaseFixture implements DependentFixtureInterface
      *
      * @throws \Exception
      */
-    public function loadData(ObjectManager $manager) : void
+    public function loadData(ObjectManager $manager): void
     {
         $array = $this->parseYamlFile('trick_fixtures.yaml');
         $data = $array['tricks'];

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Form\Collection;
 
@@ -58,7 +58,7 @@ class DTOCollection implements \IteratorAggregate, \Countable, \ArrayAccess
      *
      * @throws \Exception
      */
-    public function add(AbstractReadableDTO $object, int $key = null) : void
+    public function add(AbstractReadableDTO $object, int $key = null): void
     {
         if ($key == null) {
             $this->items[] = $object;
@@ -78,7 +78,7 @@ class DTOCollection implements \IteratorAggregate, \Countable, \ArrayAccess
      *
      * @return bool
      */
-    public function contains(int $key) : bool
+    public function contains(int $key): bool
     {
         return isset($this->items[$key]) || array_key_exists($key, $this->items);
     }
@@ -86,7 +86,7 @@ class DTOCollection implements \IteratorAggregate, \Countable, \ArrayAccess
     /**
      * {@inheritDoc}
      */
-    public function count() : int
+    public function count(): int
     {
         return count($this->items);
     }
@@ -100,7 +100,7 @@ class DTOCollection implements \IteratorAggregate, \Countable, \ArrayAccess
      *
      * @throws \Exception
      */
-    public function delete(AbstractReadableDTO $object) : void
+    public function delete(AbstractReadableDTO $object): void
     {
         $key = array_search($object, $this->items, true);
         if ($key === false) {
@@ -126,7 +126,7 @@ class DTOCollection implements \IteratorAggregate, \Countable, \ArrayAccess
      *
      * @return array
      */
-    public function getAll() : array
+    public function getAll(): array
     {
         return $this->items;
     }
@@ -134,7 +134,7 @@ class DTOCollection implements \IteratorAggregate, \Countable, \ArrayAccess
     /**
      * {@inheritDoc}
      */
-    public function getIterator() : \Iterator
+    public function getIterator(): \Iterator
     {
         return new \ArrayIterator($this->items);
     }
@@ -146,10 +146,10 @@ class DTOCollection implements \IteratorAggregate, \Countable, \ArrayAccess
      *
      * @return bool
      */
-    public function has(AbstractReadableDTO $object) : bool
+    public function has(AbstractReadableDTO $object): bool
     {
         $currentCollection = $this->getAll();
-        for ($i = 0; $i < $this->count(); $i ++) {
+        for ($i = 0; $i < $this->count(); $i++) {
             // Compare objects strictly
             if ($currentCollection[$i] === $object) {
                 return true;
@@ -161,7 +161,7 @@ class DTOCollection implements \IteratorAggregate, \Countable, \ArrayAccess
     /**
      * {@inheritDoc}
      */
-    public function offsetExists($offset) : bool
+    public function offsetExists($offset): bool
     {
         $offset = (int) $offset;
         return $this->contains($offset);
@@ -170,7 +170,7 @@ class DTOCollection implements \IteratorAggregate, \Countable, \ArrayAccess
     /**
      * {@inheritDoc}
      */
-    public function offsetGet($offset) : ?AbstractReadableDTO
+    public function offsetGet($offset): ?AbstractReadableDTO
     {
         $offset = (int) $offset;
         return $this->get($offset);
@@ -181,7 +181,7 @@ class DTOCollection implements \IteratorAggregate, \Countable, \ArrayAccess
      *
      * @throws \Exception
      */
-    public function offsetSet($offset, $value) : void
+    public function offsetSet($offset, $value): void
     {
         $offset = (int) $offset;
         $this->add($value, $offset);
@@ -192,7 +192,7 @@ class DTOCollection implements \IteratorAggregate, \Countable, \ArrayAccess
      *
      * @throws \Exception
      */
-    public function offsetUnset($offset) : void
+    public function offsetUnset($offset): void
     {
         $offset = (int) $offset;
         if ($this->contains($offset)) {

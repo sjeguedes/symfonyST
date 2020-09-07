@@ -18,7 +18,7 @@ homepage:
         permanent: true
 
 # logout
-# Logout action is called internally, so route annotation can not be used for paths definition!
+# Logout action is called internally, so route annotation cannot be used for paths definition!
 # https://symfony.com/doc/4.2/translation/locale.html
 disconnect:
     path:

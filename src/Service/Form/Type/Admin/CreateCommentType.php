@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Form\Type\Admin;
 
@@ -52,7 +52,7 @@ class CreateCommentType extends AbstractType
      *
      * @see https://chrisguitarguy.com/2018/10/05/symfony-choice-type-error-messages/
      */
-    public function buildForm(FormBuilderInterface $builder, array $options) : void
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $commentService = $this->commentService;
         // init an index for comment loop
@@ -82,7 +82,7 @@ class CreateCommentType extends AbstractType
                     },
                     // Show group names in select
                     'choice_label'    => function (Comment $comment) use (&$commentIndex) {
-                        $commentIndex ++;
+                        $commentIndex++;
                         $userFullName = $comment->getUser()->getFirstName() . ' ' .$comment->getUser()->getFamilyName();
                         /** @var Comment $comment */
                         return "Comment #{$commentIndex} posted by " . $userFullName .
@@ -107,7 +107,7 @@ class CreateCommentType extends AbstractType
      *
      * @return void
      */
-    public function configureOptions(OptionsResolver $resolver) : void
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class'     => CreateCommentDTO::class,
@@ -115,7 +115,7 @@ class CreateCommentType extends AbstractType
                 return new CreateCommentDTO(
                     // "null" by default if no previous comment was posted (Select field is not available!)
                     $form->offsetExists('parentComment')
-                        ? $form->get('parentComment')->getData() : null,
+                        ? $form->get('parentComment')->getData(): null,
                     $form->get('content')->getData()
                 );
             },

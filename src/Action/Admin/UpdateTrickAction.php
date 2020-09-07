@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Action\Admin;
 
@@ -121,7 +121,7 @@ class UpdateTrickAction
      * @throws \Exception
      * @throws NotFoundHttpException
      */
-    public function __invoke(RedirectionResponder $redirectionResponder, UpdateTrickResponder $responder, Request $request) : Response
+    public function __invoke(RedirectionResponder $redirectionResponder, UpdateTrickResponder $responder, Request $request): Response
     {
         // Check access to update form page
         $trickToUpdate = $this->checkAccessToUpdateAction($request);
@@ -170,7 +170,7 @@ class UpdateTrickAction
      * @throws \Doctrine\ORM\NonUniqueResultException
      * @throws NotFoundHttpException
      */
-    private function checkAccessToUpdateAction(Request $request) : Trick
+    private function checkAccessToUpdateAction(Request $request): Trick
     {
         // Check if a trick can be retrieved thanks to its uuid
         $trick = $this->trickService->findSingleToUpdateInFormByEncodedUuid($request->attributes->get('encodedUuid'));
@@ -180,7 +180,7 @@ class UpdateTrickAction
         // Check access permissions to trick update page
         $security = $this->userService->getSecurity();
         if (!$security->isGranted(TrickVoter::AUTHOR_OR_ADMIN_CAN_UPDATE_OR_DELETE_TRICKS, $trick)) {
-            throw new AccessDeniedException("Current user can not update this trick!");
+            throw new AccessDeniedException("Current user cannot update this trick!");
         }
         return $trick;
     }
@@ -193,7 +193,7 @@ class UpdateTrickAction
      *
      * @return array
      */
-    private function manageTrickUpdateResultRouting(UserInterface $authenticatedUser, Trick $trick) : array
+    private function manageTrickUpdateResultRouting(UserInterface $authenticatedUser, Trick $trick): array
     {
         // Get updated trick, or null if an issue occurred!
         /** @var Trick $updatedTrick */

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Utils\Command;
 
@@ -117,7 +117,7 @@ class DeleteUnusedImageCommand extends Command
      *
      * @return void
      */
-    private function addCustomDefinedOptions() : void
+    private function addCustomDefinedOptions(): void
     {
         // Option to define use of Command
         $this->addOption(
@@ -169,7 +169,7 @@ class DeleteUnusedImageCommand extends Command
      *
      * @return void
      */
-    protected function configure() : void
+    protected function configure(): void
     {
         // The short description shown while running "php bin/console list"
         $this->setDescription('Deletes any image present on server which is unused by application');
@@ -193,7 +193,7 @@ class DeleteUnusedImageCommand extends Command
      * @throws \Doctrine\ORM\NonUniqueResultException
      * @throws \Exception
      */
-    private function deleteFiles(array $imageFiles, InputInterface $input, bool $isTemporary = false) : bool
+    private function deleteFiles(array $imageFiles, InputInterface $input, bool $isTemporary = false): bool
     {
         // Store state of check process
         $isProcessOK = false;
@@ -219,7 +219,7 @@ class DeleteUnusedImageCommand extends Command
                 $isFileNotCorrectlySaved = true;
                 $this->logger->warning(
                     sprintf(
-                        "[trace app snowTricks] DeleteUnusedImageCommand/deleteFiles => error: image \"%s\" " .
+                        "[trace app SnowTricks] DeleteUnusedImageCommand/deleteFiles => error: image \"%s\" " .
                         "was found without being present in database!",
                         $file->getPathname())
                 );
@@ -233,7 +233,7 @@ class DeleteUnusedImageCommand extends Command
                 }
                 // Remove empty temporary directory at the end of loop
                 if ((count($imageFiles) - 1 === $index) && $isTemporary) {
-                    for ($i = 0; $i < count($pathArray); $i ++) {
+                    for ($i = 0; $i < count($pathArray); $i++) {
                         $path = $pathArray[$i];
                         $pattern = preg_quote(ImageUploader::TEMPORARY_DIRECTORY_NAME, '/');
                         $isTemporaryPath = preg_match("/{$pattern}$/", $path);
@@ -247,7 +247,7 @@ class DeleteUnusedImageCommand extends Command
              } catch (\Throwable $exception) {
                 // Store process error
                 $this->logger->error(
-                    sprintf("[trace app snowTricks] DeleteUnusedImageCommand/deleteFiles => exception: %s", $exception->getMessage())
+                    sprintf("[trace app SnowTricks] DeleteUnusedImageCommand/deleteFiles => exception: %s", $exception->getMessage())
                 );
                 $isProcessOK = false;
             }
@@ -273,7 +273,7 @@ class DeleteUnusedImageCommand extends Command
      *
      * @throws \Exception
      */
-    protected function execute(InputInterface $input, OutputInterface $output) : int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         // Use Symfony console style
         $ioConsoleStyle = new SymfonyStyle($input, $output);
@@ -297,7 +297,7 @@ class DeleteUnusedImageCommand extends Command
      * @throws \Doctrine\ORM\NonUniqueResultException
      * @throws \Exception
      */
-    private function executeAutomatically(InputInterface $input, SymfonyStyle $ioConsoleStyle) : int
+    private function executeAutomatically(InputInterface $input, SymfonyStyle $ioConsoleStyle): int
     {
         // Get options values
         $categoryPrefix = $input->getOption('category');
@@ -332,7 +332,7 @@ class DeleteUnusedImageCommand extends Command
      * @throws \Doctrine\ORM\NonUniqueResultException
      * @throws \Exception
      */
-    private function executeManually(InputInterface $input, OutputInterface $output, SymfonyStyle $ioConsoleStyle) : int
+    private function executeManually(InputInterface $input, OutputInterface $output, SymfonyStyle $ioConsoleStyle): int
     {
         // Output title
         $ioConsoleStyle->title('Delete image(s) (file and database entries)');
@@ -393,8 +393,7 @@ class DeleteUnusedImageCommand extends Command
         string $imageTypeKey,
         bool $isTemporary = false,
         bool $isRegExMode = false
-    ) : ?array
-    {
+    ): ?array {
         $uploadDirectoryKey = $this->getUploadDirectoryKey($imageTypeKey);
         $imageUploader = $this->imageService->getImageUploader();
         // Be careful with this pattern or filename which determines the file(s) to delete!
@@ -414,7 +413,7 @@ class DeleteUnusedImageCommand extends Command
      *
      * @return array
      */
-    private function getCustomDefinedOptions() : array
+    private function getCustomDefinedOptions(): array
     {
         return $this->getDefinition()->getOptions();
     }
@@ -426,7 +425,7 @@ class DeleteUnusedImageCommand extends Command
      * @param OutputInterface $output
      * @return array
      */
-    private function getUserManualAnswers(InputInterface $input, OutputInterface $output) : array
+    private function getUserManualAnswers(InputInterface $input, OutputInterface $output): array
     {
         // Choose a category interactively
         $helper = $this->getHelper('question');
@@ -462,7 +461,7 @@ class DeleteUnusedImageCommand extends Command
      *
      * @return string
      */
-    private function getDefaultImageNamePattern(string $imageTypeKey) : string
+    private function getDefaultImageNamePattern(string $imageTypeKey): string
     {
         $categoryPrefix = $imageTypeKey;
         // CAUTION: set empty prefix '' for particular case 'all' to avoid issue
@@ -480,10 +479,10 @@ class DeleteUnusedImageCommand extends Command
      *
      * @throws \Exception
      */
-    private function getUploadDirectoryKey(string $imageTypeKey) : ?string
+    private function getUploadDirectoryKey(string $imageTypeKey): ?string
     {
         $categoryPrefix = $imageTypeKey;
-        $uploadDirectoryKey = self::REMOVE_ALL_KEY !== $imageTypeKey ? $this->imageService->getImageDirectoryConstantValue($categoryPrefix) : null;
+        $uploadDirectoryKey = self::REMOVE_ALL_KEY !== $imageTypeKey ? $this->imageService->getImageDirectoryConstantValue($categoryPrefix): null;
         return $uploadDirectoryKey;
     }
 
@@ -499,7 +498,7 @@ class DeleteUnusedImageCommand extends Command
      *
      * @throws \Exception
      */
-    private function isUnusedFileOutdated(\DateTimeInterface $fileCreationDate, InputInterface $input) : bool
+    private function isUnusedFileOutdated(\DateTimeInterface $fileCreationDate, InputInterface $input): bool
     {
         $now = new \DateTime('now');
         $interval = $now->getTimestamp() - $fileCreationDate->getTimestamp();

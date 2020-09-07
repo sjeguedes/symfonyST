@@ -1,5 +1,5 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Action;
 
@@ -60,7 +60,7 @@ class AjaxTrickListAction
      * @throws \Doctrine\ORM\NonUniqueResultException
      * @throws \Throwable
      */
-    public function __invoke(AjaxTrickListResponder $responder, Request $request) : Response
+    public function __invoke(AjaxTrickListResponder $responder, Request $request): Response
     {
         // Filter AJAX request
         if (!$request->isXmlHttpRequest()) {
@@ -96,14 +96,14 @@ class AjaxTrickListAction
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    private function checkOutdatedTrickList(Request $request, int $trickCount) : array
+    private function checkOutdatedTrickList(Request $request, int $trickCount): array
     {
         // Total count has changed during trick list ajax loading!
         if ($this->trickService->isCountAllOutdated($trickCount)) {
             $parameters = $this->trickService->getTrickListParameters();
             $this->logger->error(
                 sprintf(
-                    "[trace app snowTricks] AjaxTrickListAction/__invoke => trickCount: %s",
+                    "[trace app SnowTricks] AjaxTrickListAction/__invoke => trickCount: %s",
                     $trickCount
                 )
             );
@@ -122,7 +122,7 @@ class AjaxTrickListAction
             if (($parameters['error'])) {
                 $this->logger->error(
                     sprintf(
-                        "[trace app snowTricks] AjaxTrickListAction/__invoke => parameters: %s",
+                        "[trace app SnowTricks] AjaxTrickListAction/__invoke => parameters: %s",
                         serialize($parameters)
                     )
                 );

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Action\Admin;
 
@@ -64,11 +64,11 @@ class RenewPasswordAction
      *
      * @throws \Exception
      */
-    public function __invoke(RedirectionResponder $redirectionResponder, RenewPasswordResponder $responder, Request $request) : Response
+    public function __invoke(RedirectionResponder $redirectionResponder, RenewPasswordResponder $responder, Request $request): Response
     {
         // Try to identify user in personal link
         $identifiedUser = $this->userService->getUserFoundInPasswordRenewalRequest();
-        // User can not be retrieved or
+        // User cannot be retrieved or
         // personal requested token does not match user token or renewal request date (forgotten password process) is outdated.
         if (\is_null($identifiedUser) || !$this->userService->isPasswordRenewalRequestTokenAllowed($identifiedUser)) {
             $this->flashBag->add(

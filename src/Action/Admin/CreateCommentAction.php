@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Action\Admin;
 
@@ -102,7 +102,7 @@ class CreateCommentAction extends AbstractCommentListAction
      * @throws AccessDeniedException
      * @throws \Exception
      */
-    public function __invoke(RedirectionResponder $redirectionResponder, SingleTrickResponder $responder, Request $request) : Response
+    public function __invoke(RedirectionResponder $redirectionResponder, SingleTrickResponder $responder, Request $request): Response
     {
         // Check access to creation form
         $currentTrick = $this->checkAccessToCreationAction($request);
@@ -166,7 +166,7 @@ class CreateCommentAction extends AbstractCommentListAction
      * @throws \Doctrine\ORM\NonUniqueResultException
      * @throws NotFoundHttpException
      */
-    private function checkAccessToCreationAction(Request $request) : Trick
+    private function checkAccessToCreationAction(Request $request): Trick
     {
         // Check if a trick can be retrieved thanks to its uuid
         $trick = $this->trickService->findSingleToUpdateInFormByEncodedUuid($request->attributes->get('encodedUuid'));
@@ -176,7 +176,7 @@ class CreateCommentAction extends AbstractCommentListAction
         // Check access permissions to trick comment creation form
         $security = $this->userService->getSecurity();
         if (!$security->isGranted('ROLE_USER')) {
-            throw new AccessDeniedException("Current user can not create a trick comment!");
+            throw new AccessDeniedException("Current user cannot create a trick comment!");
         }
         return $trick;
     }
@@ -188,7 +188,7 @@ class CreateCommentAction extends AbstractCommentListAction
      *
      * @return array
      */
-    private function manageCommentCreationResultRouting(Request $request) : array
+    private function manageCommentCreationResultRouting(Request $request): array
     {
         // A new trick comment is created or null is returned if an issue occurred!
         // In both failure or success cases, the same redirection is made!

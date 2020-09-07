@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Action\Admin;
 
@@ -65,7 +65,7 @@ class LoginAction
      *
      * @throws \Exception
      */
-    public function __invoke(RedirectionResponder $redirectionResponder, LoginResponder $responder, Request $request) : Response
+    public function __invoke(RedirectionResponder $redirectionResponder, LoginResponder $responder, Request $request): Response
     {
         // Deny access if a user is already authenticated.
         if (!\is_null($this->security->getUser())) {

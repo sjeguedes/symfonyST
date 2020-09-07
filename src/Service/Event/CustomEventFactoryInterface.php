@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Event;
 
@@ -22,5 +22,5 @@ interface CustomEventFactoryInterface
      *
      * @return CustomEventInterface|Event|null the event instance
      */
-    public function createFromContext(string $eventContext, array $eventParameters) : ?CustomEventInterface;
+    public function createFromContext(string $eventContext, array $eventParameters): ?CustomEventInterface;
 }

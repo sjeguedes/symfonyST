@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\DTO;
 
@@ -33,7 +33,7 @@ final class RequestNewPasswordDTO
     /**
      * @return string|null
      */
-    public function getUserName() : ?string
+    public function getUserName(): ?string
     {
         return $this->userName;
     }

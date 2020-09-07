@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Form\TypeToEmbed;
 
@@ -27,7 +27,7 @@ abstract class AbstractTrickCollectionEntryType extends AbstractType
      *
      * @return void
      */
-    protected function addStringToIntegerCustomDataTransformer(FormBuilderInterface $formBuilder, string $formName) : void
+    protected function addStringToIntegerCustomDataTransformer(FormBuilderInterface $formBuilder, string $formName): void
     {
         /** @var FormBuilderInterface $form */
         $form = $formBuilder->get($formName);

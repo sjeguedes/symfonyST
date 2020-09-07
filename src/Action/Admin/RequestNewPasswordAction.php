@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Action\Admin;
 
@@ -56,7 +56,7 @@ class RequestNewPasswordAction
      *
      * @throws \Exception
      */
-    public function __invoke(RedirectionResponder $redirectionResponder, RequestNewPasswordResponder $responder, Request $request) : Response
+    public function __invoke(RedirectionResponder $redirectionResponder, RequestNewPasswordResponder $responder, Request $request): Response
     {
         // Set form without initial model data and set the request by binding it
         $requestNewPasswordForm = $this->formHandler->initForm()->bindRequest($request);

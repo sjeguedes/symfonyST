@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Form\Validator;
 
@@ -22,7 +22,7 @@ abstract class AbstractTrickCollectionConstraintValidator extends ConstraintVali
      *
      * @see For information: root namespace special compiled functions: https://github.com/FriendsOfPHP/PHP-CS-Fixer/issues/3048
      */
-    protected function validateItemCollectionRank(string $collectionName, ExecutionContextInterface $context, $payload = null) : void
+    protected function validateItemCollectionRank(string $collectionName, ExecutionContextInterface $context, $payload = null): void
     {
         // Get current validated object (ImageToCropDTO or VideoInfosDTO)
         $object = $context->getObject();

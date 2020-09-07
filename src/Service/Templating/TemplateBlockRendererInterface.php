@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Templating;
 
@@ -20,7 +20,7 @@ interface TemplateBlockRendererInterface
      *
      * @return string
      */
-    public function renderTemplateBlock(string $template, string $block, array $data) : string;
+    public function renderTemplateBlock(string $template, string $block, array $data): string;
 
     /**
      * Retrieve the template block name based on fully qualified class name
@@ -33,5 +33,5 @@ interface TemplateBlockRendererInterface
      *
      * @return array an associative array which contains template name and template block name
      */
-    public  function getTemplateBlock(string $className) : array;
+    public  function getTemplateBlock(string $className): array;
 }

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Action;
 
@@ -105,7 +105,7 @@ class SingleTrickAction extends AbstractCommentListAction
      * @throws \Doctrine\ORM\NonUniqueResultException
      * @throws \Exception
      */
-    public function __invoke(SingleTrickResponder $responder, Request $request) : Response
+    public function __invoke(SingleTrickResponder $responder, Request $request): Response
     {
         // Check access to single page
         $currentTrick = $this->checkAccessToSingleAction($request);
@@ -157,7 +157,7 @@ class SingleTrickAction extends AbstractCommentListAction
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    private function checkAccessToSingleAction(Request $request) : Trick
+    private function checkAccessToSingleAction(Request $request): Trick
     {
         // Check if a trick can be retrieved thanks to its uuid
         $trick = $this->trickService->findSingleToShowByEncodedUuid($request->attributes->get('encodedUuid'));
@@ -166,7 +166,7 @@ class SingleTrickAction extends AbstractCommentListAction
         }
         // Check access permissions to view this trick
         if (!$this->authorizationChecker->isGranted(TrickVoter::AUTHOR_OR_ADMIN_CAN_VIEW_UNPUBLISHED_TRICKS, $trick)) {
-            throw new AccessDeniedException("Current user can not view this unpublished trick!");
+            throw new AccessDeniedException("Current user cannot view this unpublished trick!");
         }
         return $trick;
     }

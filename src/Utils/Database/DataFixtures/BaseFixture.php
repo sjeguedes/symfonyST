@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Utils\Database\DataFixtures;
 
@@ -47,7 +47,7 @@ abstract class BaseFixture extends Fixture
      *
      * @see Doctrine\Common\DataFixtures\AbstractFixture for addReference() method
      */
-    protected function createFixtures(string $className, int $count, callable $factory) : void
+    protected function createFixtures(string $className, int $count, callable $factory): void
     {
         for ($i = 0; $i < $count; $i++) {
             $entity = $factory($i);
@@ -62,7 +62,7 @@ abstract class BaseFixture extends Fixture
      *
      * @param ObjectManager $manager
      */
-    public function load(ObjectManager $manager) : void
+    public function load(ObjectManager $manager): void
     {
         $this->manager = $manager;
         $this->loadData($manager);
@@ -84,7 +84,7 @@ abstract class BaseFixture extends Fixture
      *
      * @return array
      */
-    protected function parseYamlFile(string $dataFile) : array
+    protected function parseYamlFile(string $dataFile): array
     {
         return Yaml::parseFile( $this->yamlFilePath . $dataFile);
     }

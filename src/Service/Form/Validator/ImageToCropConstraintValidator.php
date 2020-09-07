@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Form\Validator;
 
@@ -68,7 +68,7 @@ final class ImageToCropConstraintValidator extends AbstractTrickCollectionConstr
      * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
      * @throws \Symfony\Component\Validator\Exception\UnexpectedTypeException
      */
-    public function validate($object, Constraint $constraint) : void
+    public function validate($object, Constraint $constraint): void
     {
         if (!$object instanceof ImageToCropDTO) {
             throw new \InvalidArgumentException('Object to validate must be an instance of "ImageToCropDTO"!');
@@ -100,7 +100,7 @@ final class ImageToCropConstraintValidator extends AbstractTrickCollectionConstr
      *
      * @return void
      */
-    public function validateImage(ExecutionContextInterface $context, $payload = null) : void
+    public function validateImage(ExecutionContextInterface $context, $payload = null): void
     {
         // Get current validated object (ImageToCropDTO)
         $object = $context->getObject();
@@ -141,7 +141,7 @@ final class ImageToCropConstraintValidator extends AbstractTrickCollectionConstr
                 ->atPath('image')
                 ->addViolation();
         }
-        // "image" field can not be null (no uploaded image) when "savedImageName" field is also null.
+        // "image" field cannot be null (no uploaded image) when "savedImageName" field is also null.
         // This equals "NotNull" constraint.
         if (\is_null($object->getImage()) && \is_null($object->getSavedImageName())) {
             $addedText = !\is_null($object->getCropJSONData())
@@ -166,7 +166,7 @@ final class ImageToCropConstraintValidator extends AbstractTrickCollectionConstr
      * @throws \Exception
      * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
      */
-    public function validateImagePreviewDataURI(ExecutionContextInterface $context, $payload = null) : void
+    public function validateImagePreviewDataURI(ExecutionContextInterface $context, $payload = null): void
     {
         // Get current validated object (ImageToCropDTO)
         $object = $context->getObject();
@@ -196,11 +196,11 @@ final class ImageToCropConstraintValidator extends AbstractTrickCollectionConstr
                         ->addViolation();
                 }
             }
-            // Image preview data URI can not be null when a corresponding file was uploaded at the same time!
+            // Image preview data URI cannot be null when a corresponding file was uploaded at the same time!
             // It's really too much to validate "image" field for the preview because the preview is simply a UI data...
         } else {
             if ($object->getImage() instanceof UploadedFile) {
-                $context->buildViolation('Image preview data URI can not be null!')
+                $context->buildViolation('Image preview data URI cannot be null!')
                     ->atPath('imagePreviewDataURI')
                     ->addViolation();
             }
@@ -215,7 +215,7 @@ final class ImageToCropConstraintValidator extends AbstractTrickCollectionConstr
      *
      * @return void
      */
-    public function validateCropJSONData(ExecutionContextInterface $context, $payload = null) : void
+    public function validateCropJSONData(ExecutionContextInterface $context, $payload = null): void
     {
         // Get current validated object (ImageToCropDTO)
         $object = $context->getObject();
@@ -231,7 +231,7 @@ final class ImageToCropConstraintValidator extends AbstractTrickCollectionConstr
             }
         // Replace the "NotNull" constraint to group all cases in this method!
         } else {
-            // Validate manually image preview data URI, to be able to validate image crop JSON data which can not be null if this field is valid!
+            // Validate manually image preview data URI, to be able to validate image crop JSON data which cannot be null if this field is valid!
             $context->getValidator()->validate($context, [new Callback([$this, 'validateImagePreviewDataURI'])]);
             // Check if there are violations
             $violationsLength = $context->getViolations()->count();
@@ -250,9 +250,9 @@ final class ImageToCropConstraintValidator extends AbstractTrickCollectionConstr
                         break;
                     }
                 }
-                // "cropJSONData" field can not be null when an uploaded file is present or when "imagePreviewDataURI" field is valid and not null!
+                // "cropJSONData" field cannot be null when an uploaded file is present or when "imagePreviewDataURI" field is valid and not null!
                 if ($object->getImage() instanceof UploadedFile || (!$isImagePreviewDataURIViolation && !\is_null($context->getObject()->getImagePreviewDataURI()))) {
-                    $context->buildViolation('Image crop JSON data can not be null!')
+                    $context->buildViolation('Image crop JSON data cannot be null!')
                         ->atPath('cropJSONData')
                         ->addViolation();
                 }
@@ -270,7 +270,7 @@ final class ImageToCropConstraintValidator extends AbstractTrickCollectionConstr
      *
      * @throws \Exception
      */
-    public function validateSavedImageName(ExecutionContextInterface $context, $payload = null) : void
+    public function validateSavedImageName(ExecutionContextInterface $context, $payload = null): void
     {
         // Get current validated object (ImageToCropDTO)
         $object = $context->getObject();
@@ -325,9 +325,9 @@ final class ImageToCropConstraintValidator extends AbstractTrickCollectionConstr
                     ->addViolation();
             }
         }
-        // Saved Image name can not be null when a corresponding file was uploaded at the same time!
+        // Saved Image name cannot be null when a corresponding file was uploaded at the same time!
         if (\is_null($object->getSavedImageName()) && $object->getImage() instanceof UploadedFile) {
-            $context->buildViolation('Saved image name can not be null!')
+            $context->buildViolation('Saved image name cannot be null!')
                 ->atPath('savedImageName')
                 ->addViolation();
         }
@@ -341,7 +341,7 @@ final class ImageToCropConstraintValidator extends AbstractTrickCollectionConstr
      *
      * @return void
      */
-    public function validateShowListRank(ExecutionContextInterface $context, $payload = null) : void
+    public function validateShowListRank(ExecutionContextInterface $context, $payload = null): void
     {
         // Validate current collection item show list rank by checking ImageToCropDTO data
         $this->validateItemCollectionRank('images', $context, $payload);
@@ -355,7 +355,7 @@ final class ImageToCropConstraintValidator extends AbstractTrickCollectionConstr
      *
      * @return void
      */
-    public function validateIsMain(ExecutionContextInterface $context, $payload = null) : void
+    public function validateIsMain(ExecutionContextInterface $context, $payload = null): void
     {
         // Get current validated object (ImageToCropDTO)
         $object = $context->getObject();
