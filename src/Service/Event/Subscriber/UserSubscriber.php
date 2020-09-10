@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
@@ -121,13 +121,13 @@ class UserSubscriber implements EventSubscriberInterface
      * Remove all outdated users session custom vars which are defined
      * to check password renewal first access page.
      *
-     * @param GetResponseEvent $event
+     * @param RequestEvent $event
      *
      * @return void
      *
      * @throws \Exception
      */
-    public function onKernelRequest(GetResponseEvent $event): void
+    public function onKernelRequest(RequestEvent $event): void
     {
         // Clean unneeded password renewal page first access users session vars
         if ($event->getRequest()->getSession()->has(self::PASSWORD_RENEWAL_FIRST_ACCESS)) {
@@ -240,7 +240,9 @@ class UserSubscriber implements EventSubscriberInterface
             // Then there is no need to keep user session custom var.
             return false === $this->userService->isPasswordRenewalRequestOutdated($renewalRequestDate);
         });
-        // if filtered custom session var is an empty array then remove it, otherwise update custom session var after user entry was filtered and removed.
-        0 == \count($filteredArray) ? $this->session->remove($customSessionKey) : $this->session->set($customSessionKey, $filteredArray);
+        // if filtered custom session var is an empty array then remove it,
+        // otherwise update custom session var after user entry was filtered and removed.
+        0 == \count($filteredArray) ? $this->session->remove($customSessionKey)
+                                    : $this->session->set($customSessionKey, $filteredArray);
     }
 }

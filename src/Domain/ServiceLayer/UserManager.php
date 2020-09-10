@@ -184,7 +184,7 @@ class UserManager
         $eventName = $this->customEventFactory->getEventNameByContext($eventContext);
         /** @var EventDispatcherInterface $eventDispatcher */
         $eventDispatcher = $this->customEventFactory->getEventDispatcher();
-        $eventDispatcher->dispatch($eventName, $event);
+        $eventDispatcher->dispatch($event, $eventName);
     }
 
     /**

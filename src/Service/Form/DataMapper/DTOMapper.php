@@ -18,7 +18,7 @@ use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
  * Data Transfer Object (DTO) Mapper to map form data on demand.
  *
  * @see https://symfony.com/doc/current/form/data_mappers.html#using-the-mapper
- * @see https://github.com/symfony/symfony/blob/4.2/src/Symfony/Component/Form/DataMapperInterface.php
+ * @see https://github.com/symfony/symfony/blob/4.3/src/Symfony/Component/Form/DataMapperInterface.php
  */
 class DTOMapper implements DataMapperInterface
 {

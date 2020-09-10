@@ -10,7 +10,7 @@ security:
     encoders:
         # Custom User class
         App\Domain\Entity\User:
-            # BCrypt
+            # BCrypt (prefer use 'auto' which is recommended since Sf 4.3, because explicit algorithm is depreciated!)
             algorithm: bcrypt
             cost: 12
     firewalls:

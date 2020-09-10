@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace App\Service\Event;
 
 use App\Domain\Entity\User;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class FormUnchangedEvent.

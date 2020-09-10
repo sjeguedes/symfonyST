@@ -107,9 +107,6 @@
     "psr/log": {
         "version": "1.0.2"
     },
-    "psr/simple-cache": {
-        "version": "1.0.1"
-    },
     "ramsey/uuid": {
         "version": "3.8.0"
     },
@@ -140,6 +137,9 @@
     "symfony/cache": {
         "version": "v4.1.2"
     },
+    "symfony/cache-contracts": {
+        "version": "v1.1.10"
+    },
     "symfony/config": {
         "version": "v4.1.2"
     },
@@ -151,9 +151,6 @@
             "version": "3.3",
             "ref": "e3868d2f4a5104f19f844fe551099a00c6562527"
         }
-    },
-    "symfony/contracts": {
-        "version": "v1.0.2"
     },
     "symfony/debug": {
         "version": "v4.1.2"
@@ -169,6 +166,9 @@
     },
     "symfony/event-dispatcher": {
         "version": "v4.1.2"
+    },
+    "symfony/event-dispatcher-contracts": {
+        "version": "v1.1.9"
     },
     "symfony/filesystem": {
         "version": "v4.1.2"
@@ -221,6 +221,9 @@
             "ref": "fadbfe33303a76e25cb63401050439aa9b1a9c7f"
         }
     },
+    "symfony/mime": {
+        "version": "v4.3.11"
+    },
     "symfony/options-resolver": {
         "version": "v4.2.4"
     },
@@ -248,11 +251,17 @@
     "symfony/polyfill-intl-idn": {
         "version": "v1.11.0"
     },
+    "symfony/polyfill-intl-normalizer": {
+        "version": "v1.18.1"
+    },
     "symfony/polyfill-mbstring": {
         "version": "v1.8.0"
     },
     "symfony/polyfill-php72": {
         "version": "v1.8.0"
+    },
+    "symfony/polyfill-php73": {
+        "version": "v1.18.1"
     },
     "symfony/profiler-pack": {
         "version": "v1.0.3"
@@ -296,6 +305,9 @@
     "symfony/serializer": {
         "version": "v4.2.12"
     },
+    "symfony/service-contracts": {
+        "version": "v1.1.9"
+    },
     "symfony/stopwatch": {
         "version": "v4.1.2"
     },
@@ -312,6 +324,9 @@
             "config/packages/swiftmailer.yaml",
             "config/packages/test/swiftmailer.yaml"
         ]
+    },
+    "symfony/translation-contracts": {
+        "version": "v1.1.10"
     },
     "symfony/twig-bridge": {
         "version": "v4.1.2"

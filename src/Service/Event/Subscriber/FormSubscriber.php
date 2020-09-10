@@ -21,8 +21,8 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
@@ -355,26 +355,26 @@ class FormSubscriber implements EventSubscriberInterface
     /**
      * Define a callback when user submitted a form which generated an exception.
      *
-     * @param GetResponseForExceptionEvent $event
+     * @param ExceptionEvent $event
      *
      * @return void
      *
      * @throws /Exception
      */
-    public function onKernelException(GetResponseForExceptionEvent $event): void
+    public function onKernelException(ExceptionEvent $event): void
     {
         // Catch exception thrown by updated forms and throw a new custom exception
         // To avoid response management with "onKernelResponse" callback!
         $actionClassName = $event->getRequest()->attributes->get('_controller');
-        /*if (preg_match('/Update/', $actionClassName)) {
-                $exception = $event->getException();
-                throw new \Exception(
-                    sprintf(
-                        "A technical issue happened during update form handling! %s",
-                        $exception->getMessage()
-                    )
-                );
-        }*/
+        if (preg_match('/Update/', $actionClassName)) {
+            $exception = $event->getException();
+            throw new \Exception(
+                sprintf(
+                    "A technical issue happened during update form handling! %s",
+                    $exception->getMessage()
+                )
+            );
+        }
     }
 
     /**
@@ -388,11 +388,11 @@ class FormSubscriber implements EventSubscriberInterface
      * -- to avoid the use of a success flash message with redirection to homepage.
      * -- So use an info flash message instead, created in UserSubscriber.
      *
-     * @param FilterResponseEvent $event
+     * @param ResponseEvent $event
      *
      * @return RedirectResponse|null
      */
-    public function onKernelResponse(FilterResponseEvent $event): ?RedirectResponse
+    public function onKernelResponse(ResponseEvent $event): ?RedirectResponse
     {
         $response = null;
         // Check if it is not a form action
@@ -491,11 +491,11 @@ class FormSubscriber implements EventSubscriberInterface
      * Redirect to current form page after submit, if form is valid and unchanged.
      *
      * @param FormTypeInterface   $formType
-     * @param FilterResponseEvent $event
+     * @param ResponseEvent $event
      *
      * @return RedirectResponse|null
      */
-    private function setUnchangedFormActionResponse(FormTypeInterface $formType, FilterResponseEvent $event): ?RedirectResponse
+    private function setUnchangedFormActionResponse(FormTypeInterface $formType, ResponseEvent $event): ?RedirectResponse
     {
         // Redirect to the correct url
         $formTypeClassName = \get_class($formType);

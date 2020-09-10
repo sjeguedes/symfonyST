@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  * This class manages a custom constraint validation callback as concerns ImageToCropDTO instance.
  *
  * @see https://symfony.com/doc/current/validation/custom_constraint.html
- * @see https://symfony.com/index.php/doc/4.2/reference/constraints/Callback.html
+ * @see https://symfony.com/index.php/doc/4.3/reference/constraints/Callback.html
  */
 final class ImageToCropConstraintValidator extends AbstractTrickCollectionConstraintValidator
 {
