@@ -13,7 +13,6 @@
 /docs/
 /.idea/
 /public-dev/
-/public/assets/images/uploads/
 ###< others ###
 
 ###> friendsofphp/php-cs-fixer ###
