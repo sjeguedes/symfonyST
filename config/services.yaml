@@ -7,6 +7,9 @@ parameters:
     app_website_name: '%env(WEBSITE_NAME)%'
     app_swift_mailer_sender_email: '%env(MAILER_SENDER_EMAIL)%' # admin email
     app_swift_mailer_sender_name: '%env(MAILER_SENDER_NAME)%' # admin email name
+    # Custom configuration yaml files paths retrieved with parameter bag:
+    app_data_fixtures_yaml_dir: '%kernel.project_dir%/src/Utils/Database/DataFixtures/yaml/' # Fixtures used in production
+    app_template_list_yaml_dir: '%kernel.project_dir%/src/Service/Templating/yaml/'
     # PHP paths retrieved with parameter bag:
     app_images_upload_directory: '%kernel.project_dir%/public/assets/images/uploads'
     app_avatar_image_upload_directory: '%app_images_upload_directory%/avatars'

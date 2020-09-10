@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Service\Templating;
 
 use App\Utils\Traits\TwigHelperTrait;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Yaml\Yaml;
 use Twig\Environment;
 
 /**
@@ -29,78 +31,17 @@ final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateB
     /**
      * TwigTemplateRenderer constructor.
      *
-     * @param Environment $twig
+     * @param ParameterBagInterface $parameterBag
+     * @param Environment           $twig
      *
-     * @return void
      */
-    public function __construct(Environment $twig)
+    public function __construct(ParameterBagInterface $parameterBag, Environment $twig)
     {
         $this->templateRenderer = $twig;
-        $this->templates = [
-            [
-                'class' => 'App\\Responder\\Admin\\CreateTrickResponder',
-                'name'  => 'admin/create_trick.html.twig'
-            ],
-            [
-                'class' => 'App\\Responder\\Admin\\LoginResponder',
-                'name'  => 'admin/login.html.twig'
-            ],
-            [
-                'class' => 'App\\Responder\\Admin\\RequestNewPasswordResponder',
-                'name'  => 'admin/request_new_password.html.twig'
-            ],
-            [
-                'class' => 'App\\Responder\\Admin\\RenewPasswordResponder',
-                'name'  => 'admin/renew_password.html.twig'
-            ],
-            [
-                'class' => 'App\\Responder\\Admin\\RegisterResponder',
-                'name'  => 'admin/register.html.twig'
-            ],
-            [
-                'class' => 'App\\Responder\\Admin\\UpdateProfileResponder',
-                'name'  => 'admin/update_profile.html.twig'
-            ],
-            [
-                'class' => 'App\\Responder\\Admin\\UpdateTrickResponder',
-                'name'  => 'admin/update_trick.html.twig'
-            ],
-            [
-                'class' => 'App\\Responder\\AjaxCommentListResponder',
-                'name'  => 'single-trick/partials/comment_list.html.twig',
-                'block' => 'comment_cards'
-            ],
-            [
-                'class' => 'App\\Responder\\AjaxTrickListResponder',
-                'name'  => 'home/trick_list.html.twig',
-                'block' => 'trick_cards'
-            ],
-            [
-                'class' => 'App\\Responder\\HomeTrickListResponder',
-                'name'  => 'home/trick_list.html.twig'
-            ],
-            [
-                'class' => 'App\\Responder\\PaginatedTrickListResponder',
-                'name'  => 'tricks/paginated_list.html.twig'
-            ],
-            [
-                'class' => 'App\\Responder\\SingleTrickResponder',
-                'name'  => 'single-trick/trick.html.twig'
-            ],
-            // Emails
-            [
-                'class' => 'App\\Action\\Admin\\RequestNewPasswordAction',
-                'name'  => 'admin/mailing/mail_request_new_password.html.twig'
-            ],
-            [
-                'class' => 'App\\Action\\Admin\\RenewPasswordAction',
-                'name'  => 'admin/mailing/mail_renew_password.html.twig'
-            ],
-            [
-                'class' => 'App\\Action\\Admin\\RegisterAction',
-                'name'  => 'admin/mailing/mail_register.html.twig'
-            ]
-        ];
+        // Get template list data in particular .yaml file
+        $yamlFilePath = $parameterBag->get('app_template_list_yaml_dir');
+        $array = Yaml::parseFile( $yamlFilePath . 'template_list.yaml');
+        $this->templates = $array['templates'];
     }
 
     /**

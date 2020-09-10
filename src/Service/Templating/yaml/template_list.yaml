@@ -1,0 +1,49 @@
+templates:
+    -
+        class: 'App\Responder\Admin\CreateTrickResponder'
+        name: 'admin/create_trick.html.twig'
+    -
+        class: 'App\Responder\Admin\LoginResponder'
+        name: 'admin/login.html.twig'
+    -
+        class: 'App\Responder\Admin\RequestNewPasswordResponder'
+        name: 'admin/request_new_password.html.twig'
+    -
+        class: 'App\Responder\Admin\RenewPasswordResponder'
+        name: 'admin/renew_password.html.twig'
+    -
+        class: 'App\Responder\Admin\RegisterResponder'
+        name: 'admin/register.html.twig'
+    -
+        class: 'App\Responder\Admin\UpdateProfileResponder'
+        name: 'admin/update_profile.html.twig'
+    -
+        class: 'App\Responder\Admin\UpdateTrickResponder'
+        name: 'admin/update_trick.html.twig'
+    -
+        class: 'App\Responder\AjaxCommentListResponder'
+        name: 'single-trick/partials/comment_list.html.twig'
+        block: 'comment_cards' # template block
+    -
+        class: 'App\Responder\AjaxTrickListResponder'
+        name: 'home/trick_list.html.twig'
+        block: 'trick_cards' # template block
+    -
+        class: 'App\Responder\HomeTrickListResponder'
+        name: 'home/trick_list.html.twig'
+    -
+        class: 'App\Responder\PaginatedTrickListResponder'
+        name: 'tricks/paginated_list.html.twig'
+    -
+        class: 'App\Responder\SingleTrickResponder'
+        name: 'single-trick/trick.html.twig'
+    # Automatic emails
+    -
+        class: 'App\Action\Admin\RequestNewPasswordAction'
+        name: 'admin/mailing/mail_request_new_password.html.twig'
+    -
+        class: 'App\Action\Admin\RenewPasswordAction'
+        name: 'admin/mailing/mail_renew_password.html.twig'
+    -
+        class: 'App\Action\Admin\RegisterAction'
+        name: 'admin/mailing/mail_register.html.twig'
