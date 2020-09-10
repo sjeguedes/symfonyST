@@ -33,5 +33,5 @@ interface TemplateBlockRendererInterface
      *
      * @return array an associative array which contains template name and template block name
      */
-    public  function getTemplateBlock(string $className): array;
+    public function getTemplateBlock(string $className): array;
 }

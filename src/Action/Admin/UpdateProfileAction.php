@@ -9,8 +9,8 @@ use App\Domain\ServiceLayer\ImageManager;
 use App\Domain\ServiceLayer\MediaManager;
 use App\Domain\ServiceLayer\TrickManager;
 use App\Domain\ServiceLayer\UserManager;
-use App\Responder\Admin\UpdateProfileResponder;
 use App\Responder\Redirection\RedirectionResponder;
+use App\Responder\TemplateResponder;
 use App\Service\Form\Handler\FormHandlerInterface;
 use App\Service\Form\Type\Admin\UpdateProfileAvatarType;
 use App\Utils\Traits\RouterHelperTrait;
@@ -97,15 +97,15 @@ class UpdateProfileAction
      *     "en": "/{_locale?<en>}/{mainRoleLabel<admin|member>}/update-profile"
      * }, name="update_profile", methods={"GET", "POST"})
      *
-     * @param RedirectionResponder   $redirectionResponder
-     * @param UpdateProfileResponder $responder
-     * @param Request                $request
+     * @param RedirectionResponder $redirectionResponder
+     * @param TemplateResponder    $responder
+     * @param Request              $request
      *
      * @return Response|null
      *
      * @throws \Exception
      */
-    public function __invoke(RedirectionResponder $redirectionResponder, UpdateProfileResponder $responder, Request $request): ?Response
+    public function __invoke(RedirectionResponder $redirectionResponder, TemplateResponder $responder, Request $request): ?Response
     {
         // Get user from Symfony security context: access is controlled by ACL.
         /** @var UserInterface|User $authenticatedUser */
@@ -137,7 +137,7 @@ class UpdateProfileAction
             'userAvatarImage'         => $this->imageService->getUserAvatarImage($authenticatedUser),
             'userCreatedTricks'       => $this->trickService->findOnesByAuthor($authenticatedUser->getUuid())
         ];
-        return $responder($data);
+        return $responder($data, self::class);
     }
 
     /**

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Action\Admin;
 
-use App\Service\Form\Handler\FormHandlerInterface;
-use App\Responder\Admin\LoginResponder;
 use App\Responder\Redirection\RedirectionResponder;
+use App\Responder\TemplateResponder;
+use App\Service\Form\Handler\FormHandlerInterface;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -58,14 +58,14 @@ class LoginAction
      * }, name="connect", methods={"GET", "POST"})
      *
      * @param RedirectionResponder $redirectionResponder
-     * @param LoginResponder       $responder
+     * @param TemplateResponder    $responder
      * @param Request              $request
      *
      * @return Response
      *
      * @throws \Exception
      */
-    public function __invoke(RedirectionResponder $redirectionResponder, LoginResponder $responder, Request $request): Response
+    public function __invoke(RedirectionResponder $redirectionResponder, TemplateResponder $responder, Request $request): Response
     {
         // Deny access if a user is already authenticated.
         if (!\is_null($this->security->getUser())) {
@@ -86,6 +86,6 @@ class LoginAction
             'lastAuthenticationError' => $this->formHandler->getAuthenticationError() ?? null,
             'loginForm'               => $loginForm->createView()
         ];
-        return $responder($data);
+        return $responder($data, self::class);
     }
 }

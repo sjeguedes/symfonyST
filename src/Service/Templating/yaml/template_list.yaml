@@ -1,43 +1,44 @@
-templates:
+page_templates:
     -
-        class: 'App\Responder\Admin\CreateTrickResponder'
+        class: 'App\Action\Admin\CreateTrickAction'
         name: 'admin/create_trick.html.twig'
     -
-        class: 'App\Responder\Admin\LoginResponder'
+        class: 'App\Action\Admin\LoginAction'
         name: 'admin/login.html.twig'
     -
-        class: 'App\Responder\Admin\RequestNewPasswordResponder'
+        class: 'App\Action\Admin\RequestNewPasswordAction'
         name: 'admin/request_new_password.html.twig'
     -
-        class: 'App\Responder\Admin\RenewPasswordResponder'
+        class: 'App\Action\Admin\RenewPasswordAction'
         name: 'admin/renew_password.html.twig'
     -
-        class: 'App\Responder\Admin\RegisterResponder'
+        class: 'App\Action\Admin\RegisterAction'
         name: 'admin/register.html.twig'
     -
-        class: 'App\Responder\Admin\UpdateProfileResponder'
+        class: 'App\Action\Admin\UpdateProfileAction'
         name: 'admin/update_profile.html.twig'
     -
-        class: 'App\Responder\Admin\UpdateTrickResponder'
+        class: 'App\Action\Admin\UpdateTrickAction'
         name: 'admin/update_trick.html.twig'
     -
-        class: 'App\Responder\AjaxCommentListResponder'
+        class: 'App\Action\AjaxCommentListAction'
         name: 'single-trick/partials/comment_list.html.twig'
         block: 'comment_cards' # template block
     -
-        class: 'App\Responder\AjaxTrickListResponder'
+        class: 'App\Action\AjaxTrickListAction'
         name: 'home/trick_list.html.twig'
         block: 'trick_cards' # template block
     -
-        class: 'App\Responder\HomeTrickListResponder'
+        class: 'App\Action\HomeTrickListAction'
         name: 'home/trick_list.html.twig'
     -
-        class: 'App\Responder\PaginatedTrickListResponder'
+        class: 'App\Action\PaginatedTrickListAction'
         name: 'tricks/paginated_list.html.twig'
     -
-        class: 'App\Responder\SingleTrickResponder'
+        class: 'App\Action\SingleTrickAction'
         name: 'single-trick/trick.html.twig'
-    # Automatic emails
+# Automatic emails
+email_templates:
     -
         class: 'App\Action\Admin\RequestNewPasswordAction'
         name: 'admin/mailing/mail_request_new_password.html.twig'

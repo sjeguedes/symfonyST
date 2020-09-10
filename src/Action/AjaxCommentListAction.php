@@ -7,7 +7,7 @@ namespace App\Action;
 use App\Domain\Entity\Comment;
 use App\Domain\ServiceLayer\CommentManager;
 use App\Domain\ServiceLayer\MediaTypeManager;
-use App\Responder\AjaxCommentListResponder;
+use App\Responder\TemplateBlockResponder;
 use App\Utils\Traits\UuidHelperTrait;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
@@ -66,8 +66,8 @@ class AjaxCommentListAction extends AbstractCommentListAction
      *     name="load_trick_comments_offset_limit", methods={"GET"}
      * )
      *
-     * @param AjaxCommentListResponder $responder
-     * @param Request                  $request
+     * @param TemplateBlockResponder $responder
+     * @param Request                $request
      *
      * @return Response
      *
@@ -76,7 +76,7 @@ class AjaxCommentListAction extends AbstractCommentListAction
      *
      * @throws \Throwable
      */
-    public function __invoke(AjaxCommentListResponder $responder, Request $request): Response
+    public function __invoke(TemplateBlockResponder $responder, Request $request): Response
     {
         // Filter AJAX request
         if (!$request->isXmlHttpRequest()) {
@@ -115,7 +115,7 @@ class AjaxCommentListAction extends AbstractCommentListAction
         ];
         // Get complementary needed comment list and medias (avatar) data
         $data = array_merge($this->getCommentListData(), $this->getMediasData(), $data);
-        return $responder($data);
+        return $responder($data, self::class);
     }
 
     /**

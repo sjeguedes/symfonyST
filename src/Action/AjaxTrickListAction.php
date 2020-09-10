@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace App\Action;
 
 use App\Domain\ServiceLayer\TrickManager;
-use App\Responder\AjaxTrickListResponder;
+use App\Responder\TemplateBlockResponder;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -48,7 +48,7 @@ class AjaxTrickListAction
      *
      * @Route("/load-tricks/{offset?<\d+>}/{limit?<\d+>?}", name="load_tricks_offset_limit", methods={"GET"})
      *
-     * @param AjaxTrickListResponder $responder
+     * @param TemplateBlockResponder $responder
      * @param Request                $request
      *
      * @return Response
@@ -60,7 +60,7 @@ class AjaxTrickListAction
      * @throws \Doctrine\ORM\NonUniqueResultException
      * @throws \Throwable
      */
-    public function __invoke(AjaxTrickListResponder $responder, Request $request): Response
+    public function __invoke(TemplateBlockResponder $responder, Request $request): Response
     {
         // Filter AJAX request
         if (!$request->isXmlHttpRequest()) {
@@ -81,7 +81,7 @@ class AjaxTrickListAction
                 $infos['parameters']['limit']
             )
         ];
-        return $responder($data);
+        return $responder($data, self::class);
     }
 
     /**

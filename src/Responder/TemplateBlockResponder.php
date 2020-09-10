@@ -8,21 +8,20 @@ use App\Service\Templating\TemplateBlockRendererInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Class AbstractAjaxListResponder.
+ * Class TemplateBlockResponder.
  *
- * Manage a response with block html content based on ajax data.
- *
- * Please note this can be used to add more trick(s), comment(s), etc... to an existing list.
+ * Manage a response with block html content based on ajax compiled data,
+ * to add an HTML element to an existing list.
  */
-abstract class AbstractAjaxListResponder
+final class TemplateBlockResponder
 {
     /**
      * @var TemplateBlockRendererInterface
      */
-    protected $renderer;
+    private $renderer;
 
     /**
-     * AbstractAjaxListResponder constructor.
+     * TemplateBlockResponder constructor.
      *
      * @param TemplateBlockRendererInterface $renderer avoid coupling with template engine
      *
@@ -34,18 +33,18 @@ abstract class AbstractAjaxListResponder
     }
 
     /**
-     * set a response with a HTML template block.
+     * Invokable Responder with Magic method.
      *
      * @param array  $data
-     * @param string $className a F.Q.C.N from child class
+     * @param string $actionClassName
      *
      * @return Response
      */
-    public function setHTMLBlockResponse(array $data, string $className): Response
+    public function __invoke(array $data, string $actionClassName): Response
     {
         // Render a template block
-        $template = $this->renderer->getTemplateBlock($className)['template'];
-        $block = $this->renderer->getTemplateBlock($className)['block'];
+        $template = $this->renderer->getTemplateBlock($actionClassName)['template'];
+        $block = $this->renderer->getTemplateBlock($actionClassName)['block'];
         $response = new Response($this->renderer->renderTemplateBlock($template, $block, $data));
         $response->headers->set('Content-Type', 'text/html');
         return $response;

@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace App\Responder\Admin;
+namespace App\Responder;
 
 use App\Service\Templating\TemplateRendererInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Class UpdateTrickResponder.
+ * Class TemplateResponder.
  *
- * Manage a response with html template to show trick update form, its details and functionality.
+ * Manage a response with html template and its compiled data.
  */
-final class UpdateTrickResponder
+final class TemplateResponder
 {
     /**
      * @var TemplateRendererInterface
@@ -20,7 +20,7 @@ final class UpdateTrickResponder
     private $renderer;
 
     /**
-     * UpdateTrickResponder constructor.
+     * TemplateResponder constructor.
      *
      * @param TemplateRendererInterface $renderer avoid coupling with template engine
      *
@@ -34,13 +34,13 @@ final class UpdateTrickResponder
     /**
      * Invokable Responder with Magic method.
      *
-     * @param array $data
-     *
+     * @param array  $data
+     * @param string $actionClassName
      * @return Response
      */
-    public function __invoke(array $data): Response
+    public function __invoke(array $data, string $actionClassName): Response
     {
-        $template = $this->renderer->getTemplate(self::class);
+        $template = $this->renderer->getTemplate($actionClassName);
         return new Response($this->renderer->renderTemplate($template, $data));
     }
 }

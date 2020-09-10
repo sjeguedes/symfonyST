@@ -40,13 +40,13 @@
             <div class="uk-flex-center uk-grid uk-grid-collapse">
                 <div class="uk-width-5-6 uk-width-2-3@s uk-width-3-5@m uk-width-1-2@l uk-width-2-5@xl uk-card uk-card-primary uk-box-shadow-medium st-border-white-small">
                     <!-- //------------------------------------------------------------------------------------------------------------------------------------// -->
-                    {% if (avatarUploadError is not null) or (uniqueUserError is not null) %}
+                    {% if avatarUploadError or uniqueUserError %}
                         <div class="uk-card-header uk-padding-small uk-text-center">
-                            {# User avatar or infos error #}
+                            {# User avatar or infos erroravatarUploadError #}
                             <div class="uk-label uk-form-danger uk-box-shadow-large uk-text-bold">
                                 <p class="uk-margin-remove">
                                     <span uk-icon="icon: warning; ratio: 0.8"></span>
-                                    {% if avatarUploadError is not null %}
+                                    {% if avatarUploadError %}
                                     {{ avatarUploadError|nl2br }}
                                     {% else %}
                                     {{ uniqueUserError['email'] is defined ? uniqueUserError['email']|nl2br : uniqueUserError['username']|nl2br }}
@@ -56,7 +56,7 @@
                         </div>
                     {% endif %}
                     {# Update profile avatar and infos forms #}
-                    <div id="st-form" class="uk-card-body uk-padding-medium{{ updateProfileInfosForm.vars.valid == 1 and uniqueUserError is null ?: ' st-form-error' }}">
+                    <div id="st-form" class="uk-card-body uk-padding-medium{{ updateProfileInfosForm.vars.valid == 1 and uniqueUserError == false ?: ' st-form-error' }}">
                         {# Update profile avatar form #}
                         {% include 'admin/partials/form/update_profile_avatar.html.twig' %}
                         <hr>

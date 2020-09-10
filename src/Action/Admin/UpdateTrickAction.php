@@ -11,8 +11,8 @@ use App\Domain\ServiceLayer\MediaManager;
 use App\Domain\ServiceLayer\TrickManager;
 use App\Domain\ServiceLayer\UserManager;
 use App\Domain\ServiceLayer\VideoManager;
-use App\Responder\Admin\UpdateTrickResponder;
 use App\Responder\Redirection\RedirectionResponder;
+use App\Responder\TemplateResponder;
 use App\Service\Form\Handler\FormHandlerInterface;
 use App\Service\Security\Voter\TrickVoter;
 use App\Utils\Traits\RouterHelperTrait;
@@ -112,7 +112,7 @@ class UpdateTrickAction
      * }, name="update_trick", methods={"GET", "POST"})
      *
      * @param RedirectionResponder $redirectionResponder
-     * @param UpdateTrickResponder $responder
+     * @param TemplateResponder    $responder
      * @param Request              $request
      *
      * @return Response
@@ -121,7 +121,7 @@ class UpdateTrickAction
      * @throws \Exception
      * @throws NotFoundHttpException
      */
-    public function __invoke(RedirectionResponder $redirectionResponder, UpdateTrickResponder $responder, Request $request): Response
+    public function __invoke(RedirectionResponder $redirectionResponder, TemplateResponder $responder, Request $request): Response
     {
         // Check access to update form page
         $trickToUpdate = $this->checkAccessToUpdateAction($request);
@@ -156,7 +156,7 @@ class UpdateTrickAction
                 UrlGeneratorInterface::ABSOLUTE_URL
             )
         ];
-        return $responder($data);
+        return $responder($data, self::class);
     }
 
     /**

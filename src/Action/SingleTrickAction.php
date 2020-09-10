@@ -9,7 +9,7 @@ use App\Domain\Entity\Trick;
 use App\Domain\ServiceLayer\CommentManager;
 use App\Domain\ServiceLayer\MediaTypeManager;
 use App\Domain\ServiceLayer\TrickManager;
-use App\Responder\SingleTrickResponder;
+use App\Responder\TemplateResponder;
 use App\Service\Form\Handler\FormHandlerInterface;
 use App\Service\Security\Voter\TrickVoter;
 use App\Utils\Traits\RouterHelperTrait;
@@ -97,15 +97,15 @@ class SingleTrickAction extends AbstractCommentListAction
      *     "en": "/{_locale<en>}/trick/{slug<[\w-]+>}-{encodedUuid<\w+>}"
      * }, name="show_single_trick", methods={"GET"})
      *
-     * @param SingleTrickResponder $responder
-     * @param Request              $request
+     * @param TemplateResponder $responder
+     * @param Request           $request
      *
      * @return Response
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      * @throws \Exception
      */
-    public function __invoke(SingleTrickResponder $responder, Request $request): Response
+    public function __invoke(TemplateResponder $responder, Request $request): Response
     {
         // Check access to single page
         $currentTrick = $this->checkAccessToSingleAction($request);
@@ -145,7 +145,7 @@ class SingleTrickAction extends AbstractCommentListAction
         );
         // Get complementary needed comment list and medias data
         $data = array_merge($this->getCommentListData(), $this->getMediasData(), $data);
-        return $responder($data);
+        return $responder($data, self::class);
     }
 
     /**

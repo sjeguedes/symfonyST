@@ -12,7 +12,7 @@ use App\Domain\ServiceLayer\MediaTypeManager;
 use App\Domain\ServiceLayer\TrickManager;
 use App\Domain\ServiceLayer\UserManager;
 use App\Responder\Redirection\RedirectionResponder;
-use App\Responder\SingleTrickResponder;
+use App\Responder\TemplateResponder;
 use App\Service\Form\Handler\FormHandlerInterface;
 use App\Utils\Traits\RouterHelperTrait;
 use App\Utils\Traits\UuidHelperTrait;
@@ -94,7 +94,7 @@ class CreateCommentAction extends AbstractCommentListAction
      * }, name="create_trick_comment", methods={"POST"})
      *
      * @param RedirectionResponder $redirectionResponder
-     * @param SingleTrickResponder $responder
+     * @param TemplateResponder    $responder
      * @param Request              $request
      *
      * @return Response
@@ -102,7 +102,7 @@ class CreateCommentAction extends AbstractCommentListAction
      * @throws AccessDeniedException
      * @throws \Exception
      */
-    public function __invoke(RedirectionResponder $redirectionResponder, SingleTrickResponder $responder, Request $request): Response
+    public function __invoke(RedirectionResponder $redirectionResponder, TemplateResponder $responder, Request $request): Response
     {
         // Check access to creation form
         $currentTrick = $this->checkAccessToCreationAction($request);
@@ -152,7 +152,7 @@ class CreateCommentAction extends AbstractCommentListAction
         ];
         // Get complementary needed comment list and medias data
         $data = array_merge($this->getCommentListData(), $this->getMediasData(), $data);
-        return $responder($data);
+        return $responder($data, self::class);
     }
 
     /**

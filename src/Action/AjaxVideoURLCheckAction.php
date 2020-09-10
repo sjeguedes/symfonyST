@@ -44,9 +44,12 @@ class AjaxVideoURLCheckAction
     /**
      * Check if single trick video URL can be loaded from AJAX request.
      *
-     * Please not url is always the same even if language changed. This is a simple AJAX request and locale parameter is null.
-     * Particular "url" attribute value can be empty in some cases! Its declared placeholder requirement can be: {url<(.+)?>},
-     * but choice is made to check if "url" attribute is null (optional placeholder) instead of checking its value with this placeholder requirement: {url<(.+)>?}
+     * Please not url is always the same even if language changed.
+     * This is a simple AJAX request and locale parameter is null.
+     * Particular "url" attribute value can be empty in some cases!
+     * Its declared placeholder requirement can be: {url<(.+)?>},
+     * but choice is made to check if "url" attribute is null (optional placeholder)
+     * instead of checking its value with this placeholder requirement: {url<(.+)>?}
      *
      * @Route("/load-trick-video/url/{url<(.+)>?}", name="load_trick_video_url_check", methods={"GET"})
      *

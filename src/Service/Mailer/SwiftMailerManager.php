@@ -69,7 +69,7 @@ class SwiftMailerManager
      */
     public function createEmailBody(string $className, array $data): string
     {
-        $template = $this->renderer->getTemplate($className);
+        $template = $this->renderer->getTemplate($className, true);
         return $this->renderer->renderTemplate($template, $data);
     }
 

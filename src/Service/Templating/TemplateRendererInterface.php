@@ -29,8 +29,9 @@ interface TemplateRendererInterface
      * between Responder (or other class) fully qualified class name (key) and template name (value).
      *
      * @param string $className a fully qualified class name
+     * @param bool   $isEmail   an indicator to precise if it is an email template to render
      *
      * @return string
      */
-    public  function getTemplate(string $className): string;
+    public function getTemplate(string $className, bool $isEmail = false): string;
 }

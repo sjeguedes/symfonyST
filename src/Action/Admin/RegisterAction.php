@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Action\Admin;
 
 use App\Domain\ServiceLayer\UserManager;
+use App\Responder\TemplateResponder;
 use App\Service\Form\Handler\FormHandlerInterface;
-use App\Responder\Admin\RegisterResponder;
 use App\Responder\Redirection\RedirectionResponder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -55,15 +55,15 @@ class RegisterAction
      *     "en": "/{_locale<en>}/register"
      * }, name="register", methods={"GET", "POST"})
      *
-     * @param RedirectionResponder  $redirectionResponder
-     * @param RegisterResponder     $responder
-     * @param Request               $request
+     * @param RedirectionResponder $redirectionResponder
+     * @param TemplateResponder    $responder
+     * @param Request              $request
      *
      * @return Response
      *
      * @throws \Exception
      */
-    public function __invoke(RedirectionResponder $redirectionResponder, RegisterResponder $responder, Request $request): Response
+    public function __invoke(RedirectionResponder $redirectionResponder, TemplateResponder $responder, Request $request): Response
     {
         // Set form without initial model data and set the request by binding it
         $registerForm = $this->formHandler->initForm()->bindRequest($request);
@@ -79,7 +79,7 @@ class RegisterAction
             'uniqueUserError' => $this->formHandler->getUniqueUserError() ?? null,
             'registerForm'    => $registerForm->createView()
         ];
-        return $responder($data);
+        return $responder($data,self::class);
     }
 
     /**

@@ -11,8 +11,8 @@ use App\Domain\ServiceLayer\MediaManager;
 use App\Domain\ServiceLayer\TrickManager;
 use App\Domain\ServiceLayer\UserManager;
 use App\Domain\ServiceLayer\VideoManager;
-use App\Responder\Admin\CreateTrickResponder;
 use App\Responder\Redirection\RedirectionResponder;
+use App\Responder\TemplateResponder;
 use App\Service\Form\Handler\FormHandlerInterface;
 use App\Utils\Traits\RouterHelperTrait;
 use App\Utils\Traits\UuidHelperTrait;
@@ -101,7 +101,7 @@ class CreateTrickAction
      * }, name="create_trick", methods={"GET", "POST"})
      *
      * @param RedirectionResponder $redirectionResponder
-     * @param CreateTrickResponder $responder
+     * @param TemplateResponder    $responder
      * @param Request              $request
      *
      * @return Response
@@ -109,7 +109,7 @@ class CreateTrickAction
      * @throws AccessDeniedException
      * @throws \Exception
      */
-    public function __invoke(RedirectionResponder $redirectionResponder, CreateTrickResponder $responder, Request $request): Response
+    public function __invoke(RedirectionResponder $redirectionResponder, TemplateResponder $responder, Request $request): Response
     {
         // Check access to creation form page
         $this->checkAccessToCreationAction();
@@ -142,7 +142,7 @@ class CreateTrickAction
                 UrlGeneratorInterface::ABSOLUTE_URL
             )
         ];
-        return $responder($data);
+        return $responder($data, self::class);
     }
 
     /**

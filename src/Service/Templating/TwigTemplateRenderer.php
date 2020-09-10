@@ -40,15 +40,15 @@ final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateB
         $this->templateRenderer = $twig;
         // Get template list data in particular .yaml file
         $yamlFilePath = $parameterBag->get('app_template_list_yaml_dir');
-        $array = Yaml::parseFile( $yamlFilePath . 'template_list.yaml');
-        $this->templates = $array['templates'];
+        $this->templates = Yaml::parseFile( $yamlFilePath . 'template_list.yaml');
     }
 
     /**
      * Render a Twig engine template.
      *
      * @param string $template
-     * @param array $data
+     * @param array  $data
+     * @param bool   $isEmail
      *
      * @return string
      *
@@ -56,7 +56,7 @@ final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateB
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
      */
-    public function renderTemplate(string $template, array $data): string
+    public function renderTemplate(string $template, array $data, bool $isEmail = false): string
     {
         return $this->templateRenderer->render($template, $data);
     }
@@ -64,25 +64,28 @@ final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateB
     /**
      * Retrieve the Twig template name to show.
      *
-     * @param string $className a fully qualified name based on action (for email templates) or responder class
+     * @param string $actionClassName a fully qualified name based on action class
+     * @param bool   $isEmail         an indicator to distinct email templates
      *
      * @return string
      *
      * @see https://stackoverflow.com/questions/22407370/how-to-check-if-class-exists-within-a-namespace
      * @see https://stackoverflow.com/questions/15839292/is-there-a-namespace-aware-alternative-to-phps-class-exists?noredirect=1&lq=1
      */
-    public function getTemplate(string $className): string
+    public function getTemplate(string $actionClassName, bool $isEmail = false): string
     {
-        if (!class_exists($className)) {
+        if (!class_exists($actionClassName)) {
             throw new \InvalidArgumentException('Template cannot be rendered: mandatory class does not exist!');
         }
         $data = '';
         $i = 0;
-        foreach ($this->templates as $template) {
+        // Check template type to find (email or page/block template)
+        $templates = !$isEmail ? $this->templates['page_templates'] : $this->templates['email_templates'];
+        foreach ($templates as $template) {
             ++$i;
             $hasBlock = !isset($template['block']) ? false : true;
-            $isMatched = $className !== $template['class'] ? false : true;
-            if ($i === \count($this->templates) && false === $isMatched) {
+            $isMatched = $actionClassName !== $template['class'] ? false : true;
+            if ($i === \count($templates) && false === $isMatched) {
                 throw new \RuntimeException('No template name was found: try to use another rendering method!');
             }
             if (true === $hasBlock || false === $isMatched) {
@@ -117,22 +120,23 @@ final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateB
      * For instance, use an array to enable matching
      * between Responder (or other class) fully qualified class name (key) and template block name (value).
      *
-     * @param string $className a fully qualified class name
+     * @param string $actionClassName a fully qualified class name base on action class
      *
      * @return array an associative array which contains template name and template block name
      */
-    public function getTemplateBlock(string $className): array
+    public function getTemplateBlock(string $actionClassName): array
     {
-        if (!class_exists($className)) {
+        if (!class_exists($actionClassName)) {
             throw new \InvalidArgumentException('Template block cannot be rendered: mandatory class does not exist!');
         }
         $data = [];
         $i = 0;
-        foreach ($this->templates as $template) {
+        $templates = $this->templates['page_templates'];
+        foreach ($templates as $template) {
             ++$i;
             $hasBlock = !isset($template['block']) ? false : true;
-            $isMatched = $className !== $template['class'] ? false : true;
-            if ($i === \count($this->templates) && false === $isMatched) {
+            $isMatched = $actionClassName !== $template['class'] ? false : true;
+            if ($i === \count($templates) && false === $isMatched) {
                 throw new \RuntimeException('No template block name was found: try to use another rendering method!');
             }
             if (false === $hasBlock || false === $isMatched) {
