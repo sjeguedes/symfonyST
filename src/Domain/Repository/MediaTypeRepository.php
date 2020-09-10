@@ -6,7 +6,7 @@ namespace App\Domain\Repository;
 
 use App\Domain\Entity\MediaType;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * Class MediaTypeRepository.
@@ -18,9 +18,9 @@ class MediaTypeRepository extends ServiceEntityRepository
     /**
      * MediaTypeRepository constructor.
      *
-     * @param RegistryInterface $registry
+     * @param ManagerRegistry $registry
      */
-    public function __construct(RegistryInterface $registry)
+    public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, MediaType::class);
     }
@@ -34,7 +34,7 @@ class MediaTypeRepository extends ServiceEntityRepository
      */
     public function findOneByType(string $type): ?MediaType
     {
-        $queryBuilder = $this->createQueryBuilder('mt' );
+        $queryBuilder = $this->createQueryBuilder('mt');
         $result = $queryBuilder
             ->select(['mt'])
             ->where('mt.type = ?1')

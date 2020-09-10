@@ -6,8 +6,8 @@ namespace App\Domain\Repository;
 
 use App\Domain\Entity\TrickGroup;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Ramsey\Uuid\UuidInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
  * Class TrickGroupRepository.
@@ -19,9 +19,9 @@ class TrickGroupRepository extends ServiceEntityRepository
     /**
      * TrickGroupRepository constructor.
      *
-     * @param RegistryInterface $registry
+     * @param ManagerRegistry $registry
      */
-    public function __construct(RegistryInterface $registry)
+    public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, TrickGroup::class);
     }
@@ -44,7 +44,7 @@ class TrickGroupRepository extends ServiceEntityRepository
      */
     public function findOneByUuid(UuidInterface $uuid): ?TrickGroup
     {
-        $queryBuilder = $this->createQueryBuilder('tg' );
+        $queryBuilder = $this->createQueryBuilder('tg');
         $result = $queryBuilder
             ->select('tg')
             ->where('tg.uuid = ?1')

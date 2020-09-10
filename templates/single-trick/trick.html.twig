@@ -10,16 +10,18 @@
 {% set mediaToExpandDimensions = '' %}
 {# Loop on trick medias using variables to get main image only ! #}
 {% set break = false %}
-{% for media in trick.mediaOwner.medias if not break %}
-    {# Media must be published to be shown. #}
-    {% if media.isPublished == 1 %}
-        {# Extract main image to show #}
-        {% if media.isMain == 1 and media.mediaType.type == mediaTypesValues['trickBig'] %}
-            {% set mainImageUuid = media.mediaSource.image.uuid %}
-            {% set mainImage = asset(globalTrickUploadDirectory~media.mediasource.image.name~'.'~media.mediasource.image.format) %}
-            {% set isMainAvailable = 1 %}
-            {% set mainImageDesc = media.mediasource.image.description %}
-            {% set break = true %}
+{% for media in trick.mediaOwner.medias %}
+    {% if break == false %}
+        {# Media must be published to be shown. #}
+        {% if media.isPublished == 1 %}
+            {# Extract main image to show #}
+            {% if media.isMain == 1 and media.mediaType.type == mediaTypesValues['trickBig'] %}
+                {% set mainImageUuid = media.mediaSource.image.uuid %}
+                {% set mainImage = asset(globalTrickUploadDirectory~media.mediasource.image.name~'.'~media.mediasource.image.format) %}
+                {% set isMainAvailable = 1 %}
+                {% set mainImageDesc = media.mediasource.image.description %}
+                {% set break = true %}
+            {% endif %}
         {% endif %}
     {% endif %}
 {% endfor %}
@@ -136,19 +138,19 @@
                     {% if media.mediaType.type == mediaTypesValues['trickThumbnail'] %}
                     {# ---------------------------------------------------------------------------- #}
                     {# Get big image uuid which corresponds! #}
-                    {% set break = false %}
                     {% set bigImageUuid = null %}
-                    {% for mediaToCompare in trick.mediaOwner.medias if not break %}
-                        {# Compare images names #}
-                        {% if mediaToCompare.mediaType.type == mediaTypesValues['trickBig'] %}
-                        {% set mediaIdentifierName = preg_replace('/\\d{2,}x\\d{2,}/', '', media.mediasource.image.name) %}
-                        {% set mediaToCompareIdentifierName = preg_replace('/\\d{2,}x\\d{2,}/', '', mediaToCompare.mediasource.image.name) %}
-
-                            {% if mediaIdentifierName == mediaToCompareIdentifierName %}
-
-                                {# Get big image uuid in order to use it to create image box update link anchor (hash) for update form  #}
-                                {% set bigImageUuid = mediaToCompare.mediaSource.image.uuid %}
-                                {% set break = true %}
+                    {% set break = false %}
+                    {% for mediaToCompare in trick.mediaOwner.medias %}
+                        {% if break == false %}
+                            {# Compare images names #}
+                            {% if mediaToCompare.mediaType.type == mediaTypesValues['trickBig'] %}
+                            {% set mediaIdentifierName = preg_replace('/\\d{2,}x\\d{2,}/', '', media.mediasource.image.name) %}
+                            {% set mediaToCompareIdentifierName = preg_replace('/\\d{2,}x\\d{2,}/', '', mediaToCompare.mediasource.image.name) %}
+                                {% if mediaIdentifierName == mediaToCompareIdentifierName %}
+                                    {# Get big image uuid in order to use it to create image box update link anchor (hash) for update form  #}
+                                    {% set bigImageUuid = mediaToCompare.mediaSource.image.uuid %}
+                                    {% set break = true %}
+                                {% endif %}
                             {% endif %}
                         {% endif %}
                     {% endfor %}

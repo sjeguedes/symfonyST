@@ -6,7 +6,7 @@ namespace App\Domain\Repository;
 
 use App\Domain\Entity\MediaSource;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * Class MediaSourceRepository.
@@ -18,9 +18,9 @@ class MediaSourceRepository extends ServiceEntityRepository
     /**
      * MediaSourceRepository constructor.
      *
-     * @param RegistryInterface $registry
+     * @param ManagerRegistry $registry
      */
-    public function __construct(RegistryInterface $registry)
+    public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, MediaSource::class);
     }

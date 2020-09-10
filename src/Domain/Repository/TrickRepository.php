@@ -15,8 +15,8 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NativeQuery;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Ramsey\Uuid\UuidInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -55,13 +55,13 @@ class TrickRepository extends ServiceEntityRepository
     /**
      * TrickRepository constructor.
      *
-     * @param RegistryInterface       $registry
+     * @param ManagerRegistry         $registry
      * @param ResultSetMappingBuilder $resultSetMapping
      * @param Security                $security
      * @param UserManager             $userService
      */
     public function __construct(
-        RegistryInterface $registry,
+        ManagerRegistry $registry,
         ResultSetMappingBuilder $resultSetMapping,
         Security $security,
         UserManager $userService

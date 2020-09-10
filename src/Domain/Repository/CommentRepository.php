@@ -8,8 +8,8 @@ use App\Domain\Entity\Comment;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\Persistence\ManagerRegistry;
 use Ramsey\Uuid\UuidInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
  * Class CommentRepository.
@@ -35,10 +35,10 @@ class CommentRepository extends ServiceEntityRepository
     /**
      * CommentRepository constructor.
      *
-     * @param RegistryInterface       $registry
+     * @param ManagerRegistry         $registry
      * @param ResultSetMappingBuilder $resultSetMapping
      */
-    public function __construct(RegistryInterface $registry, ResultSetMappingBuilder $resultSetMapping)
+    public function __construct(ManagerRegistry $registry, ResultSetMappingBuilder $resultSetMapping)
     {
         parent::__construct($registry, Comment::class);
         $this->resultSetMapping = $resultSetMapping;

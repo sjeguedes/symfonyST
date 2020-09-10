@@ -1,4 +1,7 @@
 {
+    "brick/math": {
+        "version": "0.9.1"
+    },
     "doctrine/annotations": {
         "version": "1.0",
         "recipe": {
@@ -92,9 +95,6 @@
     "ocramius/proxy-manager": {
         "version": "2.1.1"
     },
-    "paragonie/random_compat": {
-        "version": "v9.99.99"
-    },
     "php": {
         "version": "7.2"
     },
@@ -106,6 +106,9 @@
     },
     "psr/log": {
         "version": "1.0.2"
+    },
+    "ramsey/collection": {
+        "version": "1.1.0"
     },
     "ramsey/uuid": {
         "version": "3.8.0"
@@ -164,6 +167,9 @@
     "symfony/dotenv": {
         "version": "v4.1.2"
     },
+    "symfony/error-handler": {
+        "version": "v4.4.13"
+    },
     "symfony/event-dispatcher": {
         "version": "v4.1.2"
     },
@@ -208,9 +214,6 @@
     },
     "symfony/intl": {
         "version": "v4.2.4"
-    },
-    "symfony/lts": {
-        "version": "4-dev"
     },
     "symfony/maker-bundle": {
         "version": "1.0",
@@ -261,6 +264,9 @@
         "version": "v1.8.0"
     },
     "symfony/polyfill-php73": {
+        "version": "v1.18.1"
+    },
+    "symfony/polyfill-php80": {
         "version": "v1.18.1"
     },
     "symfony/profiler-pack": {

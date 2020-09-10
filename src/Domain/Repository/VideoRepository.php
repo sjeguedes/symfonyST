@@ -7,8 +7,8 @@ namespace App\Domain\Repository;
 use App\Domain\Entity\Video;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Connection;
+use Doctrine\Persistence\ManagerRegistry;
 use Ramsey\Uuid\Uuid;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
  * Class VideoRepository.
@@ -20,9 +20,9 @@ class VideoRepository extends ServiceEntityRepository
     /**
      * VideoRepository constructor.
      *
-     * @param RegistryInterface $registry
+     * @param ManagerRegistry $registry
      */
-    public function __construct(RegistryInterface $registry)
+    public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Video::class);
     }
