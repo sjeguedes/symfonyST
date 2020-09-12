@@ -1,5 +1,8 @@
 page_templates:
     -
+        class: 'App\Action\Admin\CreateCommentAction'
+        name: 'single-trick/trick.html.twig'
+    -
         class: 'App\Action\Admin\CreateTrickAction'
         name: 'admin/create_trick.html.twig'
     -
