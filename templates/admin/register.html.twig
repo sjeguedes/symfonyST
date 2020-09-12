@@ -307,3 +307,8 @@
         </div>
     </div>
 {% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset(globalAssetsDirectory~'/js/common.js') }}"></script>
+{% endblock %}

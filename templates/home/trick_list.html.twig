@@ -187,3 +187,8 @@
         </div>
     </div>
 {% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset(globalAssetsDirectory~'/js/home-trick-list.js') }}"></script>
+{% endblock %}

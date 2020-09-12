@@ -3,6 +3,7 @@ import UIkit from "../../uikit/dist/js/uikit.min";
 import request from './all/ajax-request';
 import URIHelper from './all/encode-decode-uri';
 import createNotification from "./all/create-notification";
+
 export default () => {
     // Resources:
     // RequestAnimationFrame: https://blog.teamtreehouse.com/efficient-animations-with-requestanimationframe
@@ -30,6 +31,39 @@ export default () => {
         const avatarUpdateFormElement = document.getElementById('st-ajax-avatar-update-form');
         const avatarUploadAjaxMode = avatarUpdateFormElement.getAttribute('data-ajax-mode');
         let cropParams = {};
+
+        // ------------------------------------------------------------------------------------------------------------
+
+        // Add fade in effect if avatar text info element is added to DOM
+        const checkAvatarTextInfoAdded = () => {
+            const callable = () => {
+                // Avatar action text info
+                const avatarActionTextInfo = document.getElementById('st-avatar-text-info');
+                avatarActionTextInfo.classList.remove('uk-hidden');
+                if (window.getComputedStyle(avatarActionTextInfo).getPropertyValue('opacity') === '0') {
+                    avatarActionTextInfo.classList.add('st-ati-fade-in');
+                    cancelAnimationFrame(fallback);
+                } else {
+                    requestAnimationFrame(callable);
+                }
+            };
+            const fallback = requestAnimationFrame(callable);
+        };
+
+        // ------------------------------------------------------------------------------------------------------------
+
+        // Check empty object (with no property or empty properties
+        const isEmptyObject = object => {
+            if (0 === Object.getOwnPropertyNames(object).length) {
+                return true;
+            }
+            for (let key in object) {
+                if (object.hasOwnProperty(key)) {
+                    return false;
+                }
+            }
+            return true;
+        };
 
         // ------------------------------------------------------------------------------------------------------------
 
@@ -294,35 +328,4 @@ export default () => {
             });
         }
     }
-
-    // ------------------------------------------------------------------------------------------------------------
-
-    // Add fade in effect if avatar text info element is added to DOM
-    const checkAvatarTextInfoAdded = () => {
-        const callable = () => {
-            // Avatar action text info
-            const avatarActionTextInfo = document.getElementById('st-avatar-text-info');
-            avatarActionTextInfo.classList.remove('uk-hidden');
-            if (window.getComputedStyle(avatarActionTextInfo).getPropertyValue('opacity') === '0') {
-                avatarActionTextInfo.classList.add('st-ati-fade-in');
-                cancelAnimationFrame(fallback);
-            } else {
-                requestAnimationFrame(callable);
-            }
-        };
-        const fallback = requestAnimationFrame(callable);
-    };
-
-    // Check empty object (with no property or empty properties
-    const isEmptyObject = object => {
-        if (0 === Object.getOwnPropertyNames(object).length) {
-            return true;
-        }
-        for (let key in object) {
-            if (object.hasOwnProperty(key)) {
-                return false;
-            }
-        }
-        return true;
-    };
 }

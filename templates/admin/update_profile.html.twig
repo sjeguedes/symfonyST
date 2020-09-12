@@ -1,5 +1,10 @@
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ asset(globalAssetsDirectory~'/css/update-profile.css') }}" rel="stylesheet" />
+{% endblock %}
+
 {% block title %}SnowTricks - {{ app.user.nickName }}'s Profile update form{% endblock %}
 
 {% block header %}
@@ -318,4 +323,9 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset(globalAssetsDirectory~'/js/update-profile.js') }}"></script>
 {% endblock %}

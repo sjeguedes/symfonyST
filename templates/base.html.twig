@@ -8,10 +8,12 @@
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
     <link rel="manifest" href="{{ asset('site.webmanifest') }}">
     <title>{% block title %}SnowTricks - Welcome!{% endblock %}</title>
+
     {% block stylesheets %}
         <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,700" rel="stylesheet" />
-        <link href="{{ asset(globalAssetsDirectory~'/css/app.css') }}" rel="stylesheet" />
+        <link href="{{ asset(globalAssetsDirectory~'/css/common.css') }}" rel="stylesheet" />
     {% endblock %}
+
 </head>
     <body id="st-site">
         {% block body %}
@@ -43,7 +45,7 @@
                 {# this check prevents starting a session when there are no flash messages. #}
                 {% if app.request.hasPreviousSession %}
                     {# Flash messages with notification component #}
-                    {% include 'partials/all/flash_message.html.twig' %}
+                    {% include 'partials/all/flash_message.html.twig' with { 'app': app } only %}
                 {% endif %}
                     {% block content %}{% endblock %}
                 </section>
@@ -74,9 +76,10 @@
                 </footer>
             </main>
         {% endblock %}
+
         {% block javascripts %}
+            <script src="{{ asset(globalAssetsDirectory~'/js/babel-polyfill.js') }}"></script>
             <script src="{{ asset(globalAssetsDirectory~'/js/uikit.js') }}"></script>
-            <script src="{{ asset(globalAssetsDirectory~'/js/app.js') }}"></script>
         {% endblock %}
     </body>
 </html>

@@ -329,3 +329,10 @@
         <!-- End trick comments -->
     </div>
 {% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset(globalAssetsDirectory~'/js/add-trick-deletion-with-scroll.js') }}"></script>
+    <script src="{{ asset(globalAssetsDirectory~'/js/single-trick.js') }}"></script>
+    <script src="{{ asset(globalAssetsDirectory~'/js/create-or-list-trick-comment.js') }}"></script>
+{% endblock %}

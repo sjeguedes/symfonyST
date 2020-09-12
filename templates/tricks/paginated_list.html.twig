@@ -172,3 +172,8 @@
         {% endif %}
     </div>
 {% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset(globalAssetsDirectory~'/js/paginated-trick-list.js') }}"></script>
+{% endblock %}

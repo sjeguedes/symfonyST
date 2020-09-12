@@ -34,7 +34,7 @@ export default () => {
             // Manage trick deletion
             let trickRemovalLink = card.querySelector('.st-delete-trick');
             if (trickRemovalLink) {
-                deleteTrick(card.querySelector('.st-delete-trick'), element);
+                deleteTrick(card.querySelector('.st-delete-trick'));
             }
         });
         // Prevent AJAX request from being called if all cards are already loaded.

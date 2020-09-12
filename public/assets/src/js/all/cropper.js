@@ -1,4 +1,3 @@
-//import canvasToBlob from './polyfill-canvas-to-blob';
 import createNotification from './create-notification';
 import Cropper from 'cropperjs/dist/cropper.min';
 import smoothScroll from "./smooth-vertical-scroll";
@@ -357,7 +356,10 @@ export default (cropParams) =>  {
         // Close modal immediately
         hideModalHandler(null);
         // Reset crop data elements (will be possible constraints violations) to avoid exception on server side
-        resetCropDataElements();
+        // Don't apply this to user avatar update
+        //if (cropParams.formElement.getAttribute('id') !== 'st-ajax-avatar-update-form') {
+            resetCropDataElements();
+        //}
         // Delay notification to make a better visual effect
         let ti = setTimeout(() => {
             // Inform user with notification: image will not be validated on server side and constraints violations will be shown!
@@ -377,45 +379,50 @@ export default (cropParams) =>  {
         // IMPORTANT: This stores file.name which is not accessible in this event listener handler
         // https://stackoverflow.com/questions/256754/how-to-pass-arguments-to-addeventlistener-listener-function
         let newFilename = cropParams.currentFilename;
-
         // Get crop box and canvas data
         newCropBoxData = cropParams.cropper.getCropBoxData();
         newCanvasData = cropParams.cropper.getCanvasData();
         // Should set crop box data first here
         cropParams.cropper.setCropBoxData(newCropBoxData);
         cropParams.cropper.setCanvasData(newCanvasData);
-
         // Get cropped data to feed hidden particular field to effectively crop image on server-side
         let cropData = cropParams.cropper.getData();
-        let roundedData = {};
-        for (let prop in cropData) {
-            if (Object.prototype.hasOwnProperty.call(cropData, prop)) {
-                let value = cropData[prop];
-                if (typeof value === 'number') {
-                    value = Math.round(value);
+        // Delay crop data management due to asynchronous event listener
+        let to = setTimeout(() => {
+            if (cropData.width !== 0 || cropData.height !== 0) {
+                let roundedData = {};
+                for (let prop in cropData) {
+                    if (Object.prototype.hasOwnProperty.call(cropData, prop)) {
+                        let value = cropData[prop];
+                        if (typeof value === 'number') {
+                            value = Math.round(value);
+                        }
+                        roundedData[prop] = value;
+                    }
                 }
-                roundedData[prop] = value;
+                // Save crop data on server-side to avoid tampered data
+                cropParams.setCropDataImagesArray(newFilename, roundedData);
+                cropParams.setCropJSONData(cropParams.getCropDataImagesArray());
+                // Use hidden input to store crop data for constraints validation
+                cropParams.hiddenInputElement.setAttribute('value', cropParams.getCropJSONData());
+                // Create a base 64 encoded image URi, with crop area (reduced to preview width and height), thanks to default autoCrop option set to true
+                Base64ImagePreviewDataURI = cropParams.cropper.getCroppedCanvas({width: params.previewWidth, height: params.previewHeight}).toDataURL(file.type);
+                if (cropParams.hiddenInputForImagePreviewDataURIElement) {
+                    // Store reduced image preview data URI  in corresponding hidden input
+                    cropParams.hiddenInputForImagePreviewDataURIElement.setAttribute('value', Base64ImagePreviewDataURI);
+                }
+                // Reset cropped reduced preview to avoid an issue: "load" event is not triggered later if the same image is used twice!
+                cropParams.showResultElement.src = '';
+                // Show cropped reduced image in form preview
+                cropParams.showResultElement.src = Base64ImagePreviewDataURI;
+                // Remove listener to be executed once a time.
+                event.target.removeEventListener(event.type, cropHandler);
+                // Close modal when image preview data URI is loaded!
+                cropParams.showResultElement.addEventListener('load', hideModalHandler);
+                // Clear time out
+                clearTimeout(to);
             }
-        }
-        // Save crop data on server-side to avoid tampered data
-        cropParams.setCropDataImagesArray(newFilename, roundedData);
-        cropParams.setCropJSONData(cropParams.getCropDataImagesArray());
-        // Use hidden input to store crop data for constraints validation
-        cropParams.hiddenInputElement.setAttribute('value', cropParams.getCropJSONData());
-        // Create a base 64 encoded image URi, with crop area (reduced to preview width and height), thanks to default autoCrop option set to true
-        Base64ImagePreviewDataURI = cropParams.cropper.getCroppedCanvas({width: params.previewWidth, height: params.previewHeight}).toDataURL(file.type);
-        if (cropParams.hiddenInputForImagePreviewDataURIElement) {
-            // Store reduced image preview data URI  in corresponding hidden input
-            cropParams.hiddenInputForImagePreviewDataURIElement.setAttribute('value', Base64ImagePreviewDataURI);
-        }
-        // Reset cropped reduced preview to avoid an issue: "load" event is not triggered later if the same image is used twice!
-        cropParams.showResultElement.src = '';
-        // Show cropped reduced image in form preview
-        cropParams.showResultElement.src = Base64ImagePreviewDataURI;
-        // Remove listener to be executed once a time.
-        event.target.removeEventListener(event.type, cropHandler);
-        // Close modal when image preview data URI is loaded!
-        cropParams.showResultElement.addEventListener('load', hideModalHandler);
+        }, 20);
     };
 
     // ------------------------------------------------------------------------------------------------------------
