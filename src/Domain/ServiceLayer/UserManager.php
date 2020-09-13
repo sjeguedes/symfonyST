@@ -31,7 +31,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *
  * Manage users to handle, and retrieve them as a "service layer".
  */
-class UserManager
+class UserManager extends AbstractServiceLayer
 {
     use LoggerAwareTrait;
     use UuidHelperTrait;
@@ -43,6 +43,11 @@ class UserManager
     public const PASSWORD_RENEWAL_TIME_LIMIT = 60 * 30; // 30 min expressed in seconds to use with timestamps
 
     /**
+     * Define default super admin user email to avoid issue or repetition.
+     */
+    public const DEFAULT_SUPER_ADMIN_USER_EMAIL = 'default1@test.com';
+
+    /**
      * @var CustomEventFactoryInterface
      */
     private $customEventFactory;
@@ -50,7 +55,7 @@ class UserManager
     /**
      * @var EntityManagerInterface
      */
-    private $entityManager;
+    protected $entityManager;
 
     /**
      * @var Request
@@ -394,6 +399,20 @@ class UserManager
     private function removeAvatarImage(User $user, ImageManager $imageService): void
     {
         $imageService->removeUserAvatar($user);
+    }
+
+    /**
+     * Remove a user (account) and all associated entities depending on cascade operations.
+     *
+     * @param User $user
+     * @param bool $isFlushed
+     *
+     * @return bool
+     */
+    public function removeUser(User $user, bool $isFlushed = true): bool
+    {
+        // Proceed to removal in database
+        return $this->removeAndSaveNoMoreEntity($user, $isFlushed);
     }
 
     /**

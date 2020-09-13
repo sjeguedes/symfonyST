@@ -10,7 +10,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
-use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -18,7 +17,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *
  * Define User entity schema in database, its initial state and behaviors.
  *
- * His avatar image reference is defined with Image - Media - MediaType entities.
+ * Please note user avatar image "reference" is defined with Image - Media - MediaType entities.
  *
  * @ORM\Entity(repositoryClass=UserRepository::class)
  * @ORM\Table(name="users")
@@ -54,9 +53,9 @@ class User implements UserInterface, \Serializable
      * Define a label for each type of user.
      */
     const ROLE_LABELS = [
-        'ROLE_USER'  => 'Member',
-        'ROLE_ADMIN' => 'Admin',
-        'ROLE_SUPER_ADMIN' => 'Super admin'
+        'ROLE_USER'        => 'Member',
+        'ROLE_ADMIN'       => 'Admin',
+        'ROLE_SUPER_ADMIN' => 'Admin'
     ];
 
     /**
@@ -155,14 +154,16 @@ class User implements UserInterface, \Serializable
     /**
      * @var Collection (inverse side of entity relation)
      *
-     * @ORM\OneToMany(targetEntity=Comment::class, orphanRemoval=true, mappedBy="user")
+     * @ORM\OneToMany(targetEntity=Comment::class, mappedBy="user", cascade={"remove"}, orphanRemoval=true)
      */
     private $comments;
 
     /**
      * @var Collection (inverse side of entity relation)
      *
-     * @ORM\OneToMany(targetEntity=Media::class, orphanRemoval=true, mappedBy="user")
+     * Please note "orphanRemoval" option is not set to avoid loss of medias collection when a user is deleted!
+     *
+     * @ORM\OneToMany(targetEntity=Media::class, mappedBy="user")
      */
     private $medias;
 
@@ -178,7 +179,9 @@ class User implements UserInterface, \Serializable
     /**
      * @var Collection (inverse side of entity relation)
      *
-     * @ORM\OneToMany(targetEntity=Trick::class, orphanRemoval=true, mappedBy="user")
+     * Please note "orphanRemoval" option is not set to avoid loss of tricks collection when a user is deleted!
+     *
+     * @ORM\OneToMany(targetEntity=Trick::class, mappedBy="user")
      */
     private $tricks;
 
@@ -326,7 +329,6 @@ class User implements UserInterface, \Serializable
         }
         return true;
     }
-
 
     /**
      * Change family name after creation.

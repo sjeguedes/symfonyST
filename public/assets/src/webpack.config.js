@@ -19,6 +19,7 @@ let config = {
         "common": ["./src/js/app-common.js"],
         "uikit": ["./src/js/app-uikit-dev.js"],
         "add-trick-deletion-with-scroll": ["./src/js/app-add-trick-deletion-with-scroll.js"],
+        "add-user-deletion-with-scroll": ["./src/js/app-add-user-deletion-with-scroll.js"],
         "create-or-list-trick-comment": ["./src/js/app-create-or-list-trick-comment.js"],
         "create-or-update-trick": ["./src/js/app-create-or-update-trick.js"],
         "home-trick-list": ["./src/js/app-home.js"],

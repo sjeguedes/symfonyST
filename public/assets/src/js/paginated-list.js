@@ -20,7 +20,7 @@ export default () => {
             // Manage trick deletion
             let trickRemovalLink = card.querySelector('.st-delete-trick');
             if (trickRemovalLink) {
-                deleteTrick(card.querySelector('.st-delete-trick'));
+                deleteTrick(card.querySelector('.st-delete-trick'), element);
             }
         });
     }

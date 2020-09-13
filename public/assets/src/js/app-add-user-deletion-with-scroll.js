@@ -1,12 +1,12 @@
 // *************** Custom scripts ***************
 
-// Custom trick deletion with smooth scroll scripts
-import addTrickDeletionWithScroll from './trick/add-trick-deletion-with-scroll';
+// Custom user (account) deletion with smooth scroll scripts
+import addUserDeletionWithScroll from './user/add-user-deletion-with-scroll';
 
 // Init necessary scripts when DOM is ready (avoid issue with unloaded script in browser)
 const setUp = () => {
     // Page partial
-    addTrickDeletionWithScroll();
+    addUserDeletionWithScroll();
 };
 
 // Add our event listeners

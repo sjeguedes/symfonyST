@@ -4,7 +4,7 @@ import smoothScroll from './smooth-vertical-scroll';
 import UIkit from '../../../uikit/dist/js/uikit.min';
 import URIHelper from './encode-decode-uri';
 export default (
-    mediaRemovalLink,
+    entityRemovalLink,
     entityType,
     referenceElementToScroll = null,
     adjustYPosition = 0,
@@ -21,8 +21,8 @@ export default (
     // Removal button
     const deletionButton = document.getElementById(`st-confirm-delete-${entityType}-button`);
     const buttonSpinner = deletionButton.querySelector(`.st-delete-${entityType}-spinner`);
-    deletionButton.setAttribute('data-action', mediaRemovalLink.getAttribute('data-action'));
-    deletionButton.removalLink = mediaRemovalLink;
+    deletionButton.setAttribute('data-action', entityRemovalLink.getAttribute('data-action'));
+    deletionButton.removalLink = entityRemovalLink;
 
     // ------------------------------------------------------------------------------------------------------------
 

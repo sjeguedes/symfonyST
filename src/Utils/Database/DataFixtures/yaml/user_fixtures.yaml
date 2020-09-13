@@ -35,3 +35,15 @@ users:
             salt: null
         references:
             #media_owner: 18
+    -
+        #4 default admin profile to replace deleted user account
+        fields:
+            family_name: "MODERATOR"
+            first_name: "Website"
+            user_name: "Weby"
+            email: "default1@test.com"
+            password: "$2y$12$tNPkQks.JlgMW1LI5r2yjOeonwOfWEwsnCqTKEe4vvScp47PJg1AO"
+            roles: ['ROLE_SUPER_ADMIN', 'ROLE_ADMIN', 'ROLE_USER']
+            salt: null
+        references:
+            #media_owner: 19

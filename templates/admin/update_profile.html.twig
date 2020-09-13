@@ -282,10 +282,20 @@
             <div class="uk-flex uk-flex-center uk-margin-medium-top">
                 <div class="uk-text-center uk-text-uppercase uk-text-bold st-color-red">
                     Your available actions<br>
+                    {# Delete user account #}
+                    <a id="st-delete-user" data-action="{{ path('delete_user', { 'mainRoleLabel': app.user.mainRoleLabel|lower, 'encodedUuid': app.user.uuid|uuid_encode, 'csrfToken': csrf_token('delete_user') }) }}"
+                       class="uk-display-inline-block uk-button uk-button-secondary uk-border-rounded uk-box-shadow-hover-medium uk-margin-medium-top st-svg-icon-delete st-delete-user"
+                       href="#st-modal-delete-user" title="Delete your account" uk-toggle>
+                        Delete your account&nbsp;<span uk-icon="icon: trash; ratio: 1"></span>
+                    </a><br>
+                    {# ------------------------------------------------------------------------- #}
+                    {# Get trick removal ajax action in modal #}
+                    {% include 'admin/partials/removal/delete_user.html.twig' with {'user': app.user } only %}
+                    <hr>
                     <!-- Create trick -->
-                    <a id="st-create-trick" class="uk-display-inline-block uk-button uk-button-secondary uk-border-rounded uk-box-shadow-hover-medium uk-margin-medium-top"
+                    <a id="st-create-trick" class="uk-display-inline-block uk-button uk-button-secondary uk-border-rounded uk-box-shadow-hover-medium"
                        href="{{ path('create_trick', { 'mainRoleLabel': app.user.mainRoleLabel|lower }) }}" title="Create a trick">
-                        Create a trick&nbsp;&nbsp;<span uk-icon="plus-circle; ratio: 1"></span>
+                        Create a trick <span uk-icon="plus-circle; ratio: 1"></span>
                     </a><br>
                     {% if userCreatedTricks|length > 0 %}
                     <hr>
@@ -327,5 +337,6 @@
 
 {% block javascripts %}
     {{ parent() }}
+    <script src="{{ asset(globalAssetsDirectory~'/js/add-user-deletion-with-scroll.js') }}"></script>
     <script src="{{ asset(globalAssetsDirectory~'/js/update-profile.js') }}"></script>
 {% endblock %}
