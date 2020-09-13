@@ -18,6 +18,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -178,6 +179,8 @@ class UserManager extends AbstractServiceLayer
      *
      * @return void
      *
+     * @see https://symfony.com/blog/new-in-symfony-4-3-simpler-event-dispatching#supporting-both-dispatchers
+     *
      * @throws \Exception
      */
     public function createAndDispatchUserEvent(string $eventContext, User $user): void
@@ -189,6 +192,8 @@ class UserManager extends AbstractServiceLayer
         $eventName = $this->customEventFactory->getEventNameByContext($eventContext);
         /** @var EventDispatcherInterface $eventDispatcher */
         $eventDispatcher = $this->customEventFactory->getEventDispatcher();
+        // CAUTION! Use LegacyEventDispatcherProxy for forward and backward compatibility since Sf 4.3!
+        $eventDispatcher = LegacyEventDispatcherProxy::decorate($eventDispatcher);
         $eventDispatcher->dispatch($event, $eventName);
     }
 
