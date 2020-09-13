@@ -159,7 +159,7 @@ class CommentManager extends AbstractServiceLayer
      *
      * @param UuidInterface $trickUuid
      * @param string        $order       a sort order to use with comment creation date
-     * @param bool          $hasUuidOnly retrieve comments uuid data only
+     * @param bool          $hasUuidOnly retrieve comments uuid and parent comment uuid only
      *
      * @return array
      */

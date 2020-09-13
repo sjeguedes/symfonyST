@@ -287,18 +287,19 @@
             {% endif %}
         </div>
         <!-- Trick comments -->
-        {% if trick.comments|length != 0 %}
+        {% if commentsTotalCount != 0 %}
         {# Comments messages list #}
         <div class="uk-container uk-padding uk-padding-remove-bottom">
             {# Comments #}
             {% include 'single-trick/partials/comment_list.html.twig' with {
                 'commentAjaxLoadingPath': commentAjaxLoadingPath,
-                'commentCount': commentCount,
                 'commentLoadingMode': commentLoadingMode,
                 'commentNumberPerLoading': commentNumberPerLoading,
-                'selectedTrickComments': selectedTrickComments,
+                'commentsTotalCount': commentsTotalCount,
+                'firstLevelCommentsTotalCount': firstLevelCommentsTotalCount,
                 'listEnded': listEnded,
                 'mediaTypesValues': mediaTypesValues,
+                'selectedTrickComments': selectedTrickComments,
                 'technicalError': technicalError,
                 'trick': trick
             } only %}
@@ -309,11 +310,12 @@
             {# ------------------------------------------------------------------------- #}
             {% endif %}
             <!-- Load more -->
-            {% if commentNumberPerLoading < commentCount %}
+            {# Logic is based on first level comments total count! #}
+            {% if commentNumberPerLoading < firstLevelCommentsTotalCount %}
             <div class="uk-flex uk-flex-center uk-margin-medium-top">
                 <button id="st-single-load-more" class="uk-button uk-button-secondary uk-border-rounded uk-box-shadow-hover-medium">
                     <span class="st-single-spinner st-color-yellow uk-hidden" uk-spinner="ratio: 0.8"></span>
-                    Load more&nbsp;&nbsp;<span uk-icon="plus-circle"></span>
+                    Load more <span uk-icon="plus-circle"></span>
                 </button>
             </div>
             {% endif %}

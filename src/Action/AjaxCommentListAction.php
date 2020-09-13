@@ -106,12 +106,14 @@ class AjaxCommentListAction extends AbstractCommentListAction
             );
         }
         $data = [
-            'ajaxMode'              => true,
-            // Get total trick comment count
-            'commentCount'          => $selectedTrickCommentsData['commentsTotalCount'],
+            'ajaxMode'                     => true,
+            // Get all trick comments total count
+            'commentsTotalCount'           => $selectedTrickCommentsData['commentsTotalCount'],
+            // Get only first level trick comments total count
+            'firstLevelCommentsTotalCount' => $selectedTrickCommentsData['firstLevelCommentsTotalCount'],
             // Get list error by checking outdated comment count to reinitialize list
-            'listError'             => $listError,
-            'selectedTrickComments' => $selectedTrickCommentsData['commentListWithRanks']
+            'listError'                    => $listError,
+            'selectedTrickComments'        => $selectedTrickCommentsData['commentListWithRanks']
         ];
         // Get complementary needed comment list and medias (avatar) data
         $data = array_merge($this->getCommentListData(), $this->getMediasData(), $data);

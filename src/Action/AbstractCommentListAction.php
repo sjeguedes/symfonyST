@@ -106,17 +106,27 @@ abstract class AbstractCommentListAction
             true
         );
         // Get uuid data with a second simple query to use it for comparison
-        $trickCommentsUuidData = $this->commentService->findOnesByTrick($trickUuid, $commentLoadingMode, true);
+        $trickCommentData = $this->commentService->findOnesByTrick($trickUuid, $commentLoadingMode, true);
+        // Get all comments total count
+        $commentTotalCount = \count($trickCommentData);
+        // Get first level comments total count to use with AJAX loading
+        $firstLevelCommentsTotalCount = 0;
+        for ($i = 0; $i < $commentTotalCount; $i++) {
+            if (\is_null($trickCommentData[$i]['parent_uuid'])) {
+                $firstLevelCommentsTotalCount++;
+            }
+        }
         // Add comment ranks to filtered comments
         $selectedTrickComments = $this->commentService->addRanksToTrickComments(
-            $trickCommentsUuidData,
+            $trickCommentData,
             $selectedTrickComments,
             $commentLoadingMode
         );
         // Return needed data
         return [
-            'commentsTotalCount'   => \count($trickCommentsUuidData),
-            'commentListWithRanks' => $selectedTrickComments
+            'commentsTotalCount'           => $commentTotalCount,
+            'commentListWithRanks'         => $selectedTrickComments,
+            'firstLevelCommentsTotalCount' => $firstLevelCommentsTotalCount
         ];
     }
 }
