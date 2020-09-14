@@ -1,3 +1,5 @@
+[![Maintainability](https://api.codeclimate.com/v1/badges/827a5e2ff0a280908699/maintainability)](https://codeclimate.com/github/sjeguedes/symfonyST/maintainability)
+
 # symfonyST
 
 ## Website project with Symfony 4 and Uikit frameworks
@@ -25,16 +27,18 @@ $ MAILER_SENDER_EMAIL=your_mailing_sender_email_address
 # Sender email address:
 $ MAILER_SENDER_NAME=${WEBSITE_NAME} - Your mailing sender name
 ```
-*This is important for local installation only:*  
-*Please note to host provided logo in `public/assets/images/mailing/` which is used to be shown with absolute URL in automatic sent emails!*
+###### *This is important for local installation only:*  
+###### *Please note to host provided logo in `public/assets/images/mailing/` which is used to be shown with absolute URL in automatic sent emails!*
 
 ##### 3. Adapt Doctrine "dbal" section configuration (driver and server_version) to your system requirements in `doctrine.yaml` file
 
 ##### 4. Encode plain passwords manually with command line interface (CLI) using defined Symfony password encoder to customise default users application hashed passwords. Then use these data to replace existing values in `src/Utils/Database/DataFixtures/yaml/user_fixtures.yaml` to insert them in database thanks to data fixtures. 
 
 ```
-$ php bin/console security:encode-password
+$ php bin/console security:encode-password Your_secured_password@1
 ```
+
+###### *Please note your password must contain between 8 and 20 characters (digits and letters), with at least 1 digit, 1 uppercase letter, 1 lowercase letter and 1 special one.*
 
 ##### 5. Install dependencies defined in composer.json:
 
@@ -54,7 +58,7 @@ $ php bin/console doctrine:migrations:migrate
 ```
 $ php bin/console doctrine:fixtures:load
 ```
-*Please note a starting set of images files which corresponds to data fixtures is already present in project!*
+###### *Please note a starting set of images files which corresponds to data fixtures is already present in project!*
 
-##### 8. Compile assets (SASS and JS files), if you really need to, thanks to Webpack and npm configuration and files sources located in `public/assets/src`. Please note you will probably to update used packages.
+##### 8. Compile assets (SASS and JS files), if you really need to, thanks to Webpack and npm configuration and files sources located in `public/assets/src`. You will probably have to update defined packages.
 
