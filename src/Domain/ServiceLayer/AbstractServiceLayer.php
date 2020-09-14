@@ -34,8 +34,7 @@ abstract class AbstractServiceLayer
     public function __construct(
         EntityManagerInterface $entityManager,
         LoggerInterface $logger
-    )
-    {
+    ) {
         $this->entityManager = $entityManager;
         $this->setLogger($logger);
     }

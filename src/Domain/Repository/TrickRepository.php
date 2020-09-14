@@ -65,8 +65,7 @@ class TrickRepository extends ServiceEntityRepository
         ResultSetMappingBuilder $resultSetMapping,
         Security $security,
         UserManager $userService
-    )
-    {
+    ) {
         parent::__construct($registry, Trick::class);
         // ResultSetMappingBuilder extends ResultSetMapping.
         $this->resultSetMapping = $resultSetMapping;

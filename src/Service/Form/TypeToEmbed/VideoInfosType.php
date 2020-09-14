@@ -60,8 +60,7 @@ class VideoInfosType extends AbstractTrickCollectionEntryType
         ValidatorInterface $validator,
         VideoManager $videoService,
         VideoURLProxyChecker $videoURLProxyChecker
-    )
-    {
+    ) {
         $this->dataMapper = $dataMapper;
         $this->validator = $validator;
         $this->videoService = $videoService;

@@ -80,8 +80,7 @@ class UpdateTrickType extends AbstractTrickType
         VideoManager $videoService,
         RequestStack $requestStack,
         TrickGroupManager $trickGroupService
-    )
-    {
+    ) {
         parent::__construct($mediaTypeService, $imageService, $videoService);
         $this->formSubscriber = $formSubscriber;
         $this->request = $requestStack->getCurrentRequest();

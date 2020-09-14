@@ -49,8 +49,7 @@ class VideoManager extends AbstractServiceLayer
         VideoRepository $repository,
         MediaManager $mediaManager,
         LoggerInterface $logger
-    )
-    {
+    ) {
         parent::__construct($entityManager, $logger);
         $this->entityManager = $entityManager;
         $this->repository = $repository;

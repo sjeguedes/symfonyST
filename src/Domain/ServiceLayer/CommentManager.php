@@ -55,8 +55,7 @@ class CommentManager extends AbstractServiceLayer
         CommentRepository $repository,
         LoggerInterface $logger,
         SessionInterface $session
-    )
-    {
+    ) {
         parent::__construct($entityManager, $logger);
         $this->entityManager = $entityManager;
         $this->repository = $repository;

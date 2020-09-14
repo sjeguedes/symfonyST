@@ -66,8 +66,7 @@ class CreateTrickType extends AbstractTrickType
         VideoManager $videoService,
         RequestStack $requestStack,
         TrickGroupManager $trickGroupService
-    )
-    {
+    ) {
         parent::__construct($mediaTypeService, $imageService, $videoService);
         $this->request = $requestStack->getCurrentRequest();
         $this->trickGroupService = $trickGroupService;

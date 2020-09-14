@@ -91,8 +91,7 @@ class DeleteUnusedImageCommand extends Command
         ImageManager $imageService,
         MediaManager $mediaService,
         LoggerInterface $logger
-    )
-    {
+    ) {
         // Define properties to use in class here
         $this->entityManager = $entityManager;
         $this->imageService = $imageService;
