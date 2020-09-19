@@ -23,7 +23,7 @@ framework:
         # https://symfony.com/blog/new-in-symfony-4-2-auto-secure-cookies
         # https://www.freecodecamp.org/news/session-hijacking-and-how-to-stop-it-711e3683d1ac/
         # https://www.mon-code.net/article/103/Securiser-les-cookies-de-son-application-web
-        cookie_secure: true # 'auto' seems not to work correctly with 4.2!
+        cookie_secure: 'auto' # 'auto' seems not to work correctly with 4.2!
 
     #esi: true
     #fragments: true

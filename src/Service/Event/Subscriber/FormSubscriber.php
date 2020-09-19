@@ -366,8 +366,8 @@ class FormSubscriber implements EventSubscriberInterface
         // Catch exception thrown by updated forms and throw a new custom exception
         // To avoid response management with "onKernelResponse" callback!
         $actionClassName = $event->getRequest()->attributes->get('_controller');
-        if (preg_match('/Update/', $actionClassName)) {
-            $exception = $event->getException();
+        if (!\is_null($actionClassName) && preg_match('/Update/', $actionClassName)) {
+            $exception = $event->getThrowable();
             throw new \Exception(
                 sprintf(
                     "A technical issue happened during update form handling! %s",
