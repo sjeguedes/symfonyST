@@ -1,8 +1,7 @@
 {
-  "name": "public-dev",
+  "name": "st-assets",
   "version": "1.0.0",
   "description": "manage assets for symfonyST",
-  "main": "./src/js/app-dev.js",
   "dependencies": {
     "b": "^2.0.1",
     "babel-polyfill": "^6.26.0",
