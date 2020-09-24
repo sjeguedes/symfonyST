@@ -146,6 +146,12 @@ class LoginFormAuthenticationManager extends AbstractFormLoginAuthenticator
         if (!\is_null($targetPath)) {
             // Check URI
             switch (true) {
+                // Check if user main role is not the same as it is in referer parameter to avoid issue!
+                case preg_match('/(member|admin)/', $targetPath, $matches):
+                    if (strtolower($token->getUser()->getMainRoleLabel()) !== $matches[1]) {
+                        return new RedirectResponse($this->router->generate('home'));
+                    }
+                    return new RedirectResponse($targetPath);
                 // Exclude AJAX request called as referer to avoid issue!
                 case preg_match('/delete-comment/', $targetPath):
                 case preg_match('/delete-media/', $targetPath):
