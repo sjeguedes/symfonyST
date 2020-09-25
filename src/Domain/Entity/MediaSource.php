@@ -89,7 +89,7 @@ class MediaSource
         // Check parent class to make also fixture proxy work!
         \assert(
             \array_key_exists(
-                !\get_parent_class($source) ? \get_class($source): \get_parent_class($source),
+                !\get_parent_class($source) ? \get_class($source) : \get_parent_class($source),
                 self::SOURCE_TYPES
             ),
             'MediaSource source type is not allowed!'

@@ -269,7 +269,7 @@ class ImageToCropType extends AbstractTrickCollectionEntryType
         switch ($rootFormType) {
             // Get corresponding MediaOwner entity
             case $rootFormType instanceof UpdateTrickType:
-                $mediaOwner = !\is_null($entity) ? $entity->getMediaOwner(): null;
+                $mediaOwner = !\is_null($entity) ? $entity->getMediaOwner() : null;
                 break;
             // Define no media owner by default
             default:

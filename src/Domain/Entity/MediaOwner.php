@@ -93,7 +93,7 @@ class MediaOwner
         // Check parent class to make also fixture proxy work!
         \assert(
             \array_key_exists(
-                !\get_parent_class($owner) ? \get_class($owner): \get_parent_class($owner),
+                !\get_parent_class($owner) ? \get_class($owner) : \get_parent_class($owner),
                 self::OWNER_TYPES
             ),
             'MediaOwner owner type is not allowed!'

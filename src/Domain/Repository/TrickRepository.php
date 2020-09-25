@@ -225,8 +225,8 @@ class TrickRepository extends ServiceEntityRepository
             ->setParameter('endRank', $end);
         // Set current user uuid parameter if he is authenticated!
         /** @var UuidInterface $userUuid */
-        $userUuid = !\is_null($this->currentUser) ? $this->currentUser->getUuid(): null;
-        $userUuidBinary =  !\is_null($userUuid) ? $userUuid->getBytes(): null;
+        $userUuid = !\is_null($this->currentUser) ? $this->currentUser->getUuid() : null;
+        $userUuidBinary =  !\is_null($userUuid) ? $userUuid->getBytes() : null;
         $customQuery->setParameter('userUuid', $userUuidBinary);
         // Get query result;
         $result = $customQuery->getResult();

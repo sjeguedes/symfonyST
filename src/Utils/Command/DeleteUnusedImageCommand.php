@@ -481,7 +481,7 @@ class DeleteUnusedImageCommand extends Command
     private function getUploadDirectoryKey(string $imageTypeKey): ?string
     {
         $categoryPrefix = $imageTypeKey;
-        $uploadDirectoryKey = self::REMOVE_ALL_KEY !== $imageTypeKey ? $this->imageService->getImageDirectoryConstantValue($categoryPrefix): null;
+        $uploadDirectoryKey = self::REMOVE_ALL_KEY !== $imageTypeKey ? $this->imageService->getImageDirectoryConstantValue($categoryPrefix) : null;
         return $uploadDirectoryKey;
     }
 

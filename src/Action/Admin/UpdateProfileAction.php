@@ -204,7 +204,7 @@ class UpdateProfileAction
                 // Constraints and custom validation: call actions to perform if necessary on success
                 $isFormRequestValid =$this->formHandlers[1]->processFormRequest($actionData);
                 // Redirect to the right page if form request is a success
-                $response = $isFormRequestValid ? $redirectionResponder('home'): null;
+                $response = $isFormRequestValid ? $redirectionResponder('home') : null;
                 break;
             default:
                 $response = null;

@@ -115,7 +115,7 @@ class CreateCommentType extends AbstractType
                 return new CreateCommentDTO(
                     // "null" by default if no previous comment was posted (Select field is not available!)
                     $form->offsetExists('parentComment')
-                        ? $form->get('parentComment')->getData(): null,
+                        ? $form->get('parentComment')->getData() : null,
                     $form->get('content')->getData()
                 );
             },

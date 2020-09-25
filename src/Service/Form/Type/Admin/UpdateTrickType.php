@@ -200,7 +200,7 @@ class UpdateTrickType extends AbstractTrickType
                     $form->get('videos')->getData(),
                     // "false" by default for members which are not administrator (Select field is not available!)
                     $form->offsetExists('isPublished')
-                        ? $form->get('isPublished')->getData(): false
+                        ? $form->get('isPublished')->getData() : false
                 );
             },
             'required'        => false,
