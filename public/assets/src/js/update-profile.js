@@ -218,46 +218,39 @@ export default () => {
                         xhr.upload.onloadend = () => {
                             // Transition to opacity equals to 0
                             progressContainer.classList.remove('st-aup-fade-in');
-                            // Hide update text info
-                            avatarActionTextInfo.classList.add('uk-hidden');
                         }
                     }
                 };
                 // Use promise with callbacks
                 request(obj).then((response) => {
-                    // Manage response when upload progress tracking disappeared
-                    progressContainer.addEventListener('transitionend', () => {
-                        // Hide upload progress container
-                        progressContainer.classList.add('uk-hidden');
-                        // No need to parse with JSON.parse(response): response is already an object
-                        for (let prop in response) {
-                            if (Object.prototype.hasOwnProperty.call(response, prop)) {
-                                switch (prop.toString()) {
-                                    case 'formError':
-                                        // Close all possible previous notifications
-                                        UIkit.notification.closeAll();
-                                        // Add info to check file type, size and dimensions
-                                        let additionalMessage = fileInputElement.getAttribute('data-error-6');
-                                        // Error notification
-                                        createNotification(
-                                            response.formError.notification + `\n` + additionalMessage,
-                                            null,
-                                            true,
-                                            'error',
-                                            'warning',
-                                            5000
-                                        );
-                                        break;
-                                    case 'redirectionURL':
-                                        // Perform a redirection as expected
-                                        window.location.replace(response.redirectionURL);
-                                        break;
-                                    default:
-                                        window.location.href = formAction;
-                                }
+                    // No need to parse with JSON.parse(response): response is already an object
+                    for (let prop in response) {
+                        if (Object.prototype.hasOwnProperty.call(response, prop)) {
+                            switch (prop.toString()) {
+                                case 'formError':
+                                    // Close all possible previous notifications
+                                    UIkit.notification.closeAll();
+                                    // Add info to check file type, size and dimensions
+                                    let additionalMessage = fileInputElement.getAttribute('data-error-6');
+                                    // Error notification
+                                    createNotification(
+                                        response.formError.notification + `\n` + additionalMessage,
+                                        null,
+                                        true,
+                                        'error',
+                                        'warning',
+                                        5000
+                                    );
+                                    break;
+                                case 'redirectionURL':
+                                    // Perform a redirection as expected
+                                    window.location = response.redirectionURL;
+                                    break;
+                                default:
+                                    window.location = formAction;
                             }
                         }
-                    });
+                    }
                 })
                 // It is important to chain to prevent ajax request from being called twice!
                 .catch(xhr => {

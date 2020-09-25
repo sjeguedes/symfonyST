@@ -118,7 +118,7 @@ export default (
                         }
                         // Cancel timeout
                         clearTimeout(ti);
-                    }, response.redirection !== undefined ? 0 : 1500);
+                    }, response.redirection !== undefined ? 0 : 1000);
                     // Hide modal programmatically
                     UIkit.modal(entityRemovalModalElement).hide();
                 })
