@@ -1,12 +1,12 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/827a5e2ff0a280908699/maintainability)](https://codeclimate.com/github/sjeguedes/symfonyST/maintainability)
-
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/29eb61ca510e4bcea85bdad552406ed1)](https://www.codacy.com/manual/sje.guedes/symfonyST/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=sjeguedes/symfonyST&amp;utm_campaign=Badge_Grade)
 # symfonyST
 
 ## Website project with Symfony 4 and Uikit frameworks
 > https://symfony.com/doc/current/index.html  
 > https://getuikit.com/docs/introduction
 
-### Local installation
+### Local installation (can be used on deployment with ssh access with some adaptations for environment variables)
 
 ##### 1. Clone project repository  master branch on GitHub with:
 ```
@@ -50,6 +50,13 @@ $ composer install
 
 ```
 $ php bin/console doctrine:database:create
+```
+###### *Please note this command must be used on first installation only!*
+```
+$ php bin/console doctrine:schema:update --force
+```
+###### *Prefer use migrations instead of updating schema!*
+```
 $ php bin/console doctrine:migrations:migrate
 ```
 
