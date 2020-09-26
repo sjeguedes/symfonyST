@@ -9,13 +9,13 @@ use App\Domain\ServiceLayer\ImageManager;
 use App\Domain\ServiceLayer\MediaManager;
 use App\Domain\ServiceLayer\TrickManager;
 use App\Domain\ServiceLayer\UserManager;
+use App\Responder\Json\JsonResponder;
 use App\Responder\Redirection\RedirectionResponder;
 use App\Responder\TemplateResponder;
 use App\Service\Form\Handler\FormHandlerInterface;
 use App\Service\Form\Type\Admin\UpdateProfileAvatarType;
 use App\Utils\Traits\RouterHelperTrait;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -98,6 +98,7 @@ class UpdateProfileAction
      * }, name="update_profile", methods={"GET", "POST"})
      *
      * @param RedirectionResponder $redirectionResponder
+     * @param JsonResponder        $jsonResponder,
      * @param TemplateResponder    $responder
      * @param Request              $request
      *
@@ -105,8 +106,12 @@ class UpdateProfileAction
      *
      * @throws \Exception
      */
-    public function __invoke(RedirectionResponder $redirectionResponder, TemplateResponder $responder, Request $request): ?Response
-    {
+    public function __invoke(
+        RedirectionResponder $redirectionResponder,
+        JsonResponder $jsonResponder,
+        TemplateResponder $responder,
+        Request $request
+    ): ?Response {
         // Get user from Symfony security context: access is controlled by ACL.
         /** @var UserInterface|User $authenticatedUser */
         $authenticatedUser = $this->userService->getAuthenticatedMember();
@@ -119,9 +124,12 @@ class UpdateProfileAction
             // Return the appropriate response by handling the forms
             $redirectionResponse = $this->manageRedirectionResponseWithFormsHandling(
                 $redirectionResponder,
+                $jsonResponder,
                 $request,
-                $updateProfileAvatarForm,
-                $updateProfileInfosForm,
+                [
+                    'updateProfileAvatarForm' => $updateProfileAvatarForm,
+                    'updateProfileInfosForm'  => $updateProfileInfosForm
+                ],
                 $authenticatedUser
             );
             if (!\is_null($redirectionResponse)) {
@@ -144,27 +152,33 @@ class UpdateProfileAction
      * Get a response relative to avatar upload ajax request de/activation.
      *
      * @param bool                 $isFormRequestValid
+     * @param JsonResponder        $jsonResponder
      * @param RedirectionResponder $redirectionResponder
      * @param Request              $request
      *
      * @return Response|null
      */
-    private function getAvatarUploadResponse(bool $isFormRequestValid, RedirectionResponder $redirectionResponder, Request $request): ?Response
-    {
+    private function getAvatarUploadResponse(
+        bool $isFormRequestValid,
+        JsonResponder $jsonResponder,
+        RedirectionResponder $redirectionResponder,
+        Request $request
+    ): ?Response {
+        // Get profile update form defined route and user main role param
         $routeName = 'update_profile';
         $routeParameters = ['mainRoleLabel' => $request->attributes->get('mainRoleLabel')];
         if ($request->isXmlHttpRequest()) {
             // Return a JSON response to perform a JS redirection in case of success
             if ($isFormRequestValid) {
                 $redirectionURL = $this->generateURLFromRoute($routeName, $routeParameters);
-                $response = new JsonResponse(['redirectionURL' => $redirectionURL]);
+                $response = $jsonResponder(['redirectionURL' => $redirectionURL]);
             // Return a JSON response to show an invalid form or a custom check error notification
             } else {
                 $avatarUploadError = $this->formHandlers[0]->getUserAvatarError();
-                $response = new JsonResponse($avatarUploadError);
+                $response = $jsonResponder($avatarUploadError);
             }
         } else {
-            $response = $isFormRequestValid ? $redirectionResponder($routeName, $routeParameters): null;
+            $response = $isFormRequestValid ? $redirectionResponder($routeName, $routeParameters) : null;
         }
         return $response;
     }
@@ -172,35 +186,35 @@ class UpdateProfileAction
     /**
      * Manage and handle the two forms to get the corresponding response.
      *
-     * @param RedirectionResponder $redirectionResponder
-     * @param Request              $request
-     * @param FormInterface        $updateProfileAvatarForm
-     * @param FormInterface        $updateProfileInfosForm
-     * @param UserInterface        $identifiedUser
+     * @param RedirectionResponder  $redirectionResponder
+     * @param JsonResponder         $jsonResponder
+     * @param Request               $request
+     * @param array|FormInterface[] $forms
+     * @param UserInterface         $identifiedUser
      *
      * @return Response|null
      */
     private function manageRedirectionResponseWithFormsHandling(
         RedirectionResponder $redirectionResponder,
+        JsonResponder $jsonResponder,
         Request $request,
-        FormInterface $updateProfileAvatarForm,
-        FormInterface $updateProfileInfosForm,
+        array $forms,
         UserInterface $identifiedUser
     ): ?Response {
         $actionData = ['userService' => $this->userService, 'userToUpdate' => $identifiedUser];
         // Manage the forms
         switch ($submittedRequest = $request->request) {
             // Update profile avatar image
-            case $submittedRequest->has($updateProfileAvatarForm->getName()): // 'update_profile_avatar'
+            case $submittedRequest->has($forms['updateProfileAvatarForm']->getName()): // 'update_profile_avatar'
                 $actionData['imageService'] = $this->imageService;
                 $actionData['mediaService'] = $this->mediaService;
                 // Constraints and custom validation: call actions to perform if necessary on success
                 $isFormRequestValid = $this->formHandlers[0]->processFormRequest($actionData);
                 // Adapt the response depending on ajax mode de/activation
-                $response = $this->getAvatarUploadResponse($isFormRequestValid, $redirectionResponder, $request);
+                $response = $this->getAvatarUploadResponse($isFormRequestValid, $jsonResponder, $redirectionResponder, $request);
                 break;
             // Update other profile infos
-            case $submittedRequest->has($updateProfileInfosForm->getName()): // 'update_profile_infos'
+            case $submittedRequest->has($forms['updateProfileInfosForm']->getName()): // 'update_profile_infos'
                 // Constraints and custom validation: call actions to perform if necessary on success
                 $isFormRequestValid =$this->formHandlers[1]->processFormRequest($actionData);
                 // Redirect to the right page if form request is a success

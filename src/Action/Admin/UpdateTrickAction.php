@@ -206,7 +206,7 @@ class UpdateTrickAction
                 'slug' => $trick->getSlug(),
                 'encodedUuid' => $this->encode($trick->getUuid())
             ];
-        // Success (redirect to new trick page)
+        // Success (redirect to updated trick page)
         } else {
             $routeName = 'show_single_trick';
             $routeParameters = ['slug' => $updatedTrick->getSlug(), 'encodedUuid' => $this->encode($updatedTrick->getUuid())];
