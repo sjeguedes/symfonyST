@@ -41,12 +41,12 @@ class UserManager extends AbstractServiceLayer
      * Define time limit to renew a password
      * when requesting renewal permission by email (forgotten password).
      */
-    public const PASSWORD_RENEWAL_TIME_LIMIT = 60 * 30; // 30 min expressed in seconds to use with timestamps
+    const PASSWORD_RENEWAL_TIME_LIMIT = 60 * 30; // 30 min expressed in seconds to use with timestamps
 
     /**
      * Define default super admin user email to avoid issue or repetition.
      */
-    public const DEFAULT_SUPER_ADMIN_USER_EMAIL = 'default1@test.com';
+    const DEFAULT_SUPER_ADMIN_USER_EMAIL = 'default1@test.com';
 
     /**
      * @var CustomEventFactoryInterface
@@ -108,6 +108,7 @@ class UserManager extends AbstractServiceLayer
         RequestStack $requestStack,
         Security $security
     ) {
+        parent::__construct($entityManager, $logger);
         $this->customEventFactory = $customEventFactory;
         $this->entityManager = $entityManager;
         $this->repository = $repository;
@@ -150,17 +151,17 @@ class UserManager extends AbstractServiceLayer
     /**
      * Try to activate user account.
      *
-     * @param string $userEncodedId a user uuid encoded for url
+     * @param string $userEncodedUuid a user uuid encoded for url
      *
      * @return bool
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function activateAccount(string $userEncodedId): bool
+    public function activateAccount(string $userEncodedUuid): bool
     {
-        $userToValidate = $this->findSingleByEncodedUuid($userEncodedId);
+        $userToValidate = $this->findSingleByEncodedUuid($userEncodedUuid);
         // User is unknown or his account is already activated.
-        if (\is_null( $userToValidate) || $userToValidate->getIsActivated()) {
+        if (\is_null($userToValidate) || $userToValidate->getIsActivated()) {
             return false;
         }
         // Update account status
@@ -358,6 +359,7 @@ class UserManager extends AbstractServiceLayer
         }
         $now = new \DateTime('now');
         $interval = $now->getTimestamp() - $renewalRequestDate->getTimestamp();
+        // Ternary operator is not necessary but more explicit!
         return $interval > self::PASSWORD_RENEWAL_TIME_LIMIT ? true : false;
     }
 

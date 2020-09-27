@@ -18,7 +18,7 @@ class FormUnchangedEvent extends Event implements CustomEventInterface
     /**
      * Define a event name.
      */
-    public const NAME = 'form.unchanged';
+    const NAME = 'form.unchanged';
 
     /**
      * @var string

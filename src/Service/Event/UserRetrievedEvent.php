@@ -19,7 +19,7 @@ class UserRetrievedEvent extends Event implements CustomEventInterface
     /**
      * Define a event name.
      */
-    public const NAME = 'user.retrieved';
+    const NAME = 'user.retrieved';
 
     /**
      * @var string

@@ -77,8 +77,8 @@ class TrickManager extends AbstractServiceLayer
         RouterInterface $router,
         SessionInterface $session
     ) {
-        $this->customEventFactory = $customEventFactory;
         parent::__construct($entityManager, $logger);
+        $this->customEventFactory = $customEventFactory;
         $this->entityManager = $entityManager;
         $this->repository = $repository;
         $this->setLogger($logger);
