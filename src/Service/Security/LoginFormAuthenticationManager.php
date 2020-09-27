@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Security;
 
@@ -74,7 +74,7 @@ class LoginFormAuthenticationManager extends AbstractFormLoginAuthenticator
     /**
      * {@inheritdoc}
      */
-    public function supports(Request $request) : bool
+    public function supports(Request $request): bool
     {
         return 'connect' === $request->attributes->get('_route')
             && $request->isMethod('POST');
@@ -83,7 +83,7 @@ class LoginFormAuthenticationManager extends AbstractFormLoginAuthenticator
     /**
      * {@inheritdoc}
      */
-    public function getCredentials(Request $request) : array
+    public function getCredentials(Request $request): array
     {
         $credentials = [
             'username'   => $request->request->get('login')['userName'],
@@ -99,7 +99,7 @@ class LoginFormAuthenticationManager extends AbstractFormLoginAuthenticator
      * @throws \Doctrine\ORM\NonUniqueResultException
      * @throws CustomUserMessageAuthenticationException
      */
-    public function getUser($credentials, UserProviderInterface $userProvider) : UserInterface
+    public function getUser($credentials, UserProviderInterface $userProvider): UserInterface
     {
         $token = new CsrfToken('login_token', $credentials['csrf_token']);
         // CSRF token is not valid.
@@ -110,7 +110,7 @@ class LoginFormAuthenticationManager extends AbstractFormLoginAuthenticator
         // Authentication failed. User value is null.
         if (!$user) {
             throw new CustomUserMessageAuthenticationException(
-                'Please check your credentials!' . "\n" . 'User can not be found.'
+                'Please check your credentials!' . "\n" . 'User cannot be found.'
             );
         }
         return $user;
@@ -121,7 +121,7 @@ class LoginFormAuthenticationManager extends AbstractFormLoginAuthenticator
      *
      * @throws CustomUserMessageAuthenticationException
      */
-    public function checkCredentials($credentials, UserInterface $user) : bool
+    public function checkCredentials($credentials, UserInterface $user): bool
     {
         $isPasswordMatching = $this->passwordEncoder->isPasswordValid($user, $credentials['password']);
         // Authentication failed. Password value does not match user.
@@ -135,15 +135,38 @@ class LoginFormAuthenticationManager extends AbstractFormLoginAuthenticator
 
     /**
      * {@inheritdoc}
+     *
+     * For information to define this config in security.yaml instead of these success and failure callbacks methods:
+     * @see https://symfony.com/doc/current/security/form_login.html#changing-the-default-page
      */
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey) : RedirectResponse
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey): RedirectResponse
     {
         $targetPath = $this->getTargetPath($request->getSession(), $providerKey);
         // Target path is defined in configuration.
         if (!\is_null($targetPath)) {
-            return new RedirectResponse($targetPath);
+            // Check URI
+            switch (true) {
+                // Check if user main role is not the same as it is in referer parameter to avoid issue!
+                case preg_match('/(member|admin)/', $targetPath, $matches):
+                    if (strtolower($token->getUser()->getMainRoleLabel()) !== $matches[1]) {
+                        return new RedirectResponse($this->router->generate('home'));
+                    }
+                    return new RedirectResponse($targetPath);
+                // Exclude AJAX request called as referer to avoid issue!
+                case preg_match('/delete-comment/', $targetPath):
+                case preg_match('/delete-media/', $targetPath):
+                case preg_match('/delete-trick/', $targetPath):
+                case preg_match('/load-tricks/', $targetPath):
+                case preg_match('/load-trick-comments/', $targetPath):
+                case preg_match('/load-trick-video/', $targetPath):
+                    // By default, redirect to referer if it is not an AJAX request.
+                    return new RedirectResponse($this->router->generate('home'));
+                default:
+                    // Otherwise, redirect to homepage by default
+                    return new RedirectResponse($targetPath);
+            }
         }
-        // Otherwise, redirect by default to homepage.
+        // Redirect to homepage if no target path (referer) exists!
         return new RedirectResponse($this->router->generate('home'));
     }
 
@@ -155,7 +178,7 @@ class LoginFormAuthenticationManager extends AbstractFormLoginAuthenticator
      *
      * @return void
      */
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception) : void
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): void
     {
         if ($request->hasSession()) {
             $request->getSession()->set(Security::AUTHENTICATION_ERROR, $exception);
@@ -167,7 +190,7 @@ class LoginFormAuthenticationManager extends AbstractFormLoginAuthenticator
      *
      * Method is not used when authentication failed.
      */
-    protected function getLoginUrl() : string
+    protected function getLoginUrl(): string
     {
         return $this->router->generate('connect');
     }
@@ -175,7 +198,7 @@ class LoginFormAuthenticationManager extends AbstractFormLoginAuthenticator
     /**
      * {@inheritdoc}
      */
-    public function supportsRememberMe() : bool
+    public function supportsRememberMe(): bool
     {
         return true;
     }

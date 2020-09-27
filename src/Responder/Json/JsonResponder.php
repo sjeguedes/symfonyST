@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Responder\Json;
 
@@ -23,7 +23,7 @@ final class JsonResponder
      *
      * @return JsonResponse
      */
-    public function __invoke(array $data = null, int $status = 200, array $headers = [], bool $json = false) : JsonResponse
+    public function __invoke(array $data = null, int $status = 200, array $headers = [], bool $json = false): JsonResponse
     {
         // Encode data with JSON string with serializer
         return new JsonResponse($data, $status, $headers, $json);

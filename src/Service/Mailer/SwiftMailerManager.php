@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Mailer;
 
@@ -67,9 +67,9 @@ class SwiftMailerManager
      *
      * @throws \Exception
      */
-    public function createEmailBody(string $className, array $data) : string
+    public function createEmailBody(string $className, array $data): string
     {
-        $template = $this->renderer->getTemplate($className);
+        $template = $this->renderer->getTemplate($className, true);
         return $this->renderer->renderTemplate($template, $data);
     }
 
@@ -78,7 +78,7 @@ class SwiftMailerManager
      *
      * @return \Swift_Plugins_Loggers_ArrayLogger
      */
-    public function getLoggerPlugin() : \Swift_Plugins_Loggers_ArrayLogger
+    public function getLoggerPlugin(): \Swift_Plugins_Loggers_ArrayLogger
     {
         return $this->mailerLogger;
     }
@@ -93,16 +93,16 @@ class SwiftMailerManager
      *
      * @return bool
      */
-    public function sendEmail(array $from, array $to, string $subject, string $body) : bool
+    public function sendEmail(array $from, array $to, string $subject, string $body): bool
     {
-        $mail = (new \Swift_Message($subject))
+        $email = (new \Swift_Message($subject))
             ->setFrom($from)
             ->setTo($to)
             ->setSubject($subject)
             ->setBody($body)
             ->setReplyTo($from)
             ->setContentType('text/html');
-        if (!$this->mailer->send($mail)) {
+        if (!$this->mailer->send($email)) {
             return false;
         }
         return true;
@@ -118,7 +118,7 @@ class SwiftMailerManager
      * @throws \ReflectionException
      * @throws \Exception
      */
-    public function notify(EmailConfigInterface $emailConfig) : bool
+    public function notify(EmailConfigInterface $emailConfig): bool
     {
         $sender = $emailConfig->getSender();
         $receiver =  $emailConfig->getReceiver();
@@ -127,14 +127,11 @@ class SwiftMailerManager
         // Technical error when trying to send
         if (!$isEmailSent = $this->sendEmail($sender, $receiver, $emailConfig->getSubject(), $emailHtmlBody)) {
             $this->logger->error(
-                sprintf('[trace app snowTricks] action: %s/__invoke and subject: %s  => email not sent to %s: %s',
+                sprintf('[trace app SnowTricks] action: %s/__invoke and subject: %s  => email not sent to %s: %s',
                     $actionClassShortName, $emailConfig->getSubject(), $emailConfig->getReceiver(), $this->getLoggerPlugin()->dump()
                 )
             );
         }
         return $isEmailSent;
     }
-
-
-
 }

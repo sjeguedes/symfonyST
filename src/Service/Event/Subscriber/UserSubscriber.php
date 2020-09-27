@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Event\Subscriber;
 
@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
@@ -77,7 +77,7 @@ class UserSubscriber implements EventSubscriberInterface
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents() : array
+    public static function getSubscribedEvents(): array
     {
         return [
             FormUnchangedEvent::NAME          => 'onFormUnchanged',
@@ -96,7 +96,7 @@ class UserSubscriber implements EventSubscriberInterface
      *
      * @return void
      */
-    public function onFormUnchanged(FormUnchangedEvent $event) : void
+    public function onFormUnchanged(FormUnchangedEvent $event): void
     {
         // Check if action corresponds to user update profile page
         if ($isUpdateProfileAction = UpdateProfileAction::class === $this->request->attributes->get('_controller')) {
@@ -121,13 +121,13 @@ class UserSubscriber implements EventSubscriberInterface
      * Remove all outdated users session custom vars which are defined
      * to check password renewal first access page.
      *
-     * @param GetResponseEvent $event
+     * @param RequestEvent $event
      *
      * @return void
      *
      * @throws \Exception
      */
-    public function onKernelRequest(GetResponseEvent $event) : void
+    public function onKernelRequest(RequestEvent $event): void
     {
         // Clean unneeded password renewal page first access users session vars
         if ($event->getRequest()->getSession()->has(self::PASSWORD_RENEWAL_FIRST_ACCESS)) {
@@ -142,7 +142,7 @@ class UserSubscriber implements EventSubscriberInterface
      *
      * @return void
      */
-    public function onSecurityInteractiveLogin(InteractiveLoginEvent $event) : void
+    public function onSecurityInteractiveLogin(InteractiveLoginEvent $event): void
     {
         $user = $event->getAuthenticationToken()->getUser();
         $userNickName = $user->getNickName();
@@ -164,7 +164,7 @@ class UserSubscriber implements EventSubscriberInterface
      *
      * @return void
      */
-    public function onUserRetrieved(UserRetrievedEvent $event) : void
+    public function onUserRetrieved(UserRetrievedEvent $event): void
     {
         // Create a user password renewal page first access session var
         $isPasswordRenewalAction = RenewPasswordAction::class === $this->request->attributes->get('_controller');
@@ -185,7 +185,7 @@ class UserSubscriber implements EventSubscriberInterface
      * https://symfony.com/doc/current/components/http_foundation/sessions.html#namespaced-attributes
      * https://symfony.com/doc/current/session.html
      */
-    private function addPasswordRenewalFirstAccessMessage(User $identifiedUser) : void
+    private function addPasswordRenewalFirstAccessMessage(User $identifiedUser): void
     {
         // Set first access message
         $customSessionKey = self::PASSWORD_RENEWAL_FIRST_ACCESS;
@@ -228,19 +228,21 @@ class UserSubscriber implements EventSubscriberInterface
      * https://symfony.com/doc/current/components/http_foundation/sessions.html#namespaced-attributes
      * https://symfony.com/doc/current/session.html
      */
-    private function cleanPasswordRenewalFirstAccess() : void
+    private function cleanPasswordRenewalFirstAccess(): void
     {
         $customSessionKey = self::PASSWORD_RENEWAL_FIRST_ACCESS;
         // Handle session attributes bag
         $customSessionVar = $this->session->get($customSessionKey);
         // Remove all outdated users custom vars
         $filteredArray = array_filter($customSessionVar, function ($value) {
-            // Password renewal updated date is outdated or null, so user can not access password renewal page anymore.
+            // Password renewal updated date is outdated or null, so user cannot access password renewal page anymore.
             $renewalRequestDate = $value;
             // Then there is no need to keep user session custom var.
             return false === $this->userService->isPasswordRenewalRequestOutdated($renewalRequestDate);
         });
-        // if filtered custom session var is an empty array then remove it, otherwise update custom session var after user entry was filtered and removed.
-        0 == \count($filteredArray) ? $this->session->remove($customSessionKey) : $this->session->set($customSessionKey, $filteredArray);
+        // if filtered custom session var is an empty array then remove it,
+        // otherwise update custom session var after user entry was filtered and removed.
+        0 == \count($filteredArray) ? $this->session->remove($customSessionKey)
+                                    : $this->session->set($customSessionKey, $filteredArray);
     }
 }

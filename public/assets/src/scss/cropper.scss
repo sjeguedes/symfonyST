@@ -1,0 +1,22 @@
+// Styles for cropper js
+@import '../../node_modules/cropperjs/dist/cropper.css';
+
+/************************** Cropper styles override **************************/
+// Cropper image preview
+.st-cropper-preview {
+    width: 100%;
+}
+// Cropper js override
+.cropper-modal {
+    //background-color: rgba(51, 51, 51, 0.5);
+    opacity: 0;
+}
+.cropper-face {
+    background-color: rgba(30, 135, 240, 0.5);
+}
+.cropper-face, .cropper-line, .cropper-point {
+    opacity: 1;
+}
+.cropper-line {
+    background-color: rgba(236, 221, 19, 1);
+}

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Action\Admin;
 
@@ -12,7 +12,7 @@ use App\Domain\ServiceLayer\MediaTypeManager;
 use App\Domain\ServiceLayer\TrickManager;
 use App\Domain\ServiceLayer\UserManager;
 use App\Responder\Redirection\RedirectionResponder;
-use App\Responder\SingleTrickResponder;
+use App\Responder\TemplateResponder;
 use App\Service\Form\Handler\FormHandlerInterface;
 use App\Utils\Traits\RouterHelperTrait;
 use App\Utils\Traits\UuidHelperTrait;
@@ -94,7 +94,7 @@ class CreateCommentAction extends AbstractCommentListAction
      * }, name="create_trick_comment", methods={"POST"})
      *
      * @param RedirectionResponder $redirectionResponder
-     * @param SingleTrickResponder $responder
+     * @param TemplateResponder    $responder
      * @param Request              $request
      *
      * @return Response
@@ -102,7 +102,7 @@ class CreateCommentAction extends AbstractCommentListAction
      * @throws AccessDeniedException
      * @throws \Exception
      */
-    public function __invoke(RedirectionResponder $redirectionResponder, SingleTrickResponder $responder, Request $request) : Response
+    public function __invoke(RedirectionResponder $redirectionResponder, TemplateResponder $responder, Request $request): Response
     {
         // Check access to creation form
         $currentTrick = $this->checkAccessToCreationAction($request);
@@ -152,7 +152,7 @@ class CreateCommentAction extends AbstractCommentListAction
         ];
         // Get complementary needed comment list and medias data
         $data = array_merge($this->getCommentListData(), $this->getMediasData(), $data);
-        return $responder($data);
+        return $responder($data, self::class);
     }
 
     /**
@@ -166,7 +166,7 @@ class CreateCommentAction extends AbstractCommentListAction
      * @throws \Doctrine\ORM\NonUniqueResultException
      * @throws NotFoundHttpException
      */
-    private function checkAccessToCreationAction(Request $request) : Trick
+    private function checkAccessToCreationAction(Request $request): Trick
     {
         // Check if a trick can be retrieved thanks to its uuid
         $trick = $this->trickService->findSingleToUpdateInFormByEncodedUuid($request->attributes->get('encodedUuid'));
@@ -176,7 +176,7 @@ class CreateCommentAction extends AbstractCommentListAction
         // Check access permissions to trick comment creation form
         $security = $this->userService->getSecurity();
         if (!$security->isGranted('ROLE_USER')) {
-            throw new AccessDeniedException("Current user can not create a trick comment!");
+            throw new AccessDeniedException("Current user cannot create a trick comment!");
         }
         return $trick;
     }
@@ -188,7 +188,7 @@ class CreateCommentAction extends AbstractCommentListAction
      *
      * @return array
      */
-    private function manageCommentCreationResultRouting(Request $request) : array
+    private function manageCommentCreationResultRouting(Request $request): array
     {
         // A new trick comment is created or null is returned if an issue occurred!
         // In both failure or success cases, the same redirection is made!

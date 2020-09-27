@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\DTO;
 
@@ -64,7 +64,7 @@ final class UpdateProfileInfosDTO extends AbstractReadableDTO
     /**
      * @return string|null
      */
-    public function getFamilyName() : ?string
+    public function getFamilyName(): ?string
     {
         return $this->familyName;
     }
@@ -72,7 +72,7 @@ final class UpdateProfileInfosDTO extends AbstractReadableDTO
     /**
      * @return string|null
      */
-    public function getFirstName() : ?string
+    public function getFirstName(): ?string
     {
         return $this->firstName;
     }
@@ -80,7 +80,7 @@ final class UpdateProfileInfosDTO extends AbstractReadableDTO
     /**
      * @return string|null
      */
-    public function getUserName() : ?string
+    public function getUserName(): ?string
     {
         return $this->userName;
     }
@@ -88,7 +88,7 @@ final class UpdateProfileInfosDTO extends AbstractReadableDTO
     /**
      * @return string|null
      */
-    public function getEmail() : ?string
+    public function getEmail(): ?string
     {
         return $this->email;
     }
@@ -96,7 +96,7 @@ final class UpdateProfileInfosDTO extends AbstractReadableDTO
     /**
      * @return string|null
      */
-    public function getPasswords() : ?string
+    public function getPasswords(): ?string
     {
         return $this->passwords;
     }
@@ -106,7 +106,7 @@ final class UpdateProfileInfosDTO extends AbstractReadableDTO
      *
      * @return UpdateProfileInfosDTO
      */
-    public function setFamilyName(?string $familyName) : self
+    public function setFamilyName(?string $familyName): self
     {
         $this->familyName = $familyName;
         return $this;
@@ -117,7 +117,7 @@ final class UpdateProfileInfosDTO extends AbstractReadableDTO
      *
      * @return UpdateProfileInfosDTO
      */
-    public function setFirstName(?string $firstName) : self
+    public function setFirstName(?string $firstName): self
     {
         $this->firstName = $firstName;
         return $this;
@@ -128,7 +128,7 @@ final class UpdateProfileInfosDTO extends AbstractReadableDTO
      *
      * @return UpdateProfileInfosDTO
      */
-    public function setUserName(?string $nickName) : self
+    public function setUserName(?string $nickName): self
     {
         $this->userName = $nickName;
         return $this;
@@ -139,7 +139,7 @@ final class UpdateProfileInfosDTO extends AbstractReadableDTO
      *
      * @return UpdateProfileInfosDTO
      */
-    public function setEmail(?string $email) : self
+    public function setEmail(?string $email): self
     {
         $this->email = $email;
         return $this;
@@ -150,7 +150,7 @@ final class UpdateProfileInfosDTO extends AbstractReadableDTO
      *
      * @return UpdateProfileInfosDTO
      */
-    public function setPasswords(?string $passwords) : self
+    public function setPasswords(?string $passwords): self
     {
         $this->passwords = $passwords;
         return $this;

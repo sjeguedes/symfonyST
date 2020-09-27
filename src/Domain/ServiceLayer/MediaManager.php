@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\ServiceLayer;
 
@@ -95,7 +95,7 @@ class MediaManager extends AbstractServiceLayer
      *
      * @return array
      */
-    private function getMediaParametersByCheckingDataModelMethods(object $mediaDataModel) : array
+    private function getMediaParametersByCheckingDataModelMethods(object $mediaDataModel): array
     {
         // Create media with necessary associated instances and parameters
         $isMain = !method_exists($mediaDataModel, 'getIsMain') ? false : $mediaDataModel->getIsMain();
@@ -130,8 +130,7 @@ class MediaManager extends AbstractServiceLayer
         string $mediaTypeKey,
         bool $isPersisted = false,
         bool $isFlushed = false
-    ) : ?Media
-    {
+    ): ?Media {
         // Get Authenticated user
         /** @var User|UserInterface $authenticatedUser */
         $authenticatedUser = $this->security->getUser();
@@ -192,8 +191,7 @@ class MediaManager extends AbstractServiceLayer
         string $mediaTypeKey,
         bool $isPersisted = false,
         bool $isFlushed = false
-    ) : ?Media
-    {
+    ): ?Media {
         // Select a media type
         $mediaTypeReference = MediaType::TYPE_CHOICES[$mediaTypeKey];
         $mediaType = $this->mediaTypeManager->findSingleByUniqueType($mediaTypeReference);
@@ -246,7 +244,7 @@ class MediaManager extends AbstractServiceLayer
      *
      * @return EntityManagerInterface
      */
-    public function getEntityManager() : EntityManagerInterface
+    public function getEntityManager(): EntityManagerInterface
     {
         return $this->entityManager;
     }
@@ -256,7 +254,7 @@ class MediaManager extends AbstractServiceLayer
      *
      * @return MediaOwnerManager
      */
-    public function getMediaOwnerManager() : MediaOwnerManager
+    public function getMediaOwnerManager(): MediaOwnerManager
     {
         return $this->mediaOwnerManager;
     }
@@ -266,7 +264,7 @@ class MediaManager extends AbstractServiceLayer
      *
      * @return MediaSourceManager
      */
-    public function getMediaSourceManager() : MediaSourceManager
+    public function getMediaSourceManager(): MediaSourceManager
     {
         return $this->mediaSourceManager;
     }
@@ -276,7 +274,7 @@ class MediaManager extends AbstractServiceLayer
      *
      * @return MediaRepository
      */
-    public function getRepository() : MediaRepository
+    public function getRepository(): MediaRepository
     {
         return $this->repository;
     }
@@ -289,7 +287,7 @@ class MediaManager extends AbstractServiceLayer
      *
      * @return bool
      */
-    public function removeMedia(Media $media, bool $isFlushed = true) : bool
+    public function removeMedia(Media $media, bool $isFlushed = true): bool
     {
         // Proceed to removal in database
         return $this->removeAndSaveNoMoreEntity($media, $isFlushed);

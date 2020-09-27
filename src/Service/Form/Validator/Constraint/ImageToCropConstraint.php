@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Form\Validator\Constraint;
 
@@ -21,7 +21,7 @@ class ImageToCropConstraint extends Constraint
      *
      * @return string
      */
-    public function getTargets() : string
+    public function getTargets(): string
     {
         return self::CLASS_CONSTRAINT;
     }
@@ -31,7 +31,7 @@ class ImageToCropConstraint extends Constraint
      *
      * @return string
      */
-    public function validatedBy() : string
+    public function validatedBy(): string
     {
         return ImageToCropConstraintValidator::class;
     }

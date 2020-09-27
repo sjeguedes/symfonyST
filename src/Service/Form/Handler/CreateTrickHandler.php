@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Form\Handler;
 
@@ -85,7 +85,7 @@ final class CreateTrickHandler extends AbstractTrickFormHandler
      *
      * @see AbstractFormHandler::processFormRequest()
      */
-    protected function addCustomValidation(array $actionData) : bool
+    protected function addCustomValidation(array $actionData): bool
     {
         $csrfToken = $this->request->request->get('create_trick')['token'];
         // CSRF token is not valid.
@@ -138,7 +138,7 @@ final class CreateTrickHandler extends AbstractTrickFormHandler
      *
      * @see AbstractFormHandler::processFormRequest()
      */
-    protected function addCustomAction(array $actionData) : void
+    protected function addCustomAction(array $actionData): void
     {
         // Check Managers instances in passed data
         $this->checkNecessaryData($actionData);
@@ -174,8 +174,7 @@ final class CreateTrickHandler extends AbstractTrickFormHandler
         DTOCollection $imagesDTOCollection,
         DTOCollection $videosDTOCollection,
         array $actionData
-    ) : void
-    {
+    ): void {
         /** @var ImageManager $imageService */
         $imageService = $actionData['imageService'];
         // Loop on existing form images collection to create images and add corresponding medias to new trick
@@ -223,8 +222,7 @@ final class CreateTrickHandler extends AbstractTrickFormHandler
         Trick $newTrick,
         array $actionData,
         bool $isExceptionThrown = true
-    ) : bool
-    {
+    ): bool {
         // Control expected collection instance type
         $this->checkCollectionInstanceType($collectionItemDataModel);
         /** @var TrickManager $trickService */
@@ -244,7 +242,7 @@ final class CreateTrickHandler extends AbstractTrickFormHandler
             if (!$isMediaRemoved = $mediaService->removeMedia($media, false)) {
                 $this->logger->critical(
                     sprintf(
-                        "[trace app snowTricks] CreateTrickHandler/cancelTrickCreationProcess => error: " .
+                        "[trace app SnowTricks] CreateTrickHandler/cancelTrickCreationProcess => error: " .
                         "images removal was not performed correctly!"
                     )
                 );
@@ -276,7 +274,7 @@ final class CreateTrickHandler extends AbstractTrickFormHandler
      *
      * @return Trick|null
      */
-    public function getNewTrick() : ?Trick
+    public function getNewTrick(): ?Trick
     {
         return $this->newTrick;
     }
@@ -286,7 +284,7 @@ final class CreateTrickHandler extends AbstractTrickFormHandler
      *
      * @return string|null
      */
-    public function getTrickCreationError() : ?string
+    public function getTrickCreationError(): ?string
     {
         return $this->customError;
     }
@@ -303,12 +301,12 @@ final class CreateTrickHandler extends AbstractTrickFormHandler
      *
      * @see manageTrickMediaCreationError() method
      */
-    public function manageTrickRemovalError(Trick $newTrick, ?string $exceptionMessage) : string
+    public function manageTrickRemovalError(Trick $newTrick, ?string $exceptionMessage): string
     {
         $trickUuid = $newTrick->getUuid()->toString();
         $trickName = addslashes($newTrick->getName());
         $loggerMessage = sprintf(
-            "[trace app snowTricks] CreateTrickHandler/cancelTrickCreationProcess => " .
+            "[trace app SnowTricks] CreateTrickHandler/cancelTrickCreationProcess => " .
             "Trick removal issue with \"%s\" which has uuid: %s",
             $trickName,
             $trickUuid
@@ -333,7 +331,7 @@ final class CreateTrickHandler extends AbstractTrickFormHandler
      *
      * @throws \Exception
      */
-    private function startTrickCreationProcess(array $actionData) : ?Trick
+    private function startTrickCreationProcess(array $actionData): ?Trick
     {
         /** @var TrickManager $trickService */
         $trickService = $actionData['trickService'];
@@ -370,7 +368,7 @@ final class CreateTrickHandler extends AbstractTrickFormHandler
      *
      * @see https://paragonie.com/blog/2015/06/preventing-xss-vulnerabilities-in-php-everything-you-need-know
      */
-    private function terminateTrickCreationProcess(Trick $newTrick, array $actionData) : void
+    private function terminateTrickCreationProcess(Trick $newTrick, array $actionData): void
     {
         /** @var TrickManager $trickService */
         $trickService = $actionData['trickService'];
@@ -401,7 +399,7 @@ final class CreateTrickHandler extends AbstractTrickFormHandler
                        'or contact us if necessary.';
             if (!$isProcessCorrectlyCanceled) {
                 $loggerMessage = sprintf(
-                    "[trace app snowTricks] CreateTrickHandler/terminateTrickCreationProcess =>" .
+                    "[trace app SnowTricks] CreateTrickHandler/terminateTrickCreationProcess =>" .
                     "Trick or associated medias removal issue with \"%s\" which has uuid: %s",
                     $newTrick->getName(),
                     $newTrick->getUuid()->toString()

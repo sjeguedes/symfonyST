@@ -1,14 +1,14 @@
+// Import Cropper css styles for user avatar crop
+import '../scss/cropper.scss';
+
 import cropper from './all/cropper';
 import deleteMedia from './media/removal/delete-media';
-import deleteTrick from './trick/removal/delete-trick';
 import htmlStringHelper from './all/encode-decode-string';
 import loadVideoIframePreview from './media/load-video-iframe';
 import removeImageBox from './media/removal/remove-image-box';
 import removeVideoBox from './media/removal/remove-video-box';
-import smoothScroll from './all/smooth-vertical-scroll';
-import Sortable from 'sortablejs';
 import warnBeforeMediaRemoval from './media/removal/warn-before-media-removal';
-import coords from "./all/element-coords";
+
 export default () => {
     // Resources:
     // substring(): https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/String/substring
@@ -38,7 +38,6 @@ export default () => {
 
     const formElement = document.getElementById('st-create-trick-form') || document.getElementById('st-update-trick-form');
     if (formElement) {
-        const formElementName = formElement.getAttribute('name');
         // Add image box element action
         const addImageButton = document.getElementById('st-image-add-button');
         // Add image box element action
@@ -49,8 +48,6 @@ export default () => {
         const videosCollectionContainer = document.getElementById('st-videos-collection');
         // String helper
         const htmlStringHandler = htmlStringHelper();
-        // Store a show list rank for collections
-        let collectionBoxRank = null;
         // Get the data-prototype attribute which contains image box template
         let imagePrototype = imagesCollectionContainer.getAttribute('data-prototype');
         // Get the data-prototype-name attribute which contains dynamic image index name
@@ -352,32 +349,6 @@ export default () => {
 
         // ------------------------------------------------------------------------------------------------------------
 
-        // Sort collections with this script and not UIkit which has issue with appearance when dragging.
-        // https://github.com/SortableJS/Sortable
-
-        // Enable images collection re-ordering
-        let imagesCollectionSortableContainer = document.getElementById('st-images-collection-sortable-wrapper');
-        let sortableImages = Sortable.create(imagesCollectionSortableContainer, {
-            handle: '.uk-sortable-handle',
-            store: null,
-            direction: () => {
-                return 'vertical';
-            },
-            // Element dragging ended
-            onEnd: event => {
-                // Update other boxes
-                imageToCropBoxElements = document.querySelectorAll('.st-image-to-crop');
-                if (imageToCropBoxElements.length > 1) {
-                    imageToCropBoxElements.forEach((imageBox, index) => {
-                        // Update current moved "image to crop" box hidden input value which stores corresponding rank.
-                        updateBoxCollectionRankAndLabel(event, imageBox, index, '.st-image-to-crop-label');
-                    });
-                }
-            }
-        });
-
-        // ------------------------------------------------------------------------------------------------------------
-
         // Implement logic for videos collection
         videosCollectionContainer.addEventListener('click', event => {
             // Initialize event target element for bubbling up
@@ -532,82 +503,5 @@ export default () => {
             });
 
         });
-
-        // ------------------------------------------------------------------------------------------------------------
-
-        // Sort collections with this script and not UIkit which has issue with appearance when dragging.
-        // https://github.com/SortableJS/Sortable
-
-        // Enable videos collection re-ordering
-        let videosCollectionSortableContainer = document.getElementById('st-videos-collection-sortable-wrapper');
-        let sortableVideos = Sortable.create(videosCollectionSortableContainer, {
-            handle: '.uk-sortable-handle',
-            store: null,
-            direction: () => {
-                return 'vertical';
-            },
-            // Element dragging ended
-            onEnd: event => {
-                // Update other boxes
-                videoInfosBoxElements = document.querySelectorAll('.st-video-infos');
-                if (videoInfosBoxElements.length > 1) {
-                    videoInfosBoxElements.forEach((videoBox, index) => {
-                        // Update current moved "video infos" box hidden input value which stores corresponding rank.
-                        updateBoxCollectionRankAndLabel(event, videoBox, index, '.st-video-infos-label');
-                    });
-                }
-            }
-        });
-
-        // ------------------------------------------------------------------------------------------------------------
-
-        // Update show list rank and box label visual number for each box in collections
-        const updateBoxCollectionRankAndLabel = (event, collectionBoxElement, boxElementIndex, boxElementLabelCssClass) => {
-            // This condition based on event is not necessary but more explicit!
-            if (event.item === collectionBoxElement) {
-                event.item.querySelector('.st-show-list-rank').value = event.newIndex + 1;
-                collectionBoxRank = event.newIndex + 1;
-                // Update other boxes ranks
-            } else {
-                collectionBoxElement.querySelector('.st-show-list-rank').value = boxElementIndex + 1;
-                collectionBoxRank = boxElementIndex + 1;
-            }
-            // Update only box number in label as regards box visual rank!
-            let collectionBoxLabel = collectionBoxElement.querySelector(boxElementLabelCssClass);
-            // Update box label text
-            collectionBoxLabel.textContent = collectionBoxLabel.innerText.replace(new RegExp(/\d+$/, 'g'), collectionBoxRank.toString());
-        };
-
-        // ------------------------------------------------------------------------------------------------------------
-
-        // Manage image or video box URI anchor smooth scroll from trick single page
-        if (window.location.hash) {
-            let hashFromURI = window.location.hash;
-            let matches = hashFromURI.match(/^#(image|video)-(\w+)$/i);
-            if (matches !== null) {
-                let elementId = `st-${matches[1]}-box-${matches[2]}`;
-                let referenceElementToScroll = document.getElementById(elementId);
-                // "load" event handler to improve reload smooth scroll unnecessary process
-                const scrollToMediaBox = () => {
-                    smoothScroll(referenceElementToScroll, 0);
-                };
-                scrollToMediaBox();
-            }
-        }
-
-        // ------------------------------------------------------------------------------------------------------------
-
-        // Manage trick deletion
-        const trickUpdateFormElement = document.getElementById('st-update-trick-form');
-        const trickRemovalLink = document.getElementById('st-delete-trick');
-        if (trickUpdateFormElement !==null && trickRemovalLink !==null) {
-            // Prepare element to which window will scroll after deletion
-            // Here it is the same principle as in form.js!
-            let referenceElementToScroll = document.getElementById('st-form');
-            referenceElementToScroll = referenceElementToScroll.parentElement.parentElement.parentElement;
-            if (trickRemovalLink) {
-                deleteTrick(trickRemovalLink, referenceElementToScroll);
-            }
-        }
     }
 };

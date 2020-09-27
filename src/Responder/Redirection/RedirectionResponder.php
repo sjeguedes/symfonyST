@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Responder\Redirection;
 
@@ -44,7 +44,7 @@ final class RedirectionResponder
         string $route,
         array $parameters = [],
         $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
-    ) : RedirectResponse {
+    ): RedirectResponse {
         return new RedirectResponse($this->urlGenerator->generate($route, $parameters, $referenceType));
     }
 }

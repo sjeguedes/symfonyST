@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Templating;
 
@@ -19,7 +19,7 @@ interface TemplateRendererInterface
      *
      * @return string
      */
-    public function renderTemplate(string $template, array $data) : string;
+    public function renderTemplate(string $template, array $data): string;
 
     /**
      * Retrieve the template name based on fully qualified class name
@@ -29,8 +29,9 @@ interface TemplateRendererInterface
      * between Responder (or other class) fully qualified class name (key) and template name (value).
      *
      * @param string $className a fully qualified class name
+     * @param bool   $isEmail   an indicator to precise if it is an email template to render
      *
      * @return string
      */
-    public  function getTemplate(string $className) : string;
+    public function getTemplate(string $className, bool $isEmail = false): string;
 }

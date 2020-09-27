@@ -1,11 +1,11 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Action;
 
 use App\Domain\ServiceLayer\TrickManager;
-use App\Responder\HomeTrickListResponder;
+use App\Responder\TemplateResponder;
 use App\Utils\Traits\RouterHelperTrait;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
@@ -52,15 +52,15 @@ class HomeTrickListAction
      *     "en": "/en"
      * }, name="home", methods={"GET"})
      *
-     * @param HomeTrickListResponder $responder
-     * @param Request                $request
+     * @param TemplateResponder $responder
+     * @param Request           $request
      *
      * @return Response
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      * @throws \Doctrine\ORM\NoResultException
      */
-    public function __invoke(HomeTrickListResponder $responder, Request $request) : Response
+    public function __invoke(TemplateResponder $responder, Request $request): Response
     {
         // Initialize default list.
         $parameters = $this->trickService->getTrickListParameters();
@@ -68,11 +68,11 @@ class HomeTrickListAction
         if (($parameters['error'])) {
             $this->logger->error(
                 sprintf(
-                    "[trace app snowTricks] HomeTrickListAction/__invoke => parameters: %s",
+                    "[trace app SnowTricks] HomeTrickListAction/__invoke => parameters: %s",
                     serialize($parameters)
                 )
             );
-            throw new NotFoundHttpException('Trick list can not be initialized! Wrong parameters are used.');
+            throw new NotFoundHttpException('Trick list cannot be initialized! Wrong parameters are used.');
         }
         $data = [
             'listEnded'             => 'No more trick to load!',
@@ -88,6 +88,6 @@ class HomeTrickListAction
         ];
         // Store trick total count in session for use of ajax request.
         $this->trickService->storeInSession(TrickManager::TRICK_COUNT_SESSION_KEY, $data['trickCount']);
-        return $responder($data);
+        return $responder($data, self::class);
     }
 }

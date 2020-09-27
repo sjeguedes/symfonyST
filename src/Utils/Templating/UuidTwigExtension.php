@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Utils\Templating;
 
@@ -27,7 +27,7 @@ class UuidTwigExtension extends AbstractExtension
      *
      * @return array
      */
-    public function getFilters() : array
+    public function getFilters(): array
     {
         return [
             new TwigFilter(
@@ -50,7 +50,7 @@ class UuidTwigExtension extends AbstractExtension
      *
      * @return string
      */
-    public function encodeUuid(UuidInterface $uuid) : string
+    public function encodeUuid(UuidInterface $uuid): string
     {
         return $this->encode($uuid);
     }
@@ -62,7 +62,7 @@ class UuidTwigExtension extends AbstractExtension
      *
      * @return UuidInterface
      */
-    public function getUuidFromString(string $uuid) : UuidInterface
+    public function getUuidFromString(string $uuid): UuidInterface
     {
         return Uuid::fromString($uuid);
     }

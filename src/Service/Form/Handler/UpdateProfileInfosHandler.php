@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Form\Handler;
 
@@ -61,7 +61,7 @@ final class UpdateProfileInfosHandler extends AbstractFormHandler implements Ini
      *
      * @see AbstractFormHandler::processFormRequest()
      */
-    protected function addCustomValidation(array $actionData) : bool
+    protected function addCustomValidation(array $actionData): bool
     {
         $csrfToken = $this->request->request->get('update_profile_infos')['token'];
         // CSRF token is not valid.
@@ -87,7 +87,7 @@ final class UpdateProfileInfosHandler extends AbstractFormHandler implements Ini
      *
      * @see AbstractFormHandler::processFormRequest()
      */
-    protected function addCustomAction(array $actionData) : void
+    protected function addCustomAction(array $actionData): void
     {
         // Check UserManager and User instances in passed data
         $this->checkNecessaryData($actionData);
@@ -121,7 +121,7 @@ final class UpdateProfileInfosHandler extends AbstractFormHandler implements Ini
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    private function checkUniqueFormData(User $identifiedUser, UserManager $userService) : bool
+    private function checkUniqueFormData(User $identifiedUser, UserManager $userService): bool
     {
         // Chosen email or username (nickname) must not equals existing values, to be effectively checked.
         $isEmailToCheck = $identifiedUser->getEmail() !== $this->form->getData()->getEmail(); // or $this->form->get('email')->getData()
@@ -150,7 +150,7 @@ final class UpdateProfileInfosHandler extends AbstractFormHandler implements Ini
      *
      * @return array|null
      */
-    public function getUniqueUserError() : ?array
+    public function getUniqueUserError(): ?array
     {
         return $this->customError;
     }
@@ -162,7 +162,7 @@ final class UpdateProfileInfosHandler extends AbstractFormHandler implements Ini
      *
      * @throws \Exception
      */
-    public function initModelData(array $data) : object
+    public function initModelData(array $data): object
     {
         // Check User instance in passed data
         $this->checkNecessaryData($data);

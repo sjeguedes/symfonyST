@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Security\Voter;
 
@@ -37,7 +37,7 @@ class TrickVoter extends Voter
      *
      * {@inheritDoc}
      */
-    protected function supports($attribute, $subject) : bool
+    protected function supports($attribute, $subject): bool
     {
         // Check if voter supports (is concerned by) attribute argument (must be one of theses voter new roles).
         // This votes only on "Tricks" objects
@@ -51,7 +51,7 @@ class TrickVoter extends Voter
      *
      * @throws \LogicException
      */
-    protected function voteOnAttribute($attribute, $subject, TokenInterface $token) : bool
+    protected function voteOnAttribute($attribute, $subject, TokenInterface $token): bool
     {
         /** @var User|UserInterface $user */
         $user = $token->getUser();
@@ -87,7 +87,7 @@ class TrickVoter extends Voter
      *
      * @return bool
      */
-    private function canViewHisUnpublishedTricks(Trick $trick, ?User $user) : bool
+    private function canViewHisUnpublishedTricks(Trick $trick, ?User $user): bool
     {
         // here we evaluate unpublished trick context only!
         if (true === $trick->getIsPublished()) {
@@ -112,7 +112,7 @@ class TrickVoter extends Voter
      *
      * @return bool
      */
-    private function canUpdateOrDeleteHisOwnCreatedTricks(Trick $trick, ?User $user) : bool
+    private function canUpdateOrDeleteHisOwnCreatedTricks(Trick $trick, ?User $user): bool
     {
         // If authenticated user is the author (using uuid comparison), he can update or delete it,
         // obviously even if it is not moderated (unpublished) yet!

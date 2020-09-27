@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Form\Handler;
 
@@ -60,7 +60,7 @@ final class UpdateProfileAvatarHandler extends AbstractUploadFormHandler
      *
      * @see AbstractFormHandler::processFormRequest()
      */
-    protected function addCustomValidation(array $actionData) : bool
+    protected function addCustomValidation(array $actionData): bool
     {
         $csrfToken = $this->request->request->get('update_profile_avatar')['token'];
         // CSRF token is not valid.
@@ -74,7 +74,7 @@ final class UpdateProfileAvatarHandler extends AbstractUploadFormHandler
             $coherentCropData = $this->checkAvatarCropData($this->form->getData());
             // Avoid user input tampered data or evaluate technical error by checking coherent crop data
             if (!$coherentCropData) {
-                $cropDataError = 'Image upload can not be performed' . "\n" . 'due to incoherent crop data';
+                $cropDataError = 'Image upload cannot be performed' . "\n" . 'due to incoherent crop data';
                 // Do not create a flash message in case of ajax form validation
                 $message = 'Form validation failed!' . "\n" . 'A technical error happened.';
                 if (!$this->request->isXmlHttpRequest()) {
@@ -103,7 +103,7 @@ final class UpdateProfileAvatarHandler extends AbstractUploadFormHandler
      *
      * @see AbstractFormHandler::processFormRequest()
      */
-    protected function addCustomAction(array $actionData) : void
+    protected function addCustomAction(array $actionData): void
     {
         // Check UserManager, User, and ImageManager instances in passed data
         $this->checkNecessaryData($actionData);
@@ -152,7 +152,7 @@ final class UpdateProfileAvatarHandler extends AbstractUploadFormHandler
      *
      * @throws \Exception
      */
-    private function checkAvatarCropData(UpdateProfileAvatarDTO $dataModel) : bool
+    private function checkAvatarCropData(UpdateProfileAvatarDTO $dataModel): bool
     {
         return $this->checkCropData($dataModel->getAvatar(), $dataModel->getCropJSONData());
     }
@@ -162,7 +162,7 @@ final class UpdateProfileAvatarHandler extends AbstractUploadFormHandler
      *
      * @return array|null
      */
-    public function getUserAvatarError() : ?array
+    public function getUserAvatarError(): ?array
     {
         return $this->customError;
     }

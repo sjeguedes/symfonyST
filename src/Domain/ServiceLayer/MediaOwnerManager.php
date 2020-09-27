@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\ServiceLayer;
 
@@ -49,7 +49,7 @@ class MediaOwnerManager extends AbstractServiceLayer
      *
      * @return EntityManagerInterface
      */
-    public function getEntityManager() : EntityManagerInterface
+    public function getEntityManager(): EntityManagerInterface
     {
         return $this->entityManager;
     }
@@ -59,7 +59,7 @@ class MediaOwnerManager extends AbstractServiceLayer
      *
      * @return MediaOwnerRepository
      */
-    public function getRepository() : MediaOwnerRepository
+    public function getRepository(): MediaOwnerRepository
     {
         return $this->repository;
     }
@@ -75,7 +75,7 @@ class MediaOwnerManager extends AbstractServiceLayer
      *
      * @throws \Exception
      */
-    public function createMediaOwner(object $owner, bool $isPersisted = false, bool $isFlushed = false) : ?object
+    public function createMediaOwner(object $owner, bool $isPersisted = false, bool $isFlushed = false): ?object
     {
         // Bind associated MediaOwner entity if it is expected to ensure correct persistence!
         // This is needed without individual persistence by using cascade option.
@@ -93,7 +93,7 @@ class MediaOwnerManager extends AbstractServiceLayer
      *
      * @return bool
      */
-    public function removeMediaOwner(MediaOwner $mediaOwner, bool $isFlushed = true) : bool
+    public function removeMediaOwner(MediaOwner $mediaOwner, bool $isFlushed = true): bool
     {
         // Proceed to removal in database
         if (0 === count($mediaOwner->getMedias())) {

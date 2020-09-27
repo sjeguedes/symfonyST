@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Event\Handler;
 
@@ -45,7 +45,7 @@ class LogoutHandler implements LogoutSuccessHandlerInterface
      *
      * Define a callback to show a flash message when user logout.
      */
-    public function onLogoutSuccess(Request $request) : RedirectResponse
+    public function onLogoutSuccess(Request $request): RedirectResponse
     {
         $this->flashBag->add(
             'success',

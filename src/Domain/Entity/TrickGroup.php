@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\Entity;
 
@@ -81,9 +81,9 @@ class TrickGroup
         \DateTimeInterface $creationDate = null
     ) {
         $this->uuid = Uuid::uuid4();
-        \assert(!empty($name), 'TrickGroup name can not be empty!');
+        \assert(!empty($name), 'TrickGroup name cannot be empty!');
         $this->name = $name;
-        \assert(!empty($description), 'TrickGroup description can not be empty!');
+        \assert(!empty($description), 'TrickGroup description cannot be empty!');
         $this->description = $description;
         $this->creationDate = !\is_null($creationDate) ? $creationDate : new \DateTime('now');
         $this->updateDate = $this->creationDate;
@@ -99,10 +99,10 @@ class TrickGroup
      *
      * @throws \Exception
      */
-    public function modifyName(string $name) : self
+    public function modifyName(string $name): self
     {
         if (empty($name)) {
-            throw new \InvalidArgumentException('TrickGroup name can not be empty!');
+            throw new \InvalidArgumentException('TrickGroup name cannot be empty!');
         }
         $this->name = $name;
         return $this;
@@ -117,10 +117,10 @@ class TrickGroup
     *
     * @throws \Exception
     */
-    public function modifyDescription(string $description) : self
+    public function modifyDescription(string $description): self
     {
         if (empty($description)) {
-            throw new \InvalidArgumentException('TrickGroup description can not be empty!');
+            throw new \InvalidArgumentException('TrickGroup description cannot be empty!');
         }
         $this->description = $description;
         return $this;
@@ -135,10 +135,10 @@ class TrickGroup
      *
      * @throws \Exception
      */
-    public function modifyUpdateDate(\DateTimeInterface $updateDate) : self
+    public function modifyUpdateDate(\DateTimeInterface $updateDate): self
     {
         if ($this->creationDate > $updateDate) {
-            throw new \RuntimeException('Update date is not logical: TrickGroup can not be created after modified update date!');
+            throw new \RuntimeException('Update date is not logical: TrickGroup cannot be created after modified update date!');
         }
         $this->updateDate = $updateDate;
         return $this;
@@ -151,7 +151,7 @@ class TrickGroup
      *
      * @return TrickGroup
      */
-    public function addTrick(Trick $trick) : self
+    public function addTrick(Trick $trick): self
     {
         if (!$this->tricks->contains($trick)) {
             $this->tricks->add($trick);
@@ -167,7 +167,7 @@ class TrickGroup
      *
      * @return TrickGroup
      */
-    public function removeTrick(Trick $trick) : self
+    public function removeTrick(Trick $trick): self
     {
         if ($this->tricks->contains($trick)) {
             $this->tricks->removeElement($trick);
@@ -178,7 +178,7 @@ class TrickGroup
     /**
      * @return UuidInterface
      */
-    public function getUuid() : UuidInterface
+    public function getUuid(): UuidInterface
     {
         return $this->uuid;
     }
@@ -186,7 +186,7 @@ class TrickGroup
     /**
      * @return string
      */
-    public function getName() : string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -194,7 +194,7 @@ class TrickGroup
     /**
      * @return string
      */
-    public function getDescription() : string
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -202,7 +202,7 @@ class TrickGroup
     /**
      * @return \DateTimeInterface
      */
-    public function getCreationDate() : \DateTimeInterface
+    public function getCreationDate(): \DateTimeInterface
     {
         return $this->creationDate;
     }
@@ -210,7 +210,7 @@ class TrickGroup
     /**
      * @return \DateTimeInterface
      */
-    public function getUpdateDate() : \DateTimeInterface
+    public function getUpdateDate(): \DateTimeInterface
     {
         return $this->updateDate;
     }
@@ -218,7 +218,7 @@ class TrickGroup
     /**
      * @return Collection|Trick[]
      */
-    public function getTricks() : Collection
+    public function getTricks(): Collection
     {
         return $this->tricks;
     }

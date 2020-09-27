@@ -55,12 +55,14 @@
                         {# Get trick main image thumbnail or default thumbnail #}
                         {% set trickImage = asset(globalImageDirectory~'trick-default-image-400x225.png') %}
                         {% set trickImageDesc = 'No description is available. A main image must be defined!' %}
-                        {% for media in trick.mediaOwner.medias if not null %}
-                            {% if media.mediaType.type == 't_thumbnail' and media.isMain == 1 %}
-                                {% set trickImage = asset(globalTrickUploadDirectory~media.mediaSource.image.name~'.'~media.mediaSource.image.format) %}
-                                {% set trickImageDesc = media.mediaSource.image.description|e('html_attr') %}
-                            {% endif %}
-                        {% endfor %}
+                        {% if trick.mediaOwner.medias|length != 0 %}
+                            {% for media in trick.mediaOwner.medias %}
+                                {% if media.mediaType.type == 't_thumbnail' and media.isMain == 1 %}
+                                    {% set trickImage = asset(globalTrickUploadDirectory~media.mediaSource.image.name~'.'~media.mediaSource.image.format) %}
+                                    {% set trickImageDesc = media.mediaSource.image.description|e('html_attr') %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
                         <img id="st-card-image-{{ trick.rank }}" class="uk-invisible" data-default-image="{{ asset(globalImageDirectory~'trick-default-image-400x225.png') }}"
                              src="{{trickImage }}"
                              alt="{{ trickImageDesc }}">
@@ -169,4 +171,9 @@
         </div>
         {% endif %}
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset(globalAssetsDirectory~'/js/paginated-trick-list.js') }}"></script>
 {% endblock %}

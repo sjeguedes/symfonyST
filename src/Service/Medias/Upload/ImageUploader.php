@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Medias\Upload;
 
@@ -102,8 +102,7 @@ class ImageUploader
         string $uploadDirectoryKey = null,
         bool $isTemporary = false,
         bool $isRegExMode = false
-    ) : ?array
-    {
+    ): ?array {
         $isDirectory = !\is_null($uploadDirectoryKey) ? true : false;
         $directories = $this->getUploadDirectories();
         // Upload directory is set!
@@ -150,7 +149,7 @@ class ImageUploader
                 // Store process error
                 $this->logger->error(
                     sprintf(
-                        "[trace app snowTricks] ImageUploader/checkFileUploadOnServer => exception: %s",
+                        "[trace app SnowTricks] ImageUploader/checkFileUploadOnServer => exception: %s",
                         $exception->getMessage()
                     )
                 );
@@ -175,10 +174,10 @@ class ImageUploader
      *
      * @throws \Exception
      */
-    private function createCroppedAndResizedImage(string $uploadDirectory, File $uploadedImage, array $parameters) : ?File
+    private function createCroppedAndResizedImage(string $uploadDirectory, File $uploadedImage, array $parameters): ?File
     {
         if (!extension_loaded('gd')) {
-            throw new \RuntimeException('Image can not be handled: "gd" extension is not installed on server!');
+            throw new \RuntimeException('Image cannot be handled: "gd" extension is not installed on server!');
         }
         // Decode crop data to get a stdClass instance
         // IMPORTANT! At this time, JSON data contains only one crop result,
@@ -219,10 +218,10 @@ class ImageUploader
      *
      * @throws \Exception
      */
-    private function createResizedImage(string $imageDirectory, File $imageSourceFile, array $parameters) : ?File
+    private function createResizedImage(string $imageDirectory, File $imageSourceFile, array $parameters): ?File
     {
         if (!extension_loaded('gd')) {
-            throw new \RuntimeException('Image can not be handled: "gd" extension is not installed on server!');
+            throw new \RuntimeException('Image cannot be handled: "gd" extension is not installed on server!');
         }
         // Get a resource based on uploaded image extension with particular "jpg" case
         $imageType = 'jpg' === $parameters['extension'] ? 'jpeg' : $parameters['extension'];
@@ -248,7 +247,7 @@ class ImageUploader
      *
      * @throws \Exception
      */
-    public function encodeImageWithBase64(string $imagePath) : string
+    public function encodeImageWithBase64(string $imagePath): string
     {
         if (!\file_exists($imagePath)) {
             throw new \RuntimeException("Image to encode with DataURI was not found!");
@@ -272,7 +271,7 @@ class ImageUploader
      *
      * @return bool
      */
-    private function generateImage($newImageToCreateResource, string $imageType, string $newImageNamePath) : bool
+    private function generateImage($newImageToCreateResource, string $imageType, string $newImageNamePath): bool
     {
         // Define the compression quality
         // png: -1 default compiled in zlib library, 0 no compression, 1-9 where 9 is the maximum compression
@@ -299,7 +298,7 @@ class ImageUploader
      *
      * @throws \Exception
      */
-    public function getUploadDirectory(string $key) : string
+    public function getUploadDirectory(string $key): string
     {
         if (!isset($this->uploadDirectories[$key])) {
             throw new \InvalidArgumentException('Upload directory key is unknown!');
@@ -314,7 +313,7 @@ class ImageUploader
      *
      * @throws \Exception
      */
-    public function getUploadDirectories() : array
+    public function getUploadDirectories(): array
     {
         return $this->uploadDirectories;
     }
@@ -327,7 +326,7 @@ class ImageUploader
      *
      * @return string
      */
-    private function renameImageAsExpectedInMediaType(array $parameters, string $fileName) : string
+    private function renameImageAsExpectedInMediaType(array $parameters, string $fileName): string
     {
         $newImageName = $fileName;
         $isImageNameHashChanged = $parameters['isImageNameHashChanged'];
@@ -411,7 +410,7 @@ class ImageUploader
      *
      * @throws \Exception
      */
-    private function resizeImageResourceAsExpected($imageResource, array $parameters, array $fileInfos) : ?File
+    private function resizeImageResourceAsExpected($imageResource, array $parameters, array $fileInfos): ?File
     {
         if (!\is_resource($imageResource)) {
             throw new \InvalidArgumentException('A valid image resource is expected to be able to resize uploaded image!');
@@ -446,7 +445,7 @@ class ImageUploader
      *
      * @throws \Exception
      */
-    public function resizeNewImage(string $key, array $parameters, bool $isTemporaryImageSource = false) : ?\SplFileInfo
+    public function resizeNewImage(string $key, array $parameters, bool $isTemporaryImageSource = false): ?\SplFileInfo
     {
         if (!isset($this->uploadDirectories[$key])) {
             throw new \InvalidArgumentException('Chosen upload directory is unknown!');
@@ -491,8 +490,7 @@ class ImageUploader
         array $parameters,
         bool $isCropped = false,
         bool $isTemporary = false
-    ) : ?\SplFileInfo
-    {
+    ): ?\SplFileInfo {
         if (!isset($this->uploadDirectories[$key])) {
             throw new \InvalidArgumentException('Chosen upload directory is unknown!');
         }

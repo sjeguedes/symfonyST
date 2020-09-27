@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Medias;
 
@@ -30,7 +30,7 @@ class VideoURLProxyChecker
      *
      * @return null|string
      */
-    public function filterURLAttribute(Request $request, bool $isDecoded = false) : ?string
+    public function filterURLAttribute(Request $request, bool $isDecoded = false): ?string
     {
         // Get URL to check
         $url = null;
@@ -47,14 +47,14 @@ class VideoURLProxyChecker
      *
      * @return bool
      */
-    public function isAllowed(?string $url) : bool
+    public function isAllowed(?string $url): bool
     {
         if (\is_null($url)) {
             return false;
         }
         $patterns = self::ALLOWED_URL_PATTERNS;
         // Use of "array_filter" would be more appropriate here!
-        for ($i = 0; $i < count($patterns); $i ++) {
+        for ($i = 0; $i < count($patterns); $i++) {
             if (preg_match( $patterns[$i], urldecode($url))) {
                 return true;
             }
@@ -66,7 +66,7 @@ class VideoURLProxyChecker
      * Request URL to check if a content can be loaded. Choice is made to use cURL here.
      *
      * CAUTION: do not use this method alone because of potential "SSRF" attacks! At least use isAllowed() before...
-     * @link https://www.vaadata.com/blog/understanding-web-vulnerability-server-side-request-forgery-1/
+     * @see https://www.vaadata.com/blog/understanding-web-vulnerability-server-side-request-forgery-1/
      *
      * @param string|null $url
      *
@@ -80,7 +80,7 @@ class VideoURLProxyChecker
      * @see https://flaviocopes.com/http-curl/
      * @see https://www.php.net/manual/en/function.curl-error.php
      */
-    public function isContent(?string $url) : bool
+    public function isContent(?string $url): bool
     {
         if (\is_null($url)) {
             return false;
@@ -109,14 +109,14 @@ class VideoURLProxyChecker
     /**
      * Check particular youtube video availability.
      *
-     * @link Particular case for youtube video:
+     * @see Particular case for youtube video:
      * https://stackoverflow.com/questions/29166402/verify-if-video-exist-with-youtube-api-v3
      *
      * @param $url
      *
      * @return string the correct url to use to check availability
      */
-    private function prepareAccessToYoutubeVideoContent($url) : string
+    private function prepareAccessToYoutubeVideoContent($url): string
     {
         // Extract video id and use correct URL
         preg_match( '/embed\/(.+)/', urldecode($url), $matches);
@@ -136,7 +136,7 @@ class VideoURLProxyChecker
      *
      * @see https://symfony.com/doc/current/controller.html#returning-json-response
      */
-    public function verify(?string $url) : array
+    public function verify(?string $url): array
     {
         // Prepare array to be converted in JSON string with Symfony JsonResponse object (no need to use "json_encode" here)
         if (\is_null($url)) {

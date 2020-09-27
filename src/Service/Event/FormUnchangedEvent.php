@@ -1,10 +1,10 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Event;
 
 use App\Domain\Entity\User;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class FormUnchangedEvent.
@@ -18,7 +18,7 @@ class FormUnchangedEvent extends Event implements CustomEventInterface
     /**
      * Define a event name.
      */
-    public const NAME = 'form.unchanged';
+    const NAME = 'form.unchanged';
 
     /**
      * @var string
@@ -52,7 +52,7 @@ class FormUnchangedEvent extends Event implements CustomEventInterface
     /**
      * {@inheritDoc}
      */
-    public function getEventContext() : string
+    public function getEventContext(): string
     {
         return $this->eventContext;
     }
@@ -60,7 +60,7 @@ class FormUnchangedEvent extends Event implements CustomEventInterface
     /**
      * @return User
      */
-    public function getUser() : User
+    public function getUser(): User
     {
         return $this->user;
     }
@@ -68,7 +68,7 @@ class FormUnchangedEvent extends Event implements CustomEventInterface
     /**
      * @return object|null
      */
-    public function getEntityToUpdate() : ?object
+    public function getEntityToUpdate(): ?object
     {
         return $this->entityToUpdate;
     }

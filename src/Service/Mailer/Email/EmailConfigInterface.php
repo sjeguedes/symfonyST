@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Mailer\Email;
 
@@ -22,12 +22,12 @@ interface EmailConfigInterface
      *
      * @return void
      */
-    public function buildConfiguration(array $parameters) : void;
+    public function buildConfiguration(array $parameters): void;
 
     /**
      * Initialize options with a options resolver.
      *
      * @return void
      */
-    public function initOptions() : void;
+    public function initOptions(): void;
 }

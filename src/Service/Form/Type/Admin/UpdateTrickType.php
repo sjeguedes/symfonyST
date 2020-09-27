@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Form\Type\Admin;
 
@@ -80,8 +80,7 @@ class UpdateTrickType extends AbstractTrickType
         VideoManager $videoService,
         RequestStack $requestStack,
         TrickGroupManager $trickGroupService
-    )
-    {
+    ) {
         parent::__construct($mediaTypeService, $imageService, $videoService);
         $this->formSubscriber = $formSubscriber;
         $this->request = $requestStack->getCurrentRequest();
@@ -102,7 +101,7 @@ class UpdateTrickType extends AbstractTrickType
      * https://github.com/symfony/symfony/issues/25675
      * https://stackoverflow.com/questions/25363926/symfony-form-with-form-collection-cannot-pass-options-array-into-sub-forms
      */
-    public function buildForm(FormBuilderInterface $builder, array $options) : void
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $trickGroupService = $this->trickGroupService;
         // Remove possible image or video update hash anchor from current action URI
@@ -188,7 +187,7 @@ class UpdateTrickType extends AbstractTrickType
      *
      * @return void
      */
-    public function configureOptions(OptionsResolver $resolver) : void
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class'     => UpdateTrickDTO::class,

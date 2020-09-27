@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\DTO;
 
@@ -38,7 +38,7 @@ final class RenewPasswordDTO
     /**
      * @return string|null
      */
-    public function getUserName() : ?string
+    public function getUserName(): ?string
     {
         return $this->userName;
     }
@@ -46,7 +46,7 @@ final class RenewPasswordDTO
     /**
      * @return string|null
      */
-    public function getPasswords() : ?string
+    public function getPasswords(): ?string
     {
         return $this->passwords;
     }
@@ -56,7 +56,7 @@ final class RenewPasswordDTO
      *
      * @return void
      */
-    public function setUserName(?string $userName) : void
+    public function setUserName(?string $userName): void
     {
         $this->userName = $userName;
     }
@@ -66,7 +66,7 @@ final class RenewPasswordDTO
      *
      * @return void
      */
-    public function setPasswords(?string $passwords) : void
+    public function setPasswords(?string $passwords): void
     {
         $this->passwords = $passwords;
     }

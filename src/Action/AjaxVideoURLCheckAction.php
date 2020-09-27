@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Action;
 
@@ -44,9 +44,12 @@ class AjaxVideoURLCheckAction
     /**
      * Check if single trick video URL can be loaded from AJAX request.
      *
-     * Please not url is always the same even if language changed. This is a simple AJAX request and locale parameter is null.
-     * Particular "url" attribute value can be empty in some cases! Its declared placeholder requirement can be: {url<(.+)?>},
-     * but choice is made to check if "url" attribute is null (optional placeholder) instead of checking its value with this placeholder requirement: {url<(.+)>?}
+     * Please not url is always the same even if language changed.
+     * This is a simple AJAX request and locale parameter is null.
+     * Particular "url" attribute value can be empty in some cases!
+     * Its declared placeholder requirement can be: {url<(.+)?>},
+     * but choice is made to check if "url" attribute is null (optional placeholder)
+     * instead of checking its value with this placeholder requirement: {url<(.+)>?}
      *
      * @Route("/load-trick-video/url/{url<(.+)>?}", name="load_trick_video_url_check", methods={"GET"})
      *
@@ -59,14 +62,16 @@ class AjaxVideoURLCheckAction
      * @see VideoURLProxyChecker::filterURLAttribute()
      * About trailing slash:
      * @see https://symfony.com/doc/current/routing/slash_in_parameter.html
+     * CAUTION! Update any URI change in:
+     * @see LoginFormAuthenticationManager::onAuthenticationSuccess()
      */
-    public function __invoke(JsonResponder $responder, Request $request) : JsonResponse
+    public function __invoke(JsonResponder $responder, Request $request): JsonResponse
     {
         // Check video URL value
         $url = $this->trickVideoChecker->filterURLAttribute($request);
         if (\is_null($url)) {
             $this->logger->error(
-                "[trace app snowTricks] AjaxVideoURLCheckAction/__invoke => " .
+                "[trace app SnowTricks] AjaxVideoURLCheckAction/__invoke => " .
                 "Technical error due to video url set to null: check loading process for both client and server side!"
             );
         }

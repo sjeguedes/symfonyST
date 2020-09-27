@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Utils\Traits;
 
@@ -35,7 +35,7 @@ trait UserHandlingHelperTrait
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    private function checkUserUniqueData(UserManager $userService, string $type = null) : bool
+    private function checkUserUniqueData(UserManager $userService, string $type = null): bool
     {
         $isEmailUnique = true;
         $isUsernameUnique = true;
@@ -73,7 +73,7 @@ trait UserHandlingHelperTrait
      * @throws \Exception
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    private function isUserUnique(string $type, string $value, UserManager $userService) : bool
+    private function isUserUnique(string $type, string $value, UserManager $userService): bool
     {
         if (!\in_array($type, ['email', 'username'])) {
             throw new \InvalidArgumentException('Type of value is unknown!');
@@ -103,7 +103,7 @@ trait UserHandlingHelperTrait
      *
      * @throws \Exception
      */
-    public function makeSlugWithNickName(string $nickname) : string
+    public function makeSlugWithNickName(string $nickname): string
     {
         if (!extension_loaded('iconv')) {
             throw new \Exception('Sorry, iconv module is not loaded!');

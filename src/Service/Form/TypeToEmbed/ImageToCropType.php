@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Form\TypeToEmbed;
 
@@ -94,7 +94,7 @@ class ImageToCropType extends AbstractTrickCollectionEntryType
      *
      * @return void
      */
-    public function buildForm(FormBuilderInterface $builder, array $options) : void
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('image', FileType::class, [
@@ -139,7 +139,7 @@ class ImageToCropType extends AbstractTrickCollectionEntryType
      *
      * @return void
      */
-    public function configureOptions(OptionsResolver $resolver) : void
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class'  => ImageToCropDTO::class,
@@ -185,7 +185,7 @@ class ImageToCropType extends AbstractTrickCollectionEntryType
      *
      * @return void
      */
-    public function finishView(FormView $view, FormInterface $form, array $options) : void
+    public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         // Apply this reset only if form index name is set, to avoid issue
         if (ctype_digit($form->getName())) { // Form name is a string!
@@ -211,7 +211,7 @@ class ImageToCropType extends AbstractTrickCollectionEntryType
      *
      * @throws \Exception
      */
-    private function generateImageWithDirectUpload(FormtypeInterface $rootFormType, ImageToCropDTO $imageToCropDataModel) : ?Image
+    private function generateImageWithDirectUpload(FormtypeInterface $rootFormType, ImageToCropDTO $imageToCropDataModel): ?Image
     {
         // Apply this only for trick creation or update forms at this time!
         switch ($rootFormType) {
@@ -254,8 +254,7 @@ class ImageToCropType extends AbstractTrickCollectionEntryType
         ImageToCropDTO $imageToCropDataModel,
         FormTypeInterface $rootFormType,
         ?Trick $entity
-    ) : ?Media
-    {
+    ): ?Media {
         // Create mandatory Media entity which references corresponding entities:
         // MediaOwner is the attachment (none is defined here, since no trick is set yet), MediaSource is an image.
         /** @var MediaOwner|null $newMediaOwner */
@@ -297,7 +296,7 @@ class ImageToCropType extends AbstractTrickCollectionEntryType
      *
      * @return ImageToCropDTO|null
      */
-    private function prepareAndCheckDataModelForDirectUpload(FormInterface $imageToCropForm, ?array $formData, object $rootFormHandler) : ?ImageToCropDTO
+    private function prepareAndCheckDataModelForDirectUpload(FormInterface $imageToCropForm, ?array $formData, object $rootFormHandler): ?ImageToCropDTO
     {
         // No image file was uploaded, then stop process!
         if (\is_null($formData) || \is_null($formData['image'])) {
@@ -351,8 +350,7 @@ class ImageToCropType extends AbstractTrickCollectionEntryType
         ImageToCropDTO $imageToCropDataModel,
         Image $createdImageOnServer,
         FormHandlerInterface $rootFormHandler
-    ) : void
-    {
+    ): void {
         // Apply this only for update process cases
         switch ($rootFormType) {
             // Generate directly the two other image formats associated to an existing updated trick
@@ -388,7 +386,7 @@ class ImageToCropType extends AbstractTrickCollectionEntryType
      *
      * @throws \Exception
      */
-    private function updateMandatoryPersistentImageData(Image $createdImageOnServer, array $formData) : array
+    private function updateMandatoryPersistentImageData(Image $createdImageOnServer, array $formData): array
     {
         // WARNING! Delete corresponding "UploadedFile" instance to avoid a "The file could not be uploaded." violation
         // due to temporary file which does not exist on server after direct upload anymore!
@@ -417,7 +415,7 @@ class ImageToCropType extends AbstractTrickCollectionEntryType
      *
      * @return void
      */
-    private function uploadValidatedImage(FormBuilderInterface $builder , object $rootFormHandler, ?object $entity) : void
+    private function uploadValidatedImage(FormBuilderInterface $builder , object $rootFormHandler, ?object $entity): void
     {
         $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use ($rootFormHandler, $entity) {
             // Get current "image to crop" form

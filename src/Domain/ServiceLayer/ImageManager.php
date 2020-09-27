@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\ServiceLayer;
 
@@ -130,8 +130,7 @@ class ImageManager extends AbstractServiceLayer
         ?Media $newMedia,
         bool $isPersisted = false,
         bool $isFlushed = false
-    ) : ?Image
-    {
+    ): ?Image {
         // Bind associated Media entity if it is expected to ensure correct persistence!
         // This is needed without individual persistence by using cascade option.
         if (!\is_null($newMedia)) {
@@ -170,8 +169,7 @@ class ImageManager extends AbstractServiceLayer
         bool $isDirectUpload = false,
         bool $isPersisted = false,
         bool $isFlushed = false
-    ) : ?Image
-    {
+    ): ?Image {
         // Image file was not generated! So, this avoids to block running process.
         if (\is_null($newTrickImageFile)) {
            return null;
@@ -205,7 +203,7 @@ class ImageManager extends AbstractServiceLayer
      *
      * @throws \Exception
      */
-    public function createUserAvatar(?\SplFileInfo $newAvatarImageFile, UserInterface $user) : ?Image
+    public function createUserAvatar(?\SplFileInfo $newAvatarImageFile, UserInterface $user): ?Image
     {
         // Image file was not generated! So, this avoids to block running process.
         if (\is_null($newAvatarImageFile)) {
@@ -239,8 +237,7 @@ class ImageManager extends AbstractServiceLayer
     public function generateUserAvatarFile(
         UpdateProfileAvatarDTO $dataModel,
         UserInterface $user
-    ) : ?\SplFileInfo
-    {
+    ): ?\SplFileInfo {
         // Get avatar necessary parameters
         $parameters = $this->getUserAvatarParameters($dataModel, $user);
         // Upload file on server and get created file name with possible crop option
@@ -268,7 +265,7 @@ class ImageManager extends AbstractServiceLayer
      * @throws \Exception
      * @see TrickManager::removeTrick()
      */
-    public function deleteAllTrickImagesFiles(Trick $trick, Collection $mediasList = null) : void
+    public function deleteAllTrickImagesFiles(Trick $trick, Collection $mediasList = null): void
     {
         // Take into account all trick medias if specified media list is empty!
         $mediasList = $mediasList ?? $trick->getMediaOwner()->getMedias();
@@ -298,7 +295,7 @@ class ImageManager extends AbstractServiceLayer
      *
      * @see TrickManager::removeTrick()
      */
-    public function deleteOneImageFile(?Image $imageEntity, string $uploadDirectoryKey, string $imageFullName = null) : bool
+    public function deleteOneImageFile(?Image $imageEntity, string $uploadDirectoryKey, string $imageFullName = null): bool
     {
         if (\is_null($imageEntity) && \is_null($imageFullName)) {
             throw new \RuntimeException('A instance of Image, or a full image name must be defined!');
@@ -334,8 +331,7 @@ class ImageManager extends AbstractServiceLayer
         string $key,
         array $sourceImageParameters,
         bool $isDirectUpload
-    ) : ?\SplFileInfo
-    {
+    ): ?\SplFileInfo {
         if ($isDirectUpload) {
             // Upload file on server and get created file name with possible crop option
             $isCropped = property_exists(\get_class($dataModel), 'cropJSONData') ? true : false;
@@ -372,10 +368,9 @@ class ImageManager extends AbstractServiceLayer
         string $mediaTypeKey,
         bool $isDirectUpload = false,
         string $identifierName = null
-    ) : ?\SplFileInfo
-    {
-        // Direct upload mode can not be used if no image was uploaded!
-        // Direct upload off mode can not be used if data model "savedImageName" property is null and identifier is set to null!
+    ): ?\SplFileInfo {
+        // Direct upload mode cannot be used if no image was uploaded!
+        // Direct upload off mode cannot be used if data model "savedImageName" property is null and identifier is set to null!
         $isDirectUploadOnModeRequirementSet = $isDirectUpload && !\is_null($dataModel->getImage());
         $isDirectUploadOffModeRequirementSet = !$isDirectUpload && (!\is_null($dataModel->getSavedImageName()) || !\is_null($identifierName));
         if (!$isDirectUploadOnModeRequirementSet && !$isDirectUploadOffModeRequirementSet) {
@@ -398,10 +393,10 @@ class ImageManager extends AbstractServiceLayer
      *
      * @return MediaType
      */
-    private function getTrickImageMediaType(string $mediaTypeKey) : MediaType
+    private function getTrickImageMediaType(string $mediaTypeKey): MediaType
     {
         if (is_null($type = $this->mediaTypeManager->getType($mediaTypeKey))) {
-            $this->logger->error("[trace app snowTricks] ImageManager/getTrickImageMediaType => MediaType instance: null for key $mediaTypeKey");
+            $this->logger->error("[trace app SnowTricks] ImageManager/getTrickImageMediaType => MediaType instance: null for key $mediaTypeKey");
             throw new \RuntimeException("Media type key $mediaTypeKey is unknown!");
         }
         // Get expected media type data to resize the corresponding generated image
@@ -422,7 +417,7 @@ class ImageManager extends AbstractServiceLayer
      *
      * @throws \Exception
      */
-    private function getTrickImageParameters(ImageToCropDTO $dataModel, string $mediaTypeKey, bool $isDirectUpload, string $identifierName = null) : array
+    private function getTrickImageParameters(ImageToCropDTO $dataModel, string $mediaTypeKey, bool $isDirectUpload, string $identifierName = null): array
     {
         // Get corresponding MediaType instance data to associate to future Image entity
         // to resize correctly the corresponding generated image
@@ -478,7 +473,7 @@ class ImageManager extends AbstractServiceLayer
      *
      * @return string
      */
-    private function getTrickImageSanitizedIdentifierName(?string $identifierName, File $trickImage) : string
+    private function getTrickImageSanitizedIdentifierName(?string $identifierName, File $trickImage): string
     {
         if (\is_null($identifierName)) {
             // Use image original name (without extension) as image name with slug format
@@ -505,7 +500,7 @@ class ImageManager extends AbstractServiceLayer
      *
      * @throws \Exception
      */
-    private function getUserAvatarParameters(UpdateProfileAvatarDTO $dataModel, UserInterface $user) : array
+    private function getUserAvatarParameters(UpdateProfileAvatarDTO $dataModel, UserInterface $user): array
     {
         $avatar = $dataModel->getAvatar();
         $cropJSONData = $dataModel->getCropJSONData();
@@ -532,7 +527,7 @@ class ImageManager extends AbstractServiceLayer
      *
      * @return EntityManagerInterface
      */
-    public function getEntityManager() : EntityManagerInterface
+    public function getEntityManager(): EntityManagerInterface
     {
         return $this->entityManager;
     }
@@ -544,7 +539,7 @@ class ImageManager extends AbstractServiceLayer
      *
      * @return object|Image|null
      */
-    public function findSingleByName(string $fileNameWithoutExtension) : ?object
+    public function findSingleByName(string $fileNameWithoutExtension): ?object
     {
         return $this->getRepository()->findOneBy(['name' => $fileNameWithoutExtension]);
     }
@@ -560,7 +555,7 @@ class ImageManager extends AbstractServiceLayer
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function findSingleByUuid(UuidInterface $uuid) : ?Image
+    public function findSingleByUuid(UuidInterface $uuid): ?Image
     {
         return $this->getRepository()->findOneByUuid($uuid);
     }
@@ -576,7 +571,7 @@ class ImageManager extends AbstractServiceLayer
      *
      * @throws \Exception
      */
-    public function getImageDirectoryConstantValue(string $imageTypeKey) : string
+    public function getImageDirectoryConstantValue(string $imageTypeKey): string
     {
         $constantName = strtoupper($imageTypeKey) . '_IMAGE_DIRECTORY_KEY';
         $className = ImageUploader::class;
@@ -592,7 +587,7 @@ class ImageManager extends AbstractServiceLayer
      *
      * @return ImageUploader
      */
-    public function getImageUploader() : ImageUploader
+    public function getImageUploader(): ImageUploader
     {
         return $this->imageUploader;
     }
@@ -604,7 +599,7 @@ class ImageManager extends AbstractServiceLayer
      *
      * @return array|Image[]|null
      */
-    public function getImageWithIdenticalName(Image $imageEntityToFind) : ?array
+    public function getImageWithIdenticalName(Image $imageEntityToFind): ?array
     {
         $foundEntities = [];
         // Get image to find name
@@ -634,7 +629,7 @@ class ImageManager extends AbstractServiceLayer
      *
      * @throws \Exception
      */
-    public function getUserAvatarImage(UserInterface $user) : ?Image
+    public function getUserAvatarImage(UserInterface $user): ?Image
     {
         $image = null;
         // Corresponding media owner can be null, if authenticated user just created his account!
@@ -657,7 +652,7 @@ class ImageManager extends AbstractServiceLayer
      *
      * @return ImageRepository
      */
-    public function getRepository() : ImageRepository
+    public function getRepository(): ImageRepository
     {
         return $this->repository;
     }
@@ -671,7 +666,7 @@ class ImageManager extends AbstractServiceLayer
      *
      * @return array
      */
-    private function prepareImageFileData(File $image) : array
+    private function prepareImageFileData(File $image): array
     {
         $imageWidth = getimagesize($image->getPathName())[0];
         $imageHeight = getimagesize($image->getPathName())[1];
@@ -695,7 +690,7 @@ class ImageManager extends AbstractServiceLayer
      *
      * @throws \Exception
      */
-    public function prepareImageName(string $currentImageName, string $newSlug, string $imageTypeKey) : ?string
+    public function prepareImageName(string $currentImageName, string $newSlug, string $imageTypeKey): ?string
     {
         // Get dynamically a image directory key constant value depending on image type
         $constant = $this->getImageDirectoryConstantValue($imageTypeKey);
@@ -727,7 +722,7 @@ class ImageManager extends AbstractServiceLayer
      *
      * @throws \Exception
      */
-    public function purgeOrphanedImagesFiles(string $uploadDirectoryKey, array $imagesEntities) : void
+    public function purgeOrphanedImagesFiles(string $uploadDirectoryKey, array $imagesEntities): void
     {
         // Restrict search in an upload directory or sub directory to avoid unexpected file deletion
         $imagesDirectory = $this->getImageUploader()->getUploadDirectory($uploadDirectoryKey);
@@ -760,7 +755,7 @@ class ImageManager extends AbstractServiceLayer
      *
      * @throws \Exception
      */
-    public function removeEmptyTemporaryDirectory(string $uploadDirectoryKey) : void
+    public function removeEmptyTemporaryDirectory(string $uploadDirectoryKey): void
     {
         // Restrict search in an upload directory or sub directory to avoid unexpected file deletion
         $imagesDirectory = $this->getImageUploader()->getUploadDirectory($uploadDirectoryKey);
@@ -787,7 +782,7 @@ class ImageManager extends AbstractServiceLayer
      *
      * @throws \Exception
      */
-    public function removeUserAvatar(UserInterface $user) : bool
+    public function removeUserAvatar(UserInterface $user): bool
     {
         // Image is both removed physically and in database (no user avatar gallery is used on website).
         $isImageRemoved = false;
@@ -840,8 +835,7 @@ class ImageManager extends AbstractServiceLayer
         string $newImageName,
         string $imageTypeKey,
         bool $isTemporary = false
-    ) : bool
-    {
+    ): bool {
         // Get dynamically a image directory key constant value depending on image type
         $constant = $this->getImageDirectoryConstantValue($imageTypeKey);
         // Get image directory thanks to image type key passed as argument
@@ -875,8 +869,7 @@ class ImageManager extends AbstractServiceLayer
         ImageToCropDTO $imageToCropDTO,
         string $newImageName,
         bool $isFlushed = true
-    ) : bool
-    {
+    ): bool {
         // Get corresponding image Media entity
         $bigImagMediaEntity = $bigImageEntity->getMediaSource()->getMedia();
         if (is_null($bigImagMediaEntity)) {
@@ -908,7 +901,7 @@ class ImageManager extends AbstractServiceLayer
      *
      * @return bool
      */
-    public function removeImage(Image $image, bool $isFlushed = true) : bool
+    public function removeImage(Image $image, bool $isFlushed = true): bool
     {
         // Proceed to removal in database
         return $this->removeAndSaveNoMoreEntity($image, $isFlushed);

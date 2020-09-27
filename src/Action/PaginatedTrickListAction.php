@@ -1,12 +1,12 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Action;
 
 use App\Domain\ServiceLayer\TrickManager;
-use App\Responder\PaginatedTrickListResponder;
 use App\Responder\Redirection\RedirectionResponder;
+use App\Responder\TemplateResponder;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -48,16 +48,16 @@ class PaginatedTrickListAction
      *     "en": "/{_locale<en>}/trick-list/page/{page<\d+>?}"
      * }, name="list_tricks", methods={"GET"})
      *
-     * @param PaginatedTrickListResponder $responder
-     * @param RedirectionResponder        $redirectionResponder
-     * @param Request                     $request
+     * @param RedirectionResponder $redirectionResponder
+     * @param TemplateResponder    $responder
+     * @param Request              $request
      *
      * @return Response
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      * @throws \Doctrine\ORM\NoResultException
      */
-    public function __invoke(PaginatedTrickListResponder $responder, RedirectionResponder $redirectionResponder, Request $request) : Response
+    public function __invoke(RedirectionResponder $redirectionResponder, TemplateResponder $responder, Request $request): Response
     {
         // Make a redirection to page index "1" by default, if page attribute is empty (allowed in route)
         // CAUTION: be aware of defining route "page" attribute requirements and default value carefully!
@@ -68,8 +68,8 @@ class PaginatedTrickListAction
         $pageIndex = $this->trickService->filterPaginationRequestAttribute($request);
         $paginationParameters = $this->trickService->getTrickListPaginationParameters($pageIndex);
         if (\is_null($paginationParameters)) {
-            $this->logger->error("[trace app snowTricks] PaginatedTrickListAction/__invoke => pagination parameters: null");
-            throw new NotFoundHttpException('Trick list page can not be reached! Wrong parameter is used.');
+            $this->logger->error("[trace app SnowTricks] PaginatedTrickListAction/__invoke => pagination parameters: null");
+            throw new NotFoundHttpException('Trick list page cannot be reached! Wrong parameter is used.');
         }
         $data = [
             'currentPage'      => $paginationParameters['currentPage'],
@@ -79,6 +79,6 @@ class PaginatedTrickListAction
             'trickLoadingMode' => $paginationParameters['loadingMode'],
             'tricks'           => $this->trickService->getFilteredList($paginationParameters['currentOffset'], $paginationParameters['currentLimit'])
         ];
-        return $responder($data);
+        return $responder($data, self::class);
     }
 }

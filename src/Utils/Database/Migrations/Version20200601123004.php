@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Utils\Database\Migrations;
 
@@ -8,15 +8,23 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
 /**
- * Auto-generated Migration: Please modify to your needs!
+ * Version20200601123004 migration class.
  */
 final class Version20200601123004 extends AbstractMigration
 {
-    public function up(Schema $schema) : void
+    /**
+     * Add media_owners and media_sources tables and change constraints on other tables.
+     *
+     * @param Schema $schema
+     *
+     * @return void
+     *
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Migrations\AbortMigrationException
+     */
+    public function up(Schema $schema): void
     {
-        // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
-
         $this->addSql('CREATE TABLE media_owners (uuid BINARY(16) NOT NULL COMMENT \'(DC2Type:uuid_binary)\', trick_uuid BINARY(16) DEFAULT NULL COMMENT \'(DC2Type:uuid_binary)\', user_uuid BINARY(16) DEFAULT NULL COMMENT \'(DC2Type:uuid_binary)\', UNIQUE INDEX UNIQ_FE0B08249FCC6316 (trick_uuid), UNIQUE INDEX UNIQ_FE0B0824ABFE1C6F (user_uuid), PRIMARY KEY(uuid)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE media_sources (uuid BINARY(16) NOT NULL COMMENT \'(DC2Type:uuid_binary)\', image_uuid BINARY(16) DEFAULT NULL COMMENT \'(DC2Type:uuid_binary)\', video_uuid BINARY(16) DEFAULT NULL COMMENT \'(DC2Type:uuid_binary)\', UNIQUE INDEX UNIQ_B38AE3BB2345BA38 (image_uuid), UNIQUE INDEX UNIQ_B38AE3BBD6E80D7A (video_uuid), PRIMARY KEY(uuid)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('ALTER TABLE media_owners ADD CONSTRAINT FK_FE0B08249FCC6316 FOREIGN KEY (trick_uuid) REFERENCES tricks (uuid)');
@@ -37,11 +45,19 @@ final class Version20200601123004 extends AbstractMigration
         $this->addSql('ALTER TABLE media_types ADD source_type VARCHAR(45) NOT NULL, CHANGE type type VARCHAR(45) NOT NULL');
     }
 
-    public function down(Schema $schema) : void
+    /**
+     * Cancel "add media_owners and media_sources tables and change constraints on other tables".
+     *
+     * @param Schema $schema
+     *
+     * @return void
+     *
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Migrations\AbortMigrationException
+     */
+    public function down(Schema $schema): void
     {
-        // this down() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
-
         $this->addSql('ALTER TABLE medias DROP FOREIGN KEY FK_12D2AF814DFCFDA2');
         $this->addSql('ALTER TABLE medias DROP FOREIGN KEY FK_12D2AF81279DA736');
         $this->addSql('DROP TABLE media_owners');

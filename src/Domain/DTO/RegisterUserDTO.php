@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\DTO;
 
@@ -72,14 +72,14 @@ final class RegisterUserDTO
     /**
      * @return string|null
      */
-    public function getFamilyName() : ?string
+    public function getFamilyName(): ?string
     {
         return $this->familyName;
     }
     /**
      * @return string|null
      */
-    public function getFirstName() : ?string
+    public function getFirstName(): ?string
     {
         return $this->firstName;
     }
@@ -87,7 +87,7 @@ final class RegisterUserDTO
     /**
      * @return string|null
      */
-    public function getUserName() : ?string
+    public function getUserName(): ?string
     {
         return $this->userName;
     }
@@ -95,7 +95,7 @@ final class RegisterUserDTO
     /**
      * @return string|null
      */
-    public function getEmail() : ?string
+    public function getEmail(): ?string
     {
         return $this->email;
     }
@@ -103,7 +103,7 @@ final class RegisterUserDTO
     /**
      * @return string|null
      */
-    public function getPasswords() : ?string
+    public function getPasswords(): ?string
     {
         return $this->passwords;
     }
@@ -111,7 +111,7 @@ final class RegisterUserDTO
     /**
      * @return bool
      */
-    public function getAgreement() : bool
+    public function getAgreement(): bool
     {
         return $this->agreement;
     }

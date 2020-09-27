@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Tests\Domain\Entity;
 
@@ -23,15 +23,44 @@ class UserTest extends TestCase
      * Setup one user instance.
      *
      */
-    public function setUp() : void
+    public function setUp(): void
     {
         $this->user = new User(
             'RYAN',
             'Mike',
-            'Rooky',
-            'member1@test.com',
-            '$2y$10$Gh6f0Z.QgweSv5EW6TqHF.oV.lztgNEDStkz2agtQ1EGL3rDogeFi'
+            'Miky',
+            'admin1@test.com',
+            '$2y$10$FG3LeBBCW0J4o.j3TYCoSOeAQqrDO/2Ovbpitv.yB8sJvMq37WPEq'
         );
+    }
+
+    /**
+     * Test if main role label is correct.
+     *
+     * @dataProvider getRolesProvider
+     *
+     * @param array  $roles
+     * @param string $label
+     *
+     * @throws \Exception
+     */
+    public function testGetMainRoleLabel(array $roles, string $label): void
+    {
+        $this->user->modifyRoles($roles);
+        $this->assertEquals($label, $this->user->getMainRoleLabel());
+    }
+
+    /**
+     * @return \Generator
+     */
+    public function getRolesProvider(): \Generator
+    {
+        yield [['ROLE_SUPER_ADMIN'], 'Admin'];
+        yield [['ROLE_ADMIN'], 'Admin'];
+        yield [['ROLE_USER'], 'Member'];
+        yield [['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'], 'Admin'];
+        yield [['ROLE_USER', 'ROLE_ADMIN'], 'Admin'];
+        yield [['ROLE_USER', 'ROLE_SUPER_ADMIN'], 'Admin'];
     }
 
     /**
@@ -39,7 +68,7 @@ class UserTest extends TestCase
      *
      * @throws \Exception
      */
-    public function testModifyUpdateDateCanNotBeSetBeforeCreation() : void
+    public function testModifyUpdateDateCanNotBeSetBeforeCreation(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->user->modifyUpdateDate(new \DateTime('-1days'));
@@ -52,7 +81,7 @@ class UserTest extends TestCase
      *
      * @throws \Exception
      */
-    public function testModifyPasswordHasBCryptFormat() : void
+    public function testModifyPasswordHasBCryptFormat(): void
     {
         $this->user->modifyPassword('$2y$10$mAN1D4rwZT0wnxRM2er/0OfzgpZelwL6PSTNoqC3p/EmfV3lV5DSe', 'BCrypt');
         $password = $this->user->getPassword();
@@ -68,7 +97,7 @@ class UserTest extends TestCase
      *
      * @throws \Exception
      */
-    public function testGenerateRenewalTokenHasAWrongFormat(string $token) : void
+    public function testGenerateRenewalTokenHasAWrongFormat(string $token): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->user->updateRenewalToken($token);
@@ -78,11 +107,48 @@ class UserTest extends TestCase
     /**
      * @return \Generator
      */
-    public function getWrongRenewalTokensDataProvider() : \Generator
+    public function getWrongRenewalTokensDataProvider(): \Generator
     {
         yield [substr(hash('sha256', 'test1' . bin2hex(openssl_random_pseudo_bytes(8))), 0, 0)];
         yield [substr(hash('sha256', 'test2' . bin2hex(openssl_random_pseudo_bytes(8))), 0, 13)];
         yield [substr(hash('sha256', 'test3' . bin2hex(openssl_random_pseudo_bytes(8))), 0, 20)];
+    }
+
+    /**
+     * Test if nickname (username) has a valid format.
+     *
+     * Look at allowed unicode characters.
+     */
+    public function testIsNickNameValidated(): void
+    {
+        $nickname = $this->user->getNickName();
+        $this->assertRegExp('/^[\w-]{3,15}$/u', $nickname);
+    }
+
+    /**
+     * Test if nickname (username) has a valid format.
+     *
+     * @dataProvider getWrongNickNameDataProvider
+     *
+     * @param string $username
+     *
+     * @throws \Exception
+     */
+    public function testIsNickNameValidatedHasWrongFormat(string $username): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->user->modifyNickName($username);
+    }
+
+    /**
+     * @return \Generator
+     */
+    public function getWrongNickNameDataProvider(): \Generator
+    {
+        yield ['No'];
+        yield ['a-very-long-user-nickname'];
+        yield ['a-nickname-@'];
+        yield ['a nickname'];
     }
 
     /**
@@ -92,7 +158,7 @@ class UserTest extends TestCase
      *
      * @throws \Exception
      */
-    public function testUpdateRenewalTokenHasAValidFormat() : void
+    public function testUpdateRenewalTokenHasAValidFormat(): void
     {
         $this->user->updateRenewalToken(
             // Defined principle to generate a token
@@ -107,7 +173,7 @@ class UserTest extends TestCase
      *
      * @throws \Exception
      */
-    public function testUpdateRenewalRequestDateCanNotBeSetBeforeCreation() : void
+    public function testUpdateRenewalRequestDateCanNotBeSetBeforeCreation(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->user->updateRenewalRequestDate(new \DateTime('-1days'));
@@ -116,7 +182,7 @@ class UserTest extends TestCase
     /**
      * Clear setup to free memory.
      */
-    public function tearDown() : void
+    public function tearDown(): void
     {
         $this->user = null;
     }

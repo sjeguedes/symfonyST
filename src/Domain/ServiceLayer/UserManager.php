@@ -1,5 +1,5 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\ServiceLayer;
 
@@ -18,6 +18,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -31,7 +32,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *
  * Manage users to handle, and retrieve them as a "service layer".
  */
-class UserManager
+class UserManager extends AbstractServiceLayer
 {
     use LoggerAwareTrait;
     use UuidHelperTrait;
@@ -40,7 +41,12 @@ class UserManager
      * Define time limit to renew a password
      * when requesting renewal permission by email (forgotten password).
      */
-    public const PASSWORD_RENEWAL_TIME_LIMIT = 60 * 30; // 30 min expressed in seconds to use with timestamps
+    const PASSWORD_RENEWAL_TIME_LIMIT = 60 * 30; // 30 min expressed in seconds to use with timestamps
+
+    /**
+     * Define default super admin user email to avoid issue or repetition.
+     */
+    const DEFAULT_SUPER_ADMIN_USER_EMAIL = 'default1@test.com';
 
     /**
      * @var CustomEventFactoryInterface
@@ -50,7 +56,7 @@ class UserManager
     /**
      * @var EntityManagerInterface
      */
-    private $entityManager;
+    protected $entityManager;
 
     /**
      * @var Request
@@ -102,6 +108,7 @@ class UserManager
         RequestStack $requestStack,
         Security $security
     ) {
+        parent::__construct($entityManager, $logger);
         $this->customEventFactory = $customEventFactory;
         $this->entityManager = $entityManager;
         $this->repository = $repository;
@@ -125,7 +132,7 @@ class UserManager
      *
      * @throws \Exception
      */
-    public function createUser(RegisterUserDTO $dataModel) : User
+    public function createUser(RegisterUserDTO $dataModel): User
     {
         // Create a new instance based on DTO
         $newUser =  new User(
@@ -144,17 +151,17 @@ class UserManager
     /**
      * Try to activate user account.
      *
-     * @param string $userEncodedId a user uuid encoded for url
+     * @param string $userEncodedUuid a user uuid encoded for url
      *
      * @return bool
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function activateAccount(string $userEncodedId) : bool
+    public function activateAccount(string $userEncodedUuid): bool
     {
-        $userToValidate = $this->findSingleByEncodedUuid($userEncodedId);
+        $userToValidate = $this->findSingleByEncodedUuid($userEncodedUuid);
         // User is unknown or his account is already activated.
-        if (\is_null( $userToValidate) || $userToValidate->getIsActivated()) {
+        if (\is_null($userToValidate) || $userToValidate->getIsActivated()) {
             return false;
         }
         // Update account status
@@ -173,9 +180,11 @@ class UserManager
      *
      * @return void
      *
+     * @see https://symfony.com/blog/new-in-symfony-4-3-simpler-event-dispatching#supporting-both-dispatchers
+     *
      * @throws \Exception
      */
-    public function createAndDispatchUserEvent(string $eventContext, User $user) : void
+    public function createAndDispatchUserEvent(string $eventContext, User $user): void
     {
         $event = $this->customEventFactory->createFromContext($eventContext, ['user' => $user]);
         if (\is_null($event)) {
@@ -184,7 +193,9 @@ class UserManager
         $eventName = $this->customEventFactory->getEventNameByContext($eventContext);
         /** @var EventDispatcherInterface $eventDispatcher */
         $eventDispatcher = $this->customEventFactory->getEventDispatcher();
-        $eventDispatcher->dispatch($eventName, $event);
+        // CAUTION! Use LegacyEventDispatcherProxy for forward and backward compatibility since Sf 4.3!
+        $eventDispatcher = LegacyEventDispatcherProxy::decorate($eventDispatcher);
+        $eventDispatcher->dispatch($event, $eventName);
     }
 
     /**
@@ -196,7 +207,7 @@ class UserManager
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function findSingleByEncodedUuid(string $encodedUuid) : ?User
+    public function findSingleByEncodedUuid(string $encodedUuid): ?User
     {
         return $this->repository->findOneByUuid($this->decode($encodedUuid));
     }
@@ -210,7 +221,7 @@ class UserManager
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function findSingleByEmail(string $email) : ?User
+    public function findSingleByEmail(string $email): ?User
     {
         return $this->repository->findOneByEmail($email);
     }
@@ -220,7 +231,7 @@ class UserManager
      *
      * @return UserInterface
      */
-    public function getAuthenticatedMember() : UserInterface
+    public function getAuthenticatedMember(): UserInterface
     {
         return $this->security->getUser();
     }
@@ -234,7 +245,7 @@ class UserManager
      *
      * @return string
      */
-    public function generateCustomToken(string $tokenId) : string
+    public function generateCustomToken(string $tokenId): string
     {
         return substr(hash('sha256', bin2hex($tokenId . openssl_random_pseudo_bytes(8))), 0, 15);
     }
@@ -248,7 +259,7 @@ class UserManager
      *
      * @throws \Exception
      */
-    public function generatePasswordRenewalToken(User $user) : User
+    public function generatePasswordRenewalToken(User $user): User
     {
         $user->updateRenewalRequestDate(new \DateTime('now'));
         $user->updateRenewalToken($this->generateCustomToken($user->getNickName()));
@@ -263,7 +274,7 @@ class UserManager
      *
      * @return EntityManagerInterface
      */
-    public function getEntityManager() : EntityManagerInterface
+    public function getEntityManager(): EntityManagerInterface
     {
         return $this->entityManager;
     }
@@ -273,7 +284,7 @@ class UserManager
      *
      * @return UserRepository
      */
-    public function getRepository() : UserRepository
+    public function getRepository(): UserRepository
     {
         return $this->repository;
     }
@@ -283,7 +294,7 @@ class UserManager
      *
      * @return Security
      */
-    public function getSecurity() : Security
+    public function getSecurity(): Security
     {
         return $this->security;
     }
@@ -295,7 +306,7 @@ class UserManager
      *
      * @throws \Exception
      */
-    public function getUserFoundInPasswordRenewalRequest() : ?User
+    public function getUserFoundInPasswordRenewalRequest(): ?User
     {
         // 2 methods can be used: some request query parameters or attributes (placeholders) are expected in url!
         // User identifier is not used, but expected as mandatory.
@@ -314,7 +325,7 @@ class UserManager
      *
      * @return string
      */
-    public function getUserAuthenticationState() : string
+    public function getUserAuthenticationState(): string
     {
         /** @var User|UserInterface $user */
         if ($user = $this->security->getUser()) {
@@ -339,7 +350,7 @@ class UserManager
      *
      * @throws \Exception
      */
-    public function isPasswordRenewalRequestOutdated(?DateTimeInterface $renewalRequestDate) : bool
+    public function isPasswordRenewalRequestOutdated(?DateTimeInterface $renewalRequestDate): bool
     {
         // Outdated personal link is used to access password renewal page.
         // The reason is user password was already changed, and that caused password request date to be set to "null" again!
@@ -348,6 +359,7 @@ class UserManager
         }
         $now = new \DateTime('now');
         $interval = $now->getTimestamp() - $renewalRequestDate->getTimestamp();
+        // Ternary operator is not necessary but more explicit!
         return $interval > self::PASSWORD_RENEWAL_TIME_LIMIT ? true : false;
     }
 
@@ -360,7 +372,7 @@ class UserManager
      *
      * @throws \Exception
      */
-    public function isPasswordRenewalRequestTokenAllowed(User $user) : bool
+    public function isPasswordRenewalRequestTokenAllowed(User $user): bool
     {
         // 2 methods can be used: some request query parameters or attributes (placeholders) are expected in url!
         // Token is not used, but expected.
@@ -391,9 +403,23 @@ class UserManager
      *
      * @throws \Exception
      */
-    private function removeAvatarImage(User $user, ImageManager $imageService) : void
+    private function removeAvatarImage(User $user, ImageManager $imageService): void
     {
         $imageService->removeUserAvatar($user);
+    }
+
+    /**
+     * Remove a user (account) and all associated entities depending on cascade operations.
+     *
+     * @param User $user
+     * @param bool $isFlushed
+     *
+     * @return bool
+     */
+    public function removeUser(User $user, bool $isFlushed = true): bool
+    {
+        // Proceed to removal in database
+        return $this->removeAndSaveNoMoreEntity($user, $isFlushed);
     }
 
     /**
@@ -406,7 +432,7 @@ class UserManager
      *
      * @throws \Exception
      */
-    public function renewPassword(User $user, string $plainPassword) : User
+    public function renewPassword(User $user, string $plainPassword): User
     {
         // Generate encrypted password with BCrypt
         $newPassword = $this->userPasswordEncoder->encodePassword($plainPassword, null);
@@ -438,8 +464,7 @@ class UserManager
         User $user,
         ImageManager $imageService,
         MediaManager $mediaService
-    ) : bool
-    {
+    ): bool {
         // Data are saved thanks to image service which calls entity manager in both cases, no need to flush change here!
         // Update avatar image media attached to user
         if (!\is_null($dataModel->getAvatar())) {
@@ -500,7 +525,7 @@ class UserManager
      *
      * @throws \Exception
      */
-    public function updateUserProfileInfos(UpdateProfileInfosDTO $dataModel, User $user) : void
+    public function updateUserProfileInfos(UpdateProfileInfosDTO $dataModel, User $user): void
     {
         // Update user
         $user->modifyFamilyName($dataModel->getFamilyName())

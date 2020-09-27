@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\ServiceLayer;
 
@@ -49,8 +49,7 @@ class VideoManager extends AbstractServiceLayer
         VideoRepository $repository,
         MediaManager $mediaManager,
         LoggerInterface $logger
-    )
-    {
+    ) {
         parent::__construct($entityManager, $logger);
         $this->entityManager = $entityManager;
         $this->repository = $repository;
@@ -81,8 +80,7 @@ class VideoManager extends AbstractServiceLayer
         ?Media $newMedia,
         bool $isPersisted = false,
         bool $isFlushed = false
-    ) : ?Video
-    {
+    ): ?Video {
         // Bind associated Media entity if it is expected to ensure correct persistence!
         // This is needed without individual persistence by using cascade option.
         if (!\is_null($newMedia)) {
@@ -111,8 +109,7 @@ class VideoManager extends AbstractServiceLayer
         VideoInfosDTO $dataModel,
         bool $isPersisted = false,
         bool $isFlushed = false
-    ) : ?Video
-    {
+    ): ?Video {
         // Get new trick Video entity
         $newTrickVideo = new Video($dataModel->getSavedVideoName(), $dataModel->getUrl(), $dataModel->getDescription());
         // Return Video entity
@@ -129,7 +126,7 @@ class VideoManager extends AbstractServiceLayer
      *
      * @return string
      */
-    public function generateUniqueVideoNameWithURL(string $videoURL) : string
+    public function generateUniqueVideoNameWithURL(string $videoURL): string
     {
         // Get video provider name with single word
         preg_match('/(youtube|vimeo|dailymotion)/', $videoURL, $matches);
@@ -142,7 +139,7 @@ class VideoManager extends AbstractServiceLayer
      *
      * @return EntityManagerInterface
      */
-    public function getEntityManager() : EntityManagerInterface
+    public function getEntityManager(): EntityManagerInterface
     {
         return $this->entityManager;
     }
@@ -152,7 +149,7 @@ class VideoManager extends AbstractServiceLayer
      *
      * @return VideoRepository
      */
-    public function getRepository() : VideoRepository
+    public function getRepository(): VideoRepository
     {
         return $this->repository;
     }
@@ -165,7 +162,7 @@ class VideoManager extends AbstractServiceLayer
      *
      * @return bool
      */
-    public function removeVideo(Video $video, bool $isFlushed = true) : bool
+    public function removeVideo(Video $video, bool $isFlushed = true): bool
     {
         // Proceed to removal in database
         return $this->removeAndSaveNoMoreEntity($video, $isFlushed);

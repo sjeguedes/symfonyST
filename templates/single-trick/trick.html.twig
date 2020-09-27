@@ -10,16 +10,18 @@
 {% set mediaToExpandDimensions = '' %}
 {# Loop on trick medias using variables to get main image only ! #}
 {% set break = false %}
-{% for media in trick.mediaOwner.medias if not break %}
-    {# Media must be published to be shown. #}
-    {% if media.isPublished == 1 %}
-        {# Extract main image to show #}
-        {% if media.isMain == 1 and media.mediaType.type == mediaTypesValues['trickBig'] %}
-            {% set mainImageUuid = media.mediaSource.image.uuid %}
-            {% set mainImage = asset(globalTrickUploadDirectory~media.mediasource.image.name~'.'~media.mediasource.image.format) %}
-            {% set isMainAvailable = 1 %}
-            {% set mainImageDesc = media.mediasource.image.description %}
-            {% set break = true %}
+{% for media in trick.mediaOwner.medias %}
+    {% if break == false %}
+        {# Media must be published to be shown. #}
+        {% if media.isPublished == 1 %}
+            {# Extract main image to show #}
+            {% if media.isMain == 1 and media.mediaType.type == mediaTypesValues['trickBig'] %}
+                {% set mainImageUuid = media.mediaSource.image.uuid %}
+                {% set mainImage = asset(globalTrickUploadDirectory~media.mediasource.image.name~'.'~media.mediasource.image.format) %}
+                {% set isMainAvailable = 1 %}
+                {% set mainImageDesc = media.mediasource.image.description %}
+                {% set break = true %}
+            {% endif %}
         {% endif %}
     {% endif %}
 {% endfor %}
@@ -136,19 +138,19 @@
                     {% if media.mediaType.type == mediaTypesValues['trickThumbnail'] %}
                     {# ---------------------------------------------------------------------------- #}
                     {# Get big image uuid which corresponds! #}
-                    {% set break = false %}
                     {% set bigImageUuid = null %}
-                    {% for mediaToCompare in trick.mediaOwner.medias if not break %}
-                        {# Compare images names #}
-                        {% if mediaToCompare.mediaType.type == mediaTypesValues['trickBig'] %}
-                        {% set mediaIdentifierName = preg_replace('/\\d{2,}x\\d{2,}/', '', media.mediasource.image.name) %}
-                        {% set mediaToCompareIdentifierName = preg_replace('/\\d{2,}x\\d{2,}/', '', mediaToCompare.mediasource.image.name) %}
-
-                            {% if mediaIdentifierName == mediaToCompareIdentifierName %}
-
-                                {# Get big image uuid in order to use it to create image box update link anchor (hash) for update form  #}
-                                {% set bigImageUuid = mediaToCompare.mediaSource.image.uuid %}
-                                {% set break = true %}
+                    {% set break = false %}
+                    {% for mediaToCompare in trick.mediaOwner.medias %}
+                        {% if break == false %}
+                            {# Compare images names #}
+                            {% if mediaToCompare.mediaType.type == mediaTypesValues['trickBig'] %}
+                            {% set mediaIdentifierName = preg_replace('/\\d{2,}x\\d{2,}/', '', media.mediasource.image.name) %}
+                            {% set mediaToCompareIdentifierName = preg_replace('/\\d{2,}x\\d{2,}/', '', mediaToCompare.mediasource.image.name) %}
+                                {% if mediaIdentifierName == mediaToCompareIdentifierName %}
+                                    {# Get big image uuid in order to use it to create image box update link anchor (hash) for update form  #}
+                                    {% set bigImageUuid = mediaToCompare.mediaSource.image.uuid %}
+                                    {% set break = true %}
+                                {% endif %}
                             {% endif %}
                         {% endif %}
                     {% endfor %}
@@ -285,18 +287,19 @@
             {% endif %}
         </div>
         <!-- Trick comments -->
-        {% if trick.comments|length != 0 %}
+        {% if commentsTotalCount != 0 %}
         {# Comments messages list #}
         <div class="uk-container uk-padding uk-padding-remove-bottom">
             {# Comments #}
             {% include 'single-trick/partials/comment_list.html.twig' with {
                 'commentAjaxLoadingPath': commentAjaxLoadingPath,
-                'commentCount': commentCount,
                 'commentLoadingMode': commentLoadingMode,
                 'commentNumberPerLoading': commentNumberPerLoading,
-                'selectedTrickComments': selectedTrickComments,
+                'commentsTotalCount': commentsTotalCount,
+                'firstLevelCommentsTotalCount': firstLevelCommentsTotalCount,
                 'listEnded': listEnded,
                 'mediaTypesValues': mediaTypesValues,
+                'selectedTrickComments': selectedTrickComments,
                 'technicalError': technicalError,
                 'trick': trick
             } only %}
@@ -307,11 +310,12 @@
             {# ------------------------------------------------------------------------- #}
             {% endif %}
             <!-- Load more -->
-            {% if commentNumberPerLoading < commentCount %}
+            {# Logic is based on first level comments total count! #}
+            {% if commentNumberPerLoading < firstLevelCommentsTotalCount %}
             <div class="uk-flex uk-flex-center uk-margin-medium-top">
                 <button id="st-single-load-more" class="uk-button uk-button-secondary uk-border-rounded uk-box-shadow-hover-medium">
                     <span class="st-single-spinner st-color-yellow uk-hidden" uk-spinner="ratio: 0.8"></span>
-                    Load more&nbsp;&nbsp;<span uk-icon="plus-circle"></span>
+                    Load more <span uk-icon="plus-circle"></span>
                 </button>
             </div>
             {% endif %}
@@ -326,4 +330,11 @@
         {% endif %}
         <!-- End trick comments -->
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset(globalAssetsDirectory~'/js/add-trick-deletion-with-scroll.js') }}"></script>
+    <script src="{{ asset(globalAssetsDirectory~'/js/single-trick.js') }}"></script>
+    <script src="{{ asset(globalAssetsDirectory~'/js/create-or-list-trick-comment.js') }}"></script>
 {% endblock %}

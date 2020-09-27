@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\Entity;
 
@@ -110,7 +110,7 @@ class MediaSource
      *
      * @return $this
      */
-    public function setImage(Image $image) : self
+    public function setImage(Image $image): self
     {
         $this->image = $image;
         return $this;
@@ -123,7 +123,7 @@ class MediaSource
      *
      * @return $this
      */
-    public function assignMedia(Media $media) : self
+    public function assignMedia(Media $media): self
     {
         $this->media = $media;
         return $this;
@@ -138,7 +138,7 @@ class MediaSource
      *
      * @return $this
      */
-    public function setVideo(Video $video) : self
+    public function setVideo(Video $video): self
     {
         $this->video = $video;
         return $this;
@@ -147,7 +147,7 @@ class MediaSource
     /**
      * @return UuidInterface
      */
-    public function getUuid() : UuidInterface
+    public function getUuid(): UuidInterface
     {
         return $this->uuid;
     }
@@ -155,7 +155,7 @@ class MediaSource
     /**
      * @return Image|null
      */
-    public function getImage() : ?Image
+    public function getImage(): ?Image
     {
         return $this->image;
     }
@@ -163,7 +163,7 @@ class MediaSource
     /**
      * @return Media
      */
-    public function getMedia() : Media
+    public function getMedia(): Media
     {
         return $this->media;
     }
@@ -171,7 +171,7 @@ class MediaSource
     /**
      * @return Video|null
      */
-    public function getVideo() : ?Video
+    public function getVideo(): ?Video
     {
         return $this->video;
     }
@@ -179,7 +179,7 @@ class MediaSource
     /**
      * @return \DateTimeInterface
      */
-    public function getCreationDate() : \DateTimeInterface
+    public function getCreationDate(): \DateTimeInterface
     {
         return $this->creationDate;
     }
@@ -187,7 +187,7 @@ class MediaSource
     /**
      * @return \DateTimeInterface
      */
-    public function getUpdateDate() : \DateTimeInterface
+    public function getUpdateDate(): \DateTimeInterface
     {
         return $this->updateDate;
     }

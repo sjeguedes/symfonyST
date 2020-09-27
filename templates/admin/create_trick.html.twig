@@ -1,5 +1,10 @@
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ asset(globalAssetsDirectory~'/css/create-or-update-trick.css') }}" rel="stylesheet" />
+{% endblock %}
+
 {% block title %}SnowTricks - Trick creation form{% endblock %}
 
 {% block header %}
@@ -423,4 +428,10 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset(globalAssetsDirectory~'/js/create-or-update-trick.js') }}"></script>
+    <script src="{{ asset(globalAssetsDirectory~'/js/sort-media-box.js') }}"></script>
 {% endblock %}

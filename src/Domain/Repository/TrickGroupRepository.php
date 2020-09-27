@@ -1,13 +1,13 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\Repository;
 
 use App\Domain\Entity\TrickGroup;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Ramsey\Uuid\UuidInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
  * Class TrickGroupRepository.
@@ -19,9 +19,9 @@ class TrickGroupRepository extends ServiceEntityRepository
     /**
      * TrickGroupRepository constructor.
      *
-     * @param RegistryInterface $registry
+     * @param ManagerRegistry $registry
      */
-    public function __construct(RegistryInterface $registry)
+    public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, TrickGroup::class);
     }
@@ -42,9 +42,9 @@ class TrickGroupRepository extends ServiceEntityRepository
      * @see: use of string codec instead of uuid:
      * https://github.com/ramsey/uuid/blob/29fb62b48611761b4c0c4e8f4a428cad19c2b690/src/Codec/StringCodec.php#L61-L100
      */
-    public function findOneByUuid(UuidInterface $uuid) : ?TrickGroup
+    public function findOneByUuid(UuidInterface $uuid): ?TrickGroup
     {
-        $queryBuilder = $this->createQueryBuilder('tg' );
+        $queryBuilder = $this->createQueryBuilder('tg');
         $result = $queryBuilder
             ->select('tg')
             ->where('tg.uuid = ?1')

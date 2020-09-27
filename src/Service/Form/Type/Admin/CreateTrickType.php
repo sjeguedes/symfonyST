@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Form\Type\Admin;
 
@@ -66,8 +66,7 @@ class CreateTrickType extends AbstractTrickType
         VideoManager $videoService,
         RequestStack $requestStack,
         TrickGroupManager $trickGroupService
-    )
-    {
+    ) {
         parent::__construct($mediaTypeService, $imageService, $videoService);
         $this->request = $requestStack->getCurrentRequest();
         $this->trickGroupService = $trickGroupService;
@@ -87,7 +86,7 @@ class CreateTrickType extends AbstractTrickType
      * https://github.com/symfony/symfony/issues/25675
      * https://stackoverflow.com/questions/25363926/symfony-form-with-form-collection-cannot-pass-options-array-into-sub-forms
      */
-    public function buildForm(FormBuilderInterface $builder, array $options) : void
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $trickGroupService = $this->trickGroupService;
         $builder
@@ -164,7 +163,7 @@ class CreateTrickType extends AbstractTrickType
      *
      * @return void
      */
-    public function configureOptions(OptionsResolver $resolver) : void
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class'     => CreateTrickDTO::class,

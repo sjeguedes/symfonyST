@@ -1,13 +1,13 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Action;
 
 use App\Domain\Entity\Comment;
 use App\Domain\ServiceLayer\CommentManager;
 use App\Domain\ServiceLayer\MediaTypeManager;
-use App\Responder\AjaxCommentListResponder;
+use App\Responder\TemplateBlockResponder;
 use App\Utils\Traits\UuidHelperTrait;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
@@ -66,14 +66,17 @@ class AjaxCommentListAction extends AbstractCommentListAction
      *     name="load_trick_comments_offset_limit", methods={"GET"}
      * )
      *
-     * @param AjaxCommentListResponder $responder
-     * @param Request                  $request
+     * @param TemplateBlockResponder $responder
+     * @param Request                $request
      *
      * @return Response
      *
+     * CAUTION! Update any URI change in:
+     * @see LoginFormAuthenticationManager::onAuthenticationSuccess()
+     *
      * @throws \Throwable
      */
-    public function __invoke(AjaxCommentListResponder $responder, Request $request) : Response
+    public function __invoke(TemplateBlockResponder $responder, Request $request): Response
     {
         // Filter AJAX request
         if (!$request->isXmlHttpRequest()) {
@@ -103,16 +106,18 @@ class AjaxCommentListAction extends AbstractCommentListAction
             );
         }
         $data = [
-            'ajaxMode'              => true,
-            // Get total trick comment count
-            'commentCount'          => $selectedTrickCommentsData['commentsTotalCount'],
+            'ajaxMode'                     => true,
+            // Get all trick comments total count
+            'commentsTotalCount'           => $selectedTrickCommentsData['commentsTotalCount'],
+            // Get only first level trick comments total count
+            'firstLevelCommentsTotalCount' => $selectedTrickCommentsData['firstLevelCommentsTotalCount'],
             // Get list error by checking outdated comment count to reinitialize list
-            'listError'             => $listError,
-            'selectedTrickComments' => $selectedTrickCommentsData['commentListWithRanks']
+            'listError'                    => $listError,
+            'selectedTrickComments'        => $selectedTrickCommentsData['commentListWithRanks']
         ];
         // Get complementary needed comment list and medias (avatar) data
         $data = array_merge($this->getCommentListData(), $this->getMediasData(), $data);
-        return $responder($data);
+        return $responder($data, self::class);
     }
 
     /**
@@ -124,12 +129,12 @@ class AjaxCommentListAction extends AbstractCommentListAction
      *
      * @return string|null an error notification message as "$listError"
      */
-    private function checkOutdatedCommentList(UuidInterface $trickUuid, int $commentCount) : ?string
+    private function checkOutdatedCommentList(UuidInterface $trickUuid, int $commentCount): ?string
     {
         $listError = null;
         if ($this->commentService->isCountAllOutdated($trickUuid, $commentCount)) {
             $this->logger->error(
-                "[trace app snowTricks] AjaxCommentListAction/__invoke => commentCount: $commentCount"
+                "[trace app SnowTricks] AjaxCommentListAction/__invoke => commentCount: $commentCount"
             );
             $listError = 'Trick comment list was reinitialized!' . "\n" .
                 'Wrong total count is used' . "\n" .

@@ -8,7 +8,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
 /**
- * Auto-generated Migration: Please modify to your needs!
+ * Version20200825125111 migration class.
  *
  * @see integrity constraint violation with self referencing issue and work around:
  * https://github.com/doctrine/data-fixtures/issues/159
@@ -16,20 +16,36 @@ use Doctrine\Migrations\AbstractMigration;
  */
 final class Version20200825125111 extends AbstractMigration
 {
-    public function up(Schema $schema) : void
+    /**
+     * Alter comments table to add constraint on parent comment uuid.
+     *
+     * @param Schema $schema
+     *
+     * @return void
+     *
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Migrations\AbortMigrationException
+     */
+    public function up(Schema $schema): void
     {
-        // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
-
         $this->addSql('ALTER TABLE comments DROP FOREIGN KEY FK_5F9E962AA727AF64');
         $this->addSql('ALTER TABLE comments ADD CONSTRAINT FK_5F9E962AA727AF64 FOREIGN KEY (parent_comment_uuid) REFERENCES comments (uuid) ON DELETE SET NULL');
     }
 
-    public function down(Schema $schema) : void
+    /**
+     * Cancel "alter comments table to add constraint on parent comment uuid".
+     *
+     * @param Schema $schema
+     *
+     * @return void
+     *
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Migrations\AbortMigrationException
+     */
+    public function down(Schema $schema): void
     {
-        // this down() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
-
         $this->addSql('ALTER TABLE comments DROP FOREIGN KEY FK_5F9E962AA727AF64');
         $this->addSql('ALTER TABLE comments ADD CONSTRAINT FK_5F9E962AA727AF64 FOREIGN KEY (parent_comment_uuid) REFERENCES comments (uuid)');
     }

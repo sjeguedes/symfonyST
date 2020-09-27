@@ -38,7 +38,7 @@
             </div>
             <div class="uk-flex-center uk-grid uk-grid-collapse">
                 <div class="uk-width-5-6 uk-width-2-3@s uk-width-3-5@m uk-width-1-2@l uk-width-2-5@xl uk-card uk-card-primary uk-box-shadow-medium st-border-white-small">
-                    {% if uniqueUserError is not null %}
+                    {% if uniqueUserError %}
                         <div class="uk-card-header uk-padding-small uk-text-center">
                             {# User error #}
                             <div class="uk-label uk-form-danger uk-box-shadow-large uk-text-bold">
@@ -50,7 +50,7 @@
                         </div>
                     {% endif %}
                     {# Registration form #}
-                    <div id="st-form" class="uk-card-body uk-padding-medium{{ registerForm.vars.valid == 1 and uniqueUserError is null ?: ' st-form-error' }}">
+                    <div id="st-form" class="uk-card-body uk-padding-medium{{ registerForm.vars.valid == 1 and uniqueUserError == false ?: ' st-form-error' }}">
                         {% form_theme registerForm 'partials/form/uikit_3_form.html.twig' %}
                         {{ form_start(registerForm, {'attr': {'class': 'uk-grid uk-grid-collapse', 'novalidate': ''}}) }}
                             {# Family name #}
@@ -271,7 +271,10 @@
                                                     <small>
                                                         Your account will not be used for commercial ads or given to our partners.<br>
                                                         Your personal data can be modified or deleted by using a simple request sent to:
-                                                        <strong><a class="uk-link-text" href="mailto:{{ globalContactEmail }}" title="Contact Email"><span class="st-color-blue">SnowTricks - Member service</span></a></strong>
+                                                        <strong><a class="uk-link-text" href="mailto:{{ globalContactEmail }}" title="Contact Email"><span class="st-color-blue">SnowTricks - Member service</span></a></strong><br>
+                                                        You are also able to <strong><span class="st-color-orange">delete your account</span></strong> on your own, at any time.<br>
+                                                        Please simply note your created tricks and their associated images will still be shared to our community.<br>
+                                                        By registering on our website, you are allowed to create, update or delete your snowboard tricks, and comment all existing ones (with possible reply or comment deletion as moderation).
                                                     </small>
                                                 </p>
                                             </div>
@@ -306,4 +309,9 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset(globalAssetsDirectory~'/js/common.js') }}"></script>
 {% endblock %}

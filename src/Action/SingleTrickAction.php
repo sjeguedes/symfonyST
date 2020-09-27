@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Action;
 
@@ -9,7 +9,7 @@ use App\Domain\Entity\Trick;
 use App\Domain\ServiceLayer\CommentManager;
 use App\Domain\ServiceLayer\MediaTypeManager;
 use App\Domain\ServiceLayer\TrickManager;
-use App\Responder\SingleTrickResponder;
+use App\Responder\TemplateResponder;
 use App\Service\Form\Handler\FormHandlerInterface;
 use App\Service\Security\Voter\TrickVoter;
 use App\Utils\Traits\RouterHelperTrait;
@@ -97,15 +97,15 @@ class SingleTrickAction extends AbstractCommentListAction
      *     "en": "/{_locale<en>}/trick/{slug<[\w-]+>}-{encodedUuid<\w+>}"
      * }, name="show_single_trick", methods={"GET"})
      *
-     * @param SingleTrickResponder $responder
-     * @param Request              $request
+     * @param TemplateResponder $responder
+     * @param Request           $request
      *
      * @return Response
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      * @throws \Exception
      */
-    public function __invoke(SingleTrickResponder $responder, Request $request) : Response
+    public function __invoke(TemplateResponder $responder, Request $request): Response
     {
         // Check access to single page
         $currentTrick = $this->checkAccessToSingleAction($request);
@@ -122,18 +122,20 @@ class SingleTrickAction extends AbstractCommentListAction
         );
         $data = [
             // Offset and limit are not defined by default here!
-            'commentAjaxLoadingPath'    => $this->router->generate(
+            'commentAjaxLoadingPath'       => $this->router->generate(
                 'load_trick_comments_offset_limit', [
                 'trickEncodedUuid' => $request->attributes->get('encodedUuid')
             ]),
-            'createCommentForm'         => $createTrickCommentForm->createView(),
-            // Get total trick comment count
-            'commentCount'              => $selectedTrickCommentsData['commentsTotalCount'],
-            'selectedTrickComments'     => $selectedTrickCommentsData['commentListWithRanks'],
-            'trick'                     => $currentTrick,
-            'trickCommentCreationError' => null,
+            'createCommentForm'            => $createTrickCommentForm->createView(),
+            // Get all trick comments total count
+            'commentsTotalCount'           => $selectedTrickCommentsData['commentsTotalCount'],
+            // Get only first level trick comments total count
+            'firstLevelCommentsTotalCount' => $selectedTrickCommentsData['firstLevelCommentsTotalCount'],
+            'selectedTrickComments'        => $selectedTrickCommentsData['commentListWithRanks'],
+            'trick'                        => $currentTrick,
+            'trickCommentCreationError'    => null,
             // Empty declared url is more explicit!
-            'videoURLProxyPath'         => $this->router->generate(
+            'videoURLProxyPath'            => $this->router->generate(
                 'load_trick_video_url_check', [
                     'url' => ''
             ])
@@ -145,7 +147,7 @@ class SingleTrickAction extends AbstractCommentListAction
         );
         // Get complementary needed comment list and medias data
         $data = array_merge($this->getCommentListData(), $this->getMediasData(), $data);
-        return $responder($data);
+        return $responder($data, self::class);
     }
 
     /**
@@ -157,7 +159,7 @@ class SingleTrickAction extends AbstractCommentListAction
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    private function checkAccessToSingleAction(Request $request) : Trick
+    private function checkAccessToSingleAction(Request $request): Trick
     {
         // Check if a trick can be retrieved thanks to its uuid
         $trick = $this->trickService->findSingleToShowByEncodedUuid($request->attributes->get('encodedUuid'));
@@ -166,7 +168,7 @@ class SingleTrickAction extends AbstractCommentListAction
         }
         // Check access permissions to view this trick
         if (!$this->authorizationChecker->isGranted(TrickVoter::AUTHOR_OR_ADMIN_CAN_VIEW_UNPUBLISHED_TRICKS, $trick)) {
-            throw new AccessDeniedException("Current user can not view this unpublished trick!");
+            throw new AccessDeniedException("Current user cannot view this unpublished trick!");
         }
         return $trick;
     }

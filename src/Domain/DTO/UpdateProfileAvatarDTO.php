@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\DTO;
 
@@ -50,7 +50,7 @@ final class UpdateProfileAvatarDTO extends AbstractReadableDTO
     /**
      * @return UploadedFile|null
      */
-    public function getAvatar() : ?UploadedFile
+    public function getAvatar(): ?UploadedFile
     {
         return $this->avatar;
     }
@@ -58,7 +58,7 @@ final class UpdateProfileAvatarDTO extends AbstractReadableDTO
     /**
      * @return bool
      */
-    public function getRemoveAvatar() : bool
+    public function getRemoveAvatar(): bool
     {
         return $this->removeAvatar;
     }
@@ -66,7 +66,7 @@ final class UpdateProfileAvatarDTO extends AbstractReadableDTO
     /**
      * @return string|null
      */
-    public function getCropJSONData() : ?string
+    public function getCropJSONData(): ?string
     {
         return $this->cropJSONData;
     }
@@ -76,7 +76,7 @@ final class UpdateProfileAvatarDTO extends AbstractReadableDTO
      *
      * @return UpdateProfileAvatarDTO
      */
-    public function setAvatar(?UploadedFile $avatar) : self
+    public function setAvatar(?UploadedFile $avatar): self
     {
         $this->avatar = $avatar;
         return $this;
@@ -87,7 +87,7 @@ final class UpdateProfileAvatarDTO extends AbstractReadableDTO
      *
      * @return UpdateProfileAvatarDTO
      */
-    public function setRemoveAvatar(bool $removeAvatar) : self
+    public function setRemoveAvatar(bool $removeAvatar): self
     {
         $this->removeAvatar = $removeAvatar;
         return $this;
@@ -98,7 +98,7 @@ final class UpdateProfileAvatarDTO extends AbstractReadableDTO
      *
      * @return UpdateProfileAvatarDTO
      */
-    public function setCropJSONData(?string $cropJSONData) : self
+    public function setCropJSONData(?string $cropJSONData): self
     {
         $this->cropJSONData = $cropJSONData;
         return $this;

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\ServiceLayer;
 
@@ -47,7 +47,7 @@ class TrickGroupManager
      *
      * @return EntityManagerInterface
      */
-    public function getEntityManager() : EntityManagerInterface
+    public function getEntityManager(): EntityManagerInterface
     {
         return $this->entityManager;
     }
@@ -57,7 +57,7 @@ class TrickGroupManager
      *
      * @return TrickGroupRepository
      */
-    public function getRepository() : TrickGroupRepository
+    public function getRepository(): TrickGroupRepository
     {
         return $this->repository;
     }

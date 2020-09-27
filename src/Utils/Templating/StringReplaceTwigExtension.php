@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Utils\Templating;
 
@@ -19,7 +19,7 @@ class StringReplaceTwigExtension extends AbstractExtension
      *
      * @return array
      */
-    public function getFunctions() : array
+    public function getFunctions(): array
     {
         return [
             new TwigFunction(
@@ -39,7 +39,7 @@ class StringReplaceTwigExtension extends AbstractExtension
      *
      * @return string
      */
-    public function replace(string $pattern, string $replacement, string $subject) : string
+    public function replace(string $pattern, string $replacement, string $subject): string
     {
         return preg_replace($pattern, $replacement, $subject);
     }

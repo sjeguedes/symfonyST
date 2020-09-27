@@ -1,13 +1,13 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Action\Admin;
 
 use App\Domain\ServiceLayer\UserManager;
-use App\Service\Form\Handler\FormHandlerInterface;
-use App\Responder\Admin\RenewPasswordResponder;
+use App\Responder\TemplateResponder;
 use App\Responder\Redirection\RedirectionResponder;
+use App\Service\Form\Handler\FormHandlerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
@@ -21,7 +21,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class RenewPasswordAction
 {
     /**
-     * @var UserManager $userService
+     * @var UserManager
      */
     private $userService;
 
@@ -56,19 +56,19 @@ class RenewPasswordAction
      *     "en": "/{_locale<en>}/renew-password/{userId}/{renewalToken}"
      * }, name="renew_password_with_personal_link", methods={"GET", "POST"})
      *
-     * @param RedirectionResponder   $redirectionResponder
-     * @param RenewPasswordResponder $responder
-     * @param Request                $request
+     * @param RedirectionResponder $redirectionResponder
+     * @param TemplateResponder    $responder
+     * @param Request              $request
      *
      * @return Response
      *
      * @throws \Exception
      */
-    public function __invoke(RedirectionResponder $redirectionResponder, RenewPasswordResponder $responder, Request $request) : Response
+    public function __invoke(RedirectionResponder $redirectionResponder, TemplateResponder $responder, Request $request): Response
     {
         // Try to identify user in personal link
         $identifiedUser = $this->userService->getUserFoundInPasswordRenewalRequest();
-        // User can not be retrieved or
+        // User cannot be retrieved or
         // personal requested token does not match user token or renewal request date (forgotten password process) is outdated.
         if (\is_null($identifiedUser) || !$this->userService->isPasswordRenewalRequestTokenAllowed($identifiedUser)) {
             $this->flashBag->add(
@@ -95,6 +95,6 @@ class RenewPasswordAction
             'userNameError'     => $this->formHandler->getUserNameError() ?? null,
             'renewPasswordForm' => $renewPasswordForm->createView()
         ];
-        return $responder($data);
+        return $responder($data, self::class);
     }
 }

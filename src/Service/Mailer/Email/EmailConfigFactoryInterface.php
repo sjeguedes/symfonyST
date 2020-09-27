@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Mailer\Email;
 
@@ -21,5 +21,5 @@ interface EmailConfigFactoryInterface
      *
      * @return EmailConfigInterface
      */
-    public function createFromActionContext(string $actionClassName, string $actionContext, array $emailParameters) : EmailConfigInterface;
+    public function createFromActionContext(string $actionClassName, string $actionContext, array $emailParameters): EmailConfigInterface;
 }

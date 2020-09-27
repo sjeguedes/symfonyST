@@ -1,7 +1,7 @@
 <div id="st-comment-{{ currentKey }}"
      class="uk-card uk-card-default uk-position-relative uk-box-shadow-hover-large st-background-yellow st-border-white-small">
     {# Last comment indicator #}
-    {%  set LastRank = commentCount - 1 %}
+    {% set LastRank = commentsTotalCount - 1 %}
     {% if currentKey - 1 == LastRank %}
     <div id="st-last-comment-indicator" class="uk-position-top-right uk-text-center uk-text-small uk-text-uppercase uk-text-bold uk-padding-small uk-padding-remove-top uk-padding-remove-bottom st-background-blue st-last-comment-indicator">
         <span class="st-color-yellow">Last most recent comment</span>

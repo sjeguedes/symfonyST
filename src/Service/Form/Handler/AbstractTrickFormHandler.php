@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Form\Handler;
 
@@ -111,8 +111,7 @@ class AbstractTrickFormHandler extends AbstractUploadFormHandler
         Trick $trick,
         ImageToCropDTO $imageToCropDTO,
         array $actionData
-    ) : bool
-    {
+    ): bool {
         /** @var ImageManager $imageService */
         $imageService = $actionData['imageService'];
         // Get trick media owner
@@ -185,8 +184,7 @@ class AbstractTrickFormHandler extends AbstractUploadFormHandler
         Trick $trick,
         VideoInfosDTO $videoInfosDTO,
         array $actionData
-    ) : bool
-    {
+    ): bool {
         /** @var VideoManager $videoService */
         $videoService = $actionData['videoService'];
         /** @var MediaManager $mediaService */
@@ -240,7 +238,7 @@ class AbstractTrickFormHandler extends AbstractUploadFormHandler
      *
      * @return void
      */
-    protected function checkCollectionInstanceType(?object $collectionItemDataModel) : void
+    protected function checkCollectionInstanceType(?object $collectionItemDataModel): void
     {
         $condition = !\is_null($collectionItemDataModel) &&
             !$collectionItemDataModel instanceof ImageToCropDTO &&
@@ -262,7 +260,7 @@ class AbstractTrickFormHandler extends AbstractUploadFormHandler
      *
      * @return bool
      */
-    protected function checkUniqueVideoUrl(DTOCollection $videosCollection) : bool
+    protected function checkUniqueVideoUrl(DTOCollection $videosCollection): bool
     {
         $urls = [];
         foreach ($videosCollection as $videoInfos) {
@@ -292,8 +290,7 @@ class AbstractTrickFormHandler extends AbstractUploadFormHandler
         Image $baseImageEntity,
         string $mediaTypeKey,
         array $actionData
-    ) : ?Image
-    {
+    ): ?Image {
         /** @var ImageManager $imageService */
         $imageService = $actionData['imageService'];
         /** @var MediaManager $mediaService */
@@ -367,7 +364,7 @@ class AbstractTrickFormHandler extends AbstractUploadFormHandler
      *
      * @return string
      */
-    protected function manageTrickMediaCreationError(object $collectionItemDataModel, string $contextKey) : string
+    protected function manageTrickMediaCreationError(object $collectionItemDataModel, string $contextKey): string
     {
         // Prepare adapted texts depending on context.
         $text = self::TRICK_NEW_MEDIA_ERROR_TEXTS[$contextKey]['text'];
@@ -380,7 +377,7 @@ class AbstractTrickFormHandler extends AbstractUploadFormHandler
                 $errorMessage = 'Sorry, expected trick was not ' . $text . '!' . "\n" .
                                 'An error occurred during image(s) medias handling.';
                 $loggerMessage = sprintf(
-                    "[trace app snowTricks] ' . $action . ' => " .
+                    "[trace app SnowTricks] ' . $action . ' => " .
                     "Trick image issue with identifier: %s",
                     $imageIdentifierName
                 );
@@ -395,7 +392,7 @@ class AbstractTrickFormHandler extends AbstractUploadFormHandler
                 $errorMessage = 'Sorry, expected trick was not ' . $text . '!' . "\n" .
                                 'An error occurred during' . "\n" . 'video(s) medias management.';
                 $loggerMessage = sprintf(
-                    "[trace app snowTricks] ' . $action . ' => " .
+                    "[trace app SnowTricks] ' . $action . ' => " .
                     "Trick video issue with: %s",
                     $videoURL
                 );
@@ -431,8 +428,7 @@ class AbstractTrickFormHandler extends AbstractUploadFormHandler
         Image $bigImageEntity,
         Trick $trick,
         array $actionData
-    ) : ?string
-    {
+    ): ?string {
         /** @var ImageManager $imageService */
         $imageService = $actionData['imageService'];
         // Update big image Image entity (image name corresponds to "saveImageName" ImageToCropDTO property)
@@ -478,8 +474,7 @@ class AbstractTrickFormHandler extends AbstractUploadFormHandler
         ImageManager $imageService,
         array $callable = null,
         array $args = null
-    ) : void
-    {
+    ): void {
         // Control expected collection instance type
         $this->checkCollectionInstanceType($collectionItemDataModel);
         // Purge any potential orphaned images physical files
@@ -488,7 +483,7 @@ class AbstractTrickFormHandler extends AbstractUploadFormHandler
             $imageService->getRepository()->findAll()
         );
         $exceptionMessage = !\is_null($collectionItemDataModel)
-            ? $this->manageTrickMediaCreationError($collectionItemDataModel, $contextKey) : null;
+            ? $this->manageTrickMediaCreationError($collectionItemDataModel, $contextKey): null;
         // Add possibly some text to exception message with a callable
         if (!\is_null($callable) && !\is_null($args)) {
             array_push($args, $exceptionMessage);

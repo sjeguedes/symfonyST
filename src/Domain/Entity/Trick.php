@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\Entity;
 
@@ -155,8 +155,8 @@ class Trick
         bool $isPublished = false,
         \DateTimeInterface $creationDate = null
     ) {
-        \assert(!empty($name), 'Trick name can not be empty!');
-        \assert(!empty($description), 'Trick description can not be empty!');
+        \assert(!empty($name), 'Trick name cannot be empty!');
+        \assert(!empty($description), 'Trick description cannot be empty!');
         $this->uuid = Uuid::uuid4();
         $this->trickGroup = $trickGroup;
         $this->user = $user;
@@ -178,7 +178,7 @@ class Trick
      *
      * @return $this
      */
-    public function assignMediaOwner(MediaOwner $mediaOwner) : self
+    public function assignMediaOwner(MediaOwner $mediaOwner): self
     {
         $this->mediaOwner = $mediaOwner;
         return $this;
@@ -193,10 +193,10 @@ class Trick
      *
      * @throws \Exception
      */
-    public function modifyName(string $name) : self
+    public function modifyName(string $name): self
     {
         if (empty($name)) {
-            throw new \InvalidArgumentException('Trick name can not be empty!');
+            throw new \InvalidArgumentException('Trick name cannot be empty!');
         }
         $this->name = $name;
         return $this;
@@ -211,10 +211,10 @@ class Trick
      *
      * @throws \Exception
      */
-    public function modifyDescription(string $description) : self
+    public function modifyDescription(string $description): self
     {
         if (empty($description)) {
-            throw new \InvalidArgumentException('Trick description can not be empty!');
+            throw new \InvalidArgumentException('Trick description cannot be empty!');
         }
         $this->description = $description;
         return $this;
@@ -229,10 +229,10 @@ class Trick
      *
      * @throws \Exception
      */
-    public function customizeSlug(string $slug) : self
+    public function customizeSlug(string $slug): self
     {
         if (empty($slug)) {
-            throw new \InvalidArgumentException('Trick slug can not be empty!');
+            throw new \InvalidArgumentException('Trick slug cannot be empty!');
         }
         $this->slug = $this->makeSlug($slug);
         return $this;
@@ -245,7 +245,7 @@ class Trick
      *
      * @return Trick
      */
-    public function modifyIsPublished(bool $isPublished) : self
+    public function modifyIsPublished(bool $isPublished): self
     {
         $this->isPublished = $isPublished;
         return $this;
@@ -260,10 +260,10 @@ class Trick
      *
      * @throws \Exception
      */
-    public function modifyUpdateDate(\DateTimeInterface $updateDate) : self
+    public function modifyUpdateDate(\DateTimeInterface $updateDate): self
     {
         if ($this->creationDate > $updateDate) {
-            throw new \RuntimeException('Update date is not logical: Trick can not be created after modified update date!');
+            throw new \RuntimeException('Update date is not logical: Trick cannot be created after modified update date!');
         }
         $this->updateDate = $updateDate;
         return $this;
@@ -276,7 +276,7 @@ class Trick
      *
      * @return Trick
      */
-    public function modifyTrickGroup(TrickGroup $trickGroup) : self
+    public function modifyTrickGroup(TrickGroup $trickGroup): self
     {
         $this->trickGroup = $trickGroup;
         return $this;
@@ -289,7 +289,7 @@ class Trick
      *
      * @return Trick
      */
-    public function modifyUser(User $user) : self
+    public function modifyUser(User $user): self
     {
         $this->user = $user;
         return $this;
@@ -302,7 +302,7 @@ class Trick
      *
      * @return Trick
      */
-    public function addComment(Comment $comment) : self
+    public function addComment(Comment $comment): self
     {
         if (!$this->comments->contains($comment)) {
             $this->comments->add($comment);
@@ -318,7 +318,7 @@ class Trick
      *
      * @return Trick
      */
-    public function removeComment(Comment $comment) : self
+    public function removeComment(Comment $comment): self
     {
         if ($this->comments->contains($comment)) {
             $this->comments->removeElement($comment);
@@ -337,10 +337,10 @@ class Trick
      *
      * @throws \Exception
      */
-    public function assignCommentCount(int $commentCount) : self
+    public function assignCommentCount(int $commentCount): self
     {
         if ($commentCount < 0) {
-            throw new \InvalidArgumentException('Trick comments length value can not be negative!');
+            throw new \InvalidArgumentException('Trick comments length value cannot be negative!');
         }
         $this->commentCount = $commentCount;
         return $this;
@@ -357,10 +357,10 @@ class Trick
      *
      * @throws \Exception
      */
-    public function assignRank(int $rank) : self
+    public function assignRank(int $rank): self
     {
         if ($rank < 0) {
-            throw new \InvalidArgumentException('Trick rank value can not be negative!');
+            throw new \InvalidArgumentException('Trick rank value cannot be negative!');
         }
         $this->rank = $rank;
         return $this;
@@ -369,7 +369,7 @@ class Trick
     /**
      * @return UuidInterface
      */
-    public function getUuid() : UuidInterface
+    public function getUuid(): UuidInterface
     {
         return $this->uuid;
     }
@@ -377,7 +377,7 @@ class Trick
     /**
      * @return string
      */
-    public function getName() : string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -385,7 +385,7 @@ class Trick
     /**
      * @return string
      */
-    public function getDescription() : string
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -393,7 +393,7 @@ class Trick
     /**
      * @return \DateTimeInterface
      */
-    public function getCreationDate() : \DateTimeInterface
+    public function getCreationDate(): \DateTimeInterface
     {
         return $this->creationDate;
     }
@@ -401,7 +401,7 @@ class Trick
     /**
      * @return \DateTimeInterface
      */
-    public function getUpdateDate() : \DateTimeInterface
+    public function getUpdateDate(): \DateTimeInterface
     {
         return $this->updateDate;
     }
@@ -409,7 +409,7 @@ class Trick
     /**
      * @return string
      */
-    public function getSlug() : string
+    public function getSlug(): string
     {
         return $this->slug;
     }
@@ -417,7 +417,7 @@ class Trick
     /**
      * @return bool
      */
-    public function getIsPublished() : bool
+    public function getIsPublished(): bool
     {
         return $this->isPublished;
     }
@@ -425,7 +425,7 @@ class Trick
     /**
      * @return Collection|Comment[]
      */
-    public function getComments() : Collection
+    public function getComments(): Collection
     {
         return $this->comments;
     }
@@ -435,7 +435,7 @@ class Trick
      *
      * * The media owner can be null when no media is set (trick creation/update)!
      */
-    public function getMediaOwner() : ?MediaOwner
+    public function getMediaOwner(): ?MediaOwner
     {
         return $this->mediaOwner;
     }
@@ -443,7 +443,7 @@ class Trick
     /**
      * @return TrickGroup
      */
-    public function getTrickGroup() : TrickGroup
+    public function getTrickGroup(): TrickGroup
     {
         return $this->trickGroup;
     }
@@ -453,7 +453,7 @@ class Trick
      *
      * This is the trick author.
      */
-    public function getUser() : User
+    public function getUser(): User
     {
         return $this->user;
     }
@@ -461,7 +461,7 @@ class Trick
     /**
      * @return int|null
      */
-    public function getRank() : ?int
+    public function getRank(): ?int
     {
         return $this->rank;
     }
@@ -469,7 +469,7 @@ class Trick
     /**
      * @return int|null
      */
-    public function getCommentCount() : ?int
+    public function getCommentCount(): ?int
     {
         return $this->commentCount;
     }

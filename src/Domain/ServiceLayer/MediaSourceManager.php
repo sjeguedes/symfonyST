@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\ServiceLayer;
 
@@ -49,7 +49,7 @@ class MediaSourceManager extends AbstractServiceLayer
      *
      * @return EntityManagerInterface
      */
-    public function getEntityManager() : EntityManagerInterface
+    public function getEntityManager(): EntityManagerInterface
     {
         return $this->entityManager;
     }
@@ -59,7 +59,7 @@ class MediaSourceManager extends AbstractServiceLayer
      *
      * @return MediaSourceRepository
      */
-    public function getRepository() : MediaSourceRepository
+    public function getRepository(): MediaSourceRepository
     {
         return $this->repository;
     }
@@ -75,7 +75,7 @@ class MediaSourceManager extends AbstractServiceLayer
      *
      * @throws \Exception
      */
-    public function createMediaSource(object $source, bool $isPersisted = false, bool $isFlushed = false) : ?object
+    public function createMediaSource(object $source, bool $isPersisted = false, bool $isFlushed = false): ?object
     {
         $newMediaSource = new MediaSource($source);
         $source->assignMediaSource($newMediaSource);
@@ -91,7 +91,7 @@ class MediaSourceManager extends AbstractServiceLayer
      *
      * @return bool
      */
-    public function removeMediaSource(MediaSource $mediaSource, bool $isFlushed = true) : bool
+    public function removeMediaSource(MediaSource $mediaSource, bool $isFlushed = true): bool
     {
         // Proceed to removal in database
         return $this->removeAndSaveNoMoreEntity($mediaSource, $isFlushed);

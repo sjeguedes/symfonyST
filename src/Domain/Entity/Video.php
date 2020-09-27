@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\Entity;
 
@@ -87,9 +87,9 @@ class Video
         string $description,
         \DateTimeInterface $creationDate = null
     ) {
-        \assert(!empty($name), 'Video name can not be empty!'); // This can be improved with regex check!
-        \assert(!empty($url), 'Video URL can not be empty!'); // This can be improved with regex check!
-        \assert(!empty($description), 'Video description can not be empty!');
+        \assert(!empty($name), 'Video name cannot be empty!'); // This can be improved with regex check!
+        \assert(!empty($url), 'Video URL cannot be empty!'); // This can be improved with regex check!
+        \assert(!empty($description), 'Video description cannot be empty!');
         $this->uuid = Uuid::uuid4();
         $this->name = $name;
         $this->url = $url;
@@ -105,7 +105,7 @@ class Video
      *
      * @return $this
      */
-    public function assignMediaSource(MediaSource $mediaSource) : self
+    public function assignMediaSource(MediaSource $mediaSource): self
     {
         $this->mediaSource = $mediaSource;
         return $this;
@@ -120,11 +120,11 @@ class Video
      *
      * @throws \Exception
      */
-    public function modifyName(string $name) : self
+    public function modifyName(string $name): self
     {
         // This can be improved with regex check!
         if (empty($name)) {
-            throw new \InvalidArgumentException('Video name can not be empty!');
+            throw new \InvalidArgumentException('Video name cannot be empty!');
         }
         $this->name = $name;
         return $this;
@@ -139,11 +139,11 @@ class Video
     *
     * @throws \Exception
     */
-    public function modifyUrl(string $url) : self
+    public function modifyUrl(string $url): self
     {
         // This can be improved with regex check!
         if (empty($url)) {
-            throw new \InvalidArgumentException('Video URL can not be empty!');
+            throw new \InvalidArgumentException('Video URL cannot be empty!');
         }
         $this->url = $url;
         return $this;
@@ -158,10 +158,10 @@ class Video
      *
      * @throws \Exception
      */
-    public function modifyDescription(string $description) : self
+    public function modifyDescription(string $description): self
     {
         if (empty($description)) {
-            throw new \InvalidArgumentException('Video description can not be empty!');
+            throw new \InvalidArgumentException('Video description cannot be empty!');
         }
         $this->description = $description;
         return $this;
@@ -176,10 +176,10 @@ class Video
      *
      * @throws \Exception
      */
-    public function modifyUpdateDate(\DateTimeInterface $updateDate) : self
+    public function modifyUpdateDate(\DateTimeInterface $updateDate): self
     {
         if ($this->creationDate > $updateDate) {
-            throw new \RuntimeException('Update date is not logical: Video can not be created after modified update date!');
+            throw new \RuntimeException('Update date is not logical: Video cannot be created after modified update date!');
         }
         $this->updateDate = $updateDate;
         return $this;
@@ -188,7 +188,7 @@ class Video
     /**
      * @return UuidInterface
      */
-    public function getUuid() : UuidInterface
+    public function getUuid(): UuidInterface
     {
         return $this->uuid;
     }
@@ -196,7 +196,7 @@ class Video
     /**
      * @return string
      */
-    public function getName() : string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -204,7 +204,7 @@ class Video
     /**
      * @return string
      */
-    public function getUrl() : string
+    public function getUrl(): string
     {
         return $this->url;
     }
@@ -212,7 +212,7 @@ class Video
     /**
      * @return string
      */
-    public function getDescription() : string
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -220,7 +220,7 @@ class Video
     /**
      * @return \DateTimeInterface
      */
-    public function getCreationDate() : \DateTimeInterface
+    public function getCreationDate(): \DateTimeInterface
     {
         return $this->creationDate;
     }
@@ -228,7 +228,7 @@ class Video
     /**
      * @return \DateTimeInterface
      */
-    public function getUpdateDate() : \DateTimeInterface
+    public function getUpdateDate(): \DateTimeInterface
     {
         return $this->updateDate;
     }
@@ -236,7 +236,7 @@ class Video
     /**
      * @return MediaSource|null
      */
-    public function getMediaSource() : ?MediaSource
+    public function getMediaSource(): ?MediaSource
     {
         return $this->mediaSource;
     }

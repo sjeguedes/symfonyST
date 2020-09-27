@@ -23,7 +23,7 @@ App\Domain\DTO\UpdateProfileAvatarDTO:
         removeAvatar:
             - Type:
                 type: bool
-                message: "A technical error happened!\nExisting image can not be removed."
+                message: "A technical error happened!\nExisting image cannot be removed."
 
         #cropJSONData:
             # Data can be null or field can be blank because image is not mandatory!

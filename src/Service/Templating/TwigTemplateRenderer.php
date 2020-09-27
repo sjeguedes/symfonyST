@@ -1,10 +1,12 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Templating;
 
 use App\Utils\Traits\TwigHelperTrait;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Yaml\Yaml;
 use Twig\Environment;
 
 /**
@@ -29,85 +31,24 @@ final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateB
     /**
      * TwigTemplateRenderer constructor.
      *
-     * @param Environment $twig
+     * @param ParameterBagInterface $parameterBag
+     * @param Environment           $twig
      *
-     * @return void
      */
-    public function __construct(Environment $twig)
+    public function __construct(ParameterBagInterface $parameterBag, Environment $twig)
     {
         $this->templateRenderer = $twig;
-        $this->templates = [
-            [
-                'class' => 'App\\Responder\\Admin\\CreateTrickResponder',
-                'name'  => 'admin/create_trick.html.twig'
-            ],
-            [
-                'class' => 'App\\Responder\\Admin\\LoginResponder',
-                'name'  => 'admin/login.html.twig'
-            ],
-            [
-                'class' => 'App\\Responder\\Admin\\RequestNewPasswordResponder',
-                'name'  => 'admin/request_new_password.html.twig'
-            ],
-            [
-                'class' => 'App\\Responder\\Admin\\RenewPasswordResponder',
-                'name'  => 'admin/renew_password.html.twig'
-            ],
-            [
-                'class' => 'App\\Responder\\Admin\\RegisterResponder',
-                'name'  => 'admin/register.html.twig'
-            ],
-            [
-                'class' => 'App\\Responder\\Admin\\UpdateProfileResponder',
-                'name'  => 'admin/update_profile.html.twig'
-            ],
-            [
-                'class' => 'App\\Responder\\Admin\\UpdateTrickResponder',
-                'name'  => 'admin/update_trick.html.twig'
-            ],
-            [
-                'class' => 'App\\Responder\\AjaxCommentListResponder',
-                'name'  => 'single-trick/partials/comment_list.html.twig',
-                'block' => 'comment_cards'
-            ],
-            [
-                'class' => 'App\\Responder\\AjaxTrickListResponder',
-                'name'  => 'home/trick_list.html.twig',
-                'block' => 'trick_cards'
-            ],
-            [
-                'class' => 'App\\Responder\\HomeTrickListResponder',
-                'name'  => 'home/trick_list.html.twig'
-            ],
-            [
-                'class' => 'App\\Responder\\PaginatedTrickListResponder',
-                'name'  => 'tricks/paginated_list.html.twig'
-            ],
-            [
-                'class' => 'App\\Responder\\SingleTrickResponder',
-                'name'  => 'single-trick/trick.html.twig'
-            ],
-            // Emails
-            [
-                'class' => 'App\\Action\\Admin\\RequestNewPasswordAction',
-                'name'  => 'admin/mailing/mail_request_new_password.html.twig'
-            ],
-            [
-                'class' => 'App\\Action\\Admin\\RenewPasswordAction',
-                'name'  => 'admin/mailing/mail_renew_password.html.twig'
-            ],
-            [
-                'class' => 'App\\Action\\Admin\\RegisterAction',
-                'name'  => 'admin/mailing/mail_register.html.twig'
-            ]
-        ];
+        // Get template list data in particular .yaml file
+        $yamlFilePath = $parameterBag->get('app_template_list_yaml_dir');
+        $this->templates = Yaml::parseFile( $yamlFilePath . 'template_list.yaml');
     }
 
     /**
      * Render a Twig engine template.
      *
      * @param string $template
-     * @param array $data
+     * @param array  $data
+     * @param bool   $isEmail
      *
      * @return string
      *
@@ -115,7 +56,7 @@ final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateB
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
      */
-    public function renderTemplate(string $template, array $data) : string
+    public function renderTemplate(string $template, array $data, bool $isEmail = false): string
     {
         return $this->templateRenderer->render($template, $data);
     }
@@ -123,25 +64,28 @@ final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateB
     /**
      * Retrieve the Twig template name to show.
      *
-     * @param string $className a fully qualified name based on action (for email templates) or responder class
+     * @param string $actionClassName a fully qualified name based on action class
+     * @param bool   $isEmail         an indicator to distinct email templates
      *
      * @return string
      *
      * @see https://stackoverflow.com/questions/22407370/how-to-check-if-class-exists-within-a-namespace
      * @see https://stackoverflow.com/questions/15839292/is-there-a-namespace-aware-alternative-to-phps-class-exists?noredirect=1&lq=1
      */
-    public function getTemplate(string $className) : string
+    public function getTemplate(string $actionClassName, bool $isEmail = false): string
     {
-        if (!class_exists($className)) {
-            throw new \InvalidArgumentException('Template can not be rendered: mandatory class does not exist!');
+        if (!class_exists($actionClassName)) {
+            throw new \InvalidArgumentException('Template cannot be rendered: mandatory class does not exist!');
         }
         $data = '';
         $i = 0;
-        foreach ($this->templates as $template) {
-            ++ $i;
+        // Check template type to find (email or page/block template)
+        $templates = !$isEmail ? $this->templates['page_templates'] : $this->templates['email_templates'];
+        foreach ($templates as $template) {
+            ++$i;
             $hasBlock = !isset($template['block']) ? false : true;
-            $isMatched = $className !== $template['class'] ? false : true;
-            if ($i === \count($this->templates) && false === $isMatched) {
+            $isMatched = $actionClassName !== $template['class'] ? false : true;
+            if ($i === \count($templates) && false === $isMatched) {
                 throw new \RuntimeException('No template name was found: try to use another rendering method!');
             }
             if (true === $hasBlock || false === $isMatched) {
@@ -164,7 +108,7 @@ final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateB
      *
      * @throws \Throwable
      */
-    public function renderTemplateBlock(string $template, string $block, array $data) : string
+    public function renderTemplateBlock(string $template, string $block, array $data): string
     {
         return $this->renderBlock($this->templateRenderer, $template, $block, $data);
     }
@@ -176,22 +120,23 @@ final class TwigTemplateRenderer implements TemplateRendererInterface, TemplateB
      * For instance, use an array to enable matching
      * between Responder (or other class) fully qualified class name (key) and template block name (value).
      *
-     * @param string $className a fully qualified class name
+     * @param string $actionClassName a fully qualified class name base on action class
      *
      * @return array an associative array which contains template name and template block name
      */
-    public function getTemplateBlock(string $className) : array
+    public function getTemplateBlock(string $actionClassName): array
     {
-        if (!class_exists($className)) {
-            throw new \InvalidArgumentException('Template block can not be rendered: mandatory class does not exist!');
+        if (!class_exists($actionClassName)) {
+            throw new \InvalidArgumentException('Template block cannot be rendered: mandatory class does not exist!');
         }
         $data = [];
         $i = 0;
-        foreach ($this->templates as $template) {
-            ++ $i;
+        $templates = $this->templates['page_templates'];
+        foreach ($templates as $template) {
+            ++$i;
             $hasBlock = !isset($template['block']) ? false : true;
-            $isMatched = $className !== $template['class'] ? false : true;
-            if ($i === \count($this->templates) && false === $isMatched) {
+            $isMatched = $actionClassName !== $template['class'] ? false : true;
+            if ($i === \count($templates) && false === $isMatched) {
                 throw new \RuntimeException('No template block name was found: try to use another rendering method!');
             }
             if (false === $hasBlock || false === $isMatched) {

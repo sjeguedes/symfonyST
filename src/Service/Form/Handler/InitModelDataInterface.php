@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Form\Handler;
 
@@ -18,5 +18,5 @@ interface InitModelDataInterface
      *
      * @return object
      */
-    public function initModelData(array $data) : object;
+    public function initModelData(array $data): object;
 }

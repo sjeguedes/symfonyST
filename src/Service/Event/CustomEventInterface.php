@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Event;
 
@@ -14,5 +14,5 @@ interface CustomEventInterface
     /**
      * @return string a event context label to distinct cases
      */
-    public function getEventContext() : string;
+    public function getEventContext(): string;
 }

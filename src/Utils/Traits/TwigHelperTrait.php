@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Utils\Traits;
 
@@ -25,7 +25,7 @@ trait TwigHelperTrait
      *
      * @throws \Throwable
      */
-    public function renderBlock(Environment $twig, string $template, string $block, array $params) : string
+    public function renderBlock(Environment $twig, string $template, string $block, array $params): string
     {
         // Get \Twig_TemplateWrapper $twigTemplate instance with Twig_Environment $twig
         $twigTemplate = $twig->load($template);

@@ -3,6 +3,7 @@ import UIkit from "../../uikit/dist/js/uikit.min";
 import request from './all/ajax-request';
 import URIHelper from './all/encode-decode-uri';
 import createNotification from "./all/create-notification";
+
 export default () => {
     // Resources:
     // RequestAnimationFrame: https://blog.teamtreehouse.com/efficient-animations-with-requestanimationframe
@@ -30,6 +31,39 @@ export default () => {
         const avatarUpdateFormElement = document.getElementById('st-ajax-avatar-update-form');
         const avatarUploadAjaxMode = avatarUpdateFormElement.getAttribute('data-ajax-mode');
         let cropParams = {};
+
+        // ------------------------------------------------------------------------------------------------------------
+
+        // Add fade in effect if avatar text info element is added to DOM
+        const checkAvatarTextInfoAdded = () => {
+            const callable = () => {
+                // Avatar action text info
+                const avatarActionTextInfo = document.getElementById('st-avatar-text-info');
+                avatarActionTextInfo.classList.remove('uk-hidden');
+                if (window.getComputedStyle(avatarActionTextInfo).getPropertyValue('opacity') === '0') {
+                    avatarActionTextInfo.classList.add('st-ati-fade-in');
+                    cancelAnimationFrame(fallback);
+                } else {
+                    requestAnimationFrame(callable);
+                }
+            };
+            const fallback = requestAnimationFrame(callable);
+        };
+
+        // ------------------------------------------------------------------------------------------------------------
+
+        // Check empty object (with no property or empty properties
+        const isEmptyObject = object => {
+            if (0 === Object.getOwnPropertyNames(object).length) {
+                return true;
+            }
+            for (let key in object) {
+                if (object.hasOwnProperty(key)) {
+                    return false;
+                }
+            }
+            return true;
+        };
 
         // ------------------------------------------------------------------------------------------------------------
 
@@ -184,46 +218,39 @@ export default () => {
                         xhr.upload.onloadend = () => {
                             // Transition to opacity equals to 0
                             progressContainer.classList.remove('st-aup-fade-in');
-                            // Hide update text info
-                            avatarActionTextInfo.classList.add('uk-hidden');
                         }
                     }
                 };
                 // Use promise with callbacks
                 request(obj).then((response) => {
-                    // Manage response when upload progress tracking disappeared
-                    progressContainer.addEventListener('transitionend', () => {
-                        // Hide upload progress container
-                        progressContainer.classList.add('uk-hidden');
-                        // No need to parse with JSON.parse(response): response is already an object
-                        for (let prop in response) {
-                            if (Object.prototype.hasOwnProperty.call(response, prop)) {
-                                switch (prop.toString()) {
-                                    case 'formError':
-                                        // Close all possible previous notifications
-                                        UIkit.notification.closeAll();
-                                        // Add info to check file type, size and dimensions
-                                        let additionalMessage = fileInputElement.getAttribute('data-error-6');
-                                        // Error notification
-                                        createNotification(
-                                            response.formError.notification + `\n` + additionalMessage,
-                                            null,
-                                            true,
-                                            'error',
-                                            'warning',
-                                            5000
-                                        );
-                                        break;
-                                    case 'redirectionURL':
-                                        // Perform a redirection as expected
-                                        window.location.replace(response.redirectionURL);
-                                        break;
-                                    default:
-                                        window.location.href = formAction;
-                                }
+                    // No need to parse with JSON.parse(response): response is already an object
+                    for (let prop in response) {
+                        if (Object.prototype.hasOwnProperty.call(response, prop)) {
+                            switch (prop.toString()) {
+                                case 'formError':
+                                    // Close all possible previous notifications
+                                    UIkit.notification.closeAll();
+                                    // Add info to check file type, size and dimensions
+                                    let additionalMessage = fileInputElement.getAttribute('data-error-6');
+                                    // Error notification
+                                    createNotification(
+                                        response.formError.notification + `\n` + additionalMessage,
+                                        null,
+                                        true,
+                                        'error',
+                                        'warning',
+                                        5000
+                                    );
+                                    break;
+                                case 'redirectionURL':
+                                    // Perform a redirection as expected
+                                    window.location = response.redirectionURL;
+                                    break;
+                                default:
+                                    window.location = formAction;
                             }
                         }
-                    });
+                    }
                 })
                 // It is important to chain to prevent ajax request from being called twice!
                 .catch(xhr => {
@@ -294,35 +321,4 @@ export default () => {
             });
         }
     }
-
-    // ------------------------------------------------------------------------------------------------------------
-
-    // Add fade in effect if avatar text info element is added to DOM
-    const checkAvatarTextInfoAdded = () => {
-        const callable = () => {
-            // Avatar action text info
-            const avatarActionTextInfo = document.getElementById('st-avatar-text-info');
-            avatarActionTextInfo.classList.remove('uk-hidden');
-            if (window.getComputedStyle(avatarActionTextInfo).getPropertyValue('opacity') === '0') {
-                avatarActionTextInfo.classList.add('st-ati-fade-in');
-                cancelAnimationFrame(fallback);
-            } else {
-                requestAnimationFrame(callable);
-            }
-        };
-        const fallback = requestAnimationFrame(callable);
-    };
-
-    // Check empty object (with no property or empty properties
-    const isEmptyObject = object => {
-        if (0 === Object.getOwnPropertyNames(object).length) {
-            return true;
-        }
-        for (let key in object) {
-            if (object.hasOwnProperty(key)) {
-                return false;
-            }
-        }
-        return true;
-    };
 }

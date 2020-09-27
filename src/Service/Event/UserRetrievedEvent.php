@@ -1,10 +1,10 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Service\Event;
 
 use App\Domain\Entity\User;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class UserEvent.
@@ -19,7 +19,7 @@ class UserRetrievedEvent extends Event implements CustomEventInterface
     /**
      * Define a event name.
      */
-    public const NAME = 'user.retrieved';
+    const NAME = 'user.retrieved';
 
     /**
      * @var string
@@ -46,7 +46,7 @@ class UserRetrievedEvent extends Event implements CustomEventInterface
     /**
      * {@inheritDoc}
      */
-    public function getEventContext() : string
+    public function getEventContext(): string
     {
         return $this->eventContext;
     }
@@ -54,7 +54,7 @@ class UserRetrievedEvent extends Event implements CustomEventInterface
     /**
      * @return User
      */
-    public function getUser() : User
+    public function getUser(): User
     {
         return $this->user;
     }

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Utils\Traits;
 
@@ -45,7 +45,7 @@ trait RouterHelperTrait
         string $route,
         array $parameters = [],
         $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
-    ) : string {
+    ): string {
         return $this->router->generate($route, $parameters, $referenceType);
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Utils\Database\DataFixtures;
 
@@ -23,7 +23,7 @@ class CommentFixtures extends BaseFixture implements DependentFixtureInterface
      *
      * @return array
      */
-    public function getDependencies() : array
+    public function getDependencies(): array
     {
         return [
             TrickFixtures::class,
@@ -50,7 +50,7 @@ class CommentFixtures extends BaseFixture implements DependentFixtureInterface
      *
      * @throws \Exception
      */
-    public function loadData(ObjectManager $manager) : void
+    public function loadData(ObjectManager $manager): void
     {
         $array = $this->parseYamlFile('comment_fixtures.yaml');
         $data = $array['comments'];

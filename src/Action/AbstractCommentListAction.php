@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Action;
 
@@ -57,7 +57,7 @@ abstract class AbstractCommentListAction
      *
      * @return array
      */
-    protected function getCommentListData() : array
+    protected function getCommentListData(): array
     {
         return $this->commentListData;
     }
@@ -67,15 +67,15 @@ abstract class AbstractCommentListAction
      *
      * @return array
      */
-    protected function getMediasData() : array
+    protected function getMediasData(): array
     {
         // Get registered normal image type (corresponds particular dimensions)
         $mediaTypesValues = $this->mediaTypeService->getMandatoryDefaultTypes();
         $normalImageMediaType = $this->mediaTypeService->findSingleByUniqueType($mediaTypesValues['trickNormal']);
         return [
-            'mediaError'                => 'Media loading error',
-            'mediaTypesValues'          => $mediaTypesValues,
-            'normalImageMediaType'      => $normalImageMediaType
+            'mediaError'           => 'Media loading error',
+            'mediaTypesValues'     => $mediaTypesValues,
+            'normalImageMediaType' => $normalImageMediaType
         ];
     }
 
@@ -96,8 +96,7 @@ abstract class AbstractCommentListAction
         int $offset,
         int $limit,
         string $commentLoadingMode
-    ) : array
-    {
+    ): array {
         // Get comments filtered list
         $selectedTrickComments = $this->commentService->findOnesByTrickWithOffsetLimit(
             $trickUuid,
@@ -107,17 +106,27 @@ abstract class AbstractCommentListAction
             true
         );
         // Get uuid data with a second simple query to use it for comparison
-        $trickCommentsUuidData = $this->commentService->findOnesByTrick($trickUuid, $commentLoadingMode, true);
+        $trickCommentData = $this->commentService->findOnesByTrick($trickUuid, $commentLoadingMode, true);
+        // Get all comments total count
+        $commentTotalCount = \count($trickCommentData);
+        // Get first level comments total count to use with AJAX loading
+        $firstLevelCommentsTotalCount = 0;
+        for ($i = 0; $i < $commentTotalCount; $i++) {
+            if (\is_null($trickCommentData[$i]['parent_uuid'])) {
+                $firstLevelCommentsTotalCount++;
+            }
+        }
         // Add comment ranks to filtered comments
         $selectedTrickComments = $this->commentService->addRanksToTrickComments(
-            $trickCommentsUuidData,
+            $trickCommentData,
             $selectedTrickComments,
             $commentLoadingMode
         );
         // Return needed data
         return [
-            'commentsTotalCount'   => \count($trickCommentsUuidData),
-            'commentListWithRanks' => $selectedTrickComments
+            'commentsTotalCount'           => $commentTotalCount,
+            'commentListWithRanks'         => $selectedTrickComments,
+            'firstLevelCommentsTotalCount' => $firstLevelCommentsTotalCount
         ];
     }
 }

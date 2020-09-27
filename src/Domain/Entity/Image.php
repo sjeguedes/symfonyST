@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\Entity;
 
@@ -96,9 +96,9 @@ class Image
         int $size,
         \DateTimeInterface $creationDate = null
     ) {
-        \assert(!empty($name), 'Image name can not be empty!'); // This can be improved with regex check!
-        \assert(!empty($description), 'Image description can not be empty!');
-        \assert(!empty($format), 'Image format can not be empty!'); // This can be improved with regex check!
+        \assert(!empty($name), 'Image name cannot be empty!'); // This can be improved with regex check!
+        \assert(!empty($description), 'Image description cannot be empty!');
+        \assert(!empty($format), 'Image format cannot be empty!'); // This can be improved with regex check!
         \assert($size > 0, 'Image size must be greater than 0!');
         $this->uuid = Uuid::uuid4();
         $this->name = $name;
@@ -116,7 +116,7 @@ class Image
      *
      * @return $this
      */
-    public function assignMediaSource(MediaSource $mediaSource) : self
+    public function assignMediaSource(MediaSource $mediaSource): self
     {
         $this->mediaSource = $mediaSource;
         return $this;
@@ -131,11 +131,11 @@ class Image
      *
      * @throws \Exception
      */
-    public function modifyName(string $name) : self
+    public function modifyName(string $name): self
     {
         // This can be improved with regex check!
         if (empty($name)) {
-            throw new \InvalidArgumentException('Image name can not be empty!');
+            throw new \InvalidArgumentException('Image name cannot be empty!');
         }
         $this->name = $name;
         return $this;
@@ -150,10 +150,10 @@ class Image
     *
     * @throws \Exception
     */
-    public function modifyDescription(string $description) : self
+    public function modifyDescription(string $description): self
     {
         if (empty($description)) {
-            throw new \InvalidArgumentException('Image description can not be empty!');
+            throw new \InvalidArgumentException('Image description cannot be empty!');
         }
         $this->description = $description;
         return $this;
@@ -168,10 +168,10 @@ class Image
      *
      * @throws \Exception
      */
-    public function modifyUpdateDate(\DateTimeInterface $updateDate) : self
+    public function modifyUpdateDate(\DateTimeInterface $updateDate): self
     {
         if ($this->creationDate > $updateDate) {
-            throw new \RuntimeException('Update date is not logical: Image can not be created after modified update date!');
+            throw new \RuntimeException('Update date is not logical: Image cannot be created after modified update date!');
         }
         $this->updateDate = $updateDate;
         return $this;
@@ -180,7 +180,7 @@ class Image
     /**
      * @return UuidInterface
      */
-    public function getUuid() : UuidInterface
+    public function getUuid(): UuidInterface
     {
         return $this->uuid;
     }
@@ -188,7 +188,7 @@ class Image
     /**
      * @return string
      */
-    public function getName() : string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -196,7 +196,7 @@ class Image
     /**
      * @return string
      */
-    public function getDescription() : string
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -204,7 +204,7 @@ class Image
     /**
      * @return string
      */
-    public function getFormat() : string
+    public function getFormat(): string
     {
         return $this->format;
     }
@@ -212,7 +212,7 @@ class Image
     /**
      * @return int
      */
-    public function getSize() : int
+    public function getSize(): int
     {
         return $this->size;
     }
@@ -220,7 +220,7 @@ class Image
     /**
      * @return \DateTimeInterface
      */
-    public function getCreationDate() : \DateTimeInterface
+    public function getCreationDate(): \DateTimeInterface
     {
         return $this->creationDate;
     }
@@ -228,7 +228,7 @@ class Image
     /**
      * @return \DateTimeInterface
      */
-    public function getUpdateDate() : \DateTimeInterface
+    public function getUpdateDate(): \DateTimeInterface
     {
         return $this->updateDate;
     }
@@ -236,7 +236,7 @@ class Image
     /**
      * @return MediaSource|null
      */
-    public function getMediaSource() : ?MediaSource
+    public function getMediaSource(): ?MediaSource
     {
         return $this->mediaSource;
     }

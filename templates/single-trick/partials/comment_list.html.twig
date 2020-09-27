@@ -1,7 +1,7 @@
 {# Resource! manage a counter in twig loop: https://stackoverflow.com/questions/24943462/increment-value-in-twig-file #}
 {# ------------------------------------------------------------------------- #}
 {# Declare a macro to create a hierarchical comment list (parent and children realtioship) #}
-{% macro list_comments(childrenComments, parentComment, commentCount, commentLoadingMode, mediaTypesValues) %}
+{% macro list_comments(childrenComments, parentComment, commentsTotalCount, commentLoadingMode, mediaTypesValues) %}
     {# Open ul tag #}
     {% set parentCommentKey = parentComment.rank + 1 %}
     <ul id="st-replies-to-{{ parentCommentKey }}"
@@ -18,8 +18,8 @@
                 'isReply': true,
                 'parentCommentKey': parentCommentKey,
                 'mediaTypesValues': mediaTypesValues,
-                'commentCount': commentCount,
-                'commentLoadingMode': commentLoadingMode
+                'commentLoadingMode': commentLoadingMode,
+                'commentsTotalCount': commentsTotalCount
             } only %}
             {# Call possibly macro recursively, if child comment has also children comments! #}
             {%  set childrenComments2 = childComment.children %}
@@ -29,7 +29,7 @@
                 {{ _self.list_comments(
                     childrenComments2,
                     parentComment2,
-                    commentCount,
+                    commentsTotalCount,
                     commentLoadingMode,
                     mediaTypesValues
                 ) }}
@@ -56,7 +56,7 @@
             <li class="uk-comment uk-margin-remove-top uk-visible-toggle st-first-level-comment
                 {{ ajaxMode is defined ? ' uk-animation-slide-bottom-medium' }}"
                 {% if (loop.index == 1) and (listError is defined) and (listError is not null) %} data-error="{{ listError }}"{% endif %}
-                {% if loop.index == 1 %} data-count="{{ commentCount }}"{% endif %}>
+                {% if loop.index == 1 %} data-count="{{ commentsTotalCount }}"{% endif %}>
                 {# Check first comment when page is loaded not to define a <hr> tag for this case! #}
                 {% if ((ajaxMode is not defined) and (loop.index != 1)) or ajaxMode is defined %}
                 <hr class="uk-margin-medium-top uk-margin-medium-bottom">
@@ -66,8 +66,8 @@
                     'currentKey': currentKey,
                     'isFirstLevelParent': true,
                     'mediaTypesValues': mediaTypesValues,
-                    'commentCount': commentCount,
-                    'commentLoadingMode': commentLoadingMode
+                    'commentLoadingMode': commentLoadingMode,
+                    'commentsTotalCount': commentsTotalCount
                 } only %}
                 {# Call macro for children comment #}
                 {%  set childrenComments = comment.children %}
@@ -75,7 +75,7 @@
                     {{ _self.list_comments(
                         childrenComments,
                         comment,
-                        commentCount,
+                        commentsTotalCount,
                         commentLoadingMode,
                         mediaTypesValues
                     ) }}

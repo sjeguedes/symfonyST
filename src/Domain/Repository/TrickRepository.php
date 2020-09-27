@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Domain\Repository;
 
@@ -15,8 +15,8 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NativeQuery;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Ramsey\Uuid\UuidInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -55,18 +55,17 @@ class TrickRepository extends ServiceEntityRepository
     /**
      * TrickRepository constructor.
      *
-     * @param RegistryInterface       $registry
+     * @param ManagerRegistry         $registry
      * @param ResultSetMappingBuilder $resultSetMapping
      * @param Security                $security
      * @param UserManager             $userService
      */
     public function __construct(
-        RegistryInterface $registry,
+        ManagerRegistry $registry,
         ResultSetMappingBuilder $resultSetMapping,
         Security $security,
         UserManager $userService
-    )
-    {
+    ) {
         parent::__construct($registry, Trick::class);
         // ResultSetMappingBuilder extends ResultSetMapping.
         $this->resultSetMapping = $resultSetMapping;
@@ -86,7 +85,7 @@ class TrickRepository extends ServiceEntityRepository
      * @throws \Doctrine\ORM\NonUniqueResultException
      * @throws \Doctrine\ORM\NoResultException
      */
-    public function countAll() : int
+    public function countAll(): int
     {
         $queryBuilder = $this->createQueryBuilder('t');
         // Count all tricks when current user is authenticated
@@ -120,7 +119,7 @@ class TrickRepository extends ServiceEntityRepository
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    private function countAllForAuthenticatedAdmin(QueryBuilder $queryBuilder) : int
+    private function countAllForAuthenticatedAdmin(QueryBuilder $queryBuilder): int
     {
         // Return query result without filtering tricks moderation (published) state
         return (int) $queryBuilder
@@ -140,7 +139,7 @@ class TrickRepository extends ServiceEntityRepository
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    private function countAllForAuthenticatedMember(QueryBuilder $queryBuilder) : int
+    private function countAllForAuthenticatedMember(QueryBuilder $queryBuilder): int
     {
         /** @var UuidInterface $userUuid */
         $userUuid =  $this->currentUser->getUuid();
@@ -165,7 +164,7 @@ class TrickRepository extends ServiceEntityRepository
      *
      * @return mixed
      */
-    public function findAllByAuthor(UuidInterface $userUuid) : array
+    public function findAllByAuthor(UuidInterface $userUuid): array
     {
         // Administrator has access to all tricks!
         if ($this->currentUser && $this->security->isGranted(User::ADMIN_ROLE)) {
@@ -210,8 +209,7 @@ class TrickRepository extends ServiceEntityRepository
         int $init,
         int $start,
         int $end
-    ) : ?array
-    {
+    ): ?array {
         // Get custom SQL query string to use it as native query with ResultSetMapping instance
         $customSQL = $this->getTrickListCustomSQL();
         // Get a native query thanks to a ResultSetMappingBuilder instance
@@ -239,7 +237,7 @@ class TrickRepository extends ServiceEntityRepository
         }
         $tricks = [];
         // Rearrange results array to loop easily in template with rank and comment count per trick
-        for ($i = 0; $i < $count; $i ++) {
+        for ($i = 0; $i < $count; $i++) {
             $tricks[$i] = $result[$i][0];
             $tricks[$i]->assignRank($result[$i]['rank']);
             $tricks[$i]->assignCommentCount($result[$i]['commentCountPerTrick']);
@@ -259,7 +257,7 @@ class TrickRepository extends ServiceEntityRepository
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function findOneByName(string $name) : ?Trick
+    public function findOneByName(string $name): ?Trick
     {
         $queryBuilder = $this->createQueryBuilder('t');
         // No need to join media types and trick group due to no particular filter on data
@@ -294,7 +292,7 @@ class TrickRepository extends ServiceEntityRepository
      *
      * @param UuidInterface $uuid
      *
-     * @link: please not DQL sub query is not supported in SELECT clause:
+     * @see: please not DQL sub query is not supported in SELECT clause:
      * https://github.com/doctrine/orm/issues/6372
      *
      * @see: binary string to store uuid
@@ -310,7 +308,7 @@ class TrickRepository extends ServiceEntityRepository
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function findOneToShowByUuid(UuidInterface $uuid) : ?Trick
+    public function findOneToShowByUuid(UuidInterface $uuid): ?Trick
     {
         $queryBuilder = $this->createQueryBuilder('t');
         // Specifying joins reduces query numbers!
@@ -369,7 +367,7 @@ class TrickRepository extends ServiceEntityRepository
      *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function findOneToUpdateInFormByUuid(UuidInterface $uuid) : ?Trick
+    public function findOneToUpdateInFormByUuid(UuidInterface $uuid): ?Trick
     {
         $queryBuilder = $this->createQueryBuilder('t');
         // Specifying joins reduces query numbers!
@@ -416,7 +414,7 @@ class TrickRepository extends ServiceEntityRepository
      *
      * @return string
      */
-    private function getTrickListCustomSQL() : string
+    private function getTrickListCustomSQL(): string
     {
         // SQL query
         return $customSQL = "
@@ -477,7 +475,7 @@ class TrickRepository extends ServiceEntityRepository
      *
      * @return NativeQuery
      */
-    private function getTrickListCustomNativeQuery(string $customSQL, ResultSetMappingBuilder $resultSetMapping) : NativeQuery
+    private function getTrickListCustomNativeQuery(string $customSQL, ResultSetMappingBuilder $resultSetMapping): NativeQuery
     {
         $resultSetMapping->addEntityResult(Trick::class, 't')
             ->addFieldResult('t', 'uuid', 'uuid')
