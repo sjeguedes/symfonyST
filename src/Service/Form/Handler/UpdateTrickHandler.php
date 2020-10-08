@@ -19,7 +19,6 @@ use App\Domain\ServiceLayer\TrickManager;
 use App\Domain\ServiceLayer\VideoManager;
 use App\Service\Form\Collection\DTOCollection;
 use App\Service\Form\Type\Admin\UpdateTrickType;
-use App\Service\Form\Validator\VideoInfosConstraintValidator;
 use App\Service\Medias\Upload\ImageUploader;
 use App\Utils\Traits\CSRFTokenHelperTrait;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -32,7 +31,6 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Class UpdateTrickHandler.
@@ -76,14 +74,6 @@ final class UpdateTrickHandler extends AbstractTrickFormHandler implements InitM
      * @var Trick|null
      */
     private $updatedTrick;
-    /**
-     * @var VideoInfosConstraintValidator
-     */
-    private $videoValidator;
-    /**
-     * @var ValidatorInterface
-     */
-    private $validator;
 
     /**
      * RegisterHandler constructor.
@@ -101,9 +91,7 @@ final class UpdateTrickHandler extends AbstractTrickFormHandler implements InitM
         FormFactoryInterface $formFactory,
         RequestStack $requestStack,
         LoggerInterface $logger,
-        Security $security,
-        ValidatorInterface $validator,
-        VideoInfosConstraintValidator $videoValidator
+        Security $security
     ) {
         parent::__construct(
             $flashBag,
@@ -122,8 +110,6 @@ final class UpdateTrickHandler extends AbstractTrickFormHandler implements InitM
         $this->initialTrickMediaList = null;
         $this->initialTrickName = null;
         $this->updatedTrick = null;
-        $this->videoValidator = $videoValidator;
-        $this->validator = $validator;
     }
 
     /**
